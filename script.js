@@ -3,43 +3,43 @@ const products = [
     {
         id: 'sub1', title: 'ChatGPT Go', category: 'subscriptions',
         desc: 'الوصول الحصري لـ GPT-4. أولوية الوصول، استجابة أسرع ومميزات متقدمة. حساب خاص يُسلّم عبر الواتساب. / Access GPT-4, priority access, and faster response speeds. Shared account delivered to WhatsApp.', basePrice: 9700 / 940,
-        icon: '<img src="assets/chatgpt-go.png" alt="ChatGPT Go" class="full-cover-img">',
+        icon: '<img src="./assets/chatgpt-go.png" alt="ChatGPT Go" class="full-cover-img">',
         rating: '5.0', details: { type: 'Shared Account', duration: '1 Year', delivery: 'WhatsApp', options: [{ label: '1 Year Shared', price: 9700 / 940 }] }
     },
     {
         id: 'sub2', title: 'Gemini Pro', category: 'subscriptions',
         desc: 'وصول لنسخة Gemini Advanced المتميزة. يُسلّم عبر الواتساب. / Access to Gemini Advanced. Delivered to WhatsApp.', basePrice: 10,
-        icon: '<img src="assets/gemini-pro.png" alt="Gemini Pro" class="full-cover-img">',
+        icon: '<img src="./assets/gemini-pro.png" alt="Gemini Pro" class="full-cover-img">',
         rating: '4.9', details: { type: 'Shared Account', duration: '1 Month', delivery: 'WhatsApp', options: [{ label: '1 Month Shared', price: 10 }] }
     },
     {
         id: 'web1', title: 'E-commerce Store Creation', category: 'webdev',
         desc: 'Full creation of a premium, responsive e-commerce store with modern design.', basePrice: 170000 / 940,
-        icon: '<img src="assets/ecommerce-store.png" alt="E-commerce Store" class="full-cover-img">',
+        icon: '<img src="./assets/ecommerce-store.png" alt="E-commerce Store" class="full-cover-img">',
         rating: '5.0', details: { type: 'Service', includes: ['Custom Design', 'Payment Gateway Integration', 'Admin Panel'], hasForm: true }
     },
     {
         id: 'sm2', title: 'TikTok Followers', category: 'social',
         desc: 'Boost your TikTok presence instantly. Start seeing results in minutes.', basePrice: 0.01,
-        icon: '<img src="assets/tiktok-followers.png" alt="TikTok Followers" class="full-cover-img">',
+        icon: '<img src="./assets/tiktok-followers.png" alt="TikTok Followers" class="full-cover-img">',
         rating: '4.9', details: { type: 'High Quality Accounts', delivery: '5-30 Mins', batch: 1 }
     },
     {
         id: 'sm3', title: 'Facebook Followers', category: 'social',
         desc: 'Grow your Facebook page or profile organically with our fast service.', basePrice: 0.01,
-        icon: '<img src="assets/facebook-followers.png" alt="Facebook Followers" class="full-cover-img">',
+        icon: '<img src="./assets/facebook-followers.png" alt="Facebook Followers" class="full-cover-img">',
         rating: '4.7', details: { type: 'Real Look Profiles', delivery: '1-3 Hours', batch: 1 }
     },
     {
         id: 'sm1', title: 'Instagram Followers', category: 'social',
         desc: 'High-quality Instagram followers. Instant delivery within 1-2 hours.', basePrice: 0.01,
-        icon: '<img src="assets/instagram-followers.png" alt="Instagram Followers" class="full-cover-img">',
+        icon: '<img src="./assets/instagram-followers.png" alt="Instagram Followers" class="full-cover-img">',
         rating: '4.8', details: { type: 'Mixed (Real & HQ Bots)', delivery: '1-2 Hours', batch: 1 }
     },
     {
         id: 'g1', title: 'PUBG Mobile UC', category: 'gaming', outOfStock: true,
         desc: 'Instant PUBG Mobile UC Top-up. Secure and reliable directly to your Player ID.', basePrice: 5,
-        icon: '<img src="assets/pubg-uc.png" alt="PUBG Mobile UC" class="full-cover-img">',
+        icon: '<img src="./assets/pubg-uc.png" alt="PUBG Mobile UC" class="full-cover-img">',
         rating: '5.0', details: { type: 'Top-up', requiresId: true, requiresCountry: true, options: [
             { label: '60 UC', price: 5 }, { label: '325 UC', price: 20 }, { label: '660 UC', price: 40 }
         ]}
@@ -47,7 +47,7 @@ const products = [
     {
         id: 'g2', title: 'Free Fire Diamonds', category: 'gaming', outOfStock: true,
         desc: 'Get your Free Fire Diamonds instantly via Player ID.', basePrice: 4,
-        icon: '<img src="assets/freefire-diamonds.png" alt="Free Fire Diamonds" class="full-cover-img">',
+        icon: '<img src="./assets/freefire-diamonds.png" alt="Free Fire Diamonds" class="full-cover-img">',
         rating: '4.9', details: { type: 'Top-up', requiresId: true, requiresCountry: true, options: [
             { label: '100 Diamonds', price: 4 }, { label: '520 Diamonds', price: 20 }, { label: '1060 Diamonds', price: 40 }
         ]}
@@ -55,7 +55,7 @@ const products = [
     {
         id: 'web2', title: 'Website Modification', category: 'webdev',
         desc: 'Fix bugs, redesign sections, or add new features to your existing website.', basePrice: 85000 / 940,
-        icon: '<img src="assets/web-modification.png" alt="Website Modification" class="full-cover-img">',
+        icon: '<img src="./assets/web-modification.png" alt="Website Modification" class="full-cover-img">',
         rating: '4.8', details: { type: 'Service', includes: ['UI/UX Adjustments', 'Code Optimization', 'Bug Fixing'], hasForm: true }
     }
 ];
