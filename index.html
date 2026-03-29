@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zarzofficial | Premium Digital Services</title>
+    <meta name="description"
+        content="zarzofficial - The premium platform for digital services, social media growth, gaming top-ups, and web development.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#home" class="logo">
+                <svg width="38" height="38" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    style="filter: drop-shadow(0px 0px 8px rgba(255, 0, 122, 0.5));">
+                    <rect width="40" height="40" rx="12" fill="url(#logo_grad)" />
+                    <path d="M12 20 L20 12 L26 22 L32 8" stroke="url(#logo_line)" stroke-width="3.5"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                    <circle cx="32" cy="8" r="3.5" fill="#ffffff" />
+                    <text x="20" y="32" font-family="'Outfit', sans-serif" font-size="14" font-weight="900" fill="white"
+                        text-anchor="middle" letter-spacing="1">Z</text>
+                    <defs>
+                        <linearGradient id="logo_grad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#0f0d14" />
+                            <stop offset="1" stop-color="#2a0845" />
+                        </linearGradient>
+                        <linearGradient id="logo_line" x1="12" y1="12" x2="32" y2="22" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#ff007a" />
+                            <stop offset="1" stop-color="#00d4ff" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span class="logo-text" style="font-size: 1.5rem; letter-spacing: -0.5px;">zarz<span
+                        style="font-weight:300; color:var(--text-secondary);">official</span></span>
+            </a>
+
+            <div class="nav-links">
+                <a href="#home" class="nav-link active" data-view="home" data-i18n="nav_home">الرئيسية</a>
+                <a href="#store" class="nav-link" data-view="store" data-i18n="nav_store">الخدمات</a>
+                <a href="#contact" class="nav-link" data-view="contact" data-i18n="nav_contact">تواصل معنا</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="icon-btn cart-toggle" onclick="navigateTo('cart')" aria-label="Cart">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="badg" id="cart-count">0</span>
+                </button>
+                <button class="icon-btn lang-toggle" onclick="toggleLanguage()" aria-label="Language Toggle">
+                    <i class="fa-solid fa-globe"></i> <span id="lang-btn-text"
+                        style="font-size: 0.9rem; font-family: 'Cairo', sans-serif;">English</span>
+                </button>
+                <button class="mobile-menu-btn" aria-label="Mobile Menu">
+                    <div class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="app-content">
+        <!-- Home View -->
+        <section id="view-home" class="view active">
+            <header class="hero">
+                <div class="hero-content">
+                    <h1 class="hero-title" data-i18n="hero_title">ارتقِ <span>بحضورك الرقمي</span> اليوم.</h1>
+                    <p class="hero-subtitle" data-i18n="hero_subtitle">شحن ألعاب، زيادة متابعين، وتطوير مواقع احترافية
+                        مصممة لنجاحك.</p>
+                    <div class="hero-actions" style="display:flex; gap:1.5rem; margin-top:2rem; flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="navigateTo('store')"
+                            style="padding: 1rem 2rem; font-size:1.1rem;"><i class="fa-solid fa-bolt"></i> <span
+                                data-i18n="order_now_btn">اطلب الآن</span></button>
+                        <button class="btn btn-secondary" onclick="window.open('https://wa.me/201500007300', '_blank')"
+                            style="border-color:var(--accent-green); color:var(--accent-green); padding: 1rem 2rem; font-size:1.1rem; box-shadow: 0 4px 15px rgba(0, 230, 118, 0.15);"><i
+                                class="fa-brands fa-whatsapp"></i> <span data-i18n="contact_wa_btn">تواصل عبر
+                                واتساب</span></button>
+                    </div>
+                    <div class="hero-trust">
+                        <span class="trust-badge"><i class="fa-solid fa-bolt text-accent"></i> <span
+                                data-i18n="trust_fast">تسليم سريع ⚡</span></span>
+                        <span class="trust-badge"><i class="fa-solid fa-check-circle text-green"></i> <span
+                                data-i18n="trust_quality">جودة عالية ✅</span></span>
+                        <span class="trust-badge"><i class="fa-solid fa-headset text-blue"></i> <span
+                                data-i18n="trust_support">دعم 24/7 💬</span></span>
+                        <span class="trust-badge"><i class="fa-solid fa-lock text-green"></i> <span
+                                data-i18n="trust_secure">دفع آمن 🔒</span></span>
+                    </div>
+                </div>
+                <div class="hero-graphics">
+                    <!-- Abstract Glowing Lights -->
+                    <div class="blur-circle circle-1"></div>
+                    <div class="blur-circle circle-2"></div>
+                    <div class="blur-circle circle-3"></div>
+
+                    <!-- 3D Floating Icons Layout Base -->
+                    <div class="floating-icons-layout">
+                        <div class="glow-icon icon-social"><i class="fa-brands fa-instagram"></i></div>
+                        <div class="glow-icon icon-gaming"><i class="fa-solid fa-gamepad"></i></div>
+                        <div class="glow-icon icon-web"><i class="fa-solid fa-code"></i></div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="features">
+                <div class="section-header">
+                    <h2 data-i18n="cat_heading">أقسامنا الرئيسية</h2>
+                    <p data-i18n="cat_sub">اكتشف مجموعتنا الواسعة من الخدمات الرقمية</p>
+                </div>
+                <div class="category-grid">
+                    <div class="category-card" onclick="filterStore('social')">
+                        <div class="cat-icon"><i class="fa-solid fa-hashtag"></i></div>
+                        <h3 data-i18n="cat_social_title">وسائل التواصل الاجتماعي</h3>
+                        <p data-i18n="cat_social_desc">زيادة متابعين انستجرام، تيك توك، وفيسبوك.</p>
+                    </div>
+                    <div class="category-card" onclick="filterStore('gaming')">
+                        <div class="cat-icon"><i class="fa-solid fa-gamepad"></i></div>
+                        <h3 data-i18n="cat_gaming_title">ألعاب الفيديو</h3>
+                        <p data-i18n="cat_gaming_desc">شحن فوري لببجي، فري فاير، وباقات سكنات حصرية.</p>
+                    </div>
+                    <div class="category-card" onclick="filterStore('subscriptions')">
+                        <div class="cat-icon"><i class="fa-regular fa-credit-card"></i></div>
+                        <h3 data-i18n="cat_sub_title">اشتراكات الذكاء الاصطناعي</h3>
+                        <p data-i18n="cat_sub_desc">شات جي بي تي قو، جيمني برو، وأدوات ذكاء اصطناعي أخرى.</p>
+                    </div>
+                    <div class="category-card" onclick="filterStore('webdev')">
+                        <div class="cat-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                        <h3 data-i18n="cat_dev_title">تطوير المواقع</h3>
+                        <p data-i18n="cat_dev_desc">إنشاء متاجر إلكترونية، صفحات هبوط، وتعديل المواقع.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="featured-products" style="margin-top: 5rem;">
+                <div class="section-header">
+                    <h2 data-i18n="featured_heading">منتجات مميزة</h2>
+                    <p data-i18n="featured_sub">اكتشف أكثر الخدمات طلباً لدينا</p>
+                </div>
+                <div class="products-grid" id="featured-container">
+                    <!-- Featured products injected via JS -->
+                </div>
+                <div style="text-align: center; margin-top: 3rem;">
+                    <button class="btn btn-secondary" onclick="navigateTo('store')"
+                        style="padding: 1rem 2rem; font-size: 1.1rem; border-color:var(--accent-primary); color:var(--text-primary);"><span
+                            data-i18n="view_all_store">تصفح المتجر بالكامل</span> <i
+                            class="fa-solid fa-arrow-left explore-dir"></i></button>
+                </div>
+            </section>
+
+            <section class="why-us" style="margin-top: 5rem;">
+                <div class="section-header">
+                    <h2 data-i18n="why_heading">لماذا تختارنا؟</h2>
+                    <p data-i18n="why_sub">نقدم لك أفضل تجربة لخدماتك الرقمية</p>
+                </div>
+                <div class="category-grid">
+                    <div class="category-card" style="padding: 2.5rem 1.5rem;">
+                        <div class="cat-icon" style="background:rgba(255, 0, 122, 0.1);"><i
+                                class="fa-solid fa-bolt text-accent"></i></div>
+                        <h3 data-i18n="why_speed_t" style="margin-bottom:0.5rem;">سرعة التنفيذ</h3>
+                        <p data-i18n="why_speed_d" style="color:var(--text-secondary); font-size:0.95rem;">معالجة آلية
+                            وفورية للطلبات فور الدفع لضمان وقتك.</p>
+                    </div>
+                    <div class="category-card" style="padding: 2.5rem 1.5rem;">
+                        <div class="cat-icon" style="background:rgba(0, 230, 118, 0.1);"><i
+                                class="fa-solid fa-shield-halved text-green"></i></div>
+                        <h3 data-i18n="why_safe_t" style="margin-bottom:0.5rem;">دفع آمن</h3>
+                        <p data-i18n="why_safe_d" style="color:var(--text-secondary); font-size:0.95rem;">نظام دفع مشفر
+                            عبر بنكك وموثوق 100%.</p>
+                    </div>
+                    <div class="category-card" style="padding: 2.5rem 1.5rem;">
+                        <div class="cat-icon" style="background:rgba(0, 212, 255, 0.1);"><i
+                                class="fa-solid fa-headset text-blue"></i></div>
+                        <h3 data-i18n="why_support_t" style="margin-bottom:0.5rem;">دعم فني 24/7</h3>
+                        <p data-i18n="why_support_d" style="color:var(--text-secondary); font-size:0.95rem;">فريق دعم
+                            متواجد دائماً لحل أي مشكلة عبر الواتساب.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stats" style="margin-top: 5rem; text-align:center;">
+                <div class="section-header">
+                    <h2 data-i18n="stats_heading">لماذا تثق بنا؟</h2>
+                </div>
+                <div class="category-grid">
+                    <div class="glass-panel" style="padding: 2.5rem 1.5rem; text-align:center;">
+                        <i class="fa-solid fa-cart-check text-accent"
+                            style="font-size:2.5rem; margin-bottom:1rem; display:block;"></i>
+                        <h3 data-i18n="stats_1"
+                            style="font-size:2.5rem; margin-bottom:0.5rem; color:var(--text-primary);">+1000</h3>
+                        <p data-i18n="stats_1_sub" style="color:var(--text-secondary); font-size:1.1rem;">طلب ناجح</p>
+                    </div>
+                    <div class="glass-panel" style="padding: 2.5rem 1.5rem; text-align:center;">
+                        <i class="fa-solid fa-shield text-green"
+                            style="font-size:2.5rem; margin-bottom:1rem; display:block;"></i>
+                        <h3 data-i18n="stats_2"
+                            style="font-size:2.5rem; margin-bottom:0.5rem; color:var(--text-primary);">100%</h3>
+                        <p data-i18n="stats_2_sub" style="color:var(--text-secondary); font-size:1.1rem;">مضمون وآمن</p>
+                    </div>
+                    <div class="glass-panel" style="padding: 2.5rem 1.5rem; text-align:center;">
+                        <i class="fa-solid fa-headset text-blue"
+                            style="font-size:2.5rem; margin-bottom:1rem; display:block;"></i>
+                        <h3 data-i18n="stats_3"
+                            style="font-size:2.5rem; margin-bottom:0.5rem; color:var(--text-primary);">24/7</h3>
+                        <p data-i18n="stats_3_sub" style="color:var(--text-secondary); font-size:1.1rem;">خدمة عملاء
+                            ممتازة</p>
+                    </div>
+                </div>
+            </section>
+
+
+            <section class="testimonials" style="margin-top: 5rem; margin-bottom: 2rem;">
+                <div class="section-header">
+                    <h2 data-i18n="test_heading">آراء العملاء</h2>
+                    <p data-i18n="test_sub">ماذا يقول عملاؤنا عن خدماتنا</p>
+                </div>
+                <div class="category-grid">
+                    <div class="glass-panel" style="padding:2rem;">
+                        <div style="display:flex; gap:0.5rem; color:#ffb400; font-size:0.8rem; margin-bottom:1rem;"><i
+                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i></div>
+                        <p data-i18n="test_1"
+                            style="color:var(--text-secondary); font-size:1rem; margin-bottom:1.5rem; font-style:italic;">
+                            "خدمة ممتازة وسريعة جداً. طلبت شدات ببجي ووصلت في نفس اللحظة!"</p>
+                        <strong style="font-size:0.95rem;">- أحمد م.</strong>
+                    </div>
+                    <div class="glass-panel" style="padding:2rem;">
+                        <div style="display:flex; gap:0.5rem; color:#ffb400; font-size:0.8rem; margin-bottom:1rem;"><i
+                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i></div>
+                        <p data-i18n="test_2"
+                            style="color:var(--text-secondary); font-size:1rem; margin-bottom:1.5rem; font-style:italic;">
+                            "أفضل متجر لشراء متابعين التيك توك والفيس ، الجودة بصراحة رهيبة والأسعار منافسة."</p>
+                        <strong style="font-size:0.95rem;">- سارة ك.</strong>
+                    </div>
+                    <div class="glass-panel" style="padding:2rem;">
+                        <div style="display:flex; gap:0.5rem; color:#ffb400; font-size:0.8rem; margin-bottom:1rem;"><i
+                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                                class="fa-solid fa-star"></i></div>
+                        <p data-i18n="test_3"
+                            style="color:var(--text-secondary); font-size:1rem; margin-bottom:1.5rem; font-style:italic;">
+                            "تم تصميم متجر الإلكتروني بالكامل عن طريقهم.. احترافية غير مسبوقة شكراً لكم."</p>
+                        <strong style="font-size:0.95rem;">- م. عبدالعزيز</strong>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- Store View -->
+        <section id="view-store" class="view">
+            <div class="store-container">
+                <aside class="store-sidebar">
+                    <h3 data-i18n="store_cats_title">الأقسام</h3>
+                    <ul class="category-filter">
+                        <li class="active" data-filter="all" data-i18n="filter_all">جميع الخدمات</li>
+                        <li data-filter="social" data-i18n="cat_social_title">وسائل التواصل الاجتماعي</li>
+                        <li data-filter="gaming"><span data-i18n="cat_gaming_title">ألعاب الفيديو</span> <i
+                                class="fa-solid fa-gamepad" style="color:var(--text-secondary); margin-left:5px"></i>
+                        </li>
+                        <li data-filter="subscriptions"><span data-i18n="cat_sub_title">الاشتراكات</span> <i
+                                class="fa-solid fa-credit-card"
+                                style="color:var(--text-secondary); margin-left:5px"></i></li>
+                        <li data-filter="webdev"><span data-i18n="cat_dev_title">تطوير المواقع</span> <i
+                                class="fa-solid fa-laptop-code"
+                                style="color:var(--text-secondary); margin-left:5px"></i></li>
+                    </ul>
+                </aside>
+                <div class="store-content">
+                    <div class="section-header align-left">
+                        <h2 data-i18n="store_heading">متجر الخدمات</h2>
+                        <div class="search-bar">
+                            <i class="fa-solid fa-search"></i>
+                            <input type="text" id="service-search" placeholder="ابحث عن الخدمات..."
+                                data-i18n="search_placeholder" data-i18n-attr="placeholder">
+                        </div>
+                    </div>
+                    <div class="products-grid" id="products-container">
+                        <!-- Products injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Service Details View -->
+        <section id="view-details" class="view">
+            <button class="back-btn" onclick="navigateTo('store')" data-i18n="back_store"><i
+                    class="fa-solid fa-arrow-right"></i> العودة للمتجر</button>
+            <div class="details-container" id="details-container">
+                <!-- Details injected via JS -->
+            </div>
+        </section>
+
+        <!-- Cart View -->
+        <section id="view-cart" class="view">
+            <div class="cart-container">
+                <div class="cart-items-section">
+                    <h2><span data-i18n="cart_heading">سلة المشتريات</span></h2>
+                    <div id="cart-items" class="cart-list">
+                        <!-- Cart items injected via JS -->
+                    </div>
+                </div>
+                <div class="cart-summary-section">
+                    <div class="cart-summary glass-panel">
+                        <h3 data-i18n="cart_summary_title">ملخص الطلب</h3>
+                        <div class="summary-row">
+                            <span data-i18n="cart_subtotal">المجموع الفرعي</span>
+                            <span id="cart-subtotal" class="price">0.00 SAR</span>
+                        </div>
+                        <div class="summary-row">
+                            <span data-i18n="cart_fees">الرسوم</span>
+                            <span id="cart-fees" class="price">0.00 SAR</span>
+                        </div>
+                        <div class="summary-row">
+                            <span data-i18n="cart_tax">الضريبة</span>
+                            <span id="cart-tax" class="price">0.00 SAR</span>
+                        </div>
+                        <hr>
+                        <div class="summary-row total">
+                            <span data-i18n="cart_total">الإجمالي</span>
+                            <span id="cart-total" class="price">0.00 SAR</span>
+                        </div>
+                        <button class="btn btn-primary w-100 mt-2" onclick="navigateTo('checkout')" id="checkout-btn"
+                            disabled data-i18n="checkout_btn">إتمام الطلب</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Checkout View -->
+        <section id="view-checkout" class="view">
+            <button class="back-btn" onclick="navigateTo('cart')" data-i18n="back_cart"><i
+                    class="fa-solid fa-arrow-right"></i> العودة للسلة</button>
+            <div class="checkout-container">
+                <div class="checkout-form glass-panel">
+                    <h2 data-i18n="checkout_heading">إتمام الطلب</h2>
+                    <form id="checkoutForm" onsubmit="event.preventDefault(); processOrder();">
+                        <div class="form-group">
+                            <label data-i18n="form_name">الاسم</label>
+                            <input type="text" id="checkout-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="form_phone">رقم الهاتف</label>
+                            <input type="tel" id="checkout-phone" required>
+                        </div>
+                        
+                        <div class="payment-info mt-3 text-center">
+                            <div class="alert alert-info" style="border-radius:10px; background:rgba(0, 212, 255, 0.1); border:1px solid var(--accent-blue); padding:1.5rem; margin-top:1rem;">
+                                <i class="fa-solid fa-headset text-blue" style="font-size:2rem; margin-bottom:10px;"></i>
+                                <p style="font-size:1.1rem; color:var(--text-color); margin:0; line-height:1.5;" data-i18n="checkout_disclaimer">يتم التعامل مع معظم الطلبات وتأكيد الدفع عن طريق الواتساب أو المكالمات الهاتفية لضمان خدمة أسرع وأفضل.</p>
+                            </div>
+                        </div>
+
+                        <div class="checkout-actions" style="margin-top:2rem;">
+                            <button type="submit" class="btn w-100"
+                                style="background:#25D366; color:white; border:none; padding:1rem; font-size:1.1rem; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);"
+                                onclick="window.paymentActionTarget='whatsapp'">
+                                <i class="fa-brands fa-whatsapp"></i> <span data-i18n="checkout_wa_btn">إتمام الطلب عبر واتساب</span>
+                            </button>
+                            <a href="tel:0116976827" class="btn btn-secondary w-100 mt-2"
+                                style="display:flex; align-items:center; justify-content:center; gap:0.5rem; text-decoration:none; padding:1rem; font-size:1.1rem;">
+                                <i class="fa-solid fa-phone"></i> <span data-i18n="pay_call_btn">الدفع والمكالمة الهاتفية</span>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+                <div class="checkout-summary glass-panel" id="checkout-summary-box">
+                    <!-- Summary injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Account View -->
+        <section id="view-account" class="view">
+            <div class="account-container">
+                <div class="account-sidebar glass-panel">
+                    <div class="user-profile">
+                        <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+                        <h3 id="acc-name">User</h3>
+                        <p id="acc-email">user@zarzofficial.com</p>
+                    </div>
+                </div>
+                <div class="account-content glass-panel">
+                    <h2 data-i18n="acc_recent">الطلبات الأخيرة</h2>
+                    <div class="orders-list">
+                        <div class="empty-state">
+                            <i class="fa-solid fa-box-open"></i>
+                            <p data-i18n="empty_orders">لا توجد طلبات حديثة.</p>
+                            <button class="btn btn-outline" onclick="navigateTo('store')"
+                                data-i18n="go_store_btn">الذهاب للمتجر</button>
+                        </div>
+                        <!-- Order items could go here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Us View -->
+        <section id="view-contact" class="view">
+            <div class="contact-wrapper glass-panel">
+                <div class="contact-info">
+                    <h2 data-i18n="contact_heading">تواصل معنا</h2>
+                    <p data-i18n="contact_sub">هل لديك استفسارات؟ نحن هنا لمساعدتك.</p>
+                    <div class="info-items">
+                        <div class="info-item">
+                            <i class="fa-solid fa-envelope"></i>
+                            <span>medozxc7@gmail.com</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fa-solid fa-phone"></i>
+                            <a href="tel:+966504663493" dir="ltr" style="color:var(--text-color); text-decoration:none;">+966504663493</a>
+                        </div>
+                        <div class="info-item">
+                            <i class="fa-solid fa-phone"></i>
+                            <a href="tel:+201500007300" dir="ltr" style="color:var(--text-color); text-decoration:none;">+201500007300</a>
+                        </div>
+                        <div class="info-item" style="margin-top:20px;">
+                            <button class="btn btn-secondary w-100" onclick="window.open('https://wa.me/201500007300', '_blank')"
+                                style="border-color:var(--accent-green); color:var(--accent-green);"><i
+                                    class="fa-brands fa-whatsapp"></i> <span data-i18n="contact_wa_btn">تواصل عبر واتساب</span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form onsubmit="event.preventDefault(); window.location.href = 'mailto:medozxc7@gmail.com?subject=Contact%20from%20' + encodeURIComponent(document.getElementById('c-name').value) + '&body=' + encodeURIComponent('Email: ' + document.getElementById('c-email').value + '\n\nMessage:\n' + document.getElementById('c-msg').value);">
+                        <div class="form-group">
+                            <label data-i18n="contact_form_name">الاسم</label>
+                            <input type="text" id="c-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="contact_form_email">البريد الإلكتروني</label>
+                            <input type="email" id="c-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="contact_form_msg">الرسالة</label>
+                            <textarea rows="4" id="c-msg" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" data-i18n="send_msg_btn">إرسال الرسالة</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Terms View -->
+        <section id="view-terms" class="view">
+            <div class="terms-container glass-panel">
+                <h2 data-i18n="terms_heading">شروط الاستخدام</h2>
+                <div class="terms-content">
+                    <h3 data-i18n="terms_p1">1. السياسات العامة</h3>
+                    <p data-i18n="terms_d1">مرحباً بك في Zarzofficial. باستخدام موقعنا، أنت توافق على هذه الشروط.</p>
+                    <h3 data-i18n="terms_p2">2. المنتجات الرقمية</h3>
+                    <p data-i18n="terms_d2">جميع المنتجات الافتراضية، شحن الألعاب، والاشتراكات غير قابلة للاسترجاع بعد
+                        التسليم.</p>
+                    <h3 data-i18n="terms_p3">3. أوقات التسليم</h3>
+                    <p data-i18n="terms_d3">تطبق أوقات التسليم المحددة لكل خدمة. قد تحدث تأخيرات بسبب عوامل وعوائق
+                        خارجية.</p>
+                    <h3 data-i18n="terms_p4">4. الخصوصية</h3>
+                    <p data-i18n="terms_d4">نحن لا نشارك معلومات حسابك أو بياناتك الشخصية مع أي طرف ثالث.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="#home" class="logo h3">
+                    <svg width="30" height="30" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="40" height="40" rx="12" fill="url(#logo_grad_footer)" />
+                        <path d="M12 20 L20 12 L26 22 L32 8" stroke="url(#logo_line_footer)" stroke-width="3.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="32" cy="8" r="3.5" fill="#ffffff" />
+                        <text x="20" y="32" font-family="'Outfit', sans-serif" font-size="14" font-weight="900"
+                            fill="white" text-anchor="middle" letter-spacing="1">Z</text>
+                        <defs>
+                            <linearGradient id="logo_grad_footer" x1="0" y1="0" x2="40" y2="40"
+                                gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#0f0d14" />
+                                <stop offset="1" stop-color="#2a0845" />
+                            </linearGradient>
+                            <linearGradient id="logo_line_footer" x1="12" y1="12" x2="32" y2="22"
+                                gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#ff007a" />
+                                <stop offset="1" stop-color="#00d4ff" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">zarz<span
+                            style="font-weight:300; color:var(--text-secondary);">official</span></span>
+                </a>
+                <p data-i18n="footer_desc">خدمات رقمية ومنتجات افتراضية بأسعار تنافسية وجودة عالية.</p>
+            </div>
+            <div class="footer-links">
+                <h4 data-i18n="footer_links">روابط سريعة</h4>
+                <a href="#home" onclick="navigateTo('home')" data-i18n="nav_home">الرئيسية</a>
+                <a href="#store" onclick="navigateTo('store')" data-i18n="nav_store">المتجر</a>
+                <a href="#contact" onclick="navigateTo('contact')" data-i18n="nav_contact">تواصل معنا</a>
+                <a href="#terms" onclick="navigateTo('terms')" data-i18n="terms_heading">شروط الاستخدام</a>
+            </div>
+            <div class="footer-social">
+                <h4 data-i18n="footer_social">تابعنا</h4>
+                <div class="social-icons">
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+                    <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p data-i18n="footer_rights">© 2026 zarzofficial. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container"></div>
+
+    <!-- Payment Confirmation Modal -->
+    <div id="payment-modal" class="modal-overlay"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
+        <div class="modal-content glass-panel"
+            style="background:var(--card-bg); width:90%; max-width:400px; border-radius:15px; padding:2rem; text-align:center; position:relative;">
+            <button onclick="closePaymentModal()"
+                style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:1.5rem; color:var(--text-secondary); cursor:pointer;"><i
+                    class="fa-solid fa-xmark"></i></button>
+            <i class="fa-solid fa-circle-question"
+                style="font-size:3rem; color:var(--primary-color); margin-bottom:1rem;"></i>
+            <h3 style="margin-bottom:1rem; font-size:1.3rem;">هل أتممت عملية الدفع؟<br><small
+                    style="font-weight:400; color:var(--text-secondary);">Have you completed the payment?</small></h3>
+            <div id="modal-step-1" style="display:flex; gap:10px; justify-content:center; margin-top:1.5rem;">
+                <button class="btn btn-primary" style="flex:1;" onclick="showTransactionInput()">نعم (Yes)</button>
+                <button class="btn btn-secondary"
+                    style="flex:1; background:var(--surface-light); color:var(--text-color); border:1px solid var(--border-color);"
+                    onclick="closePaymentModal()">لا (No)</button>
+            </div>
+            <div id="modal-step-2" style="display:none; margin-top:1.5rem; text-align:right;">
+                <label style="font-weight:600; display:block; margin-bottom:10px; color:var(--text-color);">أدخل آخر 4
+                    أرقام من رقم المعاملة <span class="text-accent">*</span><br><small
+                        style="font-weight:400; color:var(--text-secondary);">Enter last 4 digits of transaction
+                        ID</small></label>
+                <input type="text" id="modal-transaction-id" maxlength="4" placeholder="مثال: 1234"
+                    style="width:100%; text-align:center; font-size:1.5rem; letter-spacing:8px; font-weight:bold; padding:10px; border-radius:8px; border:1px solid var(--border-color); background:var(--surface-light); margin-bottom:15px;"
+                    required>
+                <button class="btn btn-primary w-100" onclick="submitWebsitePayment()">تأكيد وإرسال (Confirm &
+                    Submit)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"
+        style="position:fixed; bottom:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:10px;">
+    </div>
+
+    <script src="translations.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
