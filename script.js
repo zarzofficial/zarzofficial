@@ -567,6 +567,51 @@ function renderVariationPreview(product) {
     `;
 }
 
+function renderServiceAssurance(product) {
+    const items = [
+        {
+            icon: 'fa-bolt',
+            title: t('Fast kickoff', 'بدء سريع'),
+            text: t('Your request is reviewed quickly so execution can start without delay.', 'تتم مراجعة طلبك بسرعة حتى يبدأ التنفيذ بدون تأخير.')
+        },
+        {
+            icon: 'fa-shield-heart',
+            title: t('Checked details', 'تفاصيل مؤكدة'),
+            text: t('Important information is confirmed with you before the service is launched.', 'يتم تأكيد المعلومات المهمة معك قبل تشغيل الخدمة.')
+        },
+        {
+            icon: 'fa-headset',
+            title: t('Direct follow-up', 'متابعة مباشرة'),
+            text: t('WhatsApp and phone support stay available during the whole order.', 'يبقى الواتساب والدعم الهاتفي متاحين طوال الطلب.')
+        }
+    ];
+
+    if (product.category === 'webdev') {
+        items[0].text = t('We align on scope and requirements first, then begin implementation in a clean workflow.', 'نحدد النطاق والمتطلبات أولاً ثم نبدأ التنفيذ ضمن مسار واضح.');
+        items[1].text = t('Links, notes, and priorities are reviewed before work starts.', 'تتم مراجعة الروابط والملاحظات والأولوية قبل بدء العمل.');
+    }
+
+    return `
+        <div class="service-order-panel">
+            <div class="service-order-heading">
+                <strong>${t('Ordering service', 'خدمة الطلب')}</strong>
+                <span>${t('A clearer path from request to delivery.', 'مسار أوضح من الطلب حتى التسليم.')}</span>
+            </div>
+            <div class="service-order-grid">
+                ${items.map(item => `
+                    <div class="service-order-card">
+                        <i class="fa-solid ${item.icon}"></i>
+                        <div>
+                            <strong>${item.title}</strong>
+                            <p>${item.text}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
 function generateProductCardHTML(p) {
     const { title, desc } = getProductCopy(p);
     const meta = getProductMeta(p);
@@ -598,7 +643,7 @@ function generateProductCardHTML(p) {
                     <button type="button" class="product-overlay-btn${wishlistActive ? ' active' : ''}" data-wishlist-id="${p.id}" aria-label="${wishlistLabel}" aria-pressed="${wishlistActive}" onclick="toggleWishlist('${p.id}')">
                         <i class="fa-${wishlistActive ? 'solid' : 'regular'} fa-heart"></i>
                     </button>
-                    <button type="button" class="product-overlay-btn" aria-label="${t('Open cart', 'افتح السلة')}" onclick="navigateTo('cart')">
+                    <button type="button" class="product-overlay-btn" aria-label="${t('Add to cart', 'أضف إلى السلة')}" onclick="addProductCardToCart('${p.id}')">
                         <i class="fa-solid fa-cart-shopping"></i>
                     </button>
                 </div>
@@ -683,17 +728,63 @@ function syncWishlistButtons(productId) {
     });
 }
 
+function persistCartState() {
+    localStorage.setItem('zarz_cart', JSON.stringify(appState.cart));
+    updateCartCount();
+}
+
+function pushCartItem({ product, qty = 1, unitPriceSar = product.basePrice, customData = {} }) {
+    const safeQty = Math.max(1, Number(qty) || 1);
+    const safeUnitPrice = Number(unitPriceSar) || product.basePrice;
+
+    appState.cart.push({
+        cartId: Date.now().toString() + Math.random().toString(36).slice(2, 7),
+        product,
+        qty: safeQty,
+        unitPriceSar: safeUnitPrice,
+        totalPriceSar: safeUnitPrice * safeQty,
+        customData
+    });
+
+    persistCartState();
+}
+
+window.addProductCardToCart = function(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+
+    if (product.outOfStock) {
+        showToast(t('This product is currently out of stock', 'هذا المنتج غير متوفر حالياً'), 'error');
+        return;
+    }
+
+    const customData = {};
+    const variationGroups = getProductVariationGroups(product);
+    variationGroups.forEach(group => {
+        if (!group.options || !group.options.length) return;
+        customData[group.id] = group.options[0].label;
+    });
+
+    pushCartItem({
+        product,
+        qty: 1,
+        unitPriceSar: product.basePrice,
+        customData
+    });
+
+    showToast(t('Added to cart. You can complete the details later.', 'تمت الإضافة إلى السلة ويمكنك إكمال التفاصيل لاحقاً.'), 'success');
+}
+
 window.toggleWishlist = function(productId) {
     if (isWishlisted(productId)) {
         appState.wishlist = appState.wishlist.filter(id => id !== productId);
         showToast(t('Removed from wishlist', 'تمت الإزالة من المفضلة'), 'success');
     } else {
-        appState.wishlist.push(productId);
+        appState.wishlist = [...new Set([...appState.wishlist, productId])];
         showToast(t('Saved to wishlist', 'تم الحفظ في المفضلة'), 'success');
     }
 
     localStorage.setItem('zarz_wishlist', JSON.stringify(appState.wishlist));
-    renderProducts(currentProductList);
     syncWishlistButtons(productId);
 };
 
@@ -955,12 +1046,13 @@ function viewDetails(productId) {
                 <div class="dynamic-options">
                     ${dynamicHtml}
                 </div>
+                ${renderServiceAssurance(product)}
                 
-                <div class="price-action-container" style="background:var(--surface-light); padding:1.5rem; border-radius:var(--border-radius-lg); border:1px solid var(--border-color); margin-top:2rem;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:1.5rem; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:1rem; flex-wrap:wrap; gap:10px;">
-                        <div style="display:flex; flex-direction:column; align-items:flex-start; gap:0.3rem;">
+                <div class="price-action-container service-checkout-box">
+                    <div class="price-action-header">
+                        <div class="price-action-labels">
                             <span style="font-size:1.1rem; color:var(--text-secondary); font-weight:600;">${t('Total Price', 'السعر الإجمالي')}</span>
-                            <span id="detail-old-price-display" data-base-sar="${product.basePrice * 1.25}" data-price-sar="${product.basePrice * 1.25}" style="text-decoration:line-through; color:var(--text-secondary); font-size:1.1rem; opacity:0.7;">
+                            <span id="detail-old-price-display" class="detail-old-price-display" data-base-sar="${product.basePrice * 1.25}" data-price-sar="${product.basePrice * 1.25}">
                                 ${formatPrice(product.basePrice * 1.25)}
                             </span>
                         </div>
@@ -970,11 +1062,11 @@ function viewDetails(productId) {
                     </div>
                     
                     <div class="price-action-buttons">
-                        <button class="btn btn-secondary w-100" onclick="addToCart('${product.id}')" style="padding: 1rem; font-size:1.1rem; flex:1;">
+                        <button class="btn btn-secondary w-100 detail-action-btn" onclick="addToCart('${product.id}')">
                             <i class="fa-solid fa-cart-plus"></i> ${appState.lang === 'ar' ? 'أضف للسلة' : 'Add to Cart'}
                         </button>
-                        <button class="btn btn-primary w-100" onclick="orderNow('${product.id}')" style="padding: 1rem; font-size:1.1rem; flex:1;">
-                            <i class="fa-solid fa-bolt"></i> ${appState.lang === 'ar' ? 'اطلب الآن' : 'Order Now'}
+                        <button class="btn btn-primary w-100 detail-action-btn" onclick="orderNow('${product.id}')">
+                            <i class="fa-solid fa-bolt"></i> ${appState.lang === 'ar' ? 'اطلب مع الدعم الآن' : 'Order with Support'}
                         </button>
                     </div>
                 </div>
@@ -1092,18 +1184,12 @@ function addToCart(productId) {
         customData.requirements = document.getElementById('web-req').value;
     }
 
-    // Add to state
-    appState.cart.push({
-        cartId: Date.now().toString(),
+    pushCartItem({
         product,
-        qty: qty,
+        qty,
         unitPriceSar: finalPrice / qty,
-        totalPriceSar: finalPrice,
         customData
     });
-    
-    localStorage.setItem('zarz_cart', JSON.stringify(appState.cart));
-    updateCartCount();
     showToast(translations[appState.lang].toast_added || 'تمت الإضافة للسلة بنجاح!', 'success');
 }
 
