@@ -3,19 +3,19 @@ const products = [
     {
         id: 'sub1', title: 'شات جي بي تي بلس - ChatGPT Plus', category: 'subscriptions',
         desc: 'استمتع بأقوى نسخة من شات جي بي تي مع سرعة وأداء متقدم. يمنحك هذا الاشتراك وصولاً لأحدث نماذج الذكاء الاصطناعي، إنشاء الصور، تحليل الملفات، والمساعدة السلسة في المهام اليومية.<br> • استجابات أسرع وأكثر دقة<br> • استخدام مكثف بدون حدود مزعجة<br> • دعم رفع وتحليل الملفات<br> • إنشاء الصور وقدرات ذكاء اصطناعي متقدمة<br> • تجربة مخصصة مع أحدث الميزات.', basePrice: 9999 / 940,
-        icon: '<img src="./assets/chatgpt-plus-v2.png" alt="ChatGPT Plus" class="full-cover-img">',
+        icon: '<img src="./assets/chatgpt-plus-v3.jpg" alt="ChatGPT Plus" class="full-cover-img">',
         rating: '5.0', details: { type: 'حساب خاص', duration: 'شهر واحد', delivery: 'واتساب', options: [{ label: 'اشتراك شهر واحد', price: 9999 / 940 }] }
     },
     {
         id: 'sub2', title: 'جيميني برو - Gemini Pro', category: 'subscriptions',
         desc: 'وصول لنسخة Gemini Advanced المتميزة. يُسلّم عبر الواتساب.', basePrice: 10,
-        icon: '<img src="./assets/gemini-pro.png" alt="Gemini Pro" class="full-cover-img">',
+        icon: '<img src="./assets/gemini-pro-v3.jpg" alt="Gemini Pro" class="full-cover-img">',
         rating: '4.9', details: { type: 'حساب خاص', duration: 'شهر واحد', delivery: 'واتساب', options: [{ label: 'اشتراك شهر واحد', price: 10 }] }
     },
     {
         id: 'web1', title: 'إنشاء متجر إلكتروني', category: 'webdev',
         desc: 'إنشاء شامل لمتجر إلكتروني متميز ومتجاوب بتصميم عصري احترافي.', basePrice: 130000 / 940,
-        icon: '<img src="./assets/ecommerce-store.png" alt="E-commerce Store" class="full-cover-img">',
+        icon: '<img src="./assets/ecommerce-store-v3.jpg" alt="E-commerce Store" class="full-cover-img">',
         rating: '5.0', details: { type: 'خدمة', includes: ['تصميم مخصص', 'ربط بوابات الدفع', 'لوحة تحكم'], hasForm: true }
     },
     {
@@ -27,7 +27,7 @@ const products = [
     {
         id: 'sm3', title: 'متابعين فيسبوك', category: 'social',
         desc: 'تنمية صفحتك أو حسابك على فيسبوك بشكل طبيعي مع خدمتنا السريعة والآمنة.', basePrice: 0.01,
-        icon: '<img src="./assets/facebook-followers.png" alt="Facebook Followers" class="full-cover-img">',
+        icon: '<img src="./assets/facebook-followers-v3.jpg" alt="Facebook Followers" class="full-cover-img">',
         rating: '4.7', details: { type: 'حسابات ذات مظهر حقيقي', delivery: '1-3 ساعات', batch: 1 }
     },
     {
@@ -47,7 +47,7 @@ const products = [
     {
         id: 'g2', title: 'جواهر فري فاير', category: 'gaming', outOfStock: true,
         desc: 'احصل على جواهر فري فاير فوراً وبكل أمان عبر رقم اللاعب (ID).', basePrice: 4,
-        icon: '<img src="./assets/freefire-diamonds.png" alt="Free Fire Diamonds" class="full-cover-img">',
+        icon: '<img src="./assets/freefire-diamonds-v3.jpg" alt="Free Fire Diamonds" class="full-cover-img">',
         rating: '4.9', details: { type: 'شحن', requiresId: true, requiresCountry: true, options: [
             { label: '100 جوهرة', price: 4 }, { label: '520 جوهرة', price: 20 }, { label: '1060 جوهرة', price: 40 }
         ]}
