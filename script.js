@@ -39,7 +39,7 @@ const products = [
     {
         id: 'g1', title: 'شدات ببجي موبايل', category: 'gaming', outOfStock: true,
         desc: 'شحن فوري لشدات ببجي موبايل. آمن وموثوق مباشرة عبر رقم اللاعب (ID).', basePrice: 5,
-        icon: '<img src="./assets/pubg-uc-v2.webp" alt="PUBG Mobile UC" class="full-cover-img">',
+        icon: '<img src="./assets/pubg-uc-v3.jpg" alt="PUBG Mobile UC" class="full-cover-img">',
         rating: '5.0', details: { type: 'شحن', requiresId: true, requiresCountry: true, options: [
             { label: '60 شدة', price: 5 }, { label: '325 شدة', price: 20 }, { label: '660 شدة', price: 40 }
         ]}
