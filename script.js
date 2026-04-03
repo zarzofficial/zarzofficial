@@ -353,8 +353,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     applyTranslations();
-    await fetchExchangeRates();
-    await detectUserCurrency();
+    fetchExchangeRates();
     initRouter();
     renderProducts(products);
     updateCartCount(false);
@@ -378,16 +377,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Currency listener (Removed as currency is now fixed to SDG)
-    const curSelect = document.getElementById('currency');
-    if(curSelect) {
-        curSelect.addEventListener('change', (e) => {
-            appState.currency = e.target.value;
-            localStorage.setItem('zarz_currency', appState.currency);
-            refreshPrices();
-            renderCart();
-        });
-    }
+// Currency dropdown removed
 
     // Search & Filter
     document.getElementById('service-search').addEventListener('input', (e) => {
@@ -506,8 +496,8 @@ window.restoreDetailsState = function() {
 };
 
 
-// Exchange Rates
-async function fetchExchangeRates() {
+// Exchange Rates setup
+function fetchExchangeRates() {
     appState.exchangeRates = {
         SAR: 1,
         SDG: 940,
@@ -515,15 +505,9 @@ async function fetchExchangeRates() {
         EGP: 940 / 73,
         AED: 940 / 942
     };
-    appState.currency = 'SDG'; // Force SDG
+    appState.currency = 'SDG'; // Enforce SDG securely
     localStorage.setItem('zarz_currency', 'SDG');
     refreshPrices();
-}
-
-// Geo-Location Currency Detection (Disabled to enforce SDG)
-async function detectUserCurrency() {
-    appState.currency = 'SDG';
-    localStorage.setItem('zarz_currency', 'SDG');
 }
 
 // Pricing formatting
