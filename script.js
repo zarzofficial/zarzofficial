@@ -21,7 +21,7 @@ const products = [
     {
         id: 'sm2', title: 'متابعين تيك توك', category: 'social',
         desc: 'زيادة فورية لحضورك على تيك توك. ابدأ برؤية النتائج في دقائق معدودة.', basePrice: 0.01,
-        icon: '<img src="./assets/tiktok-followers.png" alt="TikTok Followers" class="full-cover-img">',
+        icon: '<img src="./assets/tiktok-followers-v3.jpg" alt="TikTok Followers" class="full-cover-img">',
         rating: '4.9', details: { type: 'حسابات عالية الجودة', delivery: '5-30 دقيقة', batch: 1 }
     },
     {
@@ -33,7 +33,7 @@ const products = [
     {
         id: 'sm1', title: 'متابعين انستقرام', category: 'social',
         desc: 'متابعين انستقرام بجودة عالية. تسليم فوري خلال 1-2 ساعة.', basePrice: 0.01,
-        icon: '<img src="./assets/instagram-followers.png" alt="Instagram Followers" class="full-cover-img">',
+        icon: '<img src="./assets/instagram-followers-v3.jpg" alt="Instagram Followers" class="full-cover-img">',
         rating: '4.8', details: { type: 'مختلط (حقيقي وروبوتات عالية الجودة)', delivery: '1-2 ساعة', batch: 1 }
     },
     {
@@ -55,7 +55,7 @@ const products = [
     {
         id: 'web2', title: 'تعديل مواقع إلكترونية', category: 'webdev',
         desc: 'إصلاح الأخطاء، إعادة تصميم الأقسام، أو إضافة ميزات جديدة لموقعك الحالي بكل احترافية.', basePrice: 85000 / 940,
-        icon: '<img src="./assets/web-modification.png" alt="Website Modification" class="full-cover-img">',
+        icon: '<img src="./assets/web-modification-v3.jpg" alt="Website Modification" class="full-cover-img">',
         rating: '4.8', details: { type: 'خدمة', includes: ['تعديلات واجهة المستخدم', 'تحسين الأكواد', 'إصلاح الأخطاء'], hasForm: true }
     }
 ];
