@@ -1,10 +1,10 @@
 // Products Database
 const products = [
     {
-        id: 'sub1', title: 'شات جي بي تي - ChatGPT Go', category: 'subscriptions', outOfStock: true,
-        desc: 'الوصول الحصري لـ GPT-4. أولوية الوصول، استجابة أسرع ومميزات متقدمة. حساب خاص يُسلّم عبر الواتساب.', basePrice: 9700 / 940,
-        icon: '<img src="./assets/chatgpt-go.png" alt="ChatGPT Go" class="full-cover-img">',
-        rating: '5.0', details: { type: 'حساب خاص', duration: 'سنة واحدة', delivery: 'واتساب', options: [{ label: 'اشتراك سنة واحدة', price: 9700 / 940 }] }
+        id: 'sub1', title: 'شات جي بي تي بلس - ChatGPT Plus', category: 'subscriptions',
+        desc: 'استمتع بأقوى نسخة من شات جي بي تي مع سرعة وأداء متقدم. يمنحك هذا الاشتراك وصولاً لأحدث نماذج الذكاء الاصطناعي، إنشاء الصور، تحليل الملفات، والمساعدة السلسة في المهام اليومية.<br> • استجابات أسرع وأكثر دقة<br> • استخدام مكثف بدون حدود مزعجة<br> • دعم رفع وتحليل الملفات<br> • إنشاء الصور وقدرات ذكاء اصطناعي متقدمة<br> • تجربة مخصصة مع أحدث الميزات.', basePrice: 9999 / 940,
+        icon: '<img src="./assets/chatgpt-plus.png" alt="ChatGPT Plus" class="full-cover-img">',
+        rating: '5.0', details: { type: 'حساب خاص', duration: 'شهر واحد', delivery: 'واتساب', options: [{ label: 'اشتراك شهر واحد', price: 9999 / 940 }] }
     },
     {
         id: 'sub2', title: 'جيميني برو - Gemini Pro', category: 'subscriptions',
@@ -63,6 +63,12 @@ const products = [
 function withLazyImageAttrs(html) {
     if (typeof html !== 'string' || !html.includes('<img')) return html;
     return html.replace('<img ', '<img loading="lazy" decoding="async" ');
+}
+
+function getLocalizedProductImage(product) {
+    const { title } = getProductCopy(product);
+    const localizedAlt = String(title || '').replace(/"/g, '&quot;');
+    return withLazyImageAttrs(product.icon).replace(/alt="[^"]*"/i, `alt="${localizedAlt}"`);
 }
 
 const productDisplayMeta = {
@@ -247,10 +253,12 @@ let appState = {
     orders: safeJsonParse('zarz_orders', []),
     wishlist: safeJsonParse('zarz_wishlist', []),
     currency: 'SDG',
-    lang: localStorage.getItem('zarz_lang') || 'ar',
+    lang: 'ar',
     exchangeRates: { SAR: 1, USD: 0.266, AED: 0.979, SDG: 159.6, EGP: 12.6 }, // Default fallback (overridden below)
     currencySymbols: { SAR: 'SAR', USD: '$', AED: 'AED', SDG: 'ج.س', EGP: 'EGP' }
 };
+
+const GOOGLE_SHEETS_WEB_APP_URL = window.ZARZ_GOOGLE_SHEETS_WEB_APP_URL || 'https://script.google.com/macros/s/AKfycbztXloVNsu4_yyK05l-C7b-ggazOpj3Vb2zb42ODJOLcZfwObBYkvSLXYiO8IFYMaG8ug/exec';
 
 function t(en, ar) {
     return appState.lang === 'ar' ? ar : en;
@@ -323,6 +331,12 @@ function getStockText(product, meta) {
         : t(`${meta.stock} in stock`, `متوفر ${meta.stock}`);
 }
 
+function getPaymentMethodLabel(method) {
+    if (method === 'bankak') return t('Bankak transfer', 'تحويل بنكك');
+    if (method === 'whatsapp') return t('WhatsApp follow-up', 'متابعة عبر واتساب');
+    return method || '';
+}
+
 function isWishlisted(productId) {
     return appState.wishlist.includes(productId);
 }
@@ -330,8 +344,9 @@ function isWishlisted(productId) {
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
     // Apply persisted language settings to document
+    localStorage.setItem('zarz_lang', 'ar');
     document.documentElement.lang = appState.lang;
-    document.documentElement.dir = appState.lang === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.dir = 'rtl';
     const langBtnText = document.getElementById('lang-btn-text');
     if(langBtnText && typeof translations !== 'undefined' && translations[appState.lang]) {
         langBtnText.textContent = translations[appState.lang].lang_switch;
@@ -402,22 +417,62 @@ document.addEventListener('DOMContentLoaded', async () => {
         const savedCheckout = JSON.parse(localStorage.getItem('zarz_checkout')) || {};
         if(savedCheckout.name) document.getElementById('checkout-name').value = savedCheckout.name;
         if(savedCheckout.phone) document.getElementById('checkout-phone').value = savedCheckout.phone;
+        if(savedCheckout.paymentMethod) document.getElementById('checkout-payment-method').value = savedCheckout.paymentMethod;
+        if(savedCheckout.transactionLast4) document.getElementById('checkout-transaction-last4').value = savedCheckout.transactionLast4;
     };
     
     restoreCheckout();
 
+    const updateCheckoutPaymentUI = () => {
+        const methodSelect = document.getElementById('checkout-payment-method');
+        const bankPanel = document.getElementById('bank-transfer-panel');
+        const last4Input = document.getElementById('checkout-transaction-last4');
+        const submitBtn = document.getElementById('checkout-submit-btn') || document.querySelector('#checkoutForm button[type="submit"]');
+        const selectedMethod = methodSelect ? methodSelect.value : '';
+
+        if (bankPanel) bankPanel.hidden = selectedMethod !== 'bankak';
+        if (last4Input) {
+            last4Input.required = selectedMethod === 'bankak';
+            if (selectedMethod !== 'bankak') last4Input.value = '';
+        }
+        if (submitBtn) {
+            const label = submitBtn.querySelector('[data-i18n="checkout_submit_btn"], [data-i18n="checkout_wa_btn"]');
+            const icon = submitBtn.querySelector('i');
+            if (selectedMethod === 'bankak') {
+                submitBtn.style.background = '#0ea5e9';
+                submitBtn.style.boxShadow = '0 4px 15px rgba(14, 165, 233, 0.28)';
+                if (icon) icon.className = 'fa-solid fa-building-columns';
+                if (label) label.textContent = t('Confirm Bank Transfer Order', 'تأكيد طلب التحويل البنكي');
+            } else {
+                submitBtn.style.background = '#25D366';
+                submitBtn.style.boxShadow = '0 4px 15px rgba(37, 211, 102, 0.3)';
+                if (icon) icon.className = 'fa-solid fa-paper-plane';
+                if (label) label.textContent = t('Confirm and Send Order', 'تأكيد الطلب وإرساله');
+            }
+        }
+    };
+
     const saveCheckout = () => {
         const nameInput = document.getElementById('checkout-name');
         const phoneInput = document.getElementById('checkout-phone');
+        const paymentMethodInput = document.getElementById('checkout-payment-method');
+        const transactionLast4Input = document.getElementById('checkout-transaction-last4');
         const name = nameInput ? nameInput.value : '';
         const phone = phoneInput ? phoneInput.value : '';
-        localStorage.setItem('zarz_checkout', JSON.stringify({ name, phone }));
+        const paymentMethod = paymentMethodInput ? paymentMethodInput.value : '';
+        const transactionLast4 = transactionLast4Input ? transactionLast4Input.value : '';
+        localStorage.setItem('zarz_checkout', JSON.stringify({ name, phone, paymentMethod, transactionLast4 }));
     };
 
     const checkoutForm = document.getElementById('checkoutForm');
     if(checkoutForm) {
         checkoutForm.addEventListener('input', saveCheckout);
         checkoutForm.addEventListener('change', saveCheckout);
+    }
+    updateCheckoutPaymentUI();
+    const paymentMethodSelect = document.getElementById('checkout-payment-method');
+    if(paymentMethodSelect) {
+        paymentMethodSelect.addEventListener('change', updateCheckoutPaymentUI);
     }
 
     document.getElementById('details-container').addEventListener('input', () => { if(window.saveDetailsState) window.saveDetailsState(); });
@@ -486,6 +541,75 @@ function refreshPrices() {
     });
 }
 
+function updateSeoMeta(viewId) {
+    const descriptionMeta = document.querySelector('meta[name="description"]');
+    const canonicalLink = document.querySelector('link[rel="canonical"]');
+    const ogTitleMeta = document.querySelector('meta[property="og:title"]');
+    const ogDescriptionMeta = document.querySelector('meta[property="og:description"]');
+    const ogUrlMeta = document.querySelector('meta[property="og:url"]');
+    const twitterTitleMeta = document.querySelector('meta[name="twitter:title"]');
+    const twitterDescriptionMeta = document.querySelector('meta[name="twitter:description"]');
+    const seoBaseUrl = 'https://zarzofficial.com/';
+
+    const seoByView = {
+        home: {
+            title: 'زارز | zarz | خدمات رقمية وشحن ألعاب واشتراكات',
+            description: 'زارز أوفشال يقدم خدمات رقمية احترافية تشمل شحن الألعاب، تنمية حسابات التواصل الاجتماعي، الاشتراكات الرقمية، وتطوير المتاجر والمواقع بسرعة ودعم مباشر.'
+        },
+        store: {
+            title: 'المتجر | زارز | zarz',
+            description: 'تصفح خدمات زارز أوفشال في شحن الألعاب، الاشتراكات الرقمية، خدمات السوشيال ميديا، وتطوير المواقع والمتاجر بواجهة عربية واضحة.'
+        },
+        cart: {
+            title: 'السلة | زارز | zarz',
+            description: 'راجع طلباتك في سلة زارز أوفشال وأكمل تفاصيل الخدمة والدفع بخطوات عربية سهلة وواضحة.'
+        },
+        checkout: {
+            title: 'إتمام الطلب | زارز | zarz',
+            description: 'أكمل طلبك في زارز أوفشال بسرعة عبر نموذج عربي واضح مع متابعة مباشرة عبر واتساب أو الهاتف.'
+        },
+        contact: {
+            title: 'تواصل معنا | زارز | zarz',
+            description: 'تواصل مع فريق زارز أوفشال للاستفسارات، الطلبات المخصصة، أو المتابعة على خدمات الألعاب والاشتراكات والمواقع.'
+        },
+        account: {
+            title: 'طلباتي | زارز | zarz',
+            description: 'تابع طلباتك الأخيرة في زارز أوفشال وراجع حالة الخدمات الرقمية التي قمت بطلبها.'
+        },
+        terms: {
+            title: 'شروط الاستخدام | زارز | zarz',
+            description: 'اطلع على شروط استخدام زارز أوفشال وسياسات الخدمات الرقمية والشحن والاشتراكات قبل إتمام الطلب.'
+        }
+    };
+
+    let seo = seoByView[viewId] || seoByView.home;
+
+    if (viewId === 'details') {
+        const activeProductId = localStorage.getItem('zarz_active_product');
+        const product = products.find(p => p.id === activeProductId);
+        if (product) {
+            const { title, desc } = getProductCopy(product);
+            seo = {
+                title: `${title} | زارز | zarz`,
+                description: desc
+            };
+        }
+    }
+
+    const seoUrl = viewId && viewId !== 'home'
+        ? `${seoBaseUrl}#${viewId}`
+        : seoBaseUrl;
+
+    document.title = seo.title;
+    if (descriptionMeta) descriptionMeta.setAttribute('content', seo.description);
+    if (canonicalLink) canonicalLink.setAttribute('href', seoUrl);
+    if (ogTitleMeta) ogTitleMeta.setAttribute('content', seo.title);
+    if (ogDescriptionMeta) ogDescriptionMeta.setAttribute('content', seo.description);
+    if (ogUrlMeta) ogUrlMeta.setAttribute('content', seoUrl);
+    if (twitterTitleMeta) twitterTitleMeta.setAttribute('content', seo.title);
+    if (twitterDescriptionMeta) twitterDescriptionMeta.setAttribute('content', seo.description);
+}
+
 // Navigation / Router
 function navigateTo(viewId) {
     localStorage.setItem('zarz_view', viewId);
@@ -512,8 +636,10 @@ function navigateTo(viewId) {
         if(navLink) navLink.classList.add('active');
 
         // Specific view renders
-        if(viewId === 'cart') renderCart();
+        if(viewId === 'cart' || viewId === 'checkout') renderCart();
     }
+
+    updateSeoMeta(viewId);
 }
 
 // To use from hero buttons
@@ -638,7 +764,7 @@ function generateProductCardHTML(p) {
     <article class="product-card" aria-labelledby="product-title-${p.id}">
         <div class="product-image${isSoldOut ? ' is-soldout' : ''}"${getProductImageStyleAttr(p, 'card')}>
             <div class="product-card-top">
-                ${isSoldOut ? `<span class="product-status-badge out">${stockText}</span>` : `<span class="product-status-badge sale">${t('20% OFF', 'خصم 20%')}</span>`}
+                ${isSoldOut ? `<span class="product-status-badge out">${stockText}</span>` : `<span class="product-status-badge sale"><span class="product-status-badge-mark"><i class="fa-solid fa-percent"></i></span><span class="product-status-badge-text">${t('20% OFF', 'خصم 20%')}</span></span>`}
                 <div class="product-overlay-actions">
                     <button type="button" class="product-overlay-btn${wishlistActive ? ' active' : ''}" data-wishlist-id="${p.id}" aria-label="${wishlistLabel}" aria-pressed="${wishlistActive}" onclick="toggleWishlist('${p.id}')">
                         <i class="fa-${wishlistActive ? 'solid' : 'regular'} fa-heart"></i>
@@ -651,7 +777,7 @@ function generateProductCardHTML(p) {
             <div class="product-image-footer">
                 <span class="product-badge"><i class="fa-solid fa-star"></i> ${p.rating}</span>
             </div>
-            ${withLazyImageAttrs(p.icon)}
+            ${getLocalizedProductImage(p)}
         </div>
         <div class="product-info${isSoldOut ? ' is-muted' : ''}">
             <div class="product-meta-row">
@@ -874,27 +1000,29 @@ window.openQuickView = function(productId) {
                 </button>
                 <div class="quick-view-layout">
                     <div class="quick-view-image${product.outOfStock ? ' is-soldout' : ''}"${getProductImageStyleAttr(product, 'quickView')}>
-                        ${withLazyImageAttrs(product.icon)}
+                        ${getLocalizedProductImage(product)}
                         ${product.outOfStock ? `<div class="product-out-overlay">${t('Out of Stock', 'نفذت الكمية')}</div>` : ''}
                     </div>
                     <div class="quick-view-body">
-                        <div class="quick-view-mini-meta">
-                            <span class="product-cat">${formatCategory(product.category)}</span>
-                            <button type="button" class="product-overlay-btn${wishlistActive ? ' active' : ''}" data-wishlist-id="${product.id}" aria-label="${wishlistActive ? t('Remove from wishlist', 'إزالة من المفضلة') : t('Add to wishlist', 'أضف للمفضلة')}" aria-pressed="${wishlistActive}" onclick="toggleWishlist('${product.id}')">
-                                <i class="fa-${wishlistActive ? 'solid' : 'regular'} fa-heart"></i>
-                            </button>
-                        </div>
-                        <h2 id="quick-view-title-${product.id}">${title}</h2>
-                        <p class="quick-view-desc">${desc}</p>
-                        <div class="product-rating-row" aria-label="${t(`${product.rating} stars from ${meta.reviewCount} reviews`, `${product.rating} نجوم من ${meta.reviewCount} تقييم`)}">
-                            <span class="review-stars" aria-hidden="true"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
-                            <span class="review-text">${product.rating} · ${t(`${meta.reviewCount} reviews`, `${meta.reviewCount} تقييم`)}</span>
-                        </div>
-                        <div class="quick-view-stock${product.outOfStock ? ' out' : ''}">${getStockText(product, meta)}</div>
-                        ${renderQuickViewVariationGroups(product)}
-                        <div class="quick-view-price-box">
-                            <span class="quick-view-old-price" id="quick-view-old-price" data-price-sar="${startingPrice * 1.25}">${formatPrice(startingPrice * 1.25)}</span>
-                            <strong class="quick-view-price" id="quick-view-price" data-price-sar="${startingPrice}">${formatPrice(startingPrice)}</strong>
+                        <div class="quick-view-body-scroll">
+                            <div class="quick-view-mini-meta">
+                                <span class="product-cat">${formatCategory(product.category)}</span>
+                                <button type="button" class="product-overlay-btn${wishlistActive ? ' active' : ''}" data-wishlist-id="${product.id}" aria-label="${wishlistActive ? t('Remove from wishlist', 'إزالة من المفضلة') : t('Add to wishlist', 'أضف للمفضلة')}" aria-pressed="${wishlistActive}" onclick="toggleWishlist('${product.id}')">
+                                    <i class="fa-${wishlistActive ? 'solid' : 'regular'} fa-heart"></i>
+                                </button>
+                            </div>
+                            <h2 id="quick-view-title-${product.id}">${title}</h2>
+                            <p class="quick-view-desc">${desc}</p>
+                            <div class="product-rating-row" aria-label="${t(`${product.rating} stars from ${meta.reviewCount} reviews`, `${product.rating} نجوم من ${meta.reviewCount} تقييم`)}">
+                                <span class="review-stars" aria-hidden="true"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
+                                <span class="review-text">${product.rating} · ${t(`${meta.reviewCount} reviews`, `${meta.reviewCount} تقييم`)}</span>
+                            </div>
+                            <div class="quick-view-stock${product.outOfStock ? ' out' : ''}">${getStockText(product, meta)}</div>
+                            ${renderQuickViewVariationGroups(product)}
+                            <div class="quick-view-price-box">
+                                <span class="quick-view-old-price" id="quick-view-old-price" data-price-sar="${startingPrice * 1.25}">${formatPrice(startingPrice * 1.25)}</span>
+                                <strong class="quick-view-price" id="quick-view-price" data-price-sar="${startingPrice}">${formatPrice(startingPrice)}</strong>
+                            </div>
                         </div>
                         <div class="quick-view-actions">
                             <button type="button" class="btn btn-secondary" onclick="closeQuickView(); viewDetails('${product.id}')">${t('More Details', 'تفاصيل أكثر')}</button>
@@ -1038,7 +1166,7 @@ function viewDetails(productId) {
     const container = document.getElementById('details-container');
     container.innerHTML = `
         <div class="details-wrapper">
-            <div class="details-image"${getProductImageStyleAttr(product, 'details')}>${withLazyImageAttrs(product.icon)}</div>
+                <div class="details-image"${getProductImageStyleAttr(product, 'details')}>${getLocalizedProductImage(product)}</div>
             <div class="details-info">
                 <div class="details-cat">${formatCategory(product.category)}</div>
                 <h1>${title}</h1>
@@ -1066,7 +1194,7 @@ function viewDetails(productId) {
                             <i class="fa-solid fa-cart-plus"></i> ${appState.lang === 'ar' ? 'أضف للسلة' : 'Add to Cart'}
                         </button>
                         <button class="btn btn-primary w-100 detail-action-btn" onclick="orderNow('${product.id}')">
-                            <i class="fa-solid fa-bolt"></i> ${appState.lang === 'ar' ? 'اطلب مع الدعم الآن' : 'Order with Support'}
+                            <i class="fa-solid fa-bolt"></i> ${appState.lang === 'ar' ? 'اطلب الآن' : 'Order Now'}
                         </button>
                     </div>
                 </div>
@@ -1240,9 +1368,9 @@ function renderCart() {
         
         return `
         <div class="cart-item">
-            <div class="cart-item-img">${withLazyImageAttrs(item.product.icon)}</div>
+            <div class="cart-item-img">${getLocalizedProductImage(item.product)}</div>
             <div class="cart-item-info">
-                <div class="cart-item-title">${item.product.title}</div>
+                <div class="cart-item-title">${getProductCopy(item.product).title}</div>
                 <div class="cart-item-meta">${metaParts.join(' | ')}</div>
                 ${item.qty > 1 && item.product.category !== 'social' ? `<div class="cart-item-meta">الكمية: ${item.qty}</div>` : ''}
             </div>
@@ -1283,51 +1411,159 @@ function renderCart() {
 }
 
 // Checkout processing
-window.processOrder = function() {
+function buildOrderDetails(appCart, includeFormatting = false) {
+    return appCart.map(item => {
+        const copy = getProductCopy(item.product);
+        const title = copy.title;
+        let metaParts = [];
+        if(item.customData.link) metaParts.push((appState.lang === 'ar' ? '??????' : 'Link') + ': ' + item.customData.link);
+        if(item.customData.package) metaParts.push(item.customData.package);
+        if(item.customData.playerId) metaParts.push((appState.lang === 'ar' ? '??????' : 'Player ID') + ': ' + item.customData.playerId);
+        if(item.customData.phone) metaParts.push((appState.lang === 'ar' ? '?????' : 'Phone') + ': ' + item.customData.phone);
+        if(item.customData.server) metaParts.push((appState.lang === 'ar' ? '???????' : 'Server') + ': ' + item.customData.server);
+        const titleText = includeFormatting ? ('*' + item.qty + 'x ' + title + '*') : (item.qty + 'x ' + title);
+        const metaText = metaParts.length ? ('\n' + metaParts.join(' | ')) : '';
+        return titleText + ' - ' + formatPrice(item.totalPriceSar) + metaText;
+    }).join('\n\n');
+}
+
+async function submitOrderToGoogleSheets(payload) {
+    if (!GOOGLE_SHEETS_WEB_APP_URL) {
+        return { ok: false, reason: 'missing_endpoint' };
+    }
+
+    let response;
+    try {
+        response = await fetch(GOOGLE_SHEETS_WEB_APP_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8'
+            },
+            body: JSON.stringify(payload)
+        });
+    } catch (error) {
+        const fallbackBody = new URLSearchParams(payload).toString();
+        const fallbackResponse = await fetch(GOOGLE_SHEETS_WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+            body: fallbackBody
+        });
+
+        if (fallbackResponse && fallbackResponse.type === 'opaque') {
+            return { ok: true, transport: 'no-cors-fallback' };
+        }
+
+        throw error;
+    }
+
+    if (!response.ok) {
+        throw new Error('Sheets request failed with status ' + response.status);
+    }
+
+    const rawText = await response.text();
+    let result = { ok: true };
+
+    if (rawText) {
+        try {
+            result = JSON.parse(rawText);
+        } catch (parseError) {
+            throw new Error('Invalid Sheets response: ' + rawText.slice(0, 120));
+        }
+    }
+
+    if (!result.ok) {
+        return { ok: false, reason: 'sheet_rejected', error: result.error || 'Google Sheets rejected the order.' };
+    }
+
+    return { ok: true, transport: 'json' };
+}
+
+window.processOrder = async function() {
     if(appState.cart.length === 0) return;
-    
+
     const nameInput = document.getElementById('checkout-name').value.trim();
     const phoneInput = document.getElementById('checkout-phone').value.trim();
-    
+    const paymentMethod = document.getElementById('checkout-payment-method').value;
+    const transactionLast4 = document.getElementById('checkout-transaction-last4').value.trim();
+
     if(!nameInput || !phoneInput) {
-        showToast(appState.lang === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill all fields', 'error');
+        showToast(appState.lang === 'ar' ? '???? ??? ???? ??????' : 'Please fill all fields', 'error');
         return;
     }
-    
+    if(!paymentMethod) {
+        showToast(translations[appState.lang].payment_required_msg, 'error');
+        return;
+    }
+    if(paymentMethod === 'bankak' && !transactionLast4) {
+        showToast(translations[appState.lang].bank_last4_required_msg, 'error');
+        return;
+    }
+    if(paymentMethod === 'bankak' && !/^\d{4}$/.test(transactionLast4)) {
+        showToast(translations[appState.lang].bank_last4_invalid_msg, 'error');
+        return;
+    }
+
     const btn = document.querySelector('#checkoutForm button[type="submit"]');
     const originalText = btn ? btn.innerHTML : '';
     if(btn) {
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${appState.lang === 'ar' ? 'جاري المعالجة...' : 'Processing...'}`;
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> ' + translations[appState.lang].order_submit_progress;
         btn.disabled = true;
     }
 
-    showToast(appState.lang === 'ar' ? 'جاري تحويلك للواتساب...' : 'Redirecting to WhatsApp...', 'info');
-    finalizeOrder('whatsapp', btn, originalText);
+    try {
+        await finalizeOrder(paymentMethod, transactionLast4, btn, originalText);
+    } catch (error) {
+        console.error(error);
+        if(btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+        showToast(translations[appState.lang].order_submit_error, 'error');
+    }
 };
 
-window.finalizeOrder = function(type, submitBtn = null, submitOriginalText = null) {
+window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', submitBtn = null, submitOriginalText = null) {
     const nameInput = document.getElementById('checkout-name').value.trim();
     const phoneInput = document.getElementById('checkout-phone').value.trim();
-    const orderNum = `ZARZ-${Math.floor(Math.random()*10000)}`;
+    const orderNum = 'ZARZ-' + Math.floor(Math.random()*10000);
+    const orderDate = new Date().toISOString();
     const totalStr = document.getElementById('cart-total').textContent;
-    let detailsStr = appState.cart.map(item => {
-        let metaParts = [];
-        if(item.customData.link) metaParts.push(`الرابط: ${item.customData.link}`);
-        if(item.customData.package) metaParts.push(item.customData.package);
-        if(item.customData.playerId) metaParts.push(`الآيدي: ${item.customData.playerId}`);
-        if(item.customData.phone) metaParts.push(`الرقم: ${item.customData.phone}`);
-        if(item.customData.server) metaParts.push(`السيرفر: ${item.customData.server}`);
-        return `*${item.qty}x ${item.product.title}* - ${formatPrice(item.totalPriceSar)}\n  ${metaParts.join(', ')}`;
-    }).join('\n\n');
+    const paymentMethodLabel = getPaymentMethodLabel(paymentMethod);
+    const detailsStr = buildOrderDetails(appState.cart, true);
+    const sheetOrderText = [
+        'Order Number: ' + orderNum,
+        'Items:',
+        buildOrderDetails(appState.cart, false),
+        'Total: ' + totalStr,
+        'Payment Method: ' + paymentMethodLabel,
+        transactionLast4 ? ('Payment Confirmation (Last 4): ' + transactionLast4) : ''
+    ].filter(Boolean).join('\n');
+
+    const payload = {
+        name: nameInput,
+        phoneNumber: phoneInput,
+        order: sheetOrderText,
+        date: orderDate,
+        paymentMethod: paymentMethodLabel
+    };
+
+    const sheetResult = await submitOrderToGoogleSheets(payload);
+    if (!sheetResult.ok) {
+        throw new Error(sheetResult.reason || 'Unable to submit order to Google Sheets.');
+    }
 
     let newOrder = {
         id: orderNum,
-        date: new Date().toISOString(),
-        method: 'WhatsApp',
-        mode: 'whatsapp',
-        status: 'قيد المعالجة',
+        date: orderDate,
+        method: paymentMethodLabel,
+        mode: paymentMethod,
+        paymentReference: transactionLast4 || '-',
+        status: appState.lang === 'ar' ? '??? ????????' : 'Processing',
         total: totalStr,
-        items: appState.cart.map(i => ({ title: i.product.title, qty: i.qty }))
+        items: appState.cart.map(i => ({ title: getProductCopy(i.product).title, qty: i.qty }))
     };
     appState.orders.unshift(newOrder);
     appState.cart = [];
@@ -1337,16 +1573,19 @@ window.finalizeOrder = function(type, submitBtn = null, submitOriginalText = nul
     updateCartCount();
     renderOrders();
 
-    const msg = `*طلب جديد*\n*رقم الطلب:* ${orderNum}\n*الاسم:* ${nameInput}\n*رقم الهاتف:* ${phoneInput}\n\n*تفاصيل الطلب:*\n${detailsStr}\n\n*الإجمالي:* ${totalStr}\n\nكيف تود الدفع؟ (طريقة الدفع: بنكك / كاش / غير ذلك)`;
+    const msg = '*??? ????*\n*??? ?????:* ' + orderNum + '\n*?????:* ' + nameInput + '\n*??? ??????:* ' + phoneInput + '\n*????? ?????:* ' + paymentMethodLabel + (transactionLast4 ? ('\n*??? 4 ????? ?? ???????:* ' + transactionLast4) : '') + '\n\n*?????? ?????:*\n' + detailsStr + '\n\n*????????:* ' + totalStr;
 
-    setTimeout(() => {
-        navigateTo('account');
-        if(submitBtn) {
-            submitBtn.innerHTML = submitOriginalText;
-            submitBtn.disabled = false;
-        }
-        window.open(`https://wa.me/201500007300?text=${encodeURIComponent(msg)}`, '_blank');
-    }, 800);
+    navigateTo('account');
+    if(submitBtn) {
+        submitBtn.innerHTML = submitOriginalText;
+        submitBtn.disabled = false;
+    }
+
+    showToast(translations[appState.lang].order_submit_success, 'success');
+
+    if (paymentMethod === 'whatsapp') {
+        window.open('https://wa.me/201500007300?text=' + encodeURIComponent(msg), '_blank');
+    }
 };
 
 function renderOrders() {
