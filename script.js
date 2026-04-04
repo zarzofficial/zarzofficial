@@ -3,7 +3,7 @@ const products = [
     {
         id: 'sub1', title: 'شات جي بي تي بلس - ChatGPT Plus', category: 'subscriptions',
         desc: 'استمتع بأقوى نسخة من شات جي بي تي مع سرعة وأداء متقدم. يمنحك هذا الاشتراك وصولاً لأحدث نماذج الذكاء الاصطناعي، إنشاء الصور، تحليل الملفات، والمساعدة السلسة في المهام اليومية.<br> • استجابات أسرع وأكثر دقة<br> • استخدام مكثف بدون حدود مزعجة<br> • دعم رفع وتحليل الملفات<br> • إنشاء الصور وقدرات ذكاء اصطناعي متقدمة<br> • تجربة مخصصة مع أحدث الميزات.', basePrice: 9999 / 940,
-        icon: '<img src="./assets/chatgpt-plus-v3.jpg" alt="ChatGPT Plus" class="full-cover-img">',
+        icon: '<img src="./assets/chatgpt-plus-v4.jpg" alt="ChatGPT Plus" class="full-cover-img">',
         rating: '5.0', details: { type: 'حساب خاص', duration: 'شهر واحد', delivery: 'واتساب', options: [{ label: 'اشتراك شهر واحد', price: 9999 / 940 }] }
     },
     {
@@ -15,31 +15,31 @@ const products = [
     {
         id: 'web1', title: 'إنشاء متجر إلكتروني', category: 'webdev',
         desc: 'إنشاء شامل لمتجر إلكتروني متميز ومتجاوب بتصميم عصري احترافي.', basePrice: 130000 / 940,
-        icon: '<img src="./assets/ecommerce-store-v3.jpg" alt="E-commerce Store" class="full-cover-img">',
+        icon: '<img src="./assets/ecommerce-store-v4.jpg" alt="E-commerce Store" class="full-cover-img">',
         rating: '5.0', details: { type: 'خدمة', includes: ['تصميم مخصص', 'ربط بوابات الدفع', 'لوحة تحكم'], hasForm: true }
     },
     {
         id: 'sm2', title: 'متابعين تيك توك', category: 'social',
         desc: 'زيادة فورية لحضورك على تيك توك. ابدأ برؤية النتائج في دقائق معدودة.', basePrice: 0.01,
-        icon: '<img src="./assets/tiktok-followers-v3.jpg" alt="TikTok Followers" class="full-cover-img">',
+        icon: '<img src="./assets/tiktok-followers-v4.jpg" alt="TikTok Followers" class="full-cover-img">',
         rating: '4.9', details: { type: 'حسابات عالية الجودة', delivery: '5-30 دقيقة', batch: 1 }
     },
     {
         id: 'sm3', title: 'متابعين فيسبوك', category: 'social',
         desc: 'تنمية صفحتك أو حسابك على فيسبوك بشكل طبيعي مع خدمتنا السريعة والآمنة.', basePrice: 0.01,
-        icon: '<img src="./assets/facebook-followers-v3.jpg" alt="Facebook Followers" class="full-cover-img">',
+        icon: '<img src="./assets/facebook-followers-v4.jpg" alt="Facebook Followers" class="full-cover-img">',
         rating: '4.7', details: { type: 'حسابات ذات مظهر حقيقي', delivery: '1-3 ساعات', batch: 1 }
     },
     {
         id: 'sm1', title: 'متابعين انستقرام', category: 'social',
         desc: 'متابعين انستقرام بجودة عالية. تسليم فوري خلال 1-2 ساعة.', basePrice: 0.01,
-        icon: '<img src="./assets/instagram-followers-v3.jpg" alt="Instagram Followers" class="full-cover-img">',
+        icon: '<img src="./assets/instagram-followers-v4.jpg" alt="Instagram Followers" class="full-cover-img">',
         rating: '4.8', details: { type: 'مختلط (حقيقي وروبوتات عالية الجودة)', delivery: '1-2 ساعة', batch: 1 }
     },
     {
         id: 'g1', title: 'شدات ببجي موبايل', category: 'gaming', outOfStock: true,
         desc: 'شحن فوري لشدات ببجي موبايل. آمن وموثوق مباشرة عبر رقم اللاعب (ID).', basePrice: 5,
-        icon: '<img src="./assets/pubg-uc-v3.jpg" alt="PUBG Mobile UC" class="full-cover-img">',
+        icon: '<img src="./assets/pubg-uc-v4.jpg" alt="PUBG Mobile UC" class="full-cover-img">',
         rating: '5.0', details: { type: 'شحن', requiresId: true, requiresCountry: true, options: [
             { label: '60 شدة', price: 5 }, { label: '325 شدة', price: 20 }, { label: '660 شدة', price: 40 }
         ]}
@@ -47,7 +47,7 @@ const products = [
     {
         id: 'g2', title: 'جواهر فري فاير', category: 'gaming', outOfStock: true,
         desc: 'احصل على جواهر فري فاير فوراً وبكل أمان عبر رقم اللاعب (ID).', basePrice: 4,
-        icon: '<img src="./assets/freefire-diamonds-v3.jpg" alt="Free Fire Diamonds" class="full-cover-img">',
+        icon: '<img src="./assets/freefire-diamonds-v4.jpg" alt="Free Fire Diamonds" class="full-cover-img">',
         rating: '4.9', details: { type: 'شحن', requiresId: true, requiresCountry: true, options: [
             { label: '100 جوهرة', price: 4 }, { label: '520 جوهرة', price: 20 }, { label: '1060 جوهرة', price: 40 }
         ]}
@@ -55,7 +55,7 @@ const products = [
     {
         id: 'web2', title: 'تعديل مواقع إلكترونية', category: 'webdev',
         desc: 'إصلاح الأخطاء، إعادة تصميم الأقسام، أو إضافة ميزات جديدة لموقعك الحالي بكل احترافية.', basePrice: 85000 / 940,
-        icon: '<img src="./assets/web-modification-v3.jpg" alt="Website Modification" class="full-cover-img">',
+        icon: '<img src="./assets/web-modification-v4.jpg" alt="Website Modification" class="full-cover-img">',
         rating: '4.8', details: { type: 'خدمة', includes: ['تعديلات واجهة المستخدم', 'تحسين الأكواد', 'إصلاح الأخطاء'], hasForm: true }
     },
     {
