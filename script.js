@@ -66,15 +66,33 @@ const products = [
     }
 ];
 
-function withLazyImageAttrs(html) {
+function getWebpSource(src) {
+    return typeof src === 'string'
+        ? src.replace(/\.(jpe?g|png)$/i, '.webp')
+        : src;
+}
+
+function withOptimizedImageAttrs(html) {
     if (typeof html !== 'string' || !html.includes('<img')) return html;
-    return html.replace('<img ', '<img loading="lazy" decoding="async" ');
+
+    const optimizedImg = html.includes('loading=')
+        ? html
+        : html.replace('<img ', '<img loading="lazy" decoding="async" ');
+
+    const srcMatch = optimizedImg.match(/\ssrc="([^"]+)"/i);
+    if (!srcMatch) return optimizedImg;
+
+    const src = srcMatch[1];
+    if (!/\.(jpe?g|png)$/i.test(src)) return optimizedImg;
+
+    const webpSrc = getWebpSource(src);
+    return `<picture><source srcset="${webpSrc}" type="image/webp">${optimizedImg}</picture>`;
 }
 
 function getLocalizedProductImage(product) {
     const { title } = getProductCopy(product);
     const localizedAlt = String(title || '').replace(/"/g, '&quot;');
-    return withLazyImageAttrs(product.icon).replace(/alt="[^"]*"/i, `alt="${localizedAlt}"`);
+    return withOptimizedImageAttrs(product.icon).replace(/alt="[^"]*"/i, `alt="${localizedAlt}"`);
 }
 
 const productDisplayMeta = {
