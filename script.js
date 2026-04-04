@@ -57,6 +57,12 @@ const products = [
         desc: 'إصلاح الأخطاء، إعادة تصميم الأقسام، أو إضافة ميزات جديدة لموقعك الحالي بكل احترافية.', basePrice: 85000 / 940,
         icon: '<img src="./assets/web-modification-v3.jpg" alt="Website Modification" class="full-cover-img">',
         rating: '4.8', details: { type: 'خدمة', includes: ['تعديلات واجهة المستخدم', 'تحسين الأكواد', 'إصلاح الأخطاء'], hasForm: true }
+    },
+    {
+        id: 'web3', title: 'تأجير موقع أو متجر إلكتروني', category: 'webdev',
+        desc: 'خدمة تأجير شهري لموقع أو متجر إلكتروني جاهز للاستخدام، مع أداء سلس على الموبايل والكمبيوتر، والاستضافة وربط الدومين مشمولان.', basePrice: 30000 / 940,
+        icon: '<img src="./assets/webstore-rental-v1.jpg" alt="Website or Online Store Rental" class="full-cover-img">',
+        rating: '4.9', details: { type: 'خدمة شهرية', includes: ['موقع أو متجر احترافي جاهز للاستخدام', 'تصميم متجاوب بالكامل للموبايل والكمبيوتر', 'دعم وسائل الدفع والتحويل والدفع عند الاستلام', 'صفحة تواصل تشمل الهاتف وواتساب والبريد', 'قاعدة بيانات منظمة للعملاء والطلبات', 'لوحة تحكم بسيطة لإدارة الطلبات وتحديثها', 'أداء سريع وسلس بدون تهنيج', 'الاستضافة وربط الدومين مشمولان'], hasForm: true }
     }
 ];
 
@@ -232,10 +238,98 @@ const productDisplayMeta = {
                 ]
             }
         ]
+    },
+    web3: {
+        reviewCount: 73,
+        stock: 9,
+        imagePosition: {
+            card: 'center 40%',
+            quickView: 'center 40%',
+            details: 'center 40%'
+        }
     }
 };
 
 let currentProductList = products;
+const FEATURED_PRODUCT_IDS = ['sm2', 'sm1', 'sub2', 'web1', 'web2'];
+
+const scheduleIdleWork = (() => {
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+        return {
+            schedule(callback) {
+                return window.requestIdleCallback(callback, { timeout: 300 });
+            },
+            cancel(handle) {
+                window.cancelIdleCallback(handle);
+            }
+        };
+    }
+
+    return {
+        schedule(callback) {
+            return window.setTimeout(callback, 80);
+        },
+        cancel(handle) {
+            window.clearTimeout(handle);
+        }
+    };
+})();
+
+function createBufferedTask(task, delay = 140) {
+    let timeoutId = null;
+    let idleHandle = null;
+
+    return () => {
+        if (timeoutId) window.clearTimeout(timeoutId);
+        if (idleHandle) {
+            scheduleIdleWork.cancel(idleHandle);
+            idleHandle = null;
+        }
+
+        timeoutId = window.setTimeout(() => {
+            timeoutId = null;
+            idleHandle = scheduleIdleWork.schedule(() => {
+                idleHandle = null;
+                task();
+            });
+        }, delay);
+    };
+}
+
+function debounce(fn, delay = 100) {
+    let timeoutId = null;
+
+    return (...args) => {
+        if (timeoutId) window.clearTimeout(timeoutId);
+        timeoutId = window.setTimeout(() => {
+            timeoutId = null;
+            fn(...args);
+        }, delay);
+    };
+}
+
+function getActiveStoreFilter() {
+    return document.querySelector('.category-filter li.active')?.dataset.filter || 'all';
+}
+
+function getStoreSearchQuery() {
+    return document.getElementById('service-search')?.value.trim().toLowerCase() || '';
+}
+
+function getFilteredProducts(filter = getActiveStoreFilter(), query = getStoreSearchQuery()) {
+    let filtered = products;
+
+    if (filter !== 'all') {
+        filtered = filtered.filter(product => product.category === filter);
+    }
+
+    if (!query) return filtered;
+
+    return filtered.filter(product => {
+        const { title, desc } = getProductCopy(product);
+        return title.toLowerCase().includes(query) || desc.toLowerCase().includes(query);
+    });
+}
 
 // Helper to safely parse local storage
 function safeJsonParse(key, fallback) {
@@ -354,8 +448,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     applyTranslations();
     fetchExchangeRates();
+    renderFeaturedProducts();
     initRouter();
-    renderProducts(products);
     updateCartCount(false);
     renderOrders();
     
@@ -380,13 +474,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Currency dropdown removed
 
     // Search & Filter
-    document.getElementById('service-search').addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        const activeFilter = document.querySelector('.category-filter li.active').dataset.filter;
-        let filtered = products.filter(p => p.title.toLowerCase().includes(query) || p.desc.toLowerCase().includes(query));
-        if(activeFilter !== 'all') filtered = filtered.filter(p => p.category === activeFilter);
-        renderProducts(filtered);
-    });
+    const serviceSearch = document.getElementById('service-search');
+    const runStoreSearch = debounce(() => {
+        renderProducts(getFilteredProducts());
+    }, 90);
+
+    serviceSearch.addEventListener('input', runStoreSearch);
 
     document.querySelectorAll('.category-filter li').forEach(li => {
         li.addEventListener('click', (e) => {
@@ -395,16 +488,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.querySelectorAll('.category-filter li').forEach(el => el.classList.remove('active'));
             targetLi.classList.add('active');
             const filter = targetLi.dataset.filter;
-            document.getElementById('service-search').value = '';
-            
-            if(filter === 'all') renderProducts(products);
-            else renderProducts(products.filter(p => p.category === filter));
+            serviceSearch.value = '';
+
+            renderProducts(getFilteredProducts(filter, ''));
         });
     });
 
     // -- Form Persistence Setup --
     const restoreCheckout = () => {
-        const savedCheckout = JSON.parse(localStorage.getItem('zarz_checkout')) || {};
+        const savedCheckout = safeJsonParse('zarz_checkout', {});
         if(savedCheckout.name) document.getElementById('checkout-name').value = savedCheckout.name;
         if(savedCheckout.phone) document.getElementById('checkout-phone').value = savedCheckout.phone;
         if(savedCheckout.paymentMethod) document.getElementById('checkout-payment-method').value = savedCheckout.paymentMethod;
@@ -442,7 +534,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    const saveCheckout = () => {
+    const saveCheckout = createBufferedTask(() => {
         const nameInput = document.getElementById('checkout-name');
         const phoneInput = document.getElementById('checkout-phone');
         const paymentMethodInput = document.getElementById('checkout-payment-method');
@@ -452,7 +544,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const paymentMethod = paymentMethodInput ? paymentMethodInput.value : '';
         const transactionLast4 = transactionLast4Input ? transactionLast4Input.value : '';
         localStorage.setItem('zarz_checkout', JSON.stringify({ name, phone, paymentMethod, transactionLast4 }));
-    };
+    }, 160);
 
     const checkoutForm = document.getElementById('checkoutForm');
     if(checkoutForm) {
@@ -465,8 +557,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         paymentMethodSelect.addEventListener('change', updateCheckoutPaymentUI);
     }
 
-    document.getElementById('details-container').addEventListener('input', () => { if(window.saveDetailsState) window.saveDetailsState(); });
-    document.getElementById('details-container').addEventListener('change', () => { if(window.saveDetailsState) window.saveDetailsState(); });
+    const detailsContainer = document.getElementById('details-container');
+    const scheduleDetailsSave = createBufferedTask(() => {
+        if(window.saveDetailsState) window.saveDetailsState();
+    }, 160);
+
+    detailsContainer.addEventListener('input', scheduleDetailsSave);
+    detailsContainer.addEventListener('change', scheduleDetailsSave);
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') closeQuickView();
     });
@@ -480,7 +577,7 @@ window.saveDetailsState = function() {
 };
 
 window.restoreDetailsState = function() {
-    let state = JSON.parse(localStorage.getItem('zarz_details_form')) || {};
+    let state = safeJsonParse('zarz_details_form', {});
     let trigPkg = null;
     let trigQty = false;
     Object.keys(state).forEach(id => {
@@ -620,6 +717,7 @@ function navigateTo(viewId) {
         if(navLink) navLink.classList.add('active');
 
         // Specific view renders
+        if(viewId === 'store') renderProducts(getFilteredProducts());
         if(viewId === 'cart' || viewId === 'checkout') renderCart();
     }
 
@@ -628,11 +726,13 @@ function navigateTo(viewId) {
 
 // To use from hero buttons
 function filterStore(cat) {
-    navigateTo('store');
+    const searchInput = document.getElementById('service-search');
+    if (searchInput) searchInput.value = '';
+
     document.querySelectorAll('.category-filter li').forEach(el => el.classList.remove('active'));
     const targetLi = document.querySelector(`.category-filter li[data-filter="${cat}"]`);
     if(targetLi) targetLi.classList.add('active');
-    renderProducts(products.filter(p => p.category === cat));
+    navigateTo('store');
 }
 
 function initRouter(isHashChange = false) {
@@ -799,11 +899,14 @@ function renderProducts(items) {
     if(container) {
         container.innerHTML = items.map(generateProductCardHTML).join('');
     }
-    
+
+    refreshPrices();
+}
+
+function renderFeaturedProducts() {
     const featContainer = document.getElementById('featured-container');
     if(featContainer) {
-        const preferredIds = ['sm2', 'sm1', 'sub2', 'web1', 'web2'];
-        const featuredItems = preferredIds
+        const featuredItems = FEATURED_PRODUCT_IDS
             .map(id => products.find(p => p.id === id && !p.outOfStock))
             .filter(Boolean)
             .slice(0, 4);

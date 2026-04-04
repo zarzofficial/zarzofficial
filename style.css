@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
-
 :root {
     --bg-color: #07070a;
     --surface-color: #111116;
@@ -31,6 +29,20 @@
 
 html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+button,
+a,
+[role="button"],
+summary,
+.category-filter li {
+    touch-action: manipulation;
 }
 
 body {
@@ -362,6 +374,31 @@ main {
 
 .view.active {
     display: block;
+}
+
+#view-home > section,
+#view-store > *,
+#view-cart > *,
+#view-checkout > *,
+#view-account > *,
+#view-contact > *,
+#view-terms > * {
+    content-visibility: auto;
+    contain-intrinsic-size: 700px;
+}
+
+.product-card,
+.category-card,
+.process-card,
+.faq-item,
+.review-grid .glass-panel,
+.trust-grid .glass-panel,
+.value-grid .category-card,
+.info-card,
+.contact-form-panel,
+.service-order-card,
+.cart-item {
+    contain: layout paint;
 }
 
 @keyframes fadeIn {
@@ -2940,25 +2977,96 @@ html[dir="rtl"] .quick-view-close {
 
 /* Base Mobile Performance Optimizations */
 @media (max-width: 768px) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    /* Remove decorative layers that keep repainting on mobile */
+    body::before,
+    .blur-circle,
+    .main-category-card::after,
+    .process-card::after,
+    .review-grid .glass-panel::after,
+    .trust-grid .glass-panel::after,
+    .value-grid .category-card::after,
+    .cta-banner::before {
+        display: none !important;
+    }
+
     /* Disable heavy GPU blurring/filters to prevent freezing */
-    .blur-circle { display: none !important; }
-    
-    .glow-icon, .glass-panel, .navbar, .trust-badge, .modal-overlay {
+    .glow-icon, .glass-panel, .navbar, .trust-badge, .announcement-bar, .modal-overlay {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
         background-color: var(--surface-color) !important;
     }
-    
-    /* Disable expensive concurrent animations */
-    .icon-social, .icon-gaming, .icon-web {
+
+    /* Disable expensive concurrent animations and hover motion on touch devices */
+    .view,
+    .announcement-bar,
+    .icon-social,
+    .icon-gaming,
+    .icon-web,
+    .modal-overlay,
+    .modal-content,
+    .toast {
         animation: none !important;
+    }
+
+    .btn,
+    .icon-btn,
+    .product-card,
+    .category-card,
+    .faq-item,
+    .info-card,
+    .pay-method,
+    .variation-option,
+    .announcement-badge {
+        transition: none !important;
+    }
+
+    .icon-social,
+    .icon-gaming,
+    .icon-web,
+    .product-card:hover,
+    .category-card:hover,
+    .info-card:hover,
+    .pay-method:hover,
+    .btn-primary:hover,
+    .announcement-badge:hover {
         transform: none !important;
         box-shadow: none !important;
     }
-    
+
+    .category-card,
+    .product-card,
+    .process-card,
+    .faq-item[open],
+    .glass-panel,
+    .info-card,
+    .toast,
+    .quick-view-content,
+    .modal-content {
+        box-shadow: none !important;
+    }
+
     /* Reduce repetitive repaints on grid items */
     .category-card, .product-card {
-        animation: none !important; 
+        animation: none !important;
         transition: opacity 0.2s ease !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }

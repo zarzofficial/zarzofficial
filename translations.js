@@ -409,6 +409,8 @@ const translations = {
         'prod_web1_desc': 'إنشاء احترافي لمتاجر متجاوبة وتصميم عصري متكامل.',
         'prod_web2_title': 'تعديل المواقع',
         'prod_web2_desc': 'إصلاح الأخطاء، إعادة التصميم، أو إضافة ميزات جديدة لموقعك الحالي.',
+        'prod_web3_title': 'تأجير موقع أو متجر إلكتروني',
+        'prod_web3_desc': 'خدمة تأجير شهري لموقع أو متجر إلكتروني جاهز للاستخدام، مع تصميم متجاوب، دعم وسائل الدفع، قاعدة بيانات ولوحة تحكم بسيطة، والاستضافة وربط الدومين مشمولان.',
         'details_btn': 'التفاصيل',
 
         'add_cart_btn': 'أضف للسلة'
@@ -437,6 +439,8 @@ Object.assign(translations.en, {
     'prod_web1_desc': 'Full creation of a premium, responsive e-commerce store with modern design.',
     'prod_web2_title': 'Website Modification',
     'prod_web2_desc': 'Fix bugs, redesign sections, or add new features to your existing website.',
+    'prod_web3_title': 'Website / Online Store Rental',
+    'prod_web3_desc': 'A ready-to-use monthly website or online store rental with responsive design, payment support, a customer and order database, a simple admin dashboard, and hosting/domain connection included.',
     'details_btn': 'Details',
     'add_cart_btn': 'Add to Cart'
 });
