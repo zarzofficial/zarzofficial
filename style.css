@@ -3120,6 +3120,29 @@ html[dir="rtl"] .quick-view-close {
     .pay-method,
     .variation-option,
     .announcement-badge {
+    }
+
+    /* Disable expensive concurrent animations and hover motion on touch devices */
+    .view,
+    .announcement-bar,
+    .icon-social,
+    .icon-gaming,
+    .icon-web,
+    .modal-overlay,
+    .modal-content,
+    .toast {
+        animation: none !important;
+    }
+
+    .btn,
+    .icon-btn,
+    .product-card,
+    .category-card,
+    .faq-item,
+    .info-card,
+    .pay-method,
+    .variation-option,
+    .announcement-badge {
         transition: none !important;
     }
 
@@ -3153,6 +3176,78 @@ html[dir="rtl"] .quick-view-close {
         animation: none !important;
         transition: opacity 0.2s ease !important;
     }
+}
+
+/* Our Work Section Styles */
+.our-work-section {
+    margin-top: 5rem;
+}
+.our-work-grid {
+    display: flex;
+    gap: 2.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 3rem;
+}
+.work-card {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 240px;
+    padding: 2.5rem 1.5rem;
+    border-radius: var(--border-radius-lg);
+    background: linear-gradient(145deg, rgba(17, 17, 22, 0.94), rgba(255, 255, 255, 0.03));
+    border: 1px solid var(--border-color);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+}
+.work-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 100%;
+    background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.05), transparent 60%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+.work-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+.work-card:hover::before {
+    opacity: 1;
+}
+.work-card-img-wrapper {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-color);
+    padding: 5px;
+    transition: transform 0.4s ease;
+}
+.work-card:hover .work-card-img-wrapper {
+    transform: scale(1.05);
+}
+.work-card img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+.work-card h3 {
+    color: var(--text-primary);
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
 }
 
 @media (prefers-reduced-motion: reduce) {

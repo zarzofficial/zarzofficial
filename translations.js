@@ -192,7 +192,8 @@ const translations = {
         'footer_links': 'Quick Links',
         'footer_social': 'Follow Us',
         'footer_rights': '© 2026 zarzofficial. All rights reserved.',
-
+        'our_work_heading': 'Our Work',
+        'our_work_sub': 'Platforms and brands we have successfully delivered',
         'lang_switch': 'العربية'
     },
     'ar': {
@@ -388,6 +389,8 @@ const translations = {
         'footer_links': 'روابط سريعة',
         'footer_social': 'تابعنا',
         'footer_rights': '© 2026 zarzofficial. جميع الحقوق محفوظة.',
+        'our_work_heading': 'أعمالنا',
+        'our_work_sub': 'المنصات والعلامات التجارية التي نفذناها',
         'lang_switch': 'English',
         'prod_sm1_title': 'متابعين انستجرام',
         'prod_sm1_desc': 'متابعين انستجرام بجودة عالية. تسليم فوري خلال ساعة إلى ساعتين.',
