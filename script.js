@@ -3,43 +3,43 @@ const products = [
     {
         id: 'sub1', title: 'شات جي بي تي بلس - ChatGPT Plus', category: 'subscriptions',
         desc: 'استمتع بأقوى نسخة من شات جي بي تي مع سرعة وأداء متقدم. يمنحك هذا الاشتراك وصولاً لأحدث نماذج الذكاء الاصطناعي، إنشاء الصور، تحليل الملفات، والمساعدة السلسة في المهام اليومية.<br> • استجابات أسرع وأكثر دقة<br> • استخدام مكثف بدون حدود مزعجة<br> • دعم رفع وتحليل الملفات<br> • إنشاء الصور وقدرات ذكاء اصطناعي متقدمة<br> • تجربة مخصصة مع أحدث الميزات.', basePrice: 9999 / 940,
-        icon: '<img src="./assets/chatgpt-plus-v4.jpg" alt="ChatGPT Plus" class="full-cover-img">',
+        icon: '<img src="./assets/chatgpt-plus-v4.webp" alt="ChatGPT Plus" class="full-cover-img">',
         rating: '5.0', details: { type: 'حساب خاص', duration: 'شهر واحد', delivery: 'واتساب', options: [{ label: 'اشتراك شهر واحد', price: 9999 / 940 }] }
     },
     {
         id: 'sub2', title: 'جيميني برو - Gemini Pro', category: 'subscriptions',
         desc: 'وصول لنسخة Gemini Advanced المتميزة. يُسلّم عبر الواتساب.', basePrice: 10,
-        icon: '<img src="./assets/gemini-pro-v3.jpg" alt="Gemini Pro" class="full-cover-img">',
+        icon: '<img src="./assets/gemini-pro-v3.webp" alt="Gemini Pro" class="full-cover-img">',
         rating: '4.9', details: { type: 'حساب خاص', duration: 'شهر واحد', delivery: 'واتساب', options: [{ label: 'اشتراك شهر واحد', price: 10 }] }
     },
     {
         id: 'web1', title: 'إنشاء متجر إلكتروني', category: 'webdev',
         desc: 'إنشاء شامل لمتجر إلكتروني متميز ومتجاوب بتصميم عصري احترافي.', basePrice: 130000 / 940,
-        icon: '<img src="./assets/ecommerce-store-v4.jpg" alt="E-commerce Store" class="full-cover-img">',
+        icon: '<img src="./assets/ecommerce-store-v4.webp" alt="E-commerce Store" class="full-cover-img">',
         rating: '5.0', details: { type: 'خدمة', includes: ['تصميم مخصص', 'ربط بوابات الدفع', 'لوحة تحكم'], hasForm: true }
     },
     {
         id: 'sm2', title: 'متابعين تيك توك', category: 'social',
         desc: 'زيادة فورية لحضورك على تيك توك. ابدأ برؤية النتائج في دقائق معدودة.', basePrice: 0.01,
-        icon: '<img src="./assets/tiktok-followers-v4.jpg" alt="TikTok Followers" class="full-cover-img">',
+        icon: '<img src="./assets/tiktok-followers-v4.webp" alt="TikTok Followers" class="full-cover-img">',
         rating: '4.9', details: { type: 'حسابات عالية الجودة', delivery: '5-30 دقيقة', batch: 1 }
     },
     {
         id: 'sm3', title: 'متابعين فيسبوك', category: 'social',
         desc: 'تنمية صفحتك أو حسابك على فيسبوك بشكل طبيعي مع خدمتنا السريعة والآمنة.', basePrice: 0.01,
-        icon: '<img src="./assets/facebook-followers-v4.jpg" alt="Facebook Followers" class="full-cover-img">',
+        icon: '<img src="./assets/facebook-followers-v4.webp" alt="Facebook Followers" class="full-cover-img">',
         rating: '4.7', details: { type: 'حسابات ذات مظهر حقيقي', delivery: '1-3 ساعات', batch: 1 }
     },
     {
         id: 'sm1', title: 'متابعين انستقرام', category: 'social',
         desc: 'متابعين انستقرام بجودة عالية. تسليم فوري خلال 1-2 ساعة.', basePrice: 0.01,
-        icon: '<img src="./assets/instagram-followers-v4.jpg" alt="Instagram Followers" class="full-cover-img">',
+        icon: '<img src="./assets/instagram-followers-v4.webp" alt="Instagram Followers" class="full-cover-img">',
         rating: '4.8', details: { type: 'مختلط (حقيقي وروبوتات عالية الجودة)', delivery: '1-2 ساعة', batch: 1 }
     },
     {
         id: 'g1', title: 'شدات ببجي موبايل', category: 'gaming', outOfStock: true,
         desc: 'شحن فوري لشدات ببجي موبايل. آمن وموثوق مباشرة عبر رقم اللاعب (ID).', basePrice: 5,
-        icon: '<img src="./assets/pubg-uc-v4.jpg" alt="PUBG Mobile UC" class="full-cover-img">',
+        icon: '<img src="./assets/pubg-uc-v4.webp" alt="PUBG Mobile UC" class="full-cover-img">',
         rating: '5.0', details: { type: 'شحن', requiresId: true, requiresCountry: true, options: [
             { label: '60 شدة', price: 5 }, { label: '325 شدة', price: 20 }, { label: '660 شدة', price: 40 }
         ]}
@@ -47,7 +47,7 @@ const products = [
     {
         id: 'g2', title: 'جواهر فري فاير', category: 'gaming', outOfStock: true,
         desc: 'احصل على جواهر فري فاير فوراً وبكل أمان عبر رقم اللاعب (ID).', basePrice: 4,
-        icon: '<img src="./assets/freefire-diamonds-v4.jpg" alt="Free Fire Diamonds" class="full-cover-img">',
+        icon: '<img src="./assets/freefire-diamonds-v4.webp" alt="Free Fire Diamonds" class="full-cover-img">',
         rating: '4.9', details: { type: 'شحن', requiresId: true, requiresCountry: true, options: [
             { label: '100 جوهرة', price: 4 }, { label: '520 جوهرة', price: 20 }, { label: '1060 جوهرة', price: 40 }
         ]}
@@ -55,38 +55,23 @@ const products = [
     {
         id: 'web2', title: 'تعديل مواقع إلكترونية', category: 'webdev',
         desc: 'إصلاح الأخطاء، إعادة تصميم الأقسام، أو إضافة ميزات جديدة لموقعك الحالي بكل احترافية.', basePrice: 85000 / 940,
-        icon: '<img src="./assets/web-modification-v4.jpg" alt="Website Modification" class="full-cover-img">',
+        icon: '<img src="./assets/web-modification-v4.webp" alt="Website Modification" class="full-cover-img">',
         rating: '4.8', details: { type: 'خدمة', includes: ['تعديلات واجهة المستخدم', 'تحسين الأكواد', 'إصلاح الأخطاء'], hasForm: true }
     },
     {
         id: 'web3', title: 'تأجير موقع أو متجر إلكتروني', category: 'webdev',
         desc: 'خدمة تأجير شهري لموقع أو متجر إلكتروني جاهز للاستخدام، مع أداء سلس على الموبايل والكمبيوتر، والاستضافة وربط الدومين مشمولان.', basePrice: 30000 / 940,
-        icon: '<img src="./assets/webstore-rental-v1.jpg" alt="Website or Online Store Rental" class="full-cover-img">',
+        icon: '<img src="./assets/webstore-rental-v1.webp" alt="Website or Online Store Rental" class="full-cover-img">',
         rating: '4.9', details: { type: 'خدمة شهرية', includes: ['موقع أو متجر احترافي جاهز للاستخدام', 'تصميم متجاوب بالكامل للموبايل والكمبيوتر', 'دعم وسائل الدفع والتحويل والدفع عند الاستلام', 'صفحة تواصل تشمل الهاتف وواتساب والبريد', 'قاعدة بيانات منظمة للعملاء والطلبات', 'لوحة تحكم بسيطة لإدارة الطلبات وتحديثها', 'أداء سريع وسلس بدون تهنيج', 'الاستضافة وربط الدومين مشمولان'], hasForm: true }
     }
 ];
 
-function getWebpSource(src) {
-    return typeof src === 'string'
-        ? src.replace(/\.(jpe?g|png)$/i, '.webp')
-        : src;
-}
-
 function withOptimizedImageAttrs(html) {
     if (typeof html !== 'string' || !html.includes('<img')) return html;
 
-    const optimizedImg = html.includes('loading=')
+    return html.includes('loading=')
         ? html
         : html.replace('<img ', '<img loading="lazy" decoding="async" ');
-
-    const srcMatch = optimizedImg.match(/\ssrc="([^"]+)"/i);
-    if (!srcMatch) return optimizedImg;
-
-    const src = srcMatch[1];
-    if (!/\.(jpe?g|png)$/i.test(src)) return optimizedImg;
-
-    const webpSrc = getWebpSource(src);
-    return `<picture><source srcset="${webpSrc}" type="image/webp">${optimizedImg}</picture>`;
 }
 
 function getLocalizedProductImage(product) {
