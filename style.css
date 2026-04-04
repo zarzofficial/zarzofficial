@@ -1149,6 +1149,15 @@ main {
     gap: 1.5rem;
 }
 
+.featured-products .products-grid {
+    contain: layout paint;
+}
+
+.featured-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 460px;
+}
+
 .product-card {
     position: relative;
     background: linear-gradient(160deg, rgba(17, 17, 22, 0.98), rgba(11, 10, 16, 0.96));
@@ -3013,7 +3022,8 @@ html[dir="rtl"] .quick-view-close {
     }
 
     /* Disable heavy GPU blurring/filters to prevent freezing */
-    .glow-icon, .glass-panel, .navbar, .trust-badge, .announcement-bar, .modal-overlay {
+    .glow-icon, .glass-panel, .navbar, .trust-badge, .announcement-bar, .modal-overlay,
+    .product-status-badge, .product-badge, .variation-chip, .product-overlay-btn {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
         background-color: var(--surface-color) !important;
@@ -3066,6 +3076,30 @@ html[dir="rtl"] .quick-view-close {
     .quick-view-content,
     .modal-content {
         box-shadow: none !important;
+    }
+
+    .product-image::after,
+    .product-status-badge.sale::before,
+    .product-status-badge.sale::after {
+        display: none !important;
+    }
+
+    .featured-card {
+        background: var(--surface-color) !important;
+        contain: layout paint size !important;
+    }
+
+    .featured-card .product-image {
+        background: var(--surface-light) !important;
+    }
+
+    .featured-card .product-overlay-actions,
+    .featured-card .product-variation-preview {
+        display: none !important;
+    }
+
+    .featured-card .product-card-top {
+        justify-content: flex-start;
     }
 
     /* Reduce repetitive repaints on grid items */
