@@ -840,12 +840,11 @@ function renderServiceAssurance(product) {
     `;
 }
 
-function generateProductCardHTML(p, options = {}) {
+function generateProductCardHTML(p) {
     const { title, desc } = getProductCopy(p);
     const meta = getProductMeta(p);
     const oldPrice = p.basePrice * 1.25;
     const isSoldOut = p.outOfStock;
-    const cardClass = options.cardClass ? ` ${options.cardClass}` : '';
     const reviewText = t(`${meta.reviewCount} reviews`, `${meta.reviewCount} تقييم`);
     const ratingAria = t(
         `${p.rating} stars from ${meta.reviewCount} reviews`,
@@ -862,13 +861,9 @@ function generateProductCardHTML(p, options = {}) {
                <span class="product-old-price" data-price-sar="${oldPrice}">${formatPrice(oldPrice)}</span>
                <span class="product-price" data-price-sar="${p.basePrice}">${formatPrice(p.basePrice)}</span>
            </div>`;
-    let imageMarkup = getLocalizedProductImage(p);
-    if (options.imageLoading === 'eager') {
-        imageMarkup = imageMarkup.replace('loading="lazy"', 'loading="eager" fetchpriority="low"');
-    }
 
     return `
-    <article class="product-card${cardClass}" aria-labelledby="product-title-${p.id}">
+    <article class="product-card" aria-labelledby="product-title-${p.id}">
         <div class="product-image${isSoldOut ? ' is-soldout' : ''}"${getProductImageStyleAttr(p, 'card')}>
             <div class="product-card-top">
                 ${isSoldOut ? `<span class="product-status-badge out">${stockText}</span>` : `<span class="product-status-badge sale"><span class="product-status-badge-mark"><i class="fa-solid fa-percent"></i></span><span class="product-status-badge-text">${t('20% OFF', 'خصم 20%')}</span></span>`}
@@ -884,7 +879,7 @@ function generateProductCardHTML(p, options = {}) {
             <div class="product-image-footer">
                 <span class="product-badge"><i class="fa-solid fa-star"></i> ${p.rating}</span>
             </div>
-            ${imageMarkup}
+            ${getLocalizedProductImage(p)}
         </div>
         <div class="product-info${isSoldOut ? ' is-muted' : ''}">
             <div class="product-meta-row">
@@ -933,10 +928,7 @@ function renderFeaturedProducts() {
             .map(id => products.find(p => p.id === id && !p.outOfStock))
             .filter(Boolean)
             .slice(0, 4);
-        featContainer.innerHTML = featuredItems.map(item => generateProductCardHTML(item, {
-            cardClass: 'featured-card',
-            imageLoading: 'eager'
-        })).join('');
+        featContainer.innerHTML = featuredItems.map(generateProductCardHTML).join('');
     }
 
     refreshPrices();
