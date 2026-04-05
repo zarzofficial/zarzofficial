@@ -3,43 +3,43 @@ const products = [
     {
         id: 'sub1', title: 'شات جي بي تي بلس - ChatGPT Plus', category: 'subscriptions',
         desc: 'استمتع بأقوى نسخة من شات جي بي تي مع سرعة وأداء متقدم. يمنحك هذا الاشتراك وصولاً لأحدث نماذج الذكاء الاصطناعي، إنشاء الصور، تحليل الملفات، والمساعدة السلسة في المهام اليومية.<br> • استجابات أسرع وأكثر دقة<br> • استخدام مكثف بدون حدود مزعجة<br> • دعم رفع وتحليل الملفات<br> • إنشاء الصور وقدرات ذكاء اصطناعي متقدمة<br> • تجربة مخصصة مع أحدث الميزات.', basePrice: 9999 / 940,
-        icon: '<img src="./assets/chatgpt-plus-v4.webp" alt="ChatGPT Plus" class="full-cover-img">',
+        icon: '<img src="/assets/chatgpt-plus-v4.webp" alt="ChatGPT Plus" class="full-cover-img">',
         rating: '5.0', details: { type: 'حساب خاص', duration: 'شهر واحد', delivery: 'واتساب', options: [{ label: 'اشتراك شهر واحد', price: 9999 / 940 }] }
     },
     {
         id: 'sub2', title: 'جيميني برو - Gemini Pro', category: 'subscriptions',
         desc: 'وصول لنسخة Gemini Advanced المتميزة. يُسلّم عبر الواتساب.', basePrice: 10,
-        icon: '<img src="./assets/gemini-pro-v3.webp" alt="Gemini Pro" class="full-cover-img">',
+        icon: '<img src="/assets/gemini-pro-v3.webp" alt="Gemini Pro" class="full-cover-img">',
         rating: '4.9', details: { type: 'حساب خاص', duration: 'شهر واحد', delivery: 'واتساب', options: [{ label: 'اشتراك شهر واحد', price: 10 }] }
     },
     {
         id: 'web1', title: 'إنشاء متجر إلكتروني', category: 'webdev',
         desc: 'إنشاء شامل لمتجر إلكتروني متميز ومتجاوب بتصميم عصري احترافي.', basePrice: 130000 / 940,
-        icon: '<img src="./assets/ecommerce-store-v4.webp" alt="E-commerce Store" class="full-cover-img">',
+        icon: '<img src="/assets/ecommerce-store-v4.webp" alt="E-commerce Store" class="full-cover-img">',
         rating: '5.0', details: { type: 'خدمة', includes: ['تصميم مخصص', 'ربط بوابات الدفع', 'لوحة تحكم'], hasForm: true }
     },
     {
         id: 'sm2', title: 'متابعين تيك توك', category: 'social',
         desc: 'زيادة فورية لحضورك على تيك توك. ابدأ برؤية النتائج في دقائق معدودة.', basePrice: 0.01,
-        icon: '<img src="./assets/tiktok-followers-v4.webp" alt="TikTok Followers" class="full-cover-img">',
+        icon: '<img src="/assets/tiktok-followers-v4.webp" alt="TikTok Followers" class="full-cover-img">',
         rating: '4.9', details: { type: 'حسابات عالية الجودة', delivery: '5-30 دقيقة', batch: 1 }
     },
     {
         id: 'sm3', title: 'متابعين فيسبوك', category: 'social',
         desc: 'تنمية صفحتك أو حسابك على فيسبوك بشكل طبيعي مع خدمتنا السريعة والآمنة.', basePrice: 0.01,
-        icon: '<img src="./assets/facebook-followers-v4.webp" alt="Facebook Followers" class="full-cover-img">',
+        icon: '<img src="/assets/facebook-followers-v4.webp" alt="Facebook Followers" class="full-cover-img">',
         rating: '4.7', details: { type: 'حسابات ذات مظهر حقيقي', delivery: '1-3 ساعات', batch: 1 }
     },
     {
         id: 'sm1', title: 'متابعين انستقرام', category: 'social',
         desc: 'متابعين انستقرام بجودة عالية. تسليم فوري خلال 1-2 ساعة.', basePrice: 0.01,
-        icon: '<img src="./assets/instagram-followers-v4.webp" alt="Instagram Followers" class="full-cover-img">',
+        icon: '<img src="/assets/instagram-followers-v4.webp" alt="Instagram Followers" class="full-cover-img">',
         rating: '4.8', details: { type: 'مختلط (حقيقي وروبوتات عالية الجودة)', delivery: '1-2 ساعة', batch: 1 }
     },
     {
         id: 'g1', title: 'شدات ببجي موبايل', category: 'gaming', outOfStock: true,
         desc: 'شحن فوري لشدات ببجي موبايل. آمن وموثوق مباشرة عبر رقم اللاعب (ID).', basePrice: 5,
-        icon: '<img src="./assets/pubg-uc-v4.webp" alt="PUBG Mobile UC" class="full-cover-img">',
+        icon: '<img src="/assets/pubg-uc-v4.webp" alt="PUBG Mobile UC" class="full-cover-img">',
         rating: '5.0', details: { type: 'شحن', requiresId: true, requiresCountry: true, options: [
             { label: '60 شدة', price: 5 }, { label: '325 شدة', price: 20 }, { label: '660 شدة', price: 40 }
         ]}
@@ -47,7 +47,7 @@ const products = [
     {
         id: 'g2', title: 'جواهر فري فاير', category: 'gaming', outOfStock: true,
         desc: 'احصل على جواهر فري فاير فوراً وبكل أمان عبر رقم اللاعب (ID).', basePrice: 4,
-        icon: '<img src="./assets/freefire-diamonds-v4.webp" alt="Free Fire Diamonds" class="full-cover-img">',
+        icon: '<img src="/assets/freefire-diamonds-v4.webp" alt="Free Fire Diamonds" class="full-cover-img">',
         rating: '4.9', details: { type: 'شحن', requiresId: true, requiresCountry: true, options: [
             { label: '100 جوهرة', price: 4 }, { label: '520 جوهرة', price: 20 }, { label: '1060 جوهرة', price: 40 }
         ]}
@@ -55,13 +55,13 @@ const products = [
     {
         id: 'web2', title: 'تعديل مواقع إلكترونية', category: 'webdev',
         desc: 'إصلاح الأخطاء، إعادة تصميم الأقسام، أو إضافة ميزات جديدة لموقعك الحالي بكل احترافية.', basePrice: 85000 / 940,
-        icon: '<img src="./assets/web-modification-v4.webp" alt="Website Modification" class="full-cover-img">',
+        icon: '<img src="/assets/web-modification-v4.webp" alt="Website Modification" class="full-cover-img">',
         rating: '4.8', details: { type: 'خدمة', includes: ['تعديلات واجهة المستخدم', 'تحسين الأكواد', 'إصلاح الأخطاء'], hasForm: true }
     },
     {
         id: 'web3', title: 'تأجير موقع أو متجر إلكتروني', category: 'webdev',
         desc: 'خدمة تأجير شهري لموقع أو متجر إلكتروني جاهز للاستخدام، مع أداء سلس على الموبايل والكمبيوتر، والاستضافة وربط الدومين مشمولان.', basePrice: 30000 / 940,
-        icon: '<img src="./assets/webstore-rental-v1.webp" alt="Website or Online Store Rental" class="full-cover-img">',
+        icon: '<img src="/assets/webstore-rental-v1.webp" alt="Website or Online Store Rental" class="full-cover-img">',
         rating: '4.9', details: { type: 'خدمة شهرية', includes: ['موقع أو متجر احترافي جاهز للاستخدام', 'تصميم متجاوب بالكامل للموبايل والكمبيوتر', 'دعم وسائل الدفع والتحويل والدفع عند الاستلام', 'صفحة تواصل تشمل الهاتف وواتساب والبريد', 'قاعدة بيانات منظمة للعملاء والطلبات', 'لوحة تحكم بسيطة لإدارة الطلبات وتحديثها', 'أداء سريع وسلس بدون تهنيج', 'الاستضافة وربط الدومين مشمولان'], hasForm: true }
     }
 ];
@@ -361,6 +361,9 @@ function t(en, ar) {
     return appState.lang === 'ar' ? ar : en;
 }
 
+const RECENT_ORDERS_PAGE_SIZE = 5;
+let visibleRecentOrdersCount = RECENT_ORDERS_PAGE_SIZE;
+
 function localizeChoice(value) {
     if (value && typeof value === 'object') {
         return appState.lang === 'ar' ? (value.ar || value.en || '') : (value.en || value.ar || '');
@@ -438,6 +441,167 @@ function isWishlisted(productId) {
     return appState.wishlist.includes(productId);
 }
 
+const PRODUCT_ROUTE_SLUGS = {
+    sm1: 'instagram-followers',
+    sm2: 'tiktok-followers',
+    sm3: 'facebook-followers',
+    g1: 'pubg-mobile-uc',
+    g2: 'free-fire-diamonds',
+    sub1: 'chatgpt-plus-1-month',
+    sub2: 'gemini-pro-1-month',
+    web1: 'ecommerce-store-creation',
+    web2: 'website-modification',
+    web3: 'website-store-rental'
+};
+
+const PRODUCT_SLUG_TO_ID = Object.fromEntries(
+    Object.entries(PRODUCT_ROUTE_SLUGS).map(([productId, slug]) => [slug, productId])
+);
+
+const STATIC_PAGE_ROUTES = {
+    home: '/',
+    store: '/products/',
+    account: '/account/',
+    contact: '/contact/',
+    terms: '/terms/'
+};
+
+const STATIC_PAGE_URLS = {
+    home: 'https://zarzofficial.com/',
+    store: 'https://zarzofficial.com/products/',
+    account: 'https://zarzofficial.com/account/',
+    contact: 'https://zarzofficial.com/contact/',
+    terms: 'https://zarzofficial.com/terms/'
+};
+
+function getProductSlug(productId) {
+    return PRODUCT_ROUTE_SLUGS[productId] || '';
+}
+
+function getProductIdBySlug(slug) {
+    return PRODUCT_SLUG_TO_ID[String(slug || '').toLowerCase()] || '';
+}
+
+function normalizeRoutePath(pathname = window.location.pathname) {
+    if (!pathname) return '/';
+
+    let normalized = pathname.replace(/\/{2,}/g, '/');
+    if (!normalized.startsWith('/')) normalized = `/${normalized}`;
+    if (normalized === '/index.html') return '/';
+
+    return normalized.replace(/\/index\.html$/i, '/');
+}
+
+function getRouteContext() {
+    const pathname = (window.location.pathname || '').toLowerCase();
+    const normalizedPath = normalizeRoutePath(pathname);
+    const segments = normalizedPath.split('/').filter(Boolean);
+    const legacyHash = window.location.hash.replace('#', '').trim().toLowerCase();
+
+    if (pathname.endsWith('/store.html')) return { page: 'store', view: 'store', legacy: true, legacyHash };
+    if (pathname.endsWith('/account.html')) return { page: 'account', view: 'account', legacy: true, legacyHash };
+    if (pathname.endsWith('/contact.html')) return { page: 'contact', view: 'contact', legacy: true, legacyHash };
+
+    if (segments[0] === 'products') {
+        if (segments.length === 1) return { page: 'store', view: 'store', legacyHash };
+        if (segments[1] === 'cart') return { page: 'store', view: 'cart', legacyHash };
+        if (segments[1] === 'checkout') return { page: 'store', view: 'checkout', legacyHash };
+
+        return { page: 'store', view: 'details', slug: segments[1], legacyHash };
+    }
+
+    if (segments[0] === 'account') return { page: 'account', view: 'account', legacyHash };
+    if (segments[0] === 'contact') return { page: 'contact', view: 'contact', legacyHash };
+    if (segments[0] === 'terms') return { page: 'terms', view: 'terms', legacyHash };
+    if (legacyHash === 'terms') return { page: 'home', view: 'terms', legacyHash };
+
+    return { page: 'home', view: 'home', legacyHash };
+}
+
+function getCurrentStaticPageView() {
+    return getRouteContext().page;
+}
+
+function isStorePage() {
+    return getRouteContext().page === 'store';
+}
+
+function hasView(viewId) {
+    return Boolean(document.getElementById(`view-${viewId}`));
+}
+
+function buildStorePath(viewId, { category = '', productId = '' } = {}) {
+    if (viewId === 'cart') return '/products/cart/';
+    if (viewId === 'checkout') return '/products/checkout/';
+
+    if (viewId === 'details') {
+        const slug = getProductSlug(productId || localStorage.getItem('zarz_active_product'));
+        return slug ? `/products/${slug}/` : STATIC_PAGE_ROUTES.store;
+    }
+
+    const url = new URL(STATIC_PAGE_ROUTES.store, window.location.origin);
+    if (category && category !== 'all') {
+        url.searchParams.set('category', category);
+    }
+
+    return `${url.pathname}${url.search}`;
+}
+
+function buildRoutePath(viewId, options = {}) {
+    if (viewId === 'store' || viewId === 'cart' || viewId === 'checkout' || viewId === 'details') {
+        return buildStorePath(viewId, options);
+    }
+
+    return STATIC_PAGE_ROUTES[viewId] || STATIC_PAGE_ROUTES.home;
+}
+
+function buildAbsoluteUrl(routePath) {
+    return new URL(routePath, window.location.origin).toString();
+}
+
+function redirectToStaticPage(viewId, options = {}) {
+    window.location.assign(buildAbsoluteUrl(buildRoutePath(viewId, options)));
+}
+
+function redirectToStore(options = {}) {
+    redirectToStaticPage('store', options);
+}
+
+function setActiveStoreFilter(filter = 'all') {
+    const filterItems = Array.from(document.querySelectorAll('.category-filter li'));
+    if (!filterItems.length) return false;
+
+    let matched = false;
+    filterItems.forEach((item) => {
+        const isActive = item.dataset.filter === filter;
+        item.classList.toggle('active', isActive);
+        if (isActive) matched = true;
+    });
+
+    if (!matched) {
+        filterItems.forEach((item, index) => {
+            item.classList.toggle('active', index === 0);
+        });
+    }
+
+    return matched;
+}
+
+function applyStoreCategoryFromUrl() {
+    if (!hasView('store')) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const category = params.get('category');
+    const searchInput = document.getElementById('service-search');
+
+    if (searchInput) searchInput.value = '';
+    if (!category || !setActiveStoreFilter(category)) {
+        setActiveStoreFilter('all');
+    }
+
+    renderProducts(getFilteredProducts());
+}
+
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
     // Apply persisted language settings to document
@@ -500,32 +664,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Search & Filter
     const serviceSearch = document.getElementById('service-search');
-    const runStoreSearch = debounce(() => {
-        renderProducts(getFilteredProducts());
-    }, 90);
+    if (serviceSearch) {
+        const runStoreSearch = debounce(() => {
+            renderProducts(getFilteredProducts());
+        }, 90);
 
-    serviceSearch.addEventListener('input', runStoreSearch);
+        serviceSearch.addEventListener('input', runStoreSearch);
 
-    document.querySelectorAll('.category-filter li').forEach(li => {
-        li.addEventListener('click', (e) => {
-            const targetLi = e.target.closest('li');
-            if(!targetLi) return;
-            document.querySelectorAll('.category-filter li').forEach(el => el.classList.remove('active'));
-            targetLi.classList.add('active');
-            const filter = targetLi.dataset.filter;
-            serviceSearch.value = '';
+        document.querySelectorAll('.category-filter li').forEach(li => {
+            li.addEventListener('click', (e) => {
+                const targetLi = e.target.closest('li');
+                if(!targetLi) return;
+                document.querySelectorAll('.category-filter li').forEach(el => el.classList.remove('active'));
+                targetLi.classList.add('active');
+                const filter = targetLi.dataset.filter;
+                serviceSearch.value = '';
 
-            renderProducts(getFilteredProducts(filter, ''));
+                renderProducts(getFilteredProducts(filter, ''));
+            });
         });
-    });
+
+        applyStoreCategoryFromUrl();
+    }
 
     // -- Form Persistence Setup --
     const restoreCheckout = () => {
         const savedCheckout = safeJsonParse('zarz_checkout', {});
-        if(savedCheckout.name) document.getElementById('checkout-name').value = savedCheckout.name;
-        if(savedCheckout.phone) document.getElementById('checkout-phone').value = savedCheckout.phone;
-        if(savedCheckout.paymentMethod) document.getElementById('checkout-payment-method').value = savedCheckout.paymentMethod;
-        if(savedCheckout.transactionLast4) document.getElementById('checkout-transaction-last4').value = savedCheckout.transactionLast4;
+        const nameInput = document.getElementById('checkout-name');
+        const phoneInput = document.getElementById('checkout-phone');
+        const paymentMethodInput = document.getElementById('checkout-payment-method');
+        const transactionLast4Input = document.getElementById('checkout-transaction-last4');
+
+        if (savedCheckout.name && nameInput) nameInput.value = savedCheckout.name;
+        if (savedCheckout.phone && phoneInput) phoneInput.value = savedCheckout.phone;
+        if (savedCheckout.paymentMethod && paymentMethodInput) paymentMethodInput.value = savedCheckout.paymentMethod;
+        if (savedCheckout.transactionLast4 && transactionLast4Input) transactionLast4Input.value = savedCheckout.transactionLast4;
     };
     
     restoreCheckout();
@@ -587,8 +760,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(window.saveDetailsState) window.saveDetailsState();
     }, 160);
 
-    detailsContainer.addEventListener('input', scheduleDetailsSave);
-    detailsContainer.addEventListener('change', scheduleDetailsSave);
+    if (detailsContainer) {
+        detailsContainer.addEventListener('input', scheduleDetailsSave);
+        detailsContainer.addEventListener('change', scheduleDetailsSave);
+    }
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape') closeQuickView();
     });
@@ -655,7 +830,6 @@ function updateSeoMeta(viewId) {
     const ogUrlMeta = document.querySelector('meta[property="og:url"]');
     const twitterTitleMeta = document.querySelector('meta[name="twitter:title"]');
     const twitterDescriptionMeta = document.querySelector('meta[name="twitter:description"]');
-    const seoBaseUrl = 'https://zarzofficial.com/';
 
     const seoByView = {
         home: {
@@ -689,22 +863,23 @@ function updateSeoMeta(viewId) {
     };
 
     let seo = seoByView[viewId] || seoByView.home;
+    let seoUrl = buildAbsoluteUrl(buildRoutePath(viewId));
 
     if (viewId === 'details') {
         const activeProductId = localStorage.getItem('zarz_active_product');
         const product = products.find(p => p.id === activeProductId);
         if (product) {
-            const { title, desc } = getProductCopy(product);
+            const productCopy = getProductCopy(product);
+            const cleanDescription = String(productCopy.desc || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
             seo = {
-                title: `${title} | زارز | zarz`,
-                description: desc
+                title: productCopy.title + ' | زارز | zarz',
+                description: cleanDescription || seoByView.store.description
             };
+            seoUrl = buildAbsoluteUrl(buildRoutePath('details', { productId: product.id }));
         }
+    } else if (viewId === 'store' && isStorePage()) {
+        seoUrl = window.location.origin + normalizeRoutePath(window.location.pathname) + window.location.search;
     }
-
-    const seoUrl = viewId && viewId !== 'home'
-        ? `${seoBaseUrl}#${viewId}`
-        : seoBaseUrl;
 
     document.title = seo.title;
     if (descriptionMeta) descriptionMeta.setAttribute('content', seo.description);
@@ -717,71 +892,178 @@ function updateSeoMeta(viewId) {
 }
 
 // Navigation / Router
-function navigateTo(viewId) {
+function navigateTo(viewId, options = {}) {
+    const currentPageView = getCurrentStaticPageView();
+    const directPageViews = new Set(['home', 'store', 'account', 'contact', 'terms']);
+    const storeOnlyViews = new Set(['details', 'cart', 'checkout']);
+
+    if (directPageViews.has(viewId) && (currentPageView !== viewId || !hasView(viewId))) {
+        redirectToStaticPage(viewId, options);
+        return;
+    }
+
+    if (storeOnlyViews.has(viewId) && (!isStorePage() || !hasView(viewId))) {
+        redirectToStaticPage(viewId, options);
+        return;
+    }
+
+    const targetView = document.getElementById('view-' + viewId);
+    if (!targetView) return;
+
     localStorage.setItem('zarz_view', viewId);
-    
-    if (window.location.hash !== '#' + viewId) {
-        window.history.pushState(null, null, '#' + viewId);
+
+    const routePath = buildRoutePath(viewId, {
+        category: options.category,
+        productId: options.productId
+    });
+    const targetUrl = new URL(routePath, window.location.origin);
+    const currentPathAndSearch = normalizeRoutePath(window.location.pathname) + window.location.search;
+    const targetPathAndSearch = normalizeRoutePath(targetUrl.pathname) + targetUrl.search;
+
+    if (!options.skipHistory && currentPathAndSearch !== targetPathAndSearch) {
+        window.history.pushState(null, '', targetPathAndSearch);
     }
     
     document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
     document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-    
-    const targetView = document.getElementById(`view-${viewId}`);
-    if(targetView) {
-        targetView.classList.add('active');
-        
-        // Prevent smooth scrolling animation when changing pages
-        const originalScrollBehavior = document.documentElement.style.scrollBehavior;
-        document.documentElement.style.scrollBehavior = 'auto';
-        window.scrollTo(0, 0);
-        document.documentElement.style.scrollBehavior = originalScrollBehavior;
-        
-        // Update nav active state
-        const navLink = document.querySelector(`.nav-link[data-view="${viewId === 'details' ? 'store' : viewId}"]`);
-        if(navLink) navLink.classList.add('active');
 
-        // Specific view renders
-        if(viewId === 'store') renderProducts(getFilteredProducts());
-        if(viewId === 'cart' || viewId === 'checkout') renderCart();
+    targetView.classList.add('active');
+
+    const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    document.documentElement.style.scrollBehavior = originalScrollBehavior;
+
+    const navTargetView = viewId === 'details' ? 'store' : viewId;
+    const navLink = document.querySelector('.nav-link[data-view="' + navTargetView + '"]');
+    if (navLink) navLink.classList.add('active');
+
+    if (viewId === 'store') {
+        if (typeof options.category !== 'undefined') {
+            setActiveStoreFilter(options.category || 'all');
+        } else {
+            applyStoreCategoryFromUrl();
+        }
+        renderProducts(getFilteredProducts());
     }
+    if (viewId === 'cart' || viewId === 'checkout') renderCart();
 
     updateSeoMeta(viewId);
 }
 
 // To use from hero buttons
 function filterStore(cat) {
+    if (!isStorePage() || !hasView('store')) {
+        redirectToStore({ category: cat });
+        return;
+    }
+
     const searchInput = document.getElementById('service-search');
     if (searchInput) searchInput.value = '';
 
-    document.querySelectorAll('.category-filter li').forEach(el => el.classList.remove('active'));
-    const targetLi = document.querySelector(`.category-filter li[data-filter="${cat}"]`);
-    if(targetLi) targetLi.classList.add('active');
-    navigateTo('store');
+    navigateTo('store', { category: cat || 'all' });
+    renderProducts(getFilteredProducts(cat || 'all', ''));
 }
 
-function initRouter(isHashChange = false) {
-    let hash = window.location.hash.replace('#', '');
-    let viewToLoad = hash;
-    
-    if (!viewToLoad) {
-        viewToLoad = isHashChange ? 'home' : (localStorage.getItem('zarz_view') || 'home');
+function initRouter() {
+    const routeContext = getRouteContext();
+    const legacyHash = String(routeContext.legacyHash || '').toLowerCase();
+
+    if (routeContext.legacy) {
+        if (routeContext.page === 'store') {
+            if (legacyHash === 'cart') {
+                redirectToStaticPage('cart');
+                return;
+            }
+            if (legacyHash === 'checkout') {
+                redirectToStaticPage('checkout');
+                return;
+            }
+            if (legacyHash === 'details') {
+                const activeProductId = localStorage.getItem('zarz_active_product');
+                if (activeProductId && products.find(product => product.id === activeProductId)) {
+                    redirectToStaticPage('details', { productId: activeProductId });
+                    return;
+                }
+            }
+        }
+
+        redirectToStaticPage(routeContext.page);
+        return;
     }
-    
-    if(viewToLoad === 'details') {
-        const prodId = localStorage.getItem('zarz_active_product');
-        if(prodId && products.find(p => p.id === prodId)) {
-            viewDetails(prodId);
+
+    if (legacyHash) {
+        if (legacyHash === 'home') {
+            redirectToStaticPage('home');
             return;
-        } else {
-            viewToLoad = 'store';
+        }
+        if (legacyHash === 'store') {
+            redirectToStaticPage('store');
+            return;
+        }
+        if (legacyHash === 'account') {
+            redirectToStaticPage('account');
+            return;
+        }
+        if (legacyHash === 'contact') {
+            redirectToStaticPage('contact');
+            return;
+        }
+        if (legacyHash === 'terms') {
+            redirectToStaticPage('terms');
+            return;
+        }
+        if (legacyHash === 'cart') {
+            redirectToStaticPage('cart');
+            return;
+        }
+        if (legacyHash === 'checkout') {
+            redirectToStaticPage('checkout');
+            return;
+        }
+        if (legacyHash === 'details') {
+            const activeProductId = localStorage.getItem('zarz_active_product');
+            if (activeProductId && products.find(product => product.id === activeProductId)) {
+                redirectToStaticPage('details', { productId: activeProductId });
+                return;
+            }
+            redirectToStaticPage('store');
+            return;
         }
     }
-    navigateTo(viewToLoad);
+
+    if (routeContext.view === 'details') {
+        const productId = getProductIdBySlug(routeContext.slug);
+        if (!productId) {
+            redirectToStaticPage('store');
+            return;
+        }
+
+        viewDetails(productId);
+        return;
+    }
+
+    if (!hasView(routeContext.view)) {
+        const fallbackView = hasView(routeContext.page) ? routeContext.page : 'home';
+        navigateTo(fallbackView, { skipHistory: true });
+        return;
+    }
+
+    if (routeContext.view === 'store') {
+        const category = new URLSearchParams(window.location.search).get('category') || 'all';
+        navigateTo('store', { category, skipHistory: true });
+        return;
+    }
+
+    navigateTo(routeContext.view, { skipHistory: true });
 }
 
+window.addEventListener('popstate', () => {
+    initRouter();
+});
+
 window.addEventListener('hashchange', () => {
-    initRouter(true);
+    initRouter();
 });
 
 // Render Products
@@ -1159,6 +1441,12 @@ function viewDetails(productId) {
     localStorage.setItem('zarz_active_product', productId);
     const product = products.find(p => p.id === productId);
     if(!product) return;
+
+    const container = document.getElementById('details-container');
+    if (!hasView('details') || !container) {
+        redirectToStaticPage('details', { productId });
+        return;
+    }
     
     const { title, desc } = getProductCopy(product);
     let dynamicHtml = '';
@@ -1275,7 +1563,6 @@ function viewDetails(productId) {
         `;
     }
 
-    const container = document.getElementById('details-container');
     container.innerHTML = `
         <div class="details-wrapper">
                 <div class="details-image"${getProductImageStyleAttr(product, 'details')}>${getLocalizedProductImage(product)}</div>
@@ -1314,7 +1601,7 @@ function viewDetails(productId) {
         </div>
     `;
     
-    navigateTo('details');
+    navigateTo('details', { productId });
     setTimeout(() => {
         if(window.restoreDetailsState) window.restoreDetailsState();
     }, 0);
@@ -1435,6 +1722,7 @@ function addToCart(productId) {
 
 function updateCartCount(animate = true) {
     const el = document.getElementById('cart-count');
+    if (!el) return;
     el.textContent = appState.cart.length;
     
     if (animate) {
@@ -1455,13 +1743,19 @@ function removeFromCart(cartId) {
 function renderCart() {
     const container = document.getElementById('cart-items');
     const checkoutBtn = document.getElementById('checkout-btn');
+    const cartSubtotal = document.getElementById('cart-subtotal');
+    const cartFees = document.getElementById('cart-fees');
+    const cartTax = document.getElementById('cart-tax');
+    const cartTotal = document.getElementById('cart-total');
+    if (!container || !checkoutBtn || !cartSubtotal || !cartFees || !cartTotal) return;
     
     if(appState.cart.length === 0) {
         container.innerHTML = `<p style="color:var(--text-secondary)">السلة فارغة حالياً.</p>`;
         checkoutBtn.disabled = true;
-        document.getElementById('cart-subtotal').textContent = formatPrice(0);
-        document.getElementById('cart-fees').textContent = formatPrice(0);
-        document.getElementById('cart-total').textContent = formatPrice(0);
+        cartSubtotal.textContent = formatPrice(0);
+        cartFees.textContent = formatPrice(0);
+        cartTotal.textContent = formatPrice(0);
+        if (cartTax) cartTax.textContent = formatPrice(0);
         return;
     }
 
@@ -1497,10 +1791,10 @@ function renderCart() {
     const taxSar = 0; // Set to 0
     const totalSar = subtotalSar + feesSar + taxSar;
 
-    document.getElementById('cart-subtotal').textContent = formatPrice(subtotalSar);
-    document.getElementById('cart-fees').textContent = formatPrice(feesSar);
-    if(document.getElementById('cart-tax')) document.getElementById('cart-tax').textContent = formatPrice(taxSar);
-    document.getElementById('cart-total').textContent = formatPrice(totalSar);
+    cartSubtotal.textContent = formatPrice(subtotalSar);
+    cartFees.textContent = formatPrice(feesSar);
+    if(cartTax) cartTax.textContent = formatPrice(taxSar);
+    cartTotal.textContent = formatPrice(totalSar);
     
     // Update checkout screen summary as well
     const summaryBox = document.getElementById('checkout-summary-box');
@@ -1528,11 +1822,11 @@ function buildOrderDetails(appCart, includeFormatting = false) {
         const copy = getProductCopy(item.product);
         const title = copy.title;
         let metaParts = [];
-        if(item.customData.link) metaParts.push((appState.lang === 'ar' ? '??????' : 'Link') + ': ' + item.customData.link);
+        if(item.customData.link) metaParts.push((appState.lang === 'ar' ? 'الرابط' : 'Link') + ': ' + item.customData.link);
         if(item.customData.package) metaParts.push(item.customData.package);
-        if(item.customData.playerId) metaParts.push((appState.lang === 'ar' ? '??????' : 'Player ID') + ': ' + item.customData.playerId);
-        if(item.customData.phone) metaParts.push((appState.lang === 'ar' ? '?????' : 'Phone') + ': ' + item.customData.phone);
-        if(item.customData.server) metaParts.push((appState.lang === 'ar' ? '???????' : 'Server') + ': ' + item.customData.server);
+        if(item.customData.playerId) metaParts.push((appState.lang === 'ar' ? 'رقم اللاعب' : 'Player ID') + ': ' + item.customData.playerId);
+        if(item.customData.phone) metaParts.push((appState.lang === 'ar' ? 'الهاتف' : 'Phone') + ': ' + item.customData.phone);
+        if(item.customData.server) metaParts.push((appState.lang === 'ar' ? 'السيرفر' : 'Server') + ': ' + item.customData.server);
         const titleText = includeFormatting ? ('*' + item.qty + 'x ' + title + '*') : (item.qty + 'x ' + title);
         const metaText = metaParts.length ? ('\n' + metaParts.join(' | ')) : '';
         return titleText + ' - ' + formatPrice(item.totalPriceSar) + metaText;
@@ -1602,7 +1896,7 @@ window.processOrder = async function() {
     const transactionLast4 = document.getElementById('checkout-transaction-last4').value.trim();
 
     if(!nameInput || !phoneInput) {
-        showToast(appState.lang === 'ar' ? '???? ??? ???? ??????' : 'Please fill all fields', 'error');
+        showToast(appState.lang === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill all fields', 'error');
         return;
     }
     if(!paymentMethod) {
@@ -1673,7 +1967,7 @@ window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', subm
         method: paymentMethodLabel,
         mode: paymentMethod,
         paymentReference: transactionLast4 || '-',
-        status: appState.lang === 'ar' ? '??? ????????' : 'Processing',
+        status: appState.lang === 'ar' ? 'قيد المعالجة' : 'Processing',
         total: totalStr,
         items: appState.cart.map(i => ({ title: getProductCopy(i.product).title, qty: i.qty }))
     };
@@ -1685,7 +1979,7 @@ window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', subm
     updateCartCount();
     renderOrders();
 
-    const msg = '*??? ????*\n*??? ?????:* ' + orderNum + '\n*?????:* ' + nameInput + '\n*??? ??????:* ' + phoneInput + '\n*????? ?????:* ' + paymentMethodLabel + (transactionLast4 ? ('\n*??? 4 ????? ?? ???????:* ' + transactionLast4) : '') + '\n\n*?????? ?????:*\n' + detailsStr + '\n\n*????????:* ' + totalStr;
+    const msg = '*طلب جديد*\n*رقم الطلب:* ' + orderNum + '\n*الاسم:* ' + nameInput + '\n*رقم الهاتف:* ' + phoneInput + '\n*طريقة الدفع:* ' + paymentMethodLabel + (transactionLast4 ? ('\n*آخر 4 أرقام من التحويل:* ' + transactionLast4) : '') + '\n\n*تفاصيل الطلب:*\n' + detailsStr + '\n\n*الإجمالي:* ' + totalStr;
 
     navigateTo('account');
     if(submitBtn) {
@@ -1700,8 +1994,9 @@ window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', subm
     }
 };
 
-function renderOrders() {
+function renderOrdersLegacy() {
     const list = document.querySelector('.orders-list');
+    if (!list) return;
     const emptyState = list.querySelector('.empty-state');
     
     // Remove old orders rendered (keep empty state if exists)
@@ -1722,9 +2017,9 @@ function renderOrders() {
             : 'لا توجد تفاصيل إضافية';
             
         return `
-        <div class="cart-item" style="border-left: 4px solid var(--accent-green); animation: slideUpFade 0.4s ease-out; flex-direction: column; align-items: stretch; cursor: pointer; padding: 1rem;" onclick="toggleOrderDetails('${order.id}')">
-            <div style="display:flex; justify-content: space-between; align-items: center; width: 100%;">
-                <div style="display:flex; align-items:center; gap:10px;">
+        <div class="cart-item order-card" onclick="toggleOrderDetails('${order.id}')">
+            <div class="order-card-header">
+                <div class="order-card-main">
                     <div class="cart-item-img"><i class="fa-solid fa-check text-green"></i></div>
                     <div class="cart-item-info">
                         <div class="cart-item-title">طلب #${order.id}</div>
@@ -1733,14 +2028,14 @@ function renderOrders() {
                         </div>
                     </div>
                 </div>
-                <div style="display:flex; gap:10px;">
+                <div class="order-card-actions">
                     <button class="btn btn-secondary order-delete-btn" style="padding:0.4rem 0.8rem; font-size:0.8rem; border-color:var(--accent-red); color:var(--accent-red);" onclick="event.stopPropagation(); deleteOrder('${order.id}')">
                         <i class="fa-solid fa-trash"></i> حذف
                     </button>
-                    <button class="btn btn-primary" style="padding:0.4rem; font-size:0.8rem;"><i class="fa-solid fa-chevron-down"></i></button>
+                    <button class="btn btn-primary order-toggle-btn" style="padding:0.4rem; font-size:0.8rem;"><i class="fa-solid fa-chevron-down"></i></button>
                 </div>
             </div>
-            <div id="order-details-${order.id}" style="display:none; padding-top: 1rem; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); font-size:0.95rem; color:var(--text-secondary); width: 100%;">
+            <div id="order-details-${order.id}" class="order-card-details" style="display:none; padding-top: 1rem; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); font-size:0.95rem; color:var(--text-secondary); width: 100%;">
                 <strong style="color:var(--text-primary);">الخدمات المطلوبة:</strong><br>
                 ${itemsList}
                 <br><br>
@@ -1751,6 +2046,142 @@ function renderOrders() {
     }).join('');
     
     list.insertAdjacentHTML('beforeend', ordersHtml);
+}
+
+function updateRecentOrdersMeta(totalOrders, visibleOrders) {
+    const totalCount = document.getElementById('orders-total-count');
+    const visibleCount = document.getElementById('orders-visible-count');
+    const totalLabel = document.getElementById('orders-total-label');
+    const visibleLabel = document.getElementById('orders-visible-label');
+    const summaryNote = document.getElementById('orders-summary-note');
+
+    if (totalCount) totalCount.textContent = String(totalOrders);
+    if (visibleCount) visibleCount.textContent = String(visibleOrders);
+    if (totalLabel) totalLabel.textContent = t('Total orders', 'إجمالي الطلبات');
+    if (visibleLabel) visibleLabel.textContent = t('Visible now', 'المعروض الآن');
+
+    if (!summaryNote) return;
+
+    if (totalOrders === 0) {
+        summaryNote.textContent = t(
+            'Your newest orders will appear here once you place your first order.',
+            'ستظهر أحدث طلباتك هنا فور تنفيذ أول طلب.'
+        );
+        return;
+    }
+
+    if (visibleOrders < totalOrders) {
+        summaryNote.textContent = t(
+            `Showing ${visibleOrders} of ${totalOrders} orders, newest first.`,
+            `يتم عرض ${visibleOrders} من أصل ${totalOrders} طلبات، والأحدث أولاً.`
+        );
+        return;
+    }
+
+    summaryNote.textContent = t(
+        'All your recent orders are visible here, newest first.',
+        'كل طلباتك الأخيرة ظاهرة هنا، والأحدث أولاً.'
+    );
+}
+
+window.showMoreOrders = function() {
+    visibleRecentOrdersCount = Math.min(
+        visibleRecentOrdersCount + RECENT_ORDERS_PAGE_SIZE,
+        appState.orders.length
+    );
+    renderOrders();
+};
+
+function renderOrders() {
+    const list = document.querySelector('.orders-list');
+    if (!list) return;
+
+    const emptyState = list.querySelector('.empty-state');
+    const ordersActions = document.getElementById('orders-actions');
+    const showMoreBtn = document.getElementById('orders-show-more-btn');
+
+    Array.from(list.children).forEach((child) => {
+        if (!child.classList.contains('empty-state')) child.remove();
+    });
+
+    const sortedOrders = [...appState.orders].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    const totalOrders = sortedOrders.length;
+
+    if (totalOrders === 0) {
+        if (emptyState) emptyState.style.display = 'block';
+        if (ordersActions) ordersActions.hidden = true;
+        updateRecentOrdersMeta(0, 0);
+        return;
+    }
+
+    if (emptyState) emptyState.style.display = 'none';
+
+    visibleRecentOrdersCount = Math.min(
+        Math.max(visibleRecentOrdersCount, RECENT_ORDERS_PAGE_SIZE),
+        totalOrders
+    );
+
+    const visibleOrders = sortedOrders.slice(0, visibleRecentOrdersCount);
+    const locale = appState.lang === 'ar' ? 'ar-EG' : 'en-US';
+    const detailsLabel = t('Requested services:', 'الخدمات المطلوبة:');
+    const statusLabel = t('Order status:', 'حالة الطلب:');
+    const inProgressText = t('In progress (contact us on WhatsApp)', 'قيد المعالجة (تواصل معنا عبر واتساب)');
+    const orderTitle = t('Order', 'طلب');
+    const totalLabel = t('Total', 'الإجمالي');
+    const dateLabel = t('Date', 'التاريخ');
+    const deleteLabel = t('Delete', 'حذف');
+    const toggleDetailsLabel = t('Toggle order details', 'عرض تفاصيل الطلب');
+    const noDetailsText = t('No additional details', 'لا توجد تفاصيل إضافية');
+
+    const ordersHtml = visibleOrders.map((order) => {
+        const itemsList = order.items && order.items.length > 0
+            ? order.items.map((item) => `- ${item.qty}x ${item.title}`).join('<br>')
+            : noDetailsText;
+
+        return `
+        <div class="cart-item order-card" onclick="toggleOrderDetails('${order.id}')">
+            <div class="order-card-header">
+                <div class="order-card-main">
+                    <div class="cart-item-img"><i class="fa-solid fa-check text-green"></i></div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-title">${orderTitle} #${order.id}</div>
+                        <div class="cart-item-meta" style="margin-top:0.3rem;">
+                            ${totalLabel}: <span class="text-accent">${order.total}</span> | ${dateLabel}: ${new Date(order.date).toLocaleDateString(locale)}
+                        </div>
+                    </div>
+                </div>
+                <div class="order-card-actions">
+                    <button type="button" class="btn btn-secondary order-delete-btn" style="padding:0.4rem 0.8rem; font-size:0.8rem; border-color:var(--accent-red); color:var(--accent-red);" onclick="event.stopPropagation(); deleteOrder('${order.id}')">
+                        <i class="fa-solid fa-trash"></i> ${deleteLabel}
+                    </button>
+                    <button type="button" class="btn btn-primary order-toggle-btn" style="padding:0.4rem; font-size:0.8rem;" aria-expanded="false" aria-label="${toggleDetailsLabel}">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="order-details-${order.id}" class="order-card-details" style="display:none; padding-top: 1rem; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); font-size:0.95rem; color:var(--text-secondary); width: 100%;">
+                <strong style="color:var(--text-primary);">${detailsLabel}</strong><br>
+                ${itemsList}
+                <br><br>
+                <strong style="color:var(--text-primary);">${statusLabel}</strong> ${inProgressText}
+            </div>
+        </div>
+        `;
+    }).join('');
+
+    list.insertAdjacentHTML('beforeend', ordersHtml);
+
+    updateRecentOrdersMeta(totalOrders, visibleOrders.length);
+
+    const remainingOrders = totalOrders - visibleOrders.length;
+    if (showMoreBtn) {
+        showMoreBtn.textContent = remainingOrders > 0
+            ? t('Show More', 'عرض المزيد')
+            : t('All Visible', 'تم عرض الكل');
+    }
+    if (ordersActions) ordersActions.hidden = remainingOrders <= 0;
 }
 
 window.deleteOrder = function(orderId) {
@@ -1764,7 +2195,19 @@ window.deleteOrder = function(orderId) {
 window.toggleOrderDetails = function(orderId) {
     const detailsDiv = document.getElementById(`order-details-${orderId}`);
     if(detailsDiv) {
-        detailsDiv.style.display = detailsDiv.style.display === 'none' ? 'block' : 'none';
+        const orderCard = detailsDiv.closest('.order-card');
+        const toggleBtn = orderCard ? orderCard.querySelector('.order-toggle-btn') : null;
+        const shouldOpen = detailsDiv.style.display === 'none';
+
+        detailsDiv.style.display = shouldOpen ? 'block' : 'none';
+
+        if (orderCard) {
+            orderCard.classList.toggle('is-open', shouldOpen);
+        }
+
+        if (toggleBtn) {
+            toggleBtn.setAttribute('aria-expanded', String(shouldOpen));
+        }
     }
 };
 

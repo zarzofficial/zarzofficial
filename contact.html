@@ -1,0 +1,248 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>زارز أوفشال | ZARZ - متجر الخدمات الرقمية، شحن الألعاب والاشتراكات</title>
+    <meta name="description"
+        content="زارز أوفشال يقدم خدمات رقمية احترافية تشمل شحن الألعاب، تنمية حسابات التواصل الاجتماعي، الاشتراكات الذكية، وتطوير المتاجر والمواقع بسرعة مع دعم فني متواصل.">
+    <meta name="keywords"
+        content="زارز, zarz, خدمات رقمية, شحن العاب, شدات ببجي, جواهر فري فاير, زيادة متابعين, اشتراكات ذكية, شات جي بي تي, تصميم مواقع, متاجر الكترونية">
+    <meta property="og:title" content="زارز أوفشال | ZARZ - متجر الخدمات الرقمية">
+    <meta property="og:description"
+        content="خدمات رقمية احترافية وسريعة لشحن الألعاب وتطوير المتاجر وحسابات مواقع التواصل.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="زارز أوفشال | ZARZ">
+    <meta name="twitter:description"
+        content="خدمات رقمية احترافية وسريعة لشحن الألعاب لحسابات مواقع التواصل بأسعار تنافسية.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Tajawal:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/style.css?v=6">
+    <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
+    <link rel="manifest" href="/icons/site.webmanifest">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <svg width="38" height="38" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    style="filter: drop-shadow(0px 0px 8px rgba(255, 0, 122, 0.5));">
+                    <rect width="40" height="40" rx="12" fill="url(#logo_grad)" />
+                    <path d="M12 20 L20 12 L26 22 L32 8" stroke="url(#logo_line)" stroke-width="3.5"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                    <circle cx="32" cy="8" r="3.5" fill="#ffffff" />
+                    <text x="20" y="32" font-family="'Outfit', sans-serif" font-size="14" font-weight="900" fill="white"
+                        text-anchor="middle" letter-spacing="1">Z</text>
+                    <defs>
+                        <linearGradient id="logo_grad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#0f0d14" />
+                            <stop offset="1" stop-color="#2a0845" />
+                        </linearGradient>
+                        <linearGradient id="logo_line" x1="12" y1="12" x2="32" y2="22" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#ff007a" />
+                            <stop offset="1" stop-color="#00d4ff" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span class="logo-text" style="font-size: 1.5rem; letter-spacing: -0.5px;">zarz<span
+                        style="font-weight:300; color:var(--text-secondary);">official</span></span>
+            </a>
+
+            <div class="nav-links">
+                <a href="/" class="nav-link" data-view="home" data-i18n="nav_home">الرئيسية</a>
+                <a href="/products/" class="nav-link" data-view="store" data-i18n="nav_store">المتجر</a>
+                <a href="/account/" class="nav-link" data-view="account" data-i18n="nav_account">طلباتي</a>
+                <a href="/contact/" class="nav-link active" data-view="contact" data-i18n="nav_contact">تواصل معنا</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="icon-btn cart-toggle" onclick="navigateTo('cart')" aria-label="Cart">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="badge" id="cart-count">0</span>
+                </button>
+
+                <button class="mobile-menu-btn" aria-label="Mobile Menu">
+                    <div class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="app-content">
+        <!-- Contact Us View -->
+        <section id="view-contact" class="view active">
+            <div class="contact-wrapper glass-panel">
+                <div class="contact-info">
+                    <span class="contact-eyebrow" data-i18n="contact_badge">فريق الدعم</span>
+                    <h2 data-i18n="contact_heading">تواصل معنا</h2>
+                    <p data-i18n="contact_sub">هل لديك استفسارات؟ نحن هنا لمساعدتك.</p>
+                    <div class="contact-highlights">
+                        <div class="contact-highlight">
+                            <strong data-i18n="contact_highlight_1_title">رد سريع</strong>
+                            <span data-i18n="contact_highlight_1_text">غالبًا خلال وقت قصير عبر واتساب</span>
+                        </div>
+                        <div class="contact-highlight">
+                            <strong data-i18n="contact_highlight_2_title">متابعة مباشرة</strong>
+                            <span data-i18n="contact_highlight_2_text">قبل التنفيذ وحتى التسليم</span>
+                        </div>
+                    </div>
+
+                    <div class="info-items">
+                        <a class="info-card" href="mailto:medozxc7@gmail.com">
+                            <div class="info-card-icon"><i class="fa-solid fa-envelope"></i></div>
+                            <div class="info-card-copy">
+                                <strong data-i18n="contact_email_title">البريد الإلكتروني</strong>
+                                <span dir="ltr">medozxc7@gmail.com</span>
+                            </div>
+                        </a>
+                        <a class="info-card" href="tel:+966504663493">
+                            <div class="info-card-icon"><i class="fa-solid fa-phone"></i></div>
+                            <div class="info-card-copy">
+                                <strong data-i18n="contact_phone_1_title">هاتف السعودية</strong>
+                                <span dir="ltr">+966504663493</span>
+                            </div>
+                        </a>
+                        <a class="info-card" href="tel:+201500007300">
+                            <div class="info-card-icon"><i class="fa-solid fa-phone-volume"></i></div>
+                            <div class="info-card-copy">
+                                <strong data-i18n="contact_phone_2_title">واتساب ودعم مباشر</strong>
+                                <span dir="ltr">+201500007300</span>
+                            </div>
+                        </a>
+                        <a class="info-card" href="tel:0116976827">
+                            <div class="info-card-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                            <div class="info-card-copy">
+                                <strong data-i18n="contact_phone_3_title">رقم محلي</strong>
+                                <span dir="ltr">0116976827</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="contact-note">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <p data-i18n="contact_note">إذا كان طلبك متعلقًا بخدمة معينة، أرسل اسم الخدمة أو رابط الحساب أو
+                            المتطلبات مباشرة لتسريع الرد.</p>
+                    </div>
+
+                    <div class="contact-actions">
+                        <button class="btn btn-secondary w-100 contact-cta-btn"
+                            onclick="window.open('https://wa.me/201500007300', '_blank')"
+                            style="border-color:var(--accent-green); color:var(--accent-green);">
+                            <i class="fa-brands fa-whatsapp"></i> <span data-i18n="contact_wa_btn">تواصل عبر
+                                واتساب</span>
+                        </button>
+                        <a href="tel:+201500007300" class="btn btn-primary w-100 contact-cta-btn contact-call-btn">
+                            <i class="fa-solid fa-phone"></i> <span data-i18n="contact_call_btn">اتصال سريع</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="contact-form contact-form-panel">
+                    <div class="contact-form-head">
+                        <strong data-i18n="contact_form_title">أرسل رسالتك</strong>
+                        <span data-i18n="contact_form_sub">املأ النموذج وسيفتح بريدك مع الرسالة جاهزة للإرسال.</span>
+                    </div>
+                    <form
+                        onsubmit="event.preventDefault(); window.location.href = 'mailto:medozxc7@gmail.com?subject=Contact%20from%20' + encodeURIComponent(document.getElementById('c-name').value) + '&body=' + encodeURIComponent('Email: ' + document.getElementById('c-email').value + '\n\nMessage:\n' + document.getElementById('c-msg').value);">
+                        <div class="form-group">
+                            <label data-i18n="contact_form_name">الاسم</label>
+                            <input type="text" id="c-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="contact_form_email">البريد الإلكتروني</label>
+                            <input type="email" id="c-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="contact_form_msg">الرسالة</label>
+                            <textarea rows="5" id="c-msg" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 contact-submit-btn"
+                            data-i18n="send_msg_btn">إرسال الرسالة</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="/" class="logo h3">
+                    <svg width="30" height="30" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="40" height="40" rx="12" fill="url(#logo_grad_footer)" />
+                        <path d="M12 20 L20 12 L26 22 L32 8" stroke="url(#logo_line_footer)" stroke-width="3.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <circle cx="32" cy="8" r="3.5" fill="#ffffff" />
+                        <text x="20" y="32" font-family="'Outfit', sans-serif" font-size="14" font-weight="900"
+                            fill="white" text-anchor="middle" letter-spacing="1">Z</text>
+                        <defs>
+                            <linearGradient id="logo_grad_footer" x1="0" y1="0" x2="40" y2="40"
+                                gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#0f0d14" />
+                                <stop offset="1" stop-color="#2a0845" />
+                            </linearGradient>
+                            <linearGradient id="logo_line_footer" x1="12" y1="12" x2="32" y2="22"
+                                gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#ff007a" />
+                                <stop offset="1" stop-color="#00d4ff" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">zarz<span
+                            style="font-weight:300; color:var(--text-secondary);">official</span></span>
+                </a>
+                <p data-i18n="footer_desc">خدمات رقمية ومنتجات افتراضية بأسعار تنافسية وجودة عالية.</p>
+            </div>
+            <div class="footer-links">
+                <h4 data-i18n="footer_links">روابط سريعة</h4>
+                <a href="/" onclick="navigateTo('home')" data-i18n="nav_home">الرئيسية</a>
+                <a href="/products/" onclick="navigateTo('store')" data-i18n="nav_store">المتجر</a>
+                <a href="/account/" onclick="navigateTo('account')" data-i18n="nav_account">طلباتي</a>
+                <a href="/contact/" onclick="navigateTo('contact')" data-i18n="nav_contact">تواصل معنا</a>
+                <a href="/terms/" onclick="navigateTo('terms')" data-i18n="terms_heading">شروط الاستخدام</a>
+            </div>
+            <div class="footer-social">
+                <h4 data-i18n="footer_social">تابعنا</h4>
+                <div class="social-icons">
+                    <a href="https://web.facebook.com/profile.php?id=61555548642396" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="https://chat.whatsapp.com/Idz1dzgPaQEGLKIZcmZt1C?mode=gi_t" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p data-i18n="footer_rights">© 2026 zarzofficial. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+
+    <div id="modal-root"></div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container"></div>
+
+    <script src="/translations.js?v=3" defer></script>
+    <script src="/script.js?v=11" defer></script>
+</body>
+
+</html>
