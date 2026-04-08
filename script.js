@@ -1,4 +1,4 @@
-// Products Database
+﻿// Products Database
 const products = [
     {
         id: 'sub1', title: 'شات جي بي تي بلس', category: 'subscriptions',
@@ -1794,7 +1794,7 @@ function updateSeoMeta(viewId) {
             description: 'تواصل مع فريق زارز أوفشال عبر صفحة مستقلة تحتوي على وسائل التواصل والنموذج المباشر.'
         },
         account: {
-            title: `طلباتي | ${brandTitle}`,
+            title: `حسابي | ${brandTitle}`,
             description: 'تابع طلباتك الأخيرة في زارز أوفشال من صفحة مستقلة وسهلة التصفح.'
         },
         terms: {
@@ -3469,3 +3469,4 @@ window.copyAccount = function(text) {
         showToast('فشل في عملية النسخ', 'error');
     });
 };
+

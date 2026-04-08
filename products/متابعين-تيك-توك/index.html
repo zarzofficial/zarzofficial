@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
     <!-- Preload the main stylesheet for fastest pickup -->
-    <link rel="preload" href="/style.min.css?v=12" as="style">
+    <link rel="preload" href="/style.min.css?v=13" as="style">
 
     <!-- ===== CRITICAL CSS (inlined for instant FCP) ===== -->
     <style>
@@ -118,8 +118,8 @@
     </style>
 
     <!-- Full stylesheet (non-blocking: loads async, then applies) -->
-    <link rel="stylesheet" href="/style.min.css?v=12" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="/style.min.css?v=12"></noscript>
+    <link rel="stylesheet" href="/style.min.css?v=13" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/style.min.css?v=13"></noscript>
 
     <!-- Font Awesome (non-blocking: loaded async) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -219,7 +219,7 @@
             <div class="nav-links">
                 <a href="/" class="nav-link" data-view="home" data-i18n="nav_home">الرئيسية</a>
                 <a href="/products/" class="nav-link active" data-view="store" data-i18n="nav_store">المنتجات</a>
-                <a href="/account/" class="nav-link" data-view="account" data-i18n="nav_account">طلباتي</a>
+                <a href="/account/" class="nav-link" data-view="account" data-i18n="nav_account">حسابي</a>
                 <a href="/contact/" class="nav-link" data-view="contact" data-i18n="nav_contact">تواصل معنا</a>
             </div>
 
@@ -472,7 +472,7 @@
                 <h4 data-i18n="footer_links">روابط سريعة</h4>
                 <a href="/" onclick="navigateTo('home')" data-i18n="nav_home">الرئيسية</a>
                 <a href="/products/" onclick="navigateTo('store')" data-i18n="nav_store">المنتجات</a>
-                <a href="/account/" onclick="navigateTo('account')" data-i18n="nav_account">طلباتي</a>
+                <a href="/account/" onclick="navigateTo('account')" data-i18n="nav_account">حسابي</a>
                 <a href="/contact/" onclick="navigateTo('contact')" data-i18n="nav_contact">تواصل معنا</a>
                 <a href="/terms/" onclick="navigateTo('terms')" data-i18n="terms_heading">شروط الاستخدام</a>
             </div>
@@ -495,9 +495,10 @@
     <!-- Toast Notifications -->
     <div id="toast-container"></div>
 
-    <script type="module" src="/firebase.js?v=8"></script>
-    <script src="/script.min.js?v=2" defer></script>
+    <script type="module" src="/firebase.js?v=9"></script>
+    <script src="/script.min.js?v=3" defer></script>
 </body>
 
 </html>
+
 
