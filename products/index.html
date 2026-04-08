@@ -135,6 +135,27 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
+    <style>
+    body[data-app-ready="false"] .navbar,
+    body[data-app-ready="false"] main,
+    body[data-app-ready="false"] footer {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .navbar,
+    main,
+    footer {
+        transition: opacity 0.18s ease;
+    }
+    </style>
+
+    <script>
+        window.__zarzRevealFallback = window.setTimeout(function () {
+            if (document.body) document.body.setAttribute('data-app-ready', 'true');
+        }, 1800);
+    </script>
+
     <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
@@ -145,7 +166,7 @@
 <meta name="robots" content="index, follow">
 </head>
 
-<body>
+<body data-app-ready="false">
     <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-container">
@@ -453,7 +474,7 @@
     <div id="toast-container"></div>
 
     <script type="module" src="/firebase.js?v=7"></script>
-    <script src="/script.js?v=20" defer></script>
+    <script src="/script.js?v=21" defer></script>
 </body>
 
 </html>

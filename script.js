@@ -1155,11 +1155,35 @@ function sanitizeTrackedInput(input) {
     }
 }
 
+function revealAppShell() {
+    if (window.__zarzRevealFallback) {
+        window.clearTimeout(window.__zarzRevealFallback);
+        window.__zarzRevealFallback = null;
+    }
+
+    if (document.body) {
+        document.body.setAttribute('data-app-ready', 'true');
+    }
+}
+
+function scheduleAppReveal(delay = 900) {
+    if (window.__zarzRevealFallback) {
+        window.clearTimeout(window.__zarzRevealFallback);
+    }
+
+    window.__zarzRevealFallback = window.setTimeout(() => {
+        revealAppShell();
+    }, delay);
+}
+
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
     appState.lang = 'ar';
     document.documentElement.lang = appState.lang;
     document.documentElement.dir = 'rtl';
+    if (document.body) {
+        document.body.setAttribute('data-app-ready', 'false');
+    }
     fetchExchangeRates();
     renderFeaturedProducts();
     bindAuthStateEvents();
@@ -1188,7 +1212,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    bootstrapAuthState();
+    const shouldWaitForAuthBootstrap = getCurrentStaticPageView() === 'account';
+    scheduleAppReveal(shouldWaitForAuthBootstrap ? 1800 : 700);
+
+    const authBootstrapPromise = bootstrapAuthState();
+
+    if (shouldWaitForAuthBootstrap) {
+        authBootstrapPromise.finally(() => {
+            window.requestAnimationFrame(() => {
+                revealAppShell();
+            });
+        });
+    } else {
+        window.requestAnimationFrame(() => {
+            window.requestAnimationFrame(() => {
+                revealAppShell();
+            });
+        });
+    }
     
     // Mobile Menu
     const mobileBtn = document.querySelector('.mobile-menu-btn');
