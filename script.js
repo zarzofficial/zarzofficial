@@ -986,6 +986,92 @@ function renderAccountAvatar() {
     avatar.appendChild(fallback);
 }
 
+function getMobileMenuPreviewUser() {
+    const searchParams = new URLSearchParams(window.location.search);
+    const previewName = String(searchParams.get('preview-account-name') || '').trim();
+
+    if (!previewName) return null;
+
+    return {
+        displayName: previewName,
+        email: String(searchParams.get('preview-account-email') || '').trim(),
+        photoURL: ''
+    };
+}
+
+function ensureMobileMenuAccountCard() {
+    const navLinks = document.querySelector('.nav-links');
+    if (!navLinks) return null;
+
+    let accountCard = navLinks.querySelector('.mobile-menu-account-card');
+    if (accountCard) return accountCard;
+
+    accountCard = document.createElement('a');
+    accountCard.href = '/account/';
+    accountCard.className = 'mobile-menu-account-card';
+    accountCard.dataset.view = 'account';
+    accountCard.innerHTML = `
+        <span class="mobile-menu-account-avatar" aria-hidden="true"></span>
+        <span class="mobile-menu-account-copy">
+            <span class="mobile-menu-account-label">حسابي</span>
+            <strong class="mobile-menu-account-name">حساب الزائر</strong>
+            <span class="mobile-menu-account-note">الدخول أو متابعة الطلبات من مكان واحد</span>
+        </span>
+        <span class="mobile-menu-account-arrow" aria-hidden="true">‹</span>
+    `;
+
+    navLinks.prepend(accountCard);
+    return accountCard;
+}
+
+function updateMobileMenuAccountCard() {
+    const accountCard = ensureMobileMenuAccountCard();
+    if (!accountCard) return;
+
+    const previewUser = getMobileMenuPreviewUser();
+    const resolvedUser = previewUser || appState.user;
+    const accountName = resolvedUser ? getAccountDisplayName(resolvedUser) : 'حساب الزائر';
+    const accountNote = resolvedUser
+        ? (resolvedUser.email || 'الدخول وإدارة الطلبات من صفحة حسابك')
+        : 'الدخول أو متابعة الطلبات من مكان واحد';
+    const accountLabel = resolvedUser ? 'الحساب الحالي' : 'حسابي';
+    const avatar = accountCard.querySelector('.mobile-menu-account-avatar');
+    const nameElement = accountCard.querySelector('.mobile-menu-account-name');
+    const noteElement = accountCard.querySelector('.mobile-menu-account-note');
+    const labelElement = accountCard.querySelector('.mobile-menu-account-label');
+    const isAccountPage = getCurrentStaticPageView() === 'account';
+
+    if (nameElement) nameElement.textContent = accountName;
+    if (noteElement) noteElement.textContent = accountNote;
+    if (labelElement) labelElement.textContent = accountLabel;
+
+    accountCard.classList.toggle('is-current', isAccountPage);
+    if (isAccountPage) {
+        accountCard.setAttribute('aria-current', 'page');
+    } else {
+        accountCard.removeAttribute('aria-current');
+    }
+
+    if (!avatar) return;
+
+    avatar.innerHTML = '';
+
+    if (resolvedUser?.photoURL) {
+        const img = document.createElement('img');
+        img.src = resolvedUser.photoURL;
+        img.alt = accountName;
+        avatar.appendChild(img);
+        return;
+    }
+
+    const fallback = document.createElement('span');
+    fallback.className = 'mobile-menu-account-avatar-letter';
+    fallback.textContent = resolvedUser
+        ? (Array.from(accountName.trim())[0] || 'ز')
+        : 'ز';
+    avatar.appendChild(fallback);
+}
+
 function updateAccountProfileUI() {
     const user = appState.user;
     const isPending = shouldDelayAccountUiUntilBootstrap();
@@ -1029,6 +1115,7 @@ function updateAccountProfileUI() {
     }
 
     renderAccountAvatar();
+    updateMobileMenuAccountCard();
     updateOrdersContextCopy();
 }
 
@@ -1752,10 +1839,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const mobileBtn = document.querySelector('.mobile-menu-btn');
     const navLinks = document.querySelector('.nav-links');
     if(mobileBtn && navLinks) {
+        const mobileMenuPreviewMode = new URLSearchParams(window.location.search).get('preview-mobile-menu') === '1';
+        updateMobileMenuAccountCard();
+        navLinks.id = navLinks.id || 'site-mobile-menu';
+        mobileBtn.setAttribute('aria-controls', navLinks.id);
+        mobileBtn.setAttribute('aria-expanded', 'false');
+        navLinks.setAttribute('aria-hidden', 'true');
+
         const setMobileMenuState = (isOpen) => {
             navLinks.classList.toggle('show-mobile-menu', isOpen);
             mobileBtn.classList.toggle('active', isOpen);
             document.body.classList.toggle('nav-open', isOpen && window.innerWidth <= 768);
+            mobileBtn.setAttribute('aria-expanded', String(isOpen));
+            navLinks.setAttribute('aria-hidden', String(!isOpen));
         };
 
         mobileBtn.addEventListener('click', () => {
@@ -1786,6 +1882,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 setMobileMenuState(false);
             }
         });
+
+        if (mobileMenuPreviewMode && window.innerWidth <= 768) {
+            window.setTimeout(() => {
+                setMobileMenuState(true);
+            }, 280);
+        }
     }
 
 // Currency dropdown removed
@@ -2080,6 +2182,7 @@ function navigateTo(viewId, options = {}) {
     const navTargetView = viewId === 'details' ? 'store' : viewId;
     const navLink = document.querySelector('.nav-link[data-view="' + navTargetView + '"]');
     if (navLink) navLink.classList.add('active');
+    updateMobileMenuAccountCard();
 
     if (viewId === 'store') {
         if (typeof options.category !== 'undefined') {
