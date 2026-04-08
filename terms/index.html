@@ -371,8 +371,18 @@
                     <h2 data-i18n="featured_heading">منتجات مميزة</h2>
                     <p data-i18n="featured_sub">اكتشف أكثر الخدمات طلباً لدينا</p>
                 </div>
-                <div class="products-grid" id="featured-container">
-                    <!-- Featured products injected via JS -->
+                <div class="featured-carousel-shell">
+                    <div class="featured-carousel-controls" aria-label="التنقل بين المنتجات المميزة">
+                        <button type="button" class="featured-scroll-btn featured-scroll-btn-next" data-featured-dir="next" aria-label="عرض المزيد من المنتجات المميزة">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                        <button type="button" class="featured-scroll-btn featured-scroll-btn-prev" data-featured-dir="prev" aria-label="الرجوع إلى المنتجات السابقة">
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="products-grid" id="featured-container">
+                        <!-- Featured products injected via JS -->
+                    </div>
                 </div>
                 <div style="text-align: center; margin-top: 3rem;">
                     <button class="btn btn-secondary" onclick="navigateTo('store')"
