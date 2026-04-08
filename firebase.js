@@ -24,8 +24,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const DEFAULT_AUTH_DOMAIN = "zarzofficial-66638.firebaseapp.com";
-const CUSTOM_AUTH_DOMAIN = "auth.zarzofficial.com";
-const AUTH_DOMAIN_PROBE_CACHE_KEY = "zarz_auth_domain_probe_v1";
+const CUSTOM_AUTH_DOMAINS = ["zarzofficial.com", "auth.zarzofficial.com"];
 const DEFAULT_AUTH_DOMAIN_RETRY_AFTER_MS = 60 * 1000;
 const firebaseConfig = window.ZARZ_FIREBASE_CONFIG || {
   apiKey: "AIzaSyBJ6g-W2bAQwBkkxA_gngN4TMGR_DlVcgM",
@@ -41,9 +40,13 @@ const firebaseConfig = window.ZARZ_FIREBASE_CONFIG || {
 window.zarzCurrentUser = null;
 let firebaseServices = null;
 
-function readCachedAuthDomainProbe() {
+function getAuthDomainProbeCacheKey(domain) {
+  return `zarz_auth_domain_probe_${String(domain || "").trim().toLowerCase()}`;
+}
+
+function readCachedAuthDomainProbe(domain) {
   try {
-    const rawValue = window.sessionStorage?.getItem(AUTH_DOMAIN_PROBE_CACHE_KEY) || "";
+    const rawValue = window.sessionStorage?.getItem(getAuthDomainProbeCacheKey(domain)) || "";
     if (!rawValue) {
       return null;
     }
@@ -59,10 +62,10 @@ function readCachedAuthDomainProbe() {
   }
 }
 
-function writeCachedAuthDomainProbe(value) {
+function writeCachedAuthDomainProbe(domain, value) {
   try {
     window.sessionStorage?.setItem(
-      AUTH_DOMAIN_PROBE_CACHE_KEY,
+      getAuthDomainProbeCacheKey(domain),
       JSON.stringify({
         value,
         checkedAt: Date.now()
@@ -79,12 +82,12 @@ async function canUseCustomAuthDomain(domain) {
   }
 
   if (window.location.hostname === domain) {
-    writeCachedAuthDomainProbe("custom");
+    writeCachedAuthDomainProbe(domain, domain);
     return true;
   }
 
-  const cachedProbe = readCachedAuthDomainProbe();
-  if (cachedProbe?.value === "custom") {
+  const cachedProbe = readCachedAuthDomainProbe(domain);
+  if (cachedProbe?.value === domain) {
     return true;
   }
 
@@ -97,7 +100,7 @@ async function canUseCustomAuthDomain(domain) {
   }
 
   if (navigator.onLine === false) {
-    writeCachedAuthDomainProbe("default");
+    writeCachedAuthDomainProbe(domain, "default");
     return false;
   }
 
@@ -113,10 +116,10 @@ async function canUseCustomAuthDomain(domain) {
       redirect: "follow",
       signal: controller?.signal
     });
-    writeCachedAuthDomainProbe("custom");
+    writeCachedAuthDomainProbe(domain, domain);
     return true;
   } catch (error) {
-    writeCachedAuthDomainProbe("default");
+    writeCachedAuthDomainProbe(domain, "default");
     return false;
   } finally {
     window.clearTimeout(timeoutId);
@@ -131,8 +134,11 @@ async function resolveFirebaseConfig() {
     return resolvedConfig;
   }
 
-  if (await canUseCustomAuthDomain(CUSTOM_AUTH_DOMAIN)) {
-    resolvedConfig.authDomain = CUSTOM_AUTH_DOMAIN;
+  for (const domain of CUSTOM_AUTH_DOMAINS) {
+    if (await canUseCustomAuthDomain(domain)) {
+      resolvedConfig.authDomain = domain;
+      break;
+    }
   }
 
   return resolvedConfig;
