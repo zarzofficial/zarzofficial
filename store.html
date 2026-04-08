@@ -284,40 +284,37 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="checkout-payment-method" data-i18n="payment_select_placeholder">Choose payment
-                                method</label>
+                            <label for="checkout-payment-method" data-i18n="payment_select_placeholder">اختر طريقة الدفع</label>
                             <select id="checkout-payment-method" required>
-                                <option value="" data-i18n="payment_select_placeholder">Choose payment method</option>
-                                <option value="whatsapp" data-i18n="payment_method_whatsapp">WhatsApp follow-up</option>
-                                <option value="bankak" data-i18n="payment_method_bankak">Bankak transfer</option>
+                                <option value="" data-i18n="payment_select_placeholder">اختر طريقة الدفع</option>
+                                <option value="whatsapp" data-i18n="payment_method_whatsapp">متابعة عبر واتساب</option>
+                                <option value="bankak" data-i18n="payment_method_bankak">تحويل بنكك</option>
                             </select>
                         </div>
 
                         <div id="bank-transfer-panel" class="payment-panel" hidden>
                             <div class="payment-transfer-note">
-                                <strong data-i18n="pay_bankak_title">Payment via Bankak</strong>
-                                <p data-i18n="bank_transfer_note">Please transfer the full amount first, then enter the
-                                    last 4 digits of the transaction or payment confirmation to complete your order.</p>
+                                <strong data-i18n="pay_bankak_title">الدفع عبر بنكك</strong>
+                                <p data-i18n="bank_transfer_note">حوّل المبلغ كاملًا أولاً، ثم أدخل آخر 4 أرقام من العملية أو تأكيد الدفع لإكمال طلبك.</p>
                             </div>
                             <div class="bankak-card">
                                 <div class="bankak-row">
-                                    <span data-i18n="bank_name_label">Bank</span>
-                                    <strong data-i18n="bank_name_value">Bankak</strong>
+                                    <span data-i18n="bank_name_label">البنك</span>
+                                    <strong data-i18n="bank_name_value">بنكك</strong>
                                 </div>
                                 <div class="bankak-row">
-                                    <span data-i18n="bank_account_name_label">Name</span>
+                                    <span data-i18n="bank_account_name_label">اسم الحساب</span>
                                     <strong data-i18n="bank_account_name_value">Mohammed Ali Obaidallah</strong>
                                 </div>
                                 <div class="bankak-row">
-                                    <span data-i18n="bank_account_number_label">Account Number</span>
+                                    <span data-i18n="bank_account_number_label">رقم الحساب</span>
                                     <strong>8725999</strong>
                                 </div>
                             </div>
                             <div class="form-group" style="margin-top: 1rem;">
-                                <label for="checkout-transaction-last4" data-i18n="trans_id_label">Transaction ID (Last
-                                    4 digits)</label>
+                                <label for="checkout-transaction-last4" data-i18n="trans_id_label">رقم العملية (آخر 4 أرقام)</label>
                                 <input type="text" id="checkout-transaction-last4" inputmode="numeric" maxlength="4"
-                                    pattern="[0-9]{4}" placeholder="e.g. 1234" data-i18n="trans_id_placeholder"
+                                    pattern="[0-9]{4}" placeholder="مثال: 1234" data-i18n="trans_id_placeholder"
                                     data-i18n-attr="placeholder">
                             </div>
                         </div>
@@ -442,7 +439,7 @@
     <div id="toast-container"></div>
 
     <script type="module" src="/firebase.js?v=10"></script>
-    <script src="/script.min.js?v=6" defer></script>
+    <script src="/script.min.js?v=7" defer></script>
 </body>
 
 </html>

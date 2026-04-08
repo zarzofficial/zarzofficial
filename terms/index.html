@@ -213,7 +213,7 @@
                         <button class="btn btn-primary" onclick="navigateTo('store')"
                             style="padding: 1rem 2rem; font-size:1.1rem;"><i class="fa-solid fa-bolt"></i> <span
                                 data-i18n="order_now_btn">ابدأ التسوق الآن</span></button>
-                        <button class="btn btn-secondary" onclick="window.open('https://wa.me/201500007300', '_blank')"
+                        <button class="btn btn-secondary" onclick="openSupportWhatsApp();"
                             style="border-color:var(--accent-green); color:var(--accent-green); padding: 1rem 2rem; font-size:1.1rem; box-shadow: 0 4px 15px rgba(0, 230, 118, 0.15);"><i
                                 class="fa-brands fa-whatsapp"></i> <span data-i18n="contact_wa_btn">تواصل عبر
                                 واتساب</span></button>
@@ -578,7 +578,7 @@
                 <div class="cta-actions">
                     <button class="btn btn-primary" onclick="navigateTo('store')" data-i18n="cta_store_btn">استعرض
                         الخدمات</button>
-                    <button class="btn btn-secondary" onclick="window.open('https://wa.me/201500007300', '_blank')">
+                    <button class="btn btn-secondary" onclick="openSupportWhatsApp();">
                         <i class="fa-brands fa-whatsapp"></i>
                         <span data-i18n="contact_wa_btn">تواصل عبر واتساب</span>
                     </button>
@@ -681,7 +681,7 @@
     <div id="toast-container"></div>
 
     <script type="module" src="/firebase.js?v=10"></script>
-    <script src="/script.min.js?v=6" defer></script>
+    <script src="/script.min.js?v=7" defer></script>
 </body>
 
 </html>

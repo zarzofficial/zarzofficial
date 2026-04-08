@@ -441,11 +441,14 @@ let lastHandledAuthStateKey = '__init__';
 let accountInitialLoadPending = false;
 let accountOrdersLoadPending = false;
 const CHECKOUT_LOGIN_RETURN_KEY = 'zarz_checkout_return_after_login';
+const CHECKOUT_AUTO_SUBMIT_AFTER_LOGIN_KEY = 'zarz_checkout_autosubmit_after_login';
 const POST_NAVIGATION_TOAST_KEY = 'zarz_post_navigation_toast';
 const ACCOUNT_SCROLL_TO_ORDERS_KEY = 'zarz_account_scroll_to_orders';
 const GOOGLE_REDIRECT_RESULT_KEY = 'zarz_google_redirect_result';
+const SUPPORT_WHATSAPP_NUMBER = '201500007300';
 let shouldScrollAccountOrdersOnLoad = false;
 let pendingGoogleRedirectOutcome = null;
+let checkoutAutoSubmitHandled = false;
 
 function getAuthApi() {
     return window.zarzAuth || null;
@@ -538,6 +541,79 @@ function clearPendingCheckoutLoginReturn() {
         sessionStorage.removeItem(CHECKOUT_LOGIN_RETURN_KEY);
     } catch {}
 }
+
+function setPendingCheckoutAutoSubmitAfterLogin(payload = {}) {
+    checkoutAutoSubmitHandled = false;
+    safeSessionStorageSet(CHECKOUT_AUTO_SUBMIT_AFTER_LOGIN_KEY, JSON.stringify({
+        ...payload,
+        createdAt: Date.now()
+    }));
+}
+
+function getPendingCheckoutAutoSubmitAfterLogin() {
+    const rawValue = safeSessionStorageGet(CHECKOUT_AUTO_SUBMIT_AFTER_LOGIN_KEY);
+    if (!rawValue) return null;
+
+    try {
+        const parsedValue = JSON.parse(rawValue);
+        return parsedValue && typeof parsedValue === 'object' ? parsedValue : null;
+    } catch {
+        return null;
+    }
+}
+
+function hasPendingCheckoutAutoSubmitAfterLogin() {
+    return Boolean(getPendingCheckoutAutoSubmitAfterLogin());
+}
+
+function clearPendingCheckoutAutoSubmitAfterLogin() {
+    safeSessionStorageRemove(CHECKOUT_AUTO_SUBMIT_AFTER_LOGIN_KEY);
+}
+
+function buildWhatsAppUrl(message = '', phoneNumber = SUPPORT_WHATSAPP_NUMBER) {
+    const normalizedPhone = String(phoneNumber || '').replace(/\D/g, '') || SUPPORT_WHATSAPP_NUMBER;
+    const baseUrl = `https://wa.me/${normalizedPhone}`;
+    return message ? `${baseUrl}?text=${encodeURIComponent(message)}` : baseUrl;
+}
+
+function buildSupportWhatsAppMessage(context = 'support') {
+    if (context === 'direct-support') {
+        return 'مرحباً، أحتاج إلى دعم مباشر بخصوص طلب أو خدمة لدى زارز.';
+    }
+
+    return 'مرحباً، أريد الاستفسار عن إحدى خدمات زارز وأحتاج إلى المتابعة عبر واتساب.';
+}
+
+function buildOrderWhatsAppMessage({
+    orderNum,
+    customerName,
+    customerPhone,
+    paymentMethodLabel,
+    transactionLast4 = '',
+    detailsStr,
+    totalStr,
+    orderSource = 'guest'
+} = {}) {
+    const orderSourceLabel = orderSource === 'account' ? 'من الحساب بعد تسجيل الدخول' : 'كزائر';
+    return [
+        '*طلب جديد*',
+        `*رقم الطلب:* ${orderNum}`,
+        `*اسم العميل:* ${customerName}`,
+        `*رقم الهاتف:* ${customerPhone}`,
+        `*نوع الإكمال:* ${orderSourceLabel}`,
+        `*طريقة الدفع:* ${paymentMethodLabel}`,
+        transactionLast4 ? `*آخر 4 أرقام من التحويل:* ${transactionLast4}` : '',
+        '',
+        '*تفاصيل الطلب:*',
+        detailsStr,
+        '',
+        `*الإجمالي:* ${totalStr}`
+    ].filter(Boolean).join('\n');
+}
+
+window.openSupportWhatsApp = function(context = 'support') {
+    window.location.assign(buildWhatsAppUrl(buildSupportWhatsAppMessage(context)));
+};
 
 function queuePostNavigationToast(message, type = 'info') {
     if (!message) return;
@@ -682,9 +758,34 @@ function maybeResumeCheckoutAfterAuth() {
     if (appState.cart.length === 0) return false;
 
     window.setTimeout(() => {
-        showToast('تم تسجيل الدخول. يمكنك الآن إكمال طلبك.', 'success');
+        const resumeMessage = hasPendingCheckoutAutoSubmitAfterLogin()
+            ? 'تم تسجيل الدخول. جارٍ متابعة طلبك الآن.'
+            : 'تم تسجيل الدخول. يمكنك الآن إكمال طلبك.';
+        showToast(resumeMessage, 'success');
         navigateTo('checkout');
     }, 120);
+
+    return true;
+}
+
+function maybeAutoSubmitPendingCheckoutAfterLogin() {
+    if (checkoutAutoSubmitHandled) return false;
+    if (getCurrentStaticPageView() !== 'checkout') return false;
+    if (!appState.user || appState.cart.length === 0) return false;
+
+    const pendingCheckoutAutoSubmit = getPendingCheckoutAutoSubmitAfterLogin();
+    if (!pendingCheckoutAutoSubmit) return false;
+
+    const checkoutForm = document.getElementById('checkoutForm');
+    if (!checkoutForm) return false;
+
+    checkoutAutoSubmitHandled = true;
+    clearPendingCheckoutAutoSubmitAfterLogin();
+
+    window.setTimeout(() => {
+        showToast('جارٍ إكمال طلبك...', 'info');
+        window.processOrder();
+    }, 220);
 
     return true;
 }
@@ -964,6 +1065,7 @@ async function handleAuthStateChange(user, { silent = true } = {}) {
     appState.user = user || null;
     accountInitialLoadPending = false;
     updateAccountProfileUI();
+    maybeAutoSubmitPendingCheckoutAfterLogin();
 
     if (!authStateChanged && silent) {
         return;
@@ -1608,7 +1710,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderFeaturedProducts();
     }
 
-    if (currentPageView === 'account') {
+    if (currentPageView === 'account' || currentPageView === 'checkout') {
         bootstrapAuthState();
     } else {
         scheduleIdleTask(() => {
@@ -3131,6 +3233,10 @@ window.processOrder = async function() {
 
         if (checkoutChoice === 'login') {
             setPendingCheckoutLoginReturn();
+            setPendingCheckoutAutoSubmitAfterLogin({
+                paymentMethod,
+                paymentAction: window.paymentActionTarget || 'checkout'
+            });
             navigateTo('account');
             return;
         }
@@ -3232,11 +3338,25 @@ window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', subm
     localStorage.removeItem('zarz_checkout');
     updateCartCount();
 
-    const msg = '*طلب جديد*\n*رقم الطلب:* ' + orderNum + '\n*الاسم:* ' + nameInput + '\n*رقم الهاتف:* ' + phoneInput + '\n*طريقة الدفع:* ' + paymentMethodLabel + (transactionLast4 ? ('\n*آخر 4 أرقام من التحويل:* ' + transactionLast4) : '') + '\n\n*تفاصيل الطلب:*\n' + detailsStr + '\n\n*الإجمالي:* ' + totalStr;
-    const successMessage = shouldSyncOrder ? ARABIC_UI_TEXT.orderSubmitSuccess : ARABIC_UI_TEXT.orderSubmitSuccessGuest;
+    const msg = buildOrderWhatsAppMessage({
+        orderNum,
+        customerName: nameInput,
+        customerPhone: phoneInput,
+        paymentMethodLabel,
+        transactionLast4,
+        detailsStr,
+        totalStr,
+        orderSource: shouldSyncOrder ? 'account' : 'guest'
+    });
+    const successMessage = paymentMethod === 'whatsapp'
+        ? (shouldSyncOrder
+            ? 'تم إرسال طلبك بنجاح. سيتم تحويلك إلى واتساب لإكمال المتابعة.'
+            : 'تم حفظ طلبك بنجاح. سيتم تحويلك إلى واتساب لإكمال المتابعة.')
+        : (shouldSyncOrder ? ARABIC_UI_TEXT.orderSubmitSuccess : ARABIC_UI_TEXT.orderSubmitSuccessGuest);
     const shouldRedirectToSeparateAccountPage = getCurrentStaticPageView() !== 'account' || !hasView('account');
+    const shouldContinueViaWhatsApp = paymentMethod === 'whatsapp';
 
-    if (shouldRedirectToSeparateAccountPage) {
+    if (shouldRedirectToSeparateAccountPage && !shouldContinueViaWhatsApp) {
         queuePostNavigationToast(successMessage, 'success');
     }
 
@@ -3244,18 +3364,23 @@ window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', subm
         queueAccountOrdersScroll();
     }
 
-    navigateTo('account');
     if (submitBtn) {
         submitBtn.innerHTML = submitOriginalText;
         submitBtn.disabled = false;
     }
 
-    if (!shouldRedirectToSeparateAccountPage) {
+    if (shouldContinueViaWhatsApp) {
         showToast(successMessage, 'success');
+        window.setTimeout(() => {
+            window.location.assign(buildWhatsAppUrl(msg));
+        }, 650);
+        return;
     }
 
-    if (paymentMethod === 'whatsapp') {
-        window.open('https://wa.me/201500007300?text=' + encodeURIComponent(msg), '_blank');
+    navigateTo('account');
+
+    if (!shouldRedirectToSeparateAccountPage) {
+        showToast(successMessage, 'success');
     }
 };
 

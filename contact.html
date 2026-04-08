@@ -220,7 +220,7 @@
                                 <span dir="ltr">+966504663493</span>
                             </div>
                         </a>
-                        <a class="info-card" href="tel:+201500007300">
+                        <a class="info-card" href="#" onclick="openSupportWhatsApp('direct-support'); return false;">
                             <div class="info-card-icon"><i class="fa-solid fa-phone-volume"></i></div>
                             <div class="info-card-copy">
                                 <strong data-i18n="contact_phone_2_title">واتساب ودعم مباشر</strong>
@@ -244,7 +244,7 @@
 
                     <div class="contact-actions">
                         <button class="btn btn-secondary w-100 contact-cta-btn"
-                            onclick="window.open('https://wa.me/201500007300', '_blank')"
+                            onclick="openSupportWhatsApp();"
                             style="border-color:var(--accent-green); color:var(--accent-green);">
                             <i class="fa-brands fa-whatsapp"></i> <span data-i18n="contact_wa_btn">تواصل عبر
                                 واتساب</span>
@@ -339,7 +339,7 @@
     <div id="toast-container"></div>
 
     <script type="module" src="/firebase.js?v=10"></script>
-    <script src="/script.min.js?v=6" defer></script>
+    <script src="/script.min.js?v=7" defer></script>
 </body>
 
 </html>
