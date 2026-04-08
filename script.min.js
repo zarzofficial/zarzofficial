@@ -438,6 +438,7 @@ let currentAuthMode = 'signin';
 let accountAuthUiBound = false;
 let authStateEventsBound = false;
 let lastHandledAuthStateKey = '__init__';
+let accountInitialLoadPending = false;
 const CHECKOUT_LOGIN_RETURN_KEY = 'zarz_checkout_return_after_login';
 const POST_NAVIGATION_TOAST_KEY = 'zarz_post_navigation_toast';
 const ACCOUNT_SCROLL_TO_ORDERS_KEY = 'zarz_account_scroll_to_orders';
@@ -635,6 +636,26 @@ function handlePendingGoogleRedirectOutcome() {
     const message = outcome.message || ARABIC_UI_TEXT.authGoogleRedirectCancelled;
     setAccountFeedback(message, 'error');
     showToast(message, 'error');
+}
+
+function shouldDelayAccountUiUntilBootstrap() {
+    return getCurrentStaticPageView() === 'account' && accountInitialLoadPending;
+}
+
+function setAccountLoadingState(isLoading = shouldDelayAccountUiUntilBootstrap()) {
+    const accountContent = document.getElementById('account-content');
+    const authLoading = document.getElementById('account-auth-loading');
+    const ordersLoading = document.getElementById('account-orders-loading');
+    const ordersBody = document.getElementById('account-orders-body');
+
+    if (accountContent) {
+        accountContent.dataset.authState = isLoading ? 'loading' : 'ready';
+        accountContent.setAttribute('aria-busy', String(isLoading));
+    }
+
+    if (authLoading) authLoading.hidden = !isLoading;
+    if (ordersLoading) ordersLoading.hidden = !isLoading;
+    if (ordersBody) ordersBody.hidden = isLoading;
 }
 
 function getGuestAccountPromptMessage() {
@@ -841,6 +862,7 @@ function renderAccountAvatar() {
 
 function updateAccountProfileUI() {
     const user = appState.user;
+    const isPending = shouldDelayAccountUiUntilBootstrap();
     const guestPanel = document.getElementById('auth-guest-panel');
     const userPanel = document.getElementById('auth-user-panel');
     const accName = document.getElementById('acc-name');
@@ -848,6 +870,8 @@ function updateAccountProfileUI() {
     const userGreeting = document.getElementById('auth-user-greeting');
     const userMeta = document.getElementById('auth-user-meta');
     const authEmail = document.getElementById('auth-email');
+
+    setAccountLoadingState(isPending);
 
     if (accName) {
         accName.textContent = user ? getAccountDisplayName(user) : 'حساب الزائر';
@@ -859,8 +883,10 @@ function updateAccountProfileUI() {
             : 'يمكنك تصفح الخدمات والطلبات بسهولة';
     }
 
-    if (guestPanel) guestPanel.hidden = Boolean(user);
-    if (userPanel) userPanel.hidden = !user;
+    if (guestPanel) guestPanel.hidden = isPending || Boolean(user);
+    if (userPanel) userPanel.hidden = isPending || !user;
+
+    if (isPending) return;
 
     if (userGreeting) {
         userGreeting.textContent = user ? `أهلاً ${getAccountDisplayName(user)}` : '';
@@ -1502,6 +1528,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.documentElement.dir = 'rtl';
     const currentPageView = getCurrentStaticPageView();
     const hasAccountUi = hasAccountUiContext();
+    accountInitialLoadPending = hasAccountUi && currentPageView === 'account';
     shouldScrollAccountOrdersOnLoad = consumeAccountOrdersScroll();
     pendingGoogleRedirectOutcome = consumeGoogleRedirectOutcome();
 
@@ -1514,9 +1541,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     initRouter();
     updateCartCount(false);
     flushPendingPostNavigationToast();
-    if (hasAccountUi) {
+    if (hasAccountUi && !shouldDelayAccountUiUntilBootstrap()) {
         renderOrders();
     }
+
+    const finalizeInitialAccountBootstrap = () => {
+        if (!accountInitialLoadPending) return;
+        accountInitialLoadPending = false;
+        updateAccountProfileUI();
+        renderOrders();
+    };
 
     const bootstrapAuthState = async () => {
         if (window.zarzAuthStateReadyPromise) {
@@ -1526,6 +1560,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             } catch (error) {
                 console.error(error);
                 setAccountFeedback(ARABIC_UI_TEXT.authRequiredForSync, 'info');
+            } finally {
+                finalizeInitialAccountBootstrap();
             }
             return;
         }
@@ -1534,6 +1570,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             await handleAuthStateChange(window.zarzCurrentUser || null, { silent: true });
         } catch (error) {
             console.error(error);
+        } finally {
+            finalizeInitialAccountBootstrap();
         }
     };
 
@@ -3297,6 +3335,11 @@ window.showMoreOrders = function() {
 function renderOrders() {
     const list = document.querySelector('.orders-list');
     if (!list) return;
+
+    if (shouldDelayAccountUiUntilBootstrap()) {
+        setAccountLoadingState(true);
+        return;
+    }
 
     const emptyState = list.querySelector('.empty-state');
     const ordersActions = document.getElementById('orders-actions');

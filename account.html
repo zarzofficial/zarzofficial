@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
 <head>
@@ -22,7 +22,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
     <!-- Preload the main stylesheet for fastest pickup -->
-    <link rel="preload" href="/style.min.css?v=14" as="style">
+    <link rel="preload" href="/style.min.css?v=15" as="style">
 
     <!-- ===== CRITICAL CSS (inlined for instant FCP) ===== -->
     <style>
@@ -121,7 +121,7 @@
     </style>
 
     <!-- Full stylesheet (non-blocking: loads async, then applies) -->
-    <link rel="stylesheet" href="/style.min.css?v=14">
+    <link rel="stylesheet" href="/style.min.css?v=15">
 
     <!-- Font Awesome (non-blocking: loaded async) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -193,7 +193,15 @@
                 style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;">
 
                 <div class="account-auth-panel glass-panel" style="padding: 2rem;">
-                    <div id="auth-guest-panel">
+                    <div id="account-auth-loading" class="account-loading-state">
+                        <div class="account-loading-chip">جاري تحميل الحساب...</div>
+                        <div class="account-loading-lines">
+                            <span class="account-loading-line short"></span>
+                            <span class="account-loading-line"></span>
+                            <span class="account-loading-line medium"></span>
+                        </div>
+                    </div>
+                    <div id="auth-guest-panel" hidden>
                         <div style="max-width: 420px; margin: 0 auto; text-align: center;">
                             <h3 id="auth-panel-title" style="margin: 0 0 0.6rem 0; font-size: 1.55rem;">تسجيل الدخول</h3>
                             <p id="account-sync-hint"
@@ -282,52 +290,66 @@
 
                 <!-- Orders List -->
                 <div id="account-orders-section" class="account-orders-panel glass-panel" style="padding: 2.5rem 2rem;">
-                    <div
-                        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem;">
-                        <h2 data-i18n="acc_recent" style="margin: 0; font-size: 1.5rem;">الطلبات الأخيرة</h2>
-                        <i class="fa-solid fa-clock-rotate-left"
-                            style="color: var(--accent-primary); font-size: 1.5rem;"></i>
+                    <div id="account-orders-loading" class="account-loading-state account-loading-state-orders">
+                        <div class="account-loading-chip">جاري تحميل بيانات الحساب...</div>
+                        <div class="account-loading-grid">
+                            <span class="account-loading-card"></span>
+                            <span class="account-loading-card"></span>
+                        </div>
+                        <div class="account-loading-lines">
+                            <span class="account-loading-line"></span>
+                            <span class="account-loading-line medium"></span>
+                            <span class="account-loading-line short"></span>
+                        </div>
                     </div>
-
-                    <p id="orders-mode-note" hidden
-                        style="margin: -0.75rem 0 0.75rem; color: var(--text-secondary); font-size: 0.95rem;">ستظهر طلباتك هنا.</p>
-                    <p id="orders-summary-note"
-                        style="margin: 0 0 1.25rem; color: var(--text-secondary); font-size: 0.92rem;">ستظهر أحدث طلباتك هنا.</p>
-
-                    <div
-                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div id="account-orders-body" hidden>
                         <div
-                            style="padding: 1rem 1.1rem; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
-                            <strong id="orders-total-count"
-                                style="display: block; font-size: 1.3rem; margin-bottom: 0.25rem;">0</strong>
-                            <span id="orders-total-label"
-                                style="color: var(--text-secondary); font-size: 0.9rem;">إجمالي الطلبات</span>
+                            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem;">
+                            <h2 data-i18n="acc_recent" style="margin: 0; font-size: 1.5rem;">الطلبات الأخيرة</h2>
+                            <i class="fa-solid fa-clock-rotate-left"
+                                style="color: var(--accent-primary); font-size: 1.5rem;"></i>
                         </div>
+
+                        <p id="orders-mode-note" hidden
+                            style="margin: -0.75rem 0 0.75rem; color: var(--text-secondary); font-size: 0.95rem;">ستظهر طلباتك هنا.</p>
+                        <p id="orders-summary-note"
+                            style="margin: 0 0 1.25rem; color: var(--text-secondary); font-size: 0.92rem;">ستظهر أحدث طلباتك هنا.</p>
+
                         <div
-                            style="padding: 1rem 1.1rem; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
-                            <strong id="orders-visible-count"
-                                style="display: block; font-size: 1.3rem; margin-bottom: 0.25rem;">0</strong>
-                            <span id="orders-visible-label"
-                                style="color: var(--text-secondary); font-size: 0.9rem;">المعروض الآن</span>
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                            <div
+                                style="padding: 1rem 1.1rem; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                                <strong id="orders-total-count"
+                                    style="display: block; font-size: 1.3rem; margin-bottom: 0.25rem;">0</strong>
+                                <span id="orders-total-label"
+                                    style="color: var(--text-secondary); font-size: 0.9rem;">إجمالي الطلبات</span>
+                            </div>
+                            <div
+                                style="padding: 1rem 1.1rem; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                                <strong id="orders-visible-count"
+                                    style="display: block; font-size: 1.3rem; margin-bottom: 0.25rem;">0</strong>
+                                <span id="orders-visible-label"
+                                    style="color: var(--text-secondary); font-size: 0.9rem;">المعروض الآن</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="orders-list" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
-                        <div class="empty-state">
-                            <i class="fa-solid fa-box-open"
-                                style="font-size: 3.5rem; margin-bottom: 1.5rem; color: var(--text-secondary); opacity: 0.5;"></i>
-                            <p id="orders-empty-text" data-i18n="empty_orders"
-                                style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 1.5rem;">لا توجد
-                                طلبات حديثة.</p>
-                            <button class="btn btn-primary" onclick="navigateTo('store')" style="padding: 0.8rem 2rem;">
-                                <span data-i18n="go_store_btn">الذهاب للمتجر</span>
-                            </button>
+                        <div class="orders-list" style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
+                            <div class="empty-state">
+                                <i class="fa-solid fa-box-open"
+                                    style="font-size: 3.5rem; margin-bottom: 1.5rem; color: var(--text-secondary); opacity: 0.5;"></i>
+                                <p id="orders-empty-text" data-i18n="empty_orders"
+                                    style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 1.5rem;">لا توجد
+                                    طلبات حديثة.</p>
+                                <button class="btn btn-primary" onclick="navigateTo('store')" style="padding: 0.8rem 2rem;">
+                                    <span data-i18n="go_store_btn">الذهاب للمتجر</span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div id="orders-actions" hidden style="display: flex; justify-content: center; margin-top: 1.5rem;">
-                        <button id="orders-show-more-btn" type="button" class="btn btn-secondary"
-                            onclick="showMoreOrders()" style="padding: 0.85rem 1.6rem;">عرض المزيد</button>
+                        <div id="orders-actions" hidden style="display: flex; justify-content: center; margin-top: 1.5rem;">
+                            <button id="orders-show-more-btn" type="button" class="btn btn-secondary"
+                                onclick="showMoreOrders()" style="padding: 0.85rem 1.6rem;">عرض المزيد</button>
+                        </div>
                     </div>
                 </div>
 
@@ -393,10 +415,7 @@
     <div id="toast-container"></div>
 
     <script type="module" src="/firebase.js?v=9"></script>
-    <script src="/script.min.js?v=3" defer></script>
+    <script src="/script.min.js?v=4" defer></script>
 </body>
 
 </html>
-
-
-

@@ -2434,6 +2434,71 @@ hr {
     color: white;
 }
 .account-content { flex: 1; }
+.account-loading-state {
+    display: grid;
+    gap: 1rem;
+}
+.account-loading-chip {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 0.95rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+.account-loading-lines {
+    display: grid;
+    gap: 0.75rem;
+}
+.account-loading-line,
+.account-loading-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.account-loading-line::after,
+.account-loading-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    animation: account-loading-pulse 1.3s ease-in-out infinite;
+}
+.account-loading-line {
+    height: 14px;
+    width: 100%;
+    border-radius: 999px;
+}
+.account-loading-line.medium {
+    width: 72%;
+}
+.account-loading-line.short {
+    width: 48%;
+}
+.account-loading-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+.account-loading-card {
+    height: 76px;
+    border-radius: 16px;
+}
+.account-loading-state-orders {
+    min-height: 260px;
+    align-content: start;
+}
+@keyframes account-loading-pulse {
+    100% {
+        transform: translateX(100%);
+    }
+}
 .orders-panel {
     padding: 2rem;
 }
