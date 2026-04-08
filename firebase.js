@@ -23,9 +23,12 @@ import {
   updateProfile
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+const DEFAULT_AUTH_DOMAIN = "zarzofficial-66638.firebaseapp.com";
+const CUSTOM_AUTH_DOMAIN = "auth.zarzofficial.com";
+const AUTH_DOMAIN_PROBE_CACHE_KEY = "zarz_auth_domain_probe_v1";
 const firebaseConfig = window.ZARZ_FIREBASE_CONFIG || {
   apiKey: "AIzaSyBJ6g-W2bAQwBkkxA_gngN4TMGR_DlVcgM",
-  authDomain: "zarzofficial-66638.firebaseapp.com",
+  authDomain: DEFAULT_AUTH_DOMAIN,
   projectId: "zarzofficial-66638",
   databaseURL: "https://zarzofficial-66638-default-rtdb.europe-west1.firebasedatabase.app",
   storageBucket: "zarzofficial-66638.firebasestorage.app",
@@ -36,6 +39,83 @@ const firebaseConfig = window.ZARZ_FIREBASE_CONFIG || {
 
 window.zarzCurrentUser = null;
 let firebaseServices = null;
+
+function readCachedAuthDomainProbe() {
+  try {
+    return window.sessionStorage?.getItem(AUTH_DOMAIN_PROBE_CACHE_KEY) || "";
+  } catch (error) {
+    return "";
+  }
+}
+
+function writeCachedAuthDomainProbe(value) {
+  try {
+    window.sessionStorage?.setItem(AUTH_DOMAIN_PROBE_CACHE_KEY, value);
+  } catch (error) {
+    // Ignore storage failures and continue with runtime probing.
+  }
+}
+
+async function canUseCustomAuthDomain(domain) {
+  if (!domain || domain === DEFAULT_AUTH_DOMAIN || typeof window.fetch !== "function") {
+    return false;
+  }
+
+  if (window.location.hostname === domain) {
+    writeCachedAuthDomainProbe("custom");
+    return true;
+  }
+
+  const cachedProbe = readCachedAuthDomainProbe();
+  if (cachedProbe === "custom") {
+    return true;
+  }
+
+  if (cachedProbe === "default") {
+    return false;
+  }
+
+  if (navigator.onLine === false) {
+    writeCachedAuthDomainProbe("default");
+    return false;
+  }
+
+  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const timeoutId = window.setTimeout(() => controller?.abort(), 1500);
+
+  try {
+    await window.fetch(`https://${domain}/__/auth/handler`, {
+      method: "GET",
+      mode: "no-cors",
+      cache: "no-store",
+      credentials: "omit",
+      redirect: "follow",
+      signal: controller?.signal
+    });
+    writeCachedAuthDomainProbe("custom");
+    return true;
+  } catch (error) {
+    writeCachedAuthDomainProbe("default");
+    return false;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
+async function resolveFirebaseConfig() {
+  const resolvedConfig = { ...firebaseConfig };
+  const customDomainOverride = String(window.ZARZ_FIREBASE_CONFIG?.authDomain || "").trim();
+
+  if (customDomainOverride) {
+    return resolvedConfig;
+  }
+
+  if (await canUseCustomAuthDomain(CUSTOM_AUTH_DOMAIN)) {
+    resolvedConfig.authDomain = CUSTOM_AUTH_DOMAIN;
+  }
+
+  return resolvedConfig;
+}
 
 function getFirebaseErrorCode(error) {
   return String(error?.code || "").toLowerCase();
@@ -236,7 +316,8 @@ function createGoogleProvider() {
 
 window.firebaseReadyPromise = (async () => {
   try {
-    const app = initializeApp(firebaseConfig);
+    const resolvedFirebaseConfig = await resolveFirebaseConfig();
+    const app = initializeApp(resolvedFirebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
     auth.languageCode = "ar";
