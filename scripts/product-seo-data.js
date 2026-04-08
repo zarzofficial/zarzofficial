@@ -23,7 +23,7 @@ const siteMeta = {
 const productPages = [
     {
         id: 'sm1',
-        slug: 'instagram-followers',
+        slug: 'متابعين-انستجرام',
         availability: 'InStock',
         imageFile: 'assets/instagram-followers-v4.webp',
         imageAlt: 'تصميم خدمة متابعين إنستجرام من زارز أوفشال',
@@ -42,7 +42,7 @@ const productPages = [
     },
     {
         id: 'sm2',
-        slug: 'tiktok-followers',
+        slug: 'متابعين-تيك-توك',
         availability: 'InStock',
         imageFile: 'assets/tiktok-followers-v4.webp',
         imageAlt: 'تصميم خدمة متابعين تيك توك من زارز أوفشال',
@@ -61,7 +61,7 @@ const productPages = [
     },
     {
         id: 'sm3',
-        slug: 'facebook-followers',
+        slug: 'متابعين-فيسبوك',
         availability: 'InStock',
         imageFile: 'assets/facebook-followers-v4.webp',
         imageAlt: 'تصميم خدمة متابعين فيسبوك من زارز أوفشال',
@@ -80,7 +80,7 @@ const productPages = [
     },
     {
         id: 'g1',
-        slug: 'pubg-mobile-uc',
+        slug: 'شدات-ببجي-موبايل',
         availability: 'OutOfStock',
         imageFile: 'assets/pubg-uc-v4.webp',
         imageAlt: 'تصميم خدمة شحن شدات ببجي موبايل من زارز أوفشال',
@@ -99,7 +99,7 @@ const productPages = [
     },
     {
         id: 'g2',
-        slug: 'free-fire-diamonds',
+        slug: 'جواهر-فري-فاير',
         availability: 'OutOfStock',
         imageFile: 'assets/freefire-diamonds-v4.webp',
         imageAlt: 'تصميم خدمة شحن جواهر فري فاير من زارز أوفشال',
@@ -118,7 +118,7 @@ const productPages = [
     },
     {
         id: 'sub1',
-        slug: 'chatgpt-plus-1-month',
+        slug: 'شات-جي-بي-تي-بلس-شهر',
         availability: 'InStock',
         imageFile: 'assets/chatgpt-plus-v4.webp',
         imageAlt: 'تصميم اشتراك شات جي بي تي بلس لمدة شهر من زارز أوفشال',
@@ -137,7 +137,7 @@ const productPages = [
     },
     {
         id: 'sub2',
-        slug: 'gemini-pro-1-month',
+        slug: 'جيميني-برو-شهر',
         availability: 'InStock',
         imageFile: 'assets/gemini-pro-v3.webp',
         imageAlt: 'تصميم اشتراك جيمني برو لمدة شهر من زارز أوفشال',
@@ -156,7 +156,7 @@ const productPages = [
     },
     {
         id: 'web1',
-        slug: 'ecommerce-store-creation',
+        slug: 'انشاء-متجر-الكتروني',
         availability: 'InStock',
         imageFile: 'assets/ecommerce-store-v4.webp',
         imageAlt: 'تصميم خدمة إنشاء متجر إلكتروني من زارز أوفشال',
@@ -175,7 +175,7 @@ const productPages = [
     },
     {
         id: 'web2',
-        slug: 'website-modification',
+        slug: 'تعديل-المواقع',
         availability: 'InStock',
         imageFile: 'assets/web-modification-v4.webp',
         imageAlt: 'تصميم خدمة تعديل المواقع من زارز أوفشال',
@@ -194,7 +194,7 @@ const productPages = [
     },
     {
         id: 'web3',
-        slug: 'website-store-rental',
+        slug: 'تاجير-موقع-او-متجر-الكتروني',
         availability: 'InStock',
         imageFile: 'assets/webstore-rental-v1.webp',
         imageAlt: 'تصميم خدمة تأجير موقع أو متجر إلكتروني من زارز أوفشال',

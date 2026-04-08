@@ -1,14 +1,14 @@
 // Products Database
 const products = [
     {
-        id: 'sub1', title: 'شات جي بي تي بلس - ChatGPT Plus', category: 'subscriptions',
+        id: 'sub1', title: 'شات جي بي تي بلس', category: 'subscriptions',
         desc: 'استمتع بأقوى نسخة من شات جي بي تي مع سرعة وأداء متقدم. يمنحك هذا الاشتراك وصولاً لأحدث نماذج الذكاء الاصطناعي، إنشاء الصور، تحليل الملفات، والمساعدة السلسة في المهام اليومية.<br> • استجابات أسرع وأكثر دقة<br> • استخدام مكثف بدون حدود مزعجة<br> • دعم رفع وتحليل الملفات<br> • إنشاء الصور وقدرات ذكاء اصطناعي متقدمة<br> • تجربة مخصصة مع أحدث الميزات.', basePrice: 9999 / 940,
         icon: '<img src="/assets/chatgpt-plus-v4.webp" alt="ChatGPT Plus" class="full-cover-img">',
         rating: '5.0', details: { type: 'حساب خاص', duration: 'شهر واحد', delivery: 'واتساب', options: [{ label: 'اشتراك شهر واحد', price: 9999 / 940 }] }
     },
     {
-        id: 'sub2', title: 'جيميني برو - Gemini Pro', category: 'subscriptions',
-        desc: 'وصول لنسخة Gemini Advanced المتميزة. يُسلّم عبر الواتساب.', basePrice: 10,
+        id: 'sub2', title: 'جيميني برو', category: 'subscriptions',
+        desc: 'وصول إلى النسخة المتقدمة من جيميني. يُسلّم عبر الواتساب.', basePrice: 10,
         icon: '<img src="/assets/gemini-pro-v3.webp" alt="Gemini Pro" class="full-cover-img">',
         rating: '4.9', details: { type: 'حساب خاص', duration: 'شهر واحد', delivery: 'واتساب', options: [{ label: 'اشتراك شهر واحد', price: 10 }] }
     },
@@ -355,10 +355,22 @@ let appState = {
     currencySymbols: { SAR: 'SAR', USD: '$', AED: 'AED', SDG: 'ج.س', EGP: 'EGP' }
 };
 
-const GOOGLE_SHEETS_WEB_APP_URL = window.ZARZ_GOOGLE_SHEETS_WEB_APP_URL || 'https://script.google.com/macros/s/AKfycbztXloVNsu4_yyK05l-C7b-ggazOpj3Vb2zb42ODJOLcZfwObBYkvSLXYiO8IFYMaG8ug/exec';
+const ARABIC_UI_TEXT = {
+    toastAdded: 'تمت إضافة المنتج إلى السلة بنجاح!',
+    itemRemoved: 'تم حذف المنتج',
+    fillAllFields: 'يرجى ملء جميع الحقول',
+    paymentRequired: 'يرجى اختيار طريقة الدفع.',
+    bankLast4Required: 'يرجى إدخال آخر 4 أرقام من عملية بنكك.',
+    bankLast4Invalid: 'حقل تأكيد العملية يجب أن يحتوي على 4 أرقام فقط.',
+    orderSubmitProgress: 'جاري إرسال طلبك...',
+    orderSubmitError: 'حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.',
+    orderSubmitSuccess: 'تم إرسال طلبك بنجاح.',
+    copied: 'تم نسخ النص بنجاح',
+    copyFailed: 'فشلت عملية النسخ'
+};
 
 function t(en, ar) {
-    return appState.lang === 'ar' ? ar : en;
+    return ar || en || '';
 }
 
 const RECENT_ORDERS_PAGE_SIZE = 5;
@@ -366,19 +378,13 @@ let visibleRecentOrdersCount = RECENT_ORDERS_PAGE_SIZE;
 
 function localizeChoice(value) {
     if (value && typeof value === 'object') {
-        return appState.lang === 'ar' ? (value.ar || value.en || '') : (value.en || value.ar || '');
+        return value.ar || value.en || '';
     }
     return value || '';
 }
 
 function getProductCopy(product) {
-    let title = product.title;
-    let desc = product.desc;
-    if (translations && appState.lang && translations[appState.lang][`prod_${product.id}_title`]) {
-        title = translations[appState.lang][`prod_${product.id}_title`];
-        desc = translations[appState.lang][`prod_${product.id}_desc`];
-    }
-    return { title, desc };
+    return { title: product.title, desc: product.desc };
 }
 
 function getProductMeta(product) {
@@ -442,20 +448,33 @@ function isWishlisted(productId) {
 }
 
 const PRODUCT_ROUTE_SLUGS = {
-    sm1: 'instagram-followers',
-    sm2: 'tiktok-followers',
-    sm3: 'facebook-followers',
-    g1: 'pubg-mobile-uc',
-    g2: 'free-fire-diamonds',
-    sub1: 'chatgpt-plus-1-month',
-    sub2: 'gemini-pro-1-month',
-    web1: 'ecommerce-store-creation',
-    web2: 'website-modification',
-    web3: 'website-store-rental'
+    sm1: 'متابعين-انستجرام',
+    sm2: 'متابعين-تيك-توك',
+    sm3: 'متابعين-فيسبوك',
+    g1: 'شدات-ببجي-موبايل',
+    g2: 'جواهر-فري-فاير',
+    sub1: 'شات-جي-بي-تي-بلس-شهر',
+    sub2: 'جيميني-برو-شهر',
+    web1: 'انشاء-متجر-الكتروني',
+    web2: 'تعديل-المواقع',
+    web3: 'تاجير-موقع-او-متجر-الكتروني'
 };
 
+function normalizeProductSlug(slug) {
+    const rawSlug = String(slug || '').trim();
+
+    if (!rawSlug) return '';
+
+    try {
+        return decodeURIComponent(rawSlug);
+    } catch {
+        return rawSlug;
+    }
+}
+
 const PRODUCT_SLUG_TO_ID = Object.fromEntries(
-    Object.entries(PRODUCT_ROUTE_SLUGS).map(([productId, slug]) => [slug, productId])
+    Object.entries(PRODUCT_ROUTE_SLUGS)
+        .map(([productId, slug]) => [normalizeProductSlug(slug).toLowerCase(), productId])
 );
 
 const STATIC_PAGE_ROUTES = {
@@ -479,7 +498,7 @@ function getProductSlug(productId) {
 }
 
 function getProductIdBySlug(slug) {
-    return PRODUCT_SLUG_TO_ID[String(slug || '').toLowerCase()] || '';
+    return PRODUCT_SLUG_TO_ID[normalizeProductSlug(slug).toLowerCase()] || '';
 }
 
 function normalizeRoutePath(pathname = window.location.pathname) {
@@ -493,26 +512,28 @@ function normalizeRoutePath(pathname = window.location.pathname) {
 }
 
 function getRouteContext() {
-    const pathname = (window.location.pathname || '').toLowerCase();
-    const normalizedPath = normalizeRoutePath(pathname);
-    const segments = normalizedPath.split('/').filter(Boolean);
+    const rawPathname = window.location.pathname || '';
+    const pathname = rawPathname.toLowerCase();
+    const normalizedPath = normalizeRoutePath(rawPathname);
+    const segments = normalizedPath.split('/').filter(Boolean).map(normalizeProductSlug);
+    const normalizedSegments = segments.map(segment => segment.toLowerCase());
     const legacyHash = window.location.hash.replace('#', '').trim().toLowerCase();
 
     if (pathname.endsWith('/store.html')) return { page: 'store', view: 'store', legacy: true, legacyHash };
     if (pathname.endsWith('/account.html')) return { page: 'account', view: 'account', legacy: true, legacyHash };
     if (pathname.endsWith('/contact.html')) return { page: 'contact', view: 'contact', legacy: true, legacyHash };
 
-    if (segments[0] === 'products') {
+    if (normalizedSegments[0] === 'products') {
         if (segments.length === 1) return { page: 'store', view: 'store', legacyHash };
-        if (segments[1] === 'cart') return { page: 'store', view: 'cart', legacyHash };
-        if (segments[1] === 'checkout') return { page: 'store', view: 'checkout', legacyHash };
+        if (normalizedSegments[1] === 'cart') return { page: 'store', view: 'cart', legacyHash };
+        if (normalizedSegments[1] === 'checkout') return { page: 'store', view: 'checkout', legacyHash };
 
         return { page: 'store', view: 'details', slug: segments[1], legacyHash };
     }
 
-    if (segments[0] === 'account') return { page: 'account', view: 'account', legacyHash };
-    if (segments[0] === 'contact') return { page: 'contact', view: 'contact', legacyHash };
-    if (segments[0] === 'terms') return { page: 'terms', view: 'terms', legacyHash };
+    if (normalizedSegments[0] === 'account') return { page: 'account', view: 'account', legacyHash };
+    if (normalizedSegments[0] === 'contact') return { page: 'contact', view: 'contact', legacyHash };
+    if (normalizedSegments[0] === 'terms') return { page: 'terms', view: 'terms', legacyHash };
     if (legacyHash === 'terms') return { page: 'home', view: 'terms', legacyHash };
 
     return { page: 'home', view: 'home', legacyHash };
@@ -602,18 +623,39 @@ function applyStoreCategoryFromUrl() {
     renderProducts(getFilteredProducts());
 }
 
+function sanitizeLettersOnly(value) {
+    return String(value || '')
+        .replace(/[^\p{L}\s]/gu, '')
+        .replace(/\s{2,}/g, ' ')
+        .replace(/^\s+/g, '');
+}
+
+function sanitizeDigitsOnly(value) {
+    return String(value || '').replace(/\D+/g, '');
+}
+
+function sanitizeInputValue(value, mode) {
+    if (mode === 'letters') return sanitizeLettersOnly(value);
+    if (mode === 'digits') return sanitizeDigitsOnly(value);
+    return String(value || '');
+}
+
+function sanitizeTrackedInput(input) {
+    if (!input || !input.dataset) return;
+    const mode = input.dataset.sanitize;
+    if (!mode) return;
+
+    const sanitizedValue = sanitizeInputValue(input.value, mode);
+    if (input.value !== sanitizedValue) {
+        input.value = sanitizedValue;
+    }
+}
+
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
-    // Apply persisted language settings to document
-    localStorage.setItem('zarz_lang', 'ar');
+    appState.lang = 'ar';
     document.documentElement.lang = appState.lang;
     document.documentElement.dir = 'rtl';
-    const langBtnText = document.getElementById('lang-btn-text');
-    if(langBtnText && typeof translations !== 'undefined' && translations[appState.lang]) {
-        langBtnText.textContent = translations[appState.lang].lang_switch;
-    }
-
-    applyTranslations();
     fetchExchangeRates();
     renderFeaturedProducts();
     initRouter();
@@ -699,6 +741,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (savedCheckout.phone && phoneInput) phoneInput.value = savedCheckout.phone;
         if (savedCheckout.paymentMethod && paymentMethodInput) paymentMethodInput.value = savedCheckout.paymentMethod;
         if (savedCheckout.transactionLast4 && transactionLast4Input) transactionLast4Input.value = savedCheckout.transactionLast4;
+
+        sanitizeTrackedInput(nameInput);
+        sanitizeTrackedInput(phoneInput);
     };
     
     restoreCheckout();
@@ -754,6 +799,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(paymentMethodSelect) {
         paymentMethodSelect.addEventListener('change', updateCheckoutPaymentUI);
     }
+
+    document.addEventListener('input', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement)) return;
+        sanitizeTrackedInput(target);
+    });
 
     const detailsContainer = document.getElementById('details-container');
     const scheduleDetailsSave = createBufferedTask(() => {
@@ -830,35 +881,36 @@ function updateSeoMeta(viewId) {
     const ogUrlMeta = document.querySelector('meta[property="og:url"]');
     const twitterTitleMeta = document.querySelector('meta[name="twitter:title"]');
     const twitterDescriptionMeta = document.querySelector('meta[name="twitter:description"]');
+    const brandTitle = 'زارز | ZARZ';
 
     const seoByView = {
         home: {
-            title: 'زارز | zarz | خدمات رقمية وشحن ألعاب واشتراكات',
-            description: 'زارز أوفشال يقدم خدمات رقمية احترافية تشمل شحن الألعاب، تنمية حسابات التواصل الاجتماعي، الاشتراكات الرقمية، وتطوير المتاجر والمواقع بسرعة ودعم مباشر.'
+            title: 'زارز | ZARZ - متجر الخدمات الرقمية، شحن الألعاب والاشتراكات',
+            description: 'زارز أوفشال يقدم خدمات رقمية احترافية تشمل شحن الألعاب، تنمية حسابات التواصل الاجتماعي، الاشتراكات الذكية، وتطوير المتاجر والمواقع بسرعة مع دعم فني متواصل.'
         },
         store: {
-            title: 'المتجر | زارز | zarz',
-            description: 'تصفح خدمات زارز أوفشال في شحن الألعاب، الاشتراكات الرقمية، خدمات السوشيال ميديا، وتطوير المواقع والمتاجر بواجهة عربية واضحة.'
+            title: `المنتجات | ${brandTitle}`,
+            description: 'تصفح جميع منتجات وخدمات زارز أوفشال عبر صفحة منتجات حقيقية قابلة للأرشفة والفهرسة.'
         },
         cart: {
-            title: 'السلة | زارز | zarz',
-            description: 'راجع طلباتك في سلة زارز أوفشال وأكمل تفاصيل الخدمة والدفع بخطوات عربية سهلة وواضحة.'
+            title: `السلة | ${brandTitle}`,
+            description: 'راجع منتجاتك المختارة داخل سلة زارز أوفشال وأكمل الطلب بسهولة.'
         },
         checkout: {
-            title: 'إتمام الطلب | زارز | zarz',
-            description: 'أكمل طلبك في زارز أوفشال بسرعة عبر نموذج عربي واضح مع متابعة مباشرة عبر واتساب أو الهاتف.'
+            title: `إتمام الطلب | ${brandTitle}`,
+            description: 'أكمل طلبك في زارز أوفشال عبر صفحة دفع ومتابعة واضحة.'
         },
         contact: {
-            title: 'تواصل معنا | زارز | zarz',
-            description: 'تواصل مع فريق زارز أوفشال للاستفسارات، الطلبات المخصصة، أو المتابعة على خدمات الألعاب والاشتراكات والمواقع.'
+            title: `تواصل معنا | ${brandTitle}`,
+            description: 'تواصل مع فريق زارز أوفشال عبر صفحة مستقلة تحتوي على وسائل التواصل والنموذج المباشر.'
         },
         account: {
-            title: 'طلباتي | زارز | zarz',
-            description: 'تابع طلباتك الأخيرة في زارز أوفشال وراجع حالة الخدمات الرقمية التي قمت بطلبها.'
+            title: `طلباتي | ${brandTitle}`,
+            description: 'تابع طلباتك الأخيرة في زارز أوفشال من صفحة مستقلة وسهلة التصفح.'
         },
         terms: {
-            title: 'شروط الاستخدام | زارز | zarz',
-            description: 'اطلع على شروط استخدام زارز أوفشال وسياسات الخدمات الرقمية والشحن والاشتراكات قبل إتمام الطلب.'
+            title: `شروط الاستخدام | ${brandTitle}`,
+            description: 'اطلع على شروط الاستخدام وسياسات الطلب والدفع في زارز أوفشال.'
         }
     };
 
@@ -872,7 +924,7 @@ function updateSeoMeta(viewId) {
             const productCopy = getProductCopy(product);
             const cleanDescription = String(productCopy.desc || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
             seo = {
-                title: productCopy.title + ' | زارز | zarz',
+                title: `${productCopy.title} | ${brandTitle}`,
                 description: cleanDescription || seoByView.store.description
             };
             seoUrl = buildAbsoluteUrl(buildRoutePath('details', { productId: product.id }));
@@ -1037,6 +1089,14 @@ function initRouter() {
         if (!productId) {
             redirectToStaticPage('store');
             return;
+        }
+
+        const canonicalDetailsPath = buildStorePath('details', { productId });
+        const canonicalPathname = normalizeRoutePath(new URL(canonicalDetailsPath, window.location.origin).pathname);
+        const currentPathname = normalizeRoutePath(window.location.pathname);
+
+        if (canonicalPathname !== currentPathname) {
+            window.history.replaceState({}, '', buildAbsoluteUrl(canonicalDetailsPath));
         }
 
         viewDetails(productId);
@@ -1220,15 +1280,124 @@ function renderFeaturedProducts() {
         featContainer.innerHTML = featuredItems.map(generateProductCardHTML).join('');
     }
 
+    initFeaturedCarouselControls();
     refreshPrices();
 }
 
-function formatCategory(cat) {
-    if(appState.lang === 'ar') {
-        const map = { social: 'تواصل اجتماعي', gaming: 'ألعاب', subscriptions: 'اشتراكات الذكاء الاصطناعي', webdev: 'تطوير ويب' };
-        return map[cat] || cat;
+function getFeaturedVisibleCardIndex(container, cards) {
+    if (!container || !cards.length) return -1;
+
+    const containerRect = container.getBoundingClientRect();
+    let bestIndex = 0;
+    let bestVisibleWidth = -1;
+
+    cards.forEach((card, index) => {
+        const rect = card.getBoundingClientRect();
+        const visibleWidth = Math.max(0, Math.min(rect.right, containerRect.right) - Math.max(rect.left, containerRect.left));
+
+        if (visibleWidth > bestVisibleWidth) {
+            bestVisibleWidth = visibleWidth;
+            bestIndex = index;
+        }
+    });
+
+    return bestIndex;
+}
+
+function updateFeaturedCarouselControls() {
+    const container = document.getElementById('featured-container');
+    const controls = document.querySelector('.featured-carousel-controls');
+    const nextButton = controls?.querySelector('[data-featured-dir="next"]');
+    const prevButton = controls?.querySelector('[data-featured-dir="prev"]');
+
+    if (!container || !controls || !nextButton || !prevButton) return;
+
+    const cards = Array.from(container.querySelectorAll('.product-card'));
+    const hasOverflow = container.scrollWidth > container.clientWidth + 8;
+    const isMobile = window.innerWidth <= 768 && cards.length > 1 && hasOverflow;
+
+    controls.hidden = !isMobile;
+    if (!isMobile) {
+        prevButton.disabled = true;
+        prevButton.classList.add('is-hidden');
+        nextButton.disabled = true;
+        nextButton.classList.add('is-hidden');
+        return;
     }
-    const map = { social: 'Social Media', gaming: 'Gaming', subscriptions: 'Subscriptions', webdev: 'Web Development' };
+
+    const activeIndex = getFeaturedVisibleCardIndex(container, cards);
+    const isAtStart = activeIndex <= 0;
+    const isAtEnd = activeIndex >= cards.length - 1;
+
+    prevButton.disabled = isAtStart;
+    prevButton.classList.toggle('is-hidden', isAtStart);
+
+    nextButton.disabled = isAtEnd;
+    nextButton.classList.toggle('is-hidden', isAtEnd);
+}
+
+function scrollFeaturedCarousel(direction) {
+    const container = document.getElementById('featured-container');
+    if (!container) return;
+
+    const cards = Array.from(container.querySelectorAll('.product-card'));
+    if (!cards.length) return;
+
+    const activeIndex = getFeaturedVisibleCardIndex(container, cards);
+    const targetIndex = direction === 'next'
+        ? Math.min(activeIndex + 1, cards.length - 1)
+        : Math.max(activeIndex - 1, 0);
+
+    const targetCard = cards[targetIndex];
+    if (!targetCard) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const targetRect = targetCard.getBoundingClientRect();
+    const containerPaddingLeft = parseFloat(getComputedStyle(container).paddingLeft) || 0;
+    const deltaX = targetRect.left - containerRect.left - containerPaddingLeft;
+
+    container.scrollBy({
+        left: deltaX,
+        behavior: 'smooth'
+    });
+
+    window.setTimeout(updateFeaturedCarouselControls, 320);
+}
+
+function initFeaturedCarouselControls() {
+    const container = document.getElementById('featured-container');
+    const controls = document.querySelector('.featured-carousel-controls');
+
+    if (!container || !controls) return;
+
+    if (!container.dataset.carouselBound) {
+        controls.querySelectorAll('[data-featured-dir]').forEach(button => {
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                scrollFeaturedCarousel(button.dataset.featuredDir);
+            });
+        });
+
+        let frameId = null;
+        const scheduleUpdate = () => {
+            if (frameId) cancelAnimationFrame(frameId);
+            frameId = requestAnimationFrame(() => {
+                frameId = null;
+                updateFeaturedCarouselControls();
+            });
+        };
+
+        container.addEventListener('scroll', scheduleUpdate, { passive: true });
+        window.addEventListener('resize', scheduleUpdate);
+        container.dataset.carouselBound = 'true';
+    }
+
+    updateFeaturedCarouselControls();
+}
+
+function formatCategory(cat) {
+    const map = { social: 'تواصل اجتماعي', gaming: 'ألعاب', subscriptions: 'اشتراكات الذكاء الاصطناعي', webdev: 'تطوير ويب' };
     return map[cat] || cat;
 }
 
@@ -1533,7 +1702,7 @@ function viewDetails(productId) {
             </div>
             <div class="form-group">
                 <label>${t('Recipient Number', 'رقم المستلم')}</label>
-                <input type="tel" id="target-phone" placeholder="${t('Ex: +966...', 'مثال: +966...')}" required>
+                <input type="tel" id="target-phone" placeholder="${t('Ex: 966...', 'مثال: 966...')}" required data-sanitize="digits" inputmode="numeric" pattern="[0-9]*">
             </div>
         `;
     } else if(product.category === 'webdev') {
@@ -1590,10 +1759,10 @@ function viewDetails(productId) {
                     
                     <div class="price-action-buttons">
                         <button class="btn btn-secondary w-100 detail-action-btn" onclick="addToCart('${product.id}')">
-                            <i class="fa-solid fa-cart-plus"></i> ${appState.lang === 'ar' ? 'أضف للسلة' : 'Add to Cart'}
+                            <i class="fa-solid fa-cart-plus"></i> أضف للسلة
                         </button>
                         <button class="btn btn-primary w-100 detail-action-btn" onclick="orderNow('${product.id}')">
-                            <i class="fa-solid fa-bolt"></i> ${appState.lang === 'ar' ? 'اطلب الآن' : 'Order Now'}
+                            <i class="fa-solid fa-bolt"></i> اطلب الآن
                         </button>
                     </div>
                 </div>
@@ -1704,7 +1873,7 @@ function addToCart(productId) {
         customData.playerId = playerId;
         customData.server = country;
     } else if(product.category === 'subscriptions') {
-        const phone = document.getElementById('target-phone').value;
+        const phone = sanitizeDigitsOnly(document.getElementById('target-phone').value);
         if(!phone) return showToast('الرجاء إدخال رقم هاتف المستلم', 'error');
         customData.phone = phone;
     } else if(product.category === 'webdev') {
@@ -1717,7 +1886,7 @@ function addToCart(productId) {
         unitPriceSar: finalPrice / qty,
         customData
     });
-    showToast(translations[appState.lang].toast_added || 'تمت الإضافة للسلة بنجاح!', 'success');
+    showToast(ARABIC_UI_TEXT.toastAdded, 'success');
 }
 
 function updateCartCount(animate = true) {
@@ -1737,7 +1906,7 @@ function removeFromCart(cartId) {
     localStorage.setItem('zarz_cart', JSON.stringify(appState.cart));
     updateCartCount();
     renderCart();
-    showToast(appState.lang === 'ar' ? 'تم حذف المنتج' : 'Item removed', 'success');
+    showToast(ARABIC_UI_TEXT.itemRemoved, 'success');
 }
 
 function renderCart() {
@@ -1822,100 +1991,162 @@ function buildOrderDetails(appCart, includeFormatting = false) {
         const copy = getProductCopy(item.product);
         const title = copy.title;
         let metaParts = [];
-        if(item.customData.link) metaParts.push((appState.lang === 'ar' ? 'الرابط' : 'Link') + ': ' + item.customData.link);
+        if(item.customData.link) metaParts.push('الرابط: ' + item.customData.link);
         if(item.customData.package) metaParts.push(item.customData.package);
-        if(item.customData.playerId) metaParts.push((appState.lang === 'ar' ? 'رقم اللاعب' : 'Player ID') + ': ' + item.customData.playerId);
-        if(item.customData.phone) metaParts.push((appState.lang === 'ar' ? 'الهاتف' : 'Phone') + ': ' + item.customData.phone);
-        if(item.customData.server) metaParts.push((appState.lang === 'ar' ? 'السيرفر' : 'Server') + ': ' + item.customData.server);
+        if(item.customData.playerId) metaParts.push('رقم اللاعب: ' + item.customData.playerId);
+        if(item.customData.phone) metaParts.push('الهاتف: ' + item.customData.phone);
+        if(item.customData.server) metaParts.push('السيرفر: ' + item.customData.server);
         const titleText = includeFormatting ? ('*' + item.qty + 'x ' + title + '*') : (item.qty + 'x ' + title);
         const metaText = metaParts.length ? ('\n' + metaParts.join(' | ')) : '';
         return titleText + ' - ' + formatPrice(item.totalPriceSar) + metaText;
     }).join('\n\n');
 }
 
-async function submitOrderToGoogleSheets(payload) {
-    if (!GOOGLE_SHEETS_WEB_APP_URL) {
-        return { ok: false, reason: 'missing_endpoint' };
+function buildOrderPayload({
+    orderNum,
+    name,
+    phone,
+    paymentMethod,
+    paymentMethodLabel,
+    transactionLast4,
+    totalStr
+}) {
+    const items = appState.cart.map((item) => ({
+        productId: item.product.id,
+        productSlug: getProductSlug(item.product.id),
+        title: getProductCopy(item.product).title,
+        category: item.product.category,
+        quantity: item.qty,
+        unitPriceSar: item.unitPriceSar,
+        totalPriceSar: item.totalPriceSar,
+        customData: item.customData || {}
+    }));
+
+    return {
+        orderNumber: orderNum,
+        productId: items[0]?.productId || null,
+        quantity: items.reduce((sum, item) => sum + item.quantity, 0),
+        name,
+        phone,
+        paymentMethod,
+        paymentMethodLabel,
+        paymentReference: transactionLast4 || null,
+        total: totalStr,
+        currency: appState.currency,
+        items,
+        details: buildOrderDetails(appState.cart, false),
+        date: new Date()
+    };
+}
+
+const ORDER_VALIDATION_RULES = {
+    orderNumberMax: 40,
+    quantityMin: 1,
+    quantityMax: 9999,
+    nameMin: 2,
+    nameMax: 100,
+    phoneMin: 6,
+    phoneMax: 20,
+    paymentMethodLabelMax: 40,
+    totalMax: 50,
+    currencyMax: 10,
+    maxItems: 50,
+    detailsMax: 5000
+};
+
+function isOptionalString(value) {
+    return value == null || typeof value === 'string';
+}
+
+function getOrderValidationError(orderPayload) {
+    if (!orderPayload || typeof orderPayload !== 'object') {
+        return t('Unable to prepare the order data.', 'تعذر تجهيز بيانات الطلب.');
     }
 
-    let response;
-    try {
-        response = await fetch(GOOGLE_SHEETS_WEB_APP_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'text/plain;charset=utf-8'
-            },
-            body: JSON.stringify(payload)
-        });
-    } catch (error) {
-        const fallbackBody = new URLSearchParams(payload).toString();
-        const fallbackResponse = await fetch(GOOGLE_SHEETS_WEB_APP_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-            },
-            body: fallbackBody
-        });
-
-        if (fallbackResponse && fallbackResponse.type === 'opaque') {
-            return { ok: true, transport: 'no-cors-fallback' };
-        }
-
-        throw error;
+    if (typeof orderPayload.orderNumber !== 'string' || orderPayload.orderNumber.length === 0 || orderPayload.orderNumber.length > ORDER_VALIDATION_RULES.orderNumberMax) {
+        return t('Order number is invalid.', 'رقم الطلب غير صالح.');
     }
 
-    if (!response.ok) {
-        throw new Error('Sheets request failed with status ' + response.status);
+    if (!isOptionalString(orderPayload.productId)) {
+        return t('Product identifier is invalid.', 'معرف المنتج غير صالح.');
     }
 
-    const rawText = await response.text();
-    let result = { ok: true };
-
-    if (rawText) {
-        try {
-            result = JSON.parse(rawText);
-        } catch (parseError) {
-            throw new Error('Invalid Sheets response: ' + rawText.slice(0, 120));
-        }
+    if (!Number.isInteger(orderPayload.quantity) || orderPayload.quantity < ORDER_VALIDATION_RULES.quantityMin || orderPayload.quantity > ORDER_VALIDATION_RULES.quantityMax) {
+        return t('Quantity must be between 1 and 9999.', 'الكمية يجب أن تكون بين 1 و9999.');
     }
 
-    if (!result.ok) {
-        return { ok: false, reason: 'sheet_rejected', error: result.error || 'Google Sheets rejected the order.' };
+    if (typeof orderPayload.name !== 'string' || orderPayload.name.length < ORDER_VALIDATION_RULES.nameMin || orderPayload.name.length > ORDER_VALIDATION_RULES.nameMax) {
+        return t('Name must be between 2 and 100 characters.', 'الاسم يجب أن يكون بين حرفين و100 حرف.');
     }
 
-    return { ok: true, transport: 'json' };
+    if (typeof orderPayload.phone !== 'string' || orderPayload.phone.length < ORDER_VALIDATION_RULES.phoneMin || orderPayload.phone.length > ORDER_VALIDATION_RULES.phoneMax) {
+        return t('Phone number must be between 6 and 20 characters.', 'رقم الهاتف يجب أن يكون بين 6 و20 خانة.');
+    }
+
+    if (typeof orderPayload.paymentMethod !== 'string' || !['whatsapp', 'bankak'].includes(orderPayload.paymentMethod)) {
+        return t('Payment method is invalid.', 'طريقة الدفع غير صالحة.');
+    }
+
+    if (typeof orderPayload.paymentMethodLabel !== 'string' || orderPayload.paymentMethodLabel.length === 0 || orderPayload.paymentMethodLabel.length > ORDER_VALIDATION_RULES.paymentMethodLabelMax) {
+        return t('Payment method label is invalid.', 'وصف طريقة الدفع غير صالح.');
+    }
+
+    if (!isOptionalString(orderPayload.paymentReference)) {
+        return t('Payment reference is invalid.', 'مرجع الدفع غير صالح.');
+    }
+
+    if (typeof orderPayload.total !== 'string' || orderPayload.total.length === 0 || orderPayload.total.length > ORDER_VALIDATION_RULES.totalMax) {
+        return t('Order total is invalid.', 'إجمالي الطلب غير صالح.');
+    }
+
+    if (typeof orderPayload.currency !== 'string' || orderPayload.currency.length === 0 || orderPayload.currency.length > ORDER_VALIDATION_RULES.currencyMax) {
+        return t('Currency is invalid.', 'العملة غير صالحة.');
+    }
+
+    if (!Array.isArray(orderPayload.items) || orderPayload.items.length === 0 || orderPayload.items.length > ORDER_VALIDATION_RULES.maxItems) {
+        return t('The cart items are invalid.', 'عناصر السلة غير صالحة.');
+    }
+
+    if (typeof orderPayload.details !== 'string' || orderPayload.details.length === 0 || orderPayload.details.length > ORDER_VALIDATION_RULES.detailsMax) {
+        return t('Order details are invalid.', 'تفاصيل الطلب غير صالحة.');
+    }
+
+    if (!(orderPayload.date instanceof Date) || Number.isNaN(orderPayload.date.getTime())) {
+        return t('Order date is invalid.', 'تاريخ الطلب غير صالح.');
+    }
+
+    return '';
 }
 
 window.processOrder = async function() {
     if(appState.cart.length === 0) return;
 
-    const nameInput = document.getElementById('checkout-name').value.trim();
-    const phoneInput = document.getElementById('checkout-phone').value.trim();
+    const nameInput = sanitizeLettersOnly(document.getElementById('checkout-name').value).trim();
+    const phoneInput = sanitizeDigitsOnly(document.getElementById('checkout-phone').value).trim();
     const paymentMethod = document.getElementById('checkout-payment-method').value;
     const transactionLast4 = document.getElementById('checkout-transaction-last4').value.trim();
 
     if(!nameInput || !phoneInput) {
-        showToast(appState.lang === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill all fields', 'error');
+        showToast(ARABIC_UI_TEXT.fillAllFields, 'error');
         return;
     }
     if(!paymentMethod) {
-        showToast(translations[appState.lang].payment_required_msg, 'error');
+        showToast(ARABIC_UI_TEXT.paymentRequired, 'error');
         return;
     }
     if(paymentMethod === 'bankak' && !transactionLast4) {
-        showToast(translations[appState.lang].bank_last4_required_msg, 'error');
+        showToast(ARABIC_UI_TEXT.bankLast4Required, 'error');
         return;
     }
     if(paymentMethod === 'bankak' && !/^\d{4}$/.test(transactionLast4)) {
-        showToast(translations[appState.lang].bank_last4_invalid_msg, 'error');
+        showToast(ARABIC_UI_TEXT.bankLast4Invalid, 'error');
         return;
     }
 
     const btn = document.querySelector('#checkoutForm button[type="submit"]');
     const originalText = btn ? btn.innerHTML : '';
     if(btn) {
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> ' + translations[appState.lang].order_submit_progress;
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> ' + ARABIC_UI_TEXT.orderSubmitProgress;
         btn.disabled = true;
     }
 
@@ -1927,39 +2158,46 @@ window.processOrder = async function() {
             btn.innerHTML = originalText;
             btn.disabled = false;
         }
-        showToast(translations[appState.lang].order_submit_error, 'error');
+        showToast(error?.userMessage || ARABIC_UI_TEXT.orderSubmitError, 'error');
     }
 };
 
 window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', submitBtn = null, submitOriginalText = null) {
-    const nameInput = document.getElementById('checkout-name').value.trim();
-    const phoneInput = document.getElementById('checkout-phone').value.trim();
+    const nameInput = sanitizeLettersOnly(document.getElementById('checkout-name').value).trim();
+    const phoneInput = sanitizeDigitsOnly(document.getElementById('checkout-phone').value).trim();
     const orderNum = 'ZARZ-' + Math.floor(Math.random()*10000);
     const orderDate = new Date().toISOString();
     const totalStr = document.getElementById('cart-total').textContent;
     const paymentMethodLabel = getPaymentMethodLabel(paymentMethod);
     const detailsStr = buildOrderDetails(appState.cart, true);
-    const sheetOrderText = [
-        'Order Number: ' + orderNum,
-        'Items:',
-        buildOrderDetails(appState.cart, false),
-        'Total: ' + totalStr,
-        'Payment Method: ' + paymentMethodLabel,
-        transactionLast4 ? ('Payment Confirmation (Last 4): ' + transactionLast4) : ''
-    ].filter(Boolean).join('\n');
-
-    const payload = {
-        name: nameInput,
-        phoneNumber: phoneInput,
-        order: sheetOrderText,
-        date: orderDate,
-        paymentMethod: paymentMethodLabel
-    };
-
-    const sheetResult = await submitOrderToGoogleSheets(payload);
-    if (!sheetResult.ok) {
-        throw new Error(sheetResult.reason || 'Unable to submit order to Google Sheets.');
+    if (typeof window.createOrder !== 'function') {
+        throw new Error('createOrder is not available.');
     }
+    if (window.firebaseReadyPromise) {
+        await window.firebaseReadyPromise;
+    }
+
+    console.log('Sending order...');
+    console.log('Cart:', appState.cart);
+
+    const orderPayload = buildOrderPayload({
+        orderNum,
+        name: nameInput,
+        phone: phoneInput,
+        paymentMethod,
+        paymentMethodLabel,
+        transactionLast4,
+        totalStr
+    });
+    const orderValidationError = getOrderValidationError(orderPayload);
+
+    if (orderValidationError) {
+        const validationError = new Error(orderValidationError);
+        validationError.userMessage = orderValidationError;
+        throw validationError;
+    }
+
+    await window.createOrder(orderPayload);
 
     let newOrder = {
         id: orderNum,
@@ -1967,7 +2205,7 @@ window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', subm
         method: paymentMethodLabel,
         mode: paymentMethod,
         paymentReference: transactionLast4 || '-',
-        status: appState.lang === 'ar' ? 'قيد المعالجة' : 'Processing',
+        status: 'قيد المعالجة',
         total: totalStr,
         items: appState.cart.map(i => ({ title: getProductCopy(i.product).title, qty: i.qty }))
     };
@@ -1987,7 +2225,7 @@ window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', subm
         submitBtn.disabled = false;
     }
 
-    showToast(translations[appState.lang].order_submit_success, 'success');
+    showToast(ARABIC_UI_TEXT.orderSubmitSuccess, 'success');
 
     if (paymentMethod === 'whatsapp') {
         window.open('https://wa.me/201500007300?text=' + encodeURIComponent(msg), '_blank');
@@ -2124,7 +2362,7 @@ function renderOrders() {
     );
 
     const visibleOrders = sortedOrders.slice(0, visibleRecentOrdersCount);
-    const locale = appState.lang === 'ar' ? 'ar-EG' : 'en-US';
+    const locale = 'ar-EG';
     const detailsLabel = t('Requested services:', 'الخدمات المطلوبة:');
     const statusLabel = t('Order status:', 'حالة الطلب:');
     const inProgressText = t('In progress (contact us on WhatsApp)', 'قيد المعالجة (تواصل معنا عبر واتساب)');
@@ -2212,20 +2450,7 @@ window.toggleOrderDetails = function(orderId) {
 };
 
 
-function applyTranslations() {
-    if(typeof translations === "undefined") return;
-    const currentTranslations = translations[appState.lang];
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (currentTranslations[key]) {
-            if (el.hasAttribute('data-i18n-attr')) {
-                el.setAttribute(el.getAttribute('data-i18n-attr'), currentTranslations[key]);
-            } else {
-                el.innerHTML = currentTranslations[key];
-            }
-        }
-    });
-}
+function applyTranslations() {}
 
 // UI Utils (Toast)
 function showToast(message, type = 'info') {
@@ -2250,7 +2475,7 @@ function showToast(message, type = 'info') {
 
 window.copyAccount = function(text) {
     navigator.clipboard.writeText(text).then(() => {
-        showToast(translations[appState.lang].copied_msg || 'تم نسخ النص بنجاح', 'success');
+        showToast(ARABIC_UI_TEXT.copied, 'success');
     }).catch(err => {
         showToast('فشل في عملية النسخ', 'error');
     });

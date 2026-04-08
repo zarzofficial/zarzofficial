@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 const { productPages, siteMeta } = require('./product-seo-data');
 
@@ -14,6 +14,22 @@ const templates = {
     store: fs.readFileSync(path.join(rootDir, 'store.html'), 'utf8'),
     account: fs.readFileSync(path.join(rootDir, 'account.html'), 'utf8'),
     contact: fs.readFileSync(path.join(rootDir, 'contact.html'), 'utf8')
+};
+
+const PAGE_COPY = {
+    brandTitle: 'زارز',
+    productsTitle: 'المنتجات',
+    productsDescription: 'تصفح جميع منتجات وخدمات زارز أوفشال عبر صفحة منتجات حقيقية قابلة للأرشفة والفهرسة.',
+    cartTitle: 'السلة',
+    cartDescription: 'راجع منتجاتك المختارة داخل سلة زارز أوفشال وأكمل الطلب بسهولة.',
+    checkoutTitle: 'إتمام الطلب',
+    checkoutDescription: 'أكمل طلبك في زارز أوفشال عبر صفحة دفع ومتابعة واضحة.',
+    accountTitle: 'طلباتي',
+    accountDescription: 'تابع طلباتك الأخيرة في زارز أوفشال من صفحة مستقلة وسهلة التصفح.',
+    contactTitle: 'تواصل معنا',
+    contactDescription: 'تواصل مع فريق زارز أوفشال عبر صفحة مستقلة تحتوي على وسائل التواصل والنموذج المباشر.',
+    termsTitle: 'شروط الاستخدام',
+    termsDescription: 'اطلع على شروط الاستخدام وسياسات الطلب والدفع في زارز أوفشال.'
 };
 
 function ensureDir(dirPath) {
@@ -39,7 +55,7 @@ function escapeJson(value) {
 }
 
 function publicUrl(routePath) {
-    return `${siteMeta.domain}${routePath}`;
+    return encodeURI(`${siteMeta.domain}${routePath}`);
 }
 
 function replaceTag(html, pattern, replacement) {
@@ -112,6 +128,25 @@ function setHead(html, meta) {
     return next;
 }
 
+function setActiveView(html, activeViewId) {
+    return html.replace(
+        /<section id="view-([^"]+)" class="view(?: active)?">/g,
+        (match, viewId) => `<section id="view-${viewId}" class="view${viewId === activeViewId ? ' active' : ''}">`
+    );
+}
+
+function setActiveNavLink(html, activeViewId) {
+    const navView = ['details', 'cart', 'checkout'].includes(activeViewId) ? 'store' : activeViewId;
+    return html.replace(
+        /(<a href="[^"]*" class="nav-link)( active)?(" data-view="([^"]+)")/g,
+        (match, start, active, middle, viewId) => `${start}${viewId === navView ? ' active' : ''}${middle}`
+    );
+}
+
+function preparePage(html, meta, activeViewId) {
+    return setActiveNavLink(setActiveView(setHead(html, meta), activeViewId), activeViewId);
+}
+
 function buildSchemaBlock(schema) {
     return `<script type="application/ld+json">\n${escapeJson(schema)}\n</script>`;
 }
@@ -156,7 +191,7 @@ function buildProductSchemas(page) {
             {
                 '@type': 'ListItem',
                 position: 2,
-                name: 'المنتجات',
+                name: PAGE_COPY.productsTitle,
                 item: publicUrl('/products/')
             },
             {
@@ -171,21 +206,21 @@ function buildProductSchemas(page) {
     return [buildSchemaBlock(productSchema), buildSchemaBlock(breadcrumbSchema)].join('\n');
 }
 
-function buildStorePage(meta) {
-    return setHead(templates.store, meta);
+function buildStorePage(meta, activeView = 'store') {
+    return preparePage(templates.store, meta, activeView);
 }
 
 function buildAccountPage(meta) {
-    return setHead(templates.account, meta);
+    return preparePage(templates.account, meta, 'account');
 }
 
 function buildContactPage(meta) {
-    return setHead(templates.contact, meta);
+    return preparePage(templates.contact, meta, 'contact');
 }
 
 function buildTermsPage(meta) {
     const freshHomeTemplate = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf8');
-    return setHead(freshHomeTemplate, meta);
+    return preparePage(freshHomeTemplate, meta, 'terms');
 }
 
 function writeFile(targetPath, contents) {
@@ -269,44 +304,44 @@ function main() {
     writeFile(
         path.join(productsDir, 'index.html'),
         buildStorePage({
-            title: 'المنتجات | زارز أوفشال | ZARZ',
-            description: 'تصفح جميع منتجات وخدمات زارز أوفشال عبر صفحة منتجات حقيقية قابلة للأرشفة والفهرسة.',
+            title: `${PAGE_COPY.productsTitle} | ${PAGE_COPY.brandTitle} | ZARZ`,
+            description: PAGE_COPY.productsDescription,
             canonicalUrl: publicUrl('/products/'),
             ogUrl: publicUrl('/products/'),
-            twitterTitle: 'المنتجات | زارز أوفشال | ZARZ',
+            twitterTitle: `${PAGE_COPY.productsTitle} | ${PAGE_COPY.brandTitle} | ZARZ`,
             robots: 'index, follow'
-        })
+        }, 'store')
     );
 
     writeFile(
         path.join(productsDir, 'cart', 'index.html'),
         buildStorePage({
-            title: 'السلة | زارز أوفشال | ZARZ',
-            description: 'راجع منتجاتك المختارة داخل سلة زارز أوفشال وأكمل الطلب بسهولة.',
+            title: `${PAGE_COPY.cartTitle} | ${PAGE_COPY.brandTitle} | ZARZ`,
+            description: PAGE_COPY.cartDescription,
             canonicalUrl: publicUrl('/products/cart/'),
             ogUrl: publicUrl('/products/cart/'),
-            twitterTitle: 'السلة | زارز أوفشال | ZARZ',
+            twitterTitle: `${PAGE_COPY.cartTitle} | ${PAGE_COPY.brandTitle} | ZARZ`,
             robots: 'noindex, nofollow'
-        })
+        }, 'cart')
     );
 
     writeFile(
         path.join(productsDir, 'checkout', 'index.html'),
         buildStorePage({
-            title: 'إتمام الطلب | زارز أوفشال | ZARZ',
-            description: 'أكمل طلبك في زارز أوفشال عبر صفحة دفع ومتابعة واضحة.',
+            title: `${PAGE_COPY.checkoutTitle} | ${PAGE_COPY.brandTitle} | ZARZ`,
+            description: PAGE_COPY.checkoutDescription,
             canonicalUrl: publicUrl('/products/checkout/'),
             ogUrl: publicUrl('/products/checkout/'),
-            twitterTitle: 'إتمام الطلب | زارز أوفشال | ZARZ',
+            twitterTitle: `${PAGE_COPY.checkoutTitle} | ${PAGE_COPY.brandTitle} | ZARZ`,
             robots: 'noindex, nofollow'
-        })
+        }, 'checkout')
     );
 
     productPages.forEach((page) => {
         writeFile(
             path.join(productsDir, page.slug, 'index.html'),
             buildStorePage({
-                title: `${page.title} | زارز أوفشال | ZARZ`,
+                title: `${page.title} | ${PAGE_COPY.brandTitle} | ZARZ`,
                 description: page.metaDescription,
                 canonicalUrl: publicUrl(`/products/${page.slug}/`),
                 ogUrl: publicUrl(`/products/${page.slug}/`),
@@ -315,15 +350,16 @@ function main() {
                 imageAlt: page.imageAlt,
                 robots: 'index, follow',
                 extraHead: buildProductSchemas(page)
-            })
+            }, 'details')
         );
+
     });
 
     writeFile(
         path.join(accountDir, 'index.html'),
         buildAccountPage({
-            title: 'طلباتي | زارز أوفشال | ZARZ',
-            description: 'تابع طلباتك الأخيرة في زارز أوفشال من صفحة مستقلة وسهلة التصفح.',
+            title: `${PAGE_COPY.accountTitle} | ${PAGE_COPY.brandTitle} | ZARZ`,
+            description: PAGE_COPY.accountDescription,
             canonicalUrl: publicUrl('/account/'),
             ogUrl: publicUrl('/account/'),
             robots: 'noindex, nofollow'
@@ -333,8 +369,8 @@ function main() {
     writeFile(
         path.join(contactDir, 'index.html'),
         buildContactPage({
-            title: 'تواصل معنا | زارز أوفشال | ZARZ',
-            description: 'تواصل مع فريق زارز أوفشال عبر صفحة مستقلة تحتوي على وسائل التواصل والنموذج المباشر.',
+            title: `${PAGE_COPY.contactTitle} | ${PAGE_COPY.brandTitle} | ZARZ`,
+            description: PAGE_COPY.contactDescription,
             canonicalUrl: publicUrl('/contact/'),
             ogUrl: publicUrl('/contact/'),
             robots: 'index, follow'
@@ -344,8 +380,8 @@ function main() {
     writeFile(
         path.join(termsDir, 'index.html'),
         buildTermsPage({
-            title: 'شروط الاستخدام | زارز أوفشال | ZARZ',
-            description: 'اطلع على شروط الاستخدام وسياسات الطلب والدفع في زارز أوفشال.',
+            title: `${PAGE_COPY.termsTitle} | ${PAGE_COPY.brandTitle} | ZARZ`,
+            description: PAGE_COPY.termsDescription,
             canonicalUrl: publicUrl('/terms/'),
             ogUrl: publicUrl('/terms/'),
             robots: 'index, follow'

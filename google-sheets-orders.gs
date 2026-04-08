@@ -1,6 +1,3 @@
-const SPREADSHEET_ID = '17bJzDbIvWKvcbTgc0CWwhx6MtzM1yQzfB834IQxHEGk';
-const SHEET_NAME = 'Orders';
-
 // إعدادات إشعارات تليجرام
 const TELEGRAM_BOT_TOKEN = '8659735935:AAGJUG7dlW3yMHVgOcGjZsiKRLPVZ6UUT7s'; 
 const TELEGRAM_CHAT_ID = '6770893711';
@@ -85,21 +82,6 @@ function doPost(e) {
     if (!payload.name || !payload.phoneNumber || !payload.order || !payload.paymentMethod) {
       return jsonResponse({ ok: false, error: 'Missing required order fields.' });
     }
-
-    const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = spreadsheet.getSheetByName(SHEET_NAME) || spreadsheet.insertSheet(SHEET_NAME);
-
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow(['Name', 'Phone Number', 'Order', 'Date', 'Payment Method']);
-    }
-
-    sheet.appendRow([
-      payload.name || '',
-      payload.phoneNumber || '',
-      payload.order || '',
-      payload.date || new Date().toISOString(),
-      payload.paymentMethod || ''
-    ]);
 
     // الإشعار للتليجرام
     const tgMsg = `📦 <b>طلب جديد! (ZARZ)</b>\n\n` +
