@@ -2439,7 +2439,7 @@ hr {
     gap: 1rem;
 }
 .account-loading-chip {
-    display: inline-flex;
+    display: none;
     width: fit-content;
     align-items: center;
     justify-content: center;

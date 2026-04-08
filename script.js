@@ -653,6 +653,7 @@ function setAccountLoadingState({
 } = {}) {
     const accountContent = document.getElementById('account-content');
     const authLoadingElement = document.getElementById('account-auth-loading');
+    const ordersSection = document.getElementById('account-orders-section');
     const ordersLoadingElement = document.getElementById('account-orders-loading');
     const ordersBody = document.getElementById('account-orders-body');
 
@@ -662,8 +663,9 @@ function setAccountLoadingState({
     }
 
     if (authLoadingElement) authLoadingElement.hidden = !authLoading;
-    if (ordersLoadingElement) ordersLoadingElement.hidden = !ordersLoading;
-    if (ordersBody) ordersBody.hidden = ordersLoading;
+    if (ordersSection) ordersSection.hidden = authLoading;
+    if (ordersLoadingElement) ordersLoadingElement.hidden = authLoading || !ordersLoading;
+    if (ordersBody) ordersBody.hidden = authLoading || ordersLoading;
 }
 
 function getGuestAccountPromptMessage() {

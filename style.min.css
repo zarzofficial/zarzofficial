@@ -1,4 +1,4 @@
-﻿:root {
+:root {
     --bg-color: #07070a;
     --surface-color: #111116;
     --surface-light: rgba(255, 255, 255, 0.04);
@@ -2439,7 +2439,7 @@ hr {
     gap: 1rem;
 }
 .account-loading-chip {
-    display: inline-flex;
+    display: none;
     width: fit-content;
     align-items: center;
     justify-content: center;
@@ -3819,4 +3819,3 @@ html[dir="rtl"] .quick-view-close {
         scroll-behavior: auto !important;
     }
 }
-
