@@ -50,26 +50,36 @@
     .nav-actions{display:flex;align-items:center;gap:1rem;position:relative;z-index:var(--z-navbar-ui)}
     .icon-btn{background:transparent;border:none;color:var(--text-primary);font-size:1.2rem;cursor:pointer;position:relative;z-index:var(--z-navbar-ui);display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px}
     .badge{position:absolute;top:-8px;right:-8px;background:var(--accent-red);color:#fff;font-size:.7rem;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;pointer-events:none}
-    .mobile-menu-btn{display:none;background:none;border:none;color:var(--text-primary);font-size:1.5rem;cursor:pointer;position:relative;z-index:var(--z-navbar-ui);min-width:44px;min-height:44px}
-    .hamburger{width:24px;height:18px;position:relative;display:flex;flex-direction:column;justify-content:space-between}
-    .hamburger span{width:100%;height:2px;background:#fff;border-radius:2px;transition:.3s;transform-origin:left center}
+    .mobile-menu-btn{display:none;align-items:center;justify-content:center;background:none;border:none;color:var(--text-primary);font-size:1.5rem;cursor:pointer;position:relative;z-index:var(--z-navbar-ui);min-width:44px;min-height:44px}
+    .hamburger{width:22px;height:16px;position:absolute;inset:0;margin:auto;z-index:1}
+    .hamburger span{display:block;width:100%;height:2px;background:#fff;border-radius:2px;position:absolute;left:0;transition:all .35s cubic-bezier(.4,0,.2,1);transform-origin:center center}
+    .hamburger span:nth-child(1){top:0}
+    .hamburger span:nth-child(2){top:50%;transform:translateY(-50%)}
+    .hamburger span:nth-child(3){bottom:0}
     main{margin-top:0;min-height:calc(100vh - var(--navbar-height));position:relative;z-index:var(--z-base);overflow:visible}
     .view{display:none;padding:2rem;max-width:1200px;margin:0 auto;position:relative;z-index:var(--z-base);overflow:visible}
     .view.active{display:block}
-    .announcement-bar{background:rgba(255,0,122,0.08);border:1px solid rgba(255,0,122,0.2);border-radius:var(--border-radius-lg);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:var(--text-primary);padding:.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;font-size:.95rem;font-weight:500;margin:1rem auto 2rem;max-width:800px}
+    .announcement-bar{background:rgba(255,0,122,0.08);border:1px solid rgba(255,0,122,0.2);border-radius:var(--border-radius-lg);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:var(--text-primary);padding:.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;font-size:.95rem;font-weight:500;margin:0 auto;max-width:800px;box-sizing:border-box;position:absolute;top:.75rem;left:50%;transform:translateX(-50%);width:min(calc(100% - 4rem),800px);z-index:var(--z-announcement)}
     .announcement-content{display:flex;align-items:center;gap:1rem;flex:1}
     .announcement-badge{background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));color:#fff;padding:.3rem .8rem;border-radius:20px;font-size:.8rem;font-weight:700;white-space:nowrap;cursor:pointer}
     .announcement-text{opacity:.9;line-height:1.4}
     .close-announcement{background:transparent;border:none;color:var(--text-secondary);font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
-    .hero{display:flex;align-items:center;justify-content:space-between;padding:8rem 0 6rem;gap:4rem;position:relative;z-index:var(--z-base);overflow:visible}
+    .hero{display:flex;align-items:center;justify-content:space-between;padding:4.85rem 0 6rem;gap:4rem;position:relative;z-index:var(--z-base);overflow:visible}
     .hero-content{flex:1}
     .hero-title{font-size:4rem;line-height:1.4;margin-bottom:1.5rem}
     .hero-title span{background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
     .hero-subtitle{font-size:1.2rem;color:var(--text-secondary);margin-bottom:2rem;max-width:500px}
-    .hero-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-bottom:2rem;max-width:680px}
-    .hero-metric{padding:1.15rem 1.2rem;background:linear-gradient(145deg,rgba(17,17,22,0.94),rgba(255,255,255,0.03));border-radius:18px}
-    .hero-metric strong{display:block;font-size:1.35rem;margin-bottom:.25rem;font-family:var(--font-heading)}
-    .hero-metric span{color:var(--text-secondary);font-size:.92rem}
+    .hero-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin:2.25rem 0 2rem;width:min(100%,720px);max-width:100%;align-items:stretch}
+    .hero-metric{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:132px;padding:1.15rem 1.1rem;border-radius:22px;background:linear-gradient(160deg,rgba(16,16,24,0.98),rgba(9,9,14,0.94));border:1px solid rgba(255,255,255,0.08);overflow:hidden;box-shadow:0 20px 36px rgba(0,0,0,0.24)}
+    .hero-metric::before{content:attr(data-metric-tag);position:absolute;top:1rem;inset-inline-start:1rem;padding:.33rem .75rem;border-radius:999px;background:rgba(255,255,255,0.06);color:#fff;font-size:.76rem;font-weight:700;border:1px solid rgba(255,255,255,0.08)}
+    .hero-metric::after{content:'';position:absolute;inset:auto -35px -45px auto;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,0,122,0.28),transparent 68%);pointer-events:none}
+    .hero-metric:nth-child(1){grid-column:span 1}
+    .hero-metric:nth-child(2){grid-column:span 1;transform:none}
+    .hero-metric:nth-child(2)::after{background:radial-gradient(circle,rgba(0,212,255,0.28),transparent 68%)}
+    .hero-metric:nth-child(3){grid-column:span 1}
+    .hero-metric:nth-child(3)::after{background:radial-gradient(circle,rgba(0,230,118,0.24),transparent 70%)}
+    .hero-metric-value{display:block;font-size:clamp(1.45rem,1.8vw,1.85rem);margin-top:1.7rem;margin-bottom:.3rem;font-family:var(--font-heading);line-height:1.15}
+    .hero-metric-label{display:block;color:var(--text-secondary);font-size:.9rem;max-width:none;line-height:1.55}
     .hero-trust{display:flex;gap:1.5rem;margin-top:2rem;flex-wrap:wrap}
     .trust-badge{display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,0.05);padding:.5rem 1rem;border-radius:20px;font-size:.9rem;font-weight:600;border:1px solid rgba(255,255,255,0.1)}
     .hero-graphics{flex:1;position:relative;min-height:460px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
@@ -102,15 +112,19 @@
     @media(max-width:768px){
         .nav-actions{gap:1.2rem;align-items:center;justify-content:flex-end}
         .nav-links{display:none}
-        .mobile-menu-btn{display:block}
+        .mobile-menu-btn{display:flex}
         .logo{font-size:1.2rem;letter-spacing:0;gap:.4rem}
         .nav-container{padding:0 1rem}
         .view{padding:1rem 1rem 5rem}
-        .hero{flex-direction:column;text-align:center;margin-top:.5rem;padding:2.4rem 0 1.5rem;gap:1.25rem}
+        .hero{flex-direction:column;text-align:center;margin-top:0;padding:1.3rem 0 1.5rem;gap:1.25rem}
         .hero-title{font-size:clamp(1.85rem,8vw,2.35rem);line-height:1.25}
         .hero-subtitle{margin:0 auto 1.5rem;font-size:1rem}
-        .hero-metrics{grid-template-columns:1fr;max-width:100%;margin-bottom:1.5rem}
-        .hero-metric{text-align:center}
+        .hero-metrics{grid-template-columns:1fr;max-width:100%;margin:1.7rem 0 1.5rem}
+        .hero-metric,.hero-metric:nth-child(1),.hero-metric:nth-child(2),.hero-metric:nth-child(3){grid-column:span 1;transform:none;min-height:auto}
+        .hero-metric{padding:1rem 1rem 1.05rem;text-align:center}
+        .hero-metric::before{inset-inline-start:50%;transform:translateX(50%)}
+        .hero-metric-value{margin-top:2rem;font-size:1.7rem}
+        .hero-metric-label{max-width:none}
         .hero-actions{flex-direction:column;width:100%;gap:1rem;margin-top:1rem!important}
         .hero-actions .btn{width:100%}
         .hero-trust{justify-content:center;flex-direction:row;flex-wrap:wrap;align-items:center;gap:.4rem;margin-top:1rem}
@@ -219,17 +233,17 @@
                                 واتساب</span></button>
                     </div>
                     <div class="hero-metrics">
-                        <div class="hero-metric glass-panel">
-                            <strong data-i18n="hero_metric_1_value">+1000</strong>
-                            <span data-i18n="hero_metric_1_label">طلب ناجح</span>
+                        <div class="hero-metric glass-panel" data-metric-tag="موثوق">
+                            <strong class="hero-metric-value" data-i18n="hero_metric_1_value">+1000</strong>
+                            <span class="hero-metric-label" data-i18n="hero_metric_1_label">طلب ناجح</span>
                         </div>
-                        <div class="hero-metric glass-panel">
-                            <strong data-i18n="hero_metric_2_value">15 دقيقة</strong>
-                            <span data-i18n="hero_metric_2_label">متوسط بدء التنفيذ</span>
+                        <div class="hero-metric glass-panel" data-metric-tag="سريع">
+                            <strong class="hero-metric-value" data-i18n="hero_metric_2_value">15 دقيقة</strong>
+                            <span class="hero-metric-label" data-i18n="hero_metric_2_label">متوسط بدء التنفيذ</span>
                         </div>
-                        <div class="hero-metric glass-panel">
-                            <strong data-i18n="hero_metric_3_value">4 مسارات</strong>
-                            <span data-i18n="hero_metric_3_label">خدمات رقمية في مكان واحد</span>
+                        <div class="hero-metric glass-panel" data-metric-tag="متكامل">
+                            <strong class="hero-metric-value" data-i18n="hero_metric_3_value">4 مسارات</strong>
+                            <span class="hero-metric-label" data-i18n="hero_metric_3_label">خدمات رقمية في مكان واحد</span>
                         </div>
                     </div>
                     <div class="hero-trust">

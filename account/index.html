@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
 <head>
@@ -48,9 +48,12 @@
     .nav-actions{display:flex;align-items:center;gap:1rem;position:relative;z-index:var(--z-navbar-ui)}
     .icon-btn{background:transparent;border:none;color:var(--text-primary);font-size:1.2rem;cursor:pointer;position:relative;z-index:var(--z-navbar-ui);display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px}
     .badge{position:absolute;top:-8px;right:-8px;background:var(--accent-red);color:#fff;font-size:.7rem;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;pointer-events:none}
-    .mobile-menu-btn{display:none;background:none;border:none;color:var(--text-primary);font-size:1.5rem;cursor:pointer;position:relative;z-index:var(--z-navbar-ui);min-width:44px;min-height:44px}
-    .hamburger{width:24px;height:18px;position:relative;display:flex;flex-direction:column;justify-content:space-between}
-    .hamburger span{width:100%;height:2px;background:#fff;border-radius:2px;transition:.3s;transform-origin:left center}
+    .mobile-menu-btn{display:none;align-items:center;justify-content:center;background:none;border:none;color:var(--text-primary);font-size:1.5rem;cursor:pointer;position:relative;z-index:var(--z-navbar-ui);min-width:44px;min-height:44px}
+    .hamburger{width:22px;height:16px;position:absolute;inset:0;margin:auto;z-index:1}
+    .hamburger span{display:block;width:100%;height:2px;background:#fff;border-radius:2px;position:absolute;left:0;transition:all .35s cubic-bezier(.4,0,.2,1);transform-origin:center center}
+    .hamburger span:nth-child(1){top:0}
+    .hamburger span:nth-child(2){top:50%;transform:translateY(-50%)}
+    .hamburger span:nth-child(3){bottom:0}
     main{margin-top:0;min-height:calc(100vh - var(--navbar-height));position:relative;z-index:var(--z-base);overflow:visible}
     .view{display:none;padding:2rem;max-width:1200px;margin:0 auto;position:relative;z-index:var(--z-base);overflow:visible}
     .view.active{display:block}
@@ -100,7 +103,7 @@
     @media(max-width:768px){
         .nav-actions{gap:1.2rem;align-items:center;justify-content:flex-end}
         .nav-links{display:none}
-        .mobile-menu-btn{display:block}
+        .mobile-menu-btn{display:flex}
         .logo{font-size:1.2rem;letter-spacing:0;gap:.4rem}
         .nav-container{padding:0 1rem}
         .view{padding:1rem 1rem 5rem}
