@@ -1,15 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  getFirestore,
-  query,
-  where
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import {
   GoogleAuthProvider,
   browserLocalPersistence,
   createUserWithEmailAndPassword,
@@ -25,6 +15,7 @@ import {
   updateProfile
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+const FIRESTORE_SDK_URL = "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const DEFAULT_AUTH_DOMAIN = "zarzofficial-66638.firebaseapp.com";
 const CUSTOM_AUTH_DOMAINS = ["zarzofficial.com", "auth.zarzofficial.com"];
 const DEFAULT_AUTH_DOMAIN_RETRY_AFTER_MS = 60 * 1000;
@@ -41,6 +32,7 @@ const firebaseConfig = window.ZARZ_FIREBASE_CONFIG || {
 
 window.zarzCurrentUser = null;
 let firebaseServices = null;
+let firestoreServicesPromise = null;
 const GOOGLE_REDIRECT_PENDING_KEY = "zarz_google_redirect_pending";
 const GOOGLE_REDIRECT_RESULT_KEY = "zarz_google_redirect_result";
 
@@ -421,16 +413,52 @@ async function resolvePendingGoogleRedirect(auth) {
   }
 }
 
+async function getFirestoreServices(app) {
+  if (firebaseServices?.firestore) {
+    return firebaseServices.firestore;
+  }
+
+  if (!firestoreServicesPromise) {
+    firestoreServicesPromise = import(FIRESTORE_SDK_URL)
+      .then((firestoreModule) => {
+        const db = firebaseServices?.db || firestoreModule.getFirestore(app);
+        const firestore = {
+          db,
+          addDoc: firestoreModule.addDoc,
+          collection: firestoreModule.collection,
+          deleteDoc: firestoreModule.deleteDoc,
+          doc: firestoreModule.doc,
+          getDocs: firestoreModule.getDocs,
+          query: firestoreModule.query,
+          where: firestoreModule.where
+        };
+
+        firebaseServices = {
+          ...(firebaseServices || {}),
+          db,
+          firestore
+        };
+
+        return firestore;
+      })
+      .catch((error) => {
+        firestoreServicesPromise = null;
+        throw error;
+      });
+  }
+
+  return firestoreServicesPromise;
+}
+
 window.firebaseReadyPromise = (async () => {
   try {
     const resolvedFirebaseConfig = await resolveFirebaseConfig();
     const app = initializeApp(resolvedFirebaseConfig);
-    const db = getFirestore(app);
     const auth = getAuth(app);
     auth.languageCode = "ar";
     await setPersistence(auth, browserLocalPersistence);
     await resolvePendingGoogleRedirect(auth);
-    firebaseServices = { app, db, auth };
+    firebaseServices = { app, auth, db: null, firestore: null };
     console.log("Firebase ready");
     return firebaseServices;
   } catch (error) {
@@ -521,8 +549,9 @@ async function sendPasswordReset(email) {
 
 async function loadOrdersForCurrentUser() {
   try {
-    const { auth, db } = await window.firebaseReadyPromise;
+    const { auth, app } = await window.firebaseReadyPromise;
     const user = ensureAuthenticatedUser(auth);
+    const { db, collection, getDocs, query, where } = await getFirestoreServices(app);
     const ordersRef = collection(db, "orders");
     const snapshot = await getDocs(query(ordersRef, where("userId", "==", user.uid)));
     return snapshot.docs
@@ -535,8 +564,9 @@ async function loadOrdersForCurrentUser() {
 
 async function deleteOrderForCurrentUser(orderId) {
   try {
-    const { auth, db } = await window.firebaseReadyPromise;
+    const { auth, app } = await window.firebaseReadyPromise;
     ensureAuthenticatedUser(auth);
+    const { db, deleteDoc, doc } = await getFirestoreServices(app);
     await deleteDoc(doc(db, "orders", orderId));
     return true;
   } catch (error) {
@@ -546,8 +576,9 @@ async function deleteOrderForCurrentUser(orderId) {
 
 window.createOrder = async function(orderData) {
   try {
-    const { auth, db } = await window.firebaseReadyPromise;
+    const { auth, app } = await window.firebaseReadyPromise;
     const user = ensureAuthenticatedUser(auth);
+    const { db, addDoc, collection } = await getFirestoreServices(app);
     const payload = {
       ...orderData,
       userId: user.uid,
