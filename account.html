@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
 <head>
@@ -22,7 +22,7 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
     <!-- Preload the main stylesheet for fastest pickup -->
-    <link rel="preload" href="/style.min.css?v=11" as="style">
+    <link rel="preload" href="/style.min.css?v=12" as="style">
 
     <!-- ===== CRITICAL CSS (inlined for instant FCP) ===== -->
     <style>
@@ -121,8 +121,8 @@
     </style>
 
     <!-- Full stylesheet (non-blocking: loads async, then applies) -->
-    <link rel="stylesheet" href="/style.min.css?v=11" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="/style.min.css?v=11"></noscript>
+    <link rel="stylesheet" href="/style.min.css?v=12" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/style.min.css?v=12"></noscript>
 
     <!-- Font Awesome (non-blocking: loaded async) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -190,10 +190,10 @@
     <!-- Main Content -->
     <main id="app-content">
 <section id="view-account" class="view">
-            <div class="account-container"
+            <div id="account-content" class="account-container"
                 style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;">
 
-                <div class="glass-panel" style="padding: 2rem;">
+                <div class="account-auth-panel glass-panel" style="padding: 2rem;">
                     <div id="auth-guest-panel">
                         <div style="max-width: 420px; margin: 0 auto; text-align: center;">
                             <h3 id="auth-panel-title" style="margin: 0 0 0.6rem 0; font-size: 1.55rem;">تسجيل الدخول</h3>
@@ -282,7 +282,7 @@
                 </div>
 
                 <!-- Orders List -->
-                <div class="glass-panel" style="padding: 2.5rem 2rem;">
+                <div id="account-orders-section" class="account-orders-panel glass-panel" style="padding: 2.5rem 2rem;">
                     <div
                         style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem;">
                         <h2 data-i18n="acc_recent" style="margin: 0; font-size: 1.5rem;">الطلبات الأخيرة</h2>
@@ -393,8 +393,9 @@
     <!-- Toast Notifications -->
     <div id="toast-container"></div>
 
-    <script type="module" src="/firebase.js?v=7"></script>
-    <script src="/script.min.js?v=1" defer></script>
+    <script type="module" src="/firebase.js?v=8"></script>
+    <script src="/script.min.js?v=2" defer></script>
 </body>
 
 </html>
+

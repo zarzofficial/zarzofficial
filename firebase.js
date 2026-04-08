@@ -14,11 +14,13 @@ import {
   browserLocalPersistence,
   createUserWithEmailAndPassword,
   getAuth,
+  getRedirectResult,
   onAuthStateChanged,
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
   signOut as firebaseSignOut,
   updateProfile
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -39,6 +41,32 @@ const firebaseConfig = window.ZARZ_FIREBASE_CONFIG || {
 
 window.zarzCurrentUser = null;
 let firebaseServices = null;
+const GOOGLE_REDIRECT_PENDING_KEY = "zarz_google_redirect_pending";
+const GOOGLE_REDIRECT_RESULT_KEY = "zarz_google_redirect_result";
+
+function readSessionStorageValue(key) {
+  try {
+    return window.sessionStorage?.getItem(key) || "";
+  } catch (error) {
+    return "";
+  }
+}
+
+function writeSessionStorageValue(key, value) {
+  try {
+    window.sessionStorage?.setItem(key, value);
+  } catch (error) {
+    // Ignore storage failures and continue with the in-memory auth flow.
+  }
+}
+
+function removeSessionStorageValue(key) {
+  try {
+    window.sessionStorage?.removeItem(key);
+  } catch (error) {
+    // Ignore storage failures and continue with the in-memory auth flow.
+  }
+}
 
 function getAuthDomainProbeCacheKey(domain) {
   return `zarz_auth_domain_probe_${String(domain || "").trim().toLowerCase()}`;
@@ -341,6 +369,58 @@ function createGoogleProvider() {
   return provider;
 }
 
+function shouldPreferGoogleRedirect() {
+  const userAgent = String(window.navigator?.userAgent || "").toLowerCase();
+  const hasCoarsePointer = typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches;
+  return hasCoarsePointer || /android|iphone|ipad|ipod|iemobile|opera mini|mobile/.test(userAgent);
+}
+
+function storeGoogleRedirectOutcome(outcome) {
+  if (!outcome || typeof outcome !== "object") return;
+  writeSessionStorageValue(
+    GOOGLE_REDIRECT_RESULT_KEY,
+    JSON.stringify({
+      ...outcome,
+      createdAt: Date.now()
+    })
+  );
+}
+
+async function resolvePendingGoogleRedirect(auth) {
+  const hadPendingRedirect = readSessionStorageValue(GOOGLE_REDIRECT_PENDING_KEY) === "1";
+
+  try {
+    const redirectResult = await getRedirectResult(auth);
+    removeSessionStorageValue(GOOGLE_REDIRECT_PENDING_KEY);
+
+    if (redirectResult?.user) {
+      storeGoogleRedirectOutcome({ status: "success" });
+      return dispatchAuthChange(auth.currentUser || redirectResult.user);
+    }
+
+    if (hadPendingRedirect && auth.currentUser) {
+      storeGoogleRedirectOutcome({ status: "success" });
+      return dispatchAuthChange(auth.currentUser);
+    }
+
+    if (hadPendingRedirect) {
+      storeGoogleRedirectOutcome({
+        status: "cancelled",
+        message: "لم يكتمل تسجيل الدخول عبر Google. حاول مرة أخرى."
+      });
+    }
+
+    return null;
+  } catch (error) {
+    removeSessionStorageValue(GOOGLE_REDIRECT_PENDING_KEY);
+    storeGoogleRedirectOutcome({
+      status: "error",
+      message: getFriendlyAuthErrorMessage(error, "google")
+    });
+    return null;
+  }
+}
+
 window.firebaseReadyPromise = (async () => {
   try {
     const resolvedFirebaseConfig = await resolveFirebaseConfig();
@@ -349,6 +429,7 @@ window.firebaseReadyPromise = (async () => {
     const auth = getAuth(app);
     auth.languageCode = "ar";
     await setPersistence(auth, browserLocalPersistence);
+    await resolvePendingGoogleRedirect(auth);
     firebaseServices = { app, db, auth };
     console.log("Firebase ready");
     return firebaseServices;
@@ -402,15 +483,15 @@ async function signInWithEmail({ email, password }) {
 
 async function signInWithGoogle() {
   try {
-    const auth = firebaseServices?.auth;
-
-    if (!auth) {
-      const notReadyError = new Error("Firebase auth is still initializing.");
-      notReadyError.code = "auth/not-ready";
-      throw notReadyError;
-    }
+    const { auth } = await window.firebaseReadyPromise;
 
     const provider = createGoogleProvider();
+    if (shouldPreferGoogleRedirect()) {
+      writeSessionStorageValue(GOOGLE_REDIRECT_PENDING_KEY, "1");
+      await signInWithRedirect(auth, provider);
+      return { pendingRedirect: true };
+    }
+
     const credential = await signInWithPopup(auth, provider);
     return dispatchAuthChange(auth.currentUser || credential.user);
   } catch (error) {

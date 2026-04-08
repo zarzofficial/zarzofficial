@@ -364,6 +364,26 @@ function safeJsonParse(key, fallback) {
     }
 }
 
+function safeSessionStorageGet(key) {
+    try {
+        return sessionStorage.getItem(key);
+    } catch {
+        return '';
+    }
+}
+
+function safeSessionStorageSet(key, value) {
+    try {
+        sessionStorage.setItem(key, value);
+    } catch {}
+}
+
+function safeSessionStorageRemove(key) {
+    try {
+        sessionStorage.removeItem(key);
+    } catch {}
+}
+
 const GUEST_ORDERS_STORAGE_KEY = 'zarz_orders';
 
 // App State
@@ -402,6 +422,8 @@ Object.assign(ARABIC_UI_TEXT, {
     authSignInSuccess: 'تم تسجيل الدخول بنجاح.',
     authRegisterSuccess: 'تم إنشاء الحساب وتسجيل الدخول.',
     authGoogleSuccess: 'تم تسجيل الدخول عبر Google.',
+    authGoogleRedirectProgress: 'سيتم تحويلك إلى Google لإكمال تسجيل الدخول...',
+    authGoogleRedirectCancelled: 'لم يكتمل تسجيل الدخول عبر Google. حاول مرة أخرى.',
     authResetSent: 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك.',
     authLoadOrdersFailed: 'تعذر تحميل طلبات الحساب الآن.'
 });
@@ -417,6 +439,11 @@ let accountAuthUiBound = false;
 let authStateEventsBound = false;
 let lastHandledAuthStateKey = '__init__';
 const CHECKOUT_LOGIN_RETURN_KEY = 'zarz_checkout_return_after_login';
+const POST_NAVIGATION_TOAST_KEY = 'zarz_post_navigation_toast';
+const ACCOUNT_SCROLL_TO_ORDERS_KEY = 'zarz_account_scroll_to_orders';
+const GOOGLE_REDIRECT_RESULT_KEY = 'zarz_google_redirect_result';
+let shouldScrollAccountOrdersOnLoad = false;
+let pendingGoogleRedirectOutcome = null;
 
 function getAuthApi() {
     return window.zarzAuth || null;
@@ -508,6 +535,106 @@ function clearPendingCheckoutLoginReturn() {
     try {
         sessionStorage.removeItem(CHECKOUT_LOGIN_RETURN_KEY);
     } catch {}
+}
+
+function queuePostNavigationToast(message, type = 'info') {
+    if (!message) return;
+
+    safeSessionStorageSet(POST_NAVIGATION_TOAST_KEY, JSON.stringify({
+        message,
+        type,
+        createdAt: Date.now()
+    }));
+}
+
+function consumePostNavigationToast() {
+    const rawValue = safeSessionStorageGet(POST_NAVIGATION_TOAST_KEY);
+    if (!rawValue) return null;
+
+    safeSessionStorageRemove(POST_NAVIGATION_TOAST_KEY);
+
+    try {
+        const parsedValue = JSON.parse(rawValue);
+        return parsedValue && typeof parsedValue === 'object' ? parsedValue : null;
+    } catch {
+        return null;
+    }
+}
+
+function queueAccountOrdersScroll() {
+    safeSessionStorageSet(ACCOUNT_SCROLL_TO_ORDERS_KEY, '1');
+}
+
+function consumeAccountOrdersScroll() {
+    const shouldScroll = safeSessionStorageGet(ACCOUNT_SCROLL_TO_ORDERS_KEY) === '1';
+    safeSessionStorageRemove(ACCOUNT_SCROLL_TO_ORDERS_KEY);
+    return shouldScroll;
+}
+
+function consumeGoogleRedirectOutcome() {
+    const rawValue = safeSessionStorageGet(GOOGLE_REDIRECT_RESULT_KEY);
+    if (!rawValue) return null;
+
+    safeSessionStorageRemove(GOOGLE_REDIRECT_RESULT_KEY);
+
+    try {
+        const parsedValue = JSON.parse(rawValue);
+        return parsedValue && typeof parsedValue === 'object' ? parsedValue : null;
+    } catch {
+        return null;
+    }
+}
+
+function flushPendingPostNavigationToast() {
+    const pendingToast = consumePostNavigationToast();
+    if (!pendingToast?.message) return;
+
+    window.setTimeout(() => {
+        showToast(pendingToast.message, pendingToast.type || 'info');
+    }, 120);
+}
+
+function shouldPrioritizeGuestOrders() {
+    return !appState.user && appState.ordersSource === 'guest' && appState.orders.length > 0;
+}
+
+function applyAccountOrdersPriorityLayout() {
+    const container = document.getElementById('account-content');
+    const ordersSection = document.getElementById('account-orders-section');
+
+    if (!container || !ordersSection) return;
+
+    const shouldPrioritize = shouldPrioritizeGuestOrders();
+    container.classList.toggle('guest-orders-priority', shouldPrioritize);
+
+    if (!shouldPrioritize || !shouldScrollAccountOrdersOnLoad) return;
+
+    shouldScrollAccountOrdersOnLoad = false;
+    window.setTimeout(() => {
+        ordersSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }, 160);
+}
+
+function handlePendingGoogleRedirectOutcome() {
+    if (!pendingGoogleRedirectOutcome) return;
+
+    const outcome = pendingGoogleRedirectOutcome;
+    pendingGoogleRedirectOutcome = null;
+
+    if (outcome.status === 'success' && appState.user) {
+        setAccountFeedback(ARABIC_UI_TEXT.authGoogleSuccess, 'success');
+        if (!maybeResumeCheckoutAfterAuth()) {
+            showToast(ARABIC_UI_TEXT.authGoogleSuccess, 'success');
+        }
+        return;
+    }
+
+    const message = outcome.message || ARABIC_UI_TEXT.authGoogleRedirectCancelled;
+    setAccountFeedback(message, 'error');
+    showToast(message, 'error');
 }
 
 function getGuestAccountPromptMessage() {
@@ -657,10 +784,13 @@ function updateOrdersContextCopy() {
     const modeNote = document.getElementById('orders-mode-note');
     const emptyText = document.getElementById('orders-empty-text');
     const summaryNote = document.getElementById('orders-summary-note');
+    const showGuestOrdersNote = shouldPrioritizeGuestOrders();
 
     if (modeNote) {
-        modeNote.hidden = true;
-        modeNote.textContent = '';
+        modeNote.hidden = !showGuestOrdersNote;
+        modeNote.textContent = showGuestOrdersNote
+            ? 'هذه طلباتك كزائر وتظهر هنا أولاً. يمكنك تسجيل الدخول لاحقاً للمتابعة من حسابك.'
+            : '';
     }
 
     if (emptyText) {
@@ -673,6 +803,8 @@ function updateOrdersContextCopy() {
             ? 'ستظهر طلبات هذا الحساب هنا.'
             : 'ستظهر أحدث طلباتك هنا.';
     }
+
+    applyAccountOrdersPriorityLayout();
 }
 
 function renderAccountAvatar() {
@@ -812,6 +944,8 @@ async function handleAuthStateChange(user, { silent = true } = {}) {
             showToast(error?.userMessage || ARABIC_UI_TEXT.authLoadOrdersFailed, 'error');
         }
     }
+
+    handlePendingGoogleRedirectOutcome();
 }
 
 function bindAuthStateEvents() {
@@ -923,7 +1057,11 @@ function bindAccountAuthUI() {
 
             try {
                 setButtonBusy(googleBtn, true, 'جارٍ فتح Google...');
-                await authApi.signInWithGoogle();
+                const googleSignInResult = await authApi.signInWithGoogle();
+                if (googleSignInResult?.pendingRedirect) {
+                    setAccountFeedback(ARABIC_UI_TEXT.authGoogleRedirectProgress, 'info');
+                    return;
+                }
                 setAccountFeedback('تم تسجيل الدخول عبر Google.', 'success');
                 if (!maybeResumeCheckoutAfterAuth()) {
                     showToast(ARABIC_UI_TEXT.authGoogleSuccess, 'success');
@@ -1364,6 +1502,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.documentElement.dir = 'rtl';
     const currentPageView = getCurrentStaticPageView();
     const hasAccountUi = hasAccountUiContext();
+    shouldScrollAccountOrdersOnLoad = consumeAccountOrdersScroll();
+    pendingGoogleRedirectOutcome = consumeGoogleRedirectOutcome();
 
     fetchExchangeRates();
     bindAuthStateEvents();
@@ -1373,6 +1513,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     initRouter();
     updateCartCount(false);
+    flushPendingPostNavigationToast();
     if (hasAccountUi) {
         renderOrders();
     }
@@ -3014,20 +3155,29 @@ window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', subm
     };
 
     if (shouldSyncOrder) {
-        appState.orders = [newOrder, ...appState.orders.filter((order) => order.id !== newOrder.id)];
+        setActiveOrders([newOrder, ...appState.orders.filter((order) => order.id !== newOrder.id)], 'remote');
     } else {
         appState.guestOrders.unshift(newOrder);
         persistGuestOrders();
-        appState.orders = [...appState.guestOrders];
+        setActiveOrders([...appState.guestOrders], 'guest');
     }
 
     appState.cart = [];
     localStorage.setItem('zarz_cart', JSON.stringify(appState.cart));
     localStorage.removeItem('zarz_checkout');
     updateCartCount();
-    renderOrders();
 
     const msg = '*طلب جديد*\n*رقم الطلب:* ' + orderNum + '\n*الاسم:* ' + nameInput + '\n*رقم الهاتف:* ' + phoneInput + '\n*طريقة الدفع:* ' + paymentMethodLabel + (transactionLast4 ? ('\n*آخر 4 أرقام من التحويل:* ' + transactionLast4) : '') + '\n\n*تفاصيل الطلب:*\n' + detailsStr + '\n\n*الإجمالي:* ' + totalStr;
+    const successMessage = shouldSyncOrder ? ARABIC_UI_TEXT.orderSubmitSuccess : ARABIC_UI_TEXT.orderSubmitSuccessGuest;
+    const shouldRedirectToSeparateAccountPage = getCurrentStaticPageView() !== 'account' || !hasView('account');
+
+    if (shouldRedirectToSeparateAccountPage) {
+        queuePostNavigationToast(successMessage, 'success');
+    }
+
+    if (!shouldSyncOrder && shouldRedirectToSeparateAccountPage) {
+        queueAccountOrdersScroll();
+    }
 
     navigateTo('account');
     if (submitBtn) {
@@ -3035,7 +3185,9 @@ window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', subm
         submitBtn.disabled = false;
     }
 
-    showToast(shouldSyncOrder ? ARABIC_UI_TEXT.orderSubmitSuccess : ARABIC_UI_TEXT.orderSubmitSuccessGuest, 'success');
+    if (!shouldRedirectToSeparateAccountPage) {
+        showToast(successMessage, 'success');
+    }
 
     if (paymentMethod === 'whatsapp') {
         window.open('https://wa.me/201500007300?text=' + encodeURIComponent(msg), '_blank');
@@ -3164,6 +3316,7 @@ function renderOrders() {
         if (ordersActions) ordersActions.hidden = true;
         updateRecentOrdersMeta(0, 0);
         updateOrdersContextCopy();
+        applyAccountOrdersPriorityLayout();
         return;
     }
 
@@ -3234,6 +3387,7 @@ function renderOrders() {
             : t('All Visible', 'تم عرض الكل');
     }
     if (ordersActions) ordersActions.hidden = remainingOrders <= 0;
+    applyAccountOrdersPriorityLayout();
 }
 
 window.deleteOrder = async function(orderId) {

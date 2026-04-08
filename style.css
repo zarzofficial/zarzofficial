@@ -2494,6 +2494,15 @@ hr {
     scrollbar-gutter: stable;
     overscroll-behavior: contain;
 }
+.account-orders-panel {
+    scroll-margin-top: calc(var(--navbar-height) + 1.25rem);
+}
+.account-container.guest-orders-priority .account-orders-panel {
+    order: -1;
+}
+.account-container.guest-orders-priority .account-auth-panel {
+    order: 1;
+}
 .orders-list::-webkit-scrollbar {
     width: 8px;
 }
