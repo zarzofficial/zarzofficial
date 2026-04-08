@@ -19,7 +19,9 @@ service cloud.firestore {
         'currency',
         'items',
         'details',
-        'date'
+        'date',
+        'userId',
+        'userEmail'
       ]) &&
       data.keys().hasOnly([
         'orderNumber',
@@ -34,7 +36,9 @@ service cloud.firestore {
         'currency',
         'items',
         'details',
-        'date'
+        'date',
+        'userId',
+        'userEmail'
       ]) &&
       data.orderNumber is string &&
       data.orderNumber.size() > 0 &&
@@ -67,13 +71,22 @@ service cloud.firestore {
       data.details is string &&
       data.details.size() > 0 &&
       data.details.size() <= 5000 &&
+      data.userId is string &&
+      data.userId.size() > 0 &&
+      data.userId.size() <= 128 &&
+      data.userEmail is string &&
+      data.userEmail.size() > 0 &&
+      data.userEmail.size() <= 200 &&
       data.date is timestamp;
     }
 
     match /orders/{orderId} {
-      allow create: if validOrder(request.resource.data);
-      allow get, list: if false;
-      allow update, delete: if false;
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid &&
+        validOrder(request.resource.data);
+      allow get, list, delete: if request.auth != null &&
+        resource.data.userId == request.auth.uid;
+      allow update: if false;
     }
   }
 }

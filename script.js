@@ -344,16 +344,22 @@ function safeJsonParse(key, fallback) {
     }
 }
 
+const GUEST_ORDERS_STORAGE_KEY = 'zarz_orders';
+
 // App State
 let appState = {
     cart: safeJsonParse('zarz_cart', []),
-    orders: safeJsonParse('zarz_orders', []),
+    guestOrders: safeJsonParse(GUEST_ORDERS_STORAGE_KEY, []),
+    orders: [],
     wishlist: safeJsonParse('zarz_wishlist', []),
     currency: 'SDG',
     lang: 'ar',
+    user: window.zarzCurrentUser || null,
+    ordersSource: 'guest',
     exchangeRates: { SAR: 1, USD: 0.266, AED: 0.979, SDG: 159.6, EGP: 12.6 }, // Default fallback (overridden below)
     currencySymbols: { SAR: 'SAR', USD: '$', AED: 'AED', SDG: 'ج.س', EGP: 'EGP' }
 };
+appState.orders = [...appState.guestOrders];
 
 const ARABIC_UI_TEXT = {
     toastAdded: 'تمت إضافة المنتج إلى السلة بنجاح!',
@@ -369,12 +375,496 @@ const ARABIC_UI_TEXT = {
     copyFailed: 'فشلت عملية النسخ'
 };
 
+Object.assign(ARABIC_UI_TEXT, {
+    orderSubmitSuccessGuest: 'تم حفظ طلبك على هذا الجهاز. سجل دخولك لمزامنته بين الأجهزة.',
+    authRequiredForSync: 'سجل دخولك لمشاهدة طلباتك المتزامنة عبر Firebase من أي جهاز.',
+    authSignOutSuccess: 'تم تسجيل الخروج بنجاح.',
+    authSignInSuccess: 'تم تسجيل الدخول بنجاح.',
+    authRegisterSuccess: 'تم إنشاء الحساب وتسجيل الدخول.',
+    authGoogleSuccess: 'تم تسجيل الدخول عبر Google.',
+    authResetSent: 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك.',
+    authLoadOrdersFailed: 'تعذر تحميل طلبات الحساب الآن.'
+});
+
 function t(en, ar) {
     return ar || en || '';
 }
 
 const RECENT_ORDERS_PAGE_SIZE = 5;
 let visibleRecentOrdersCount = RECENT_ORDERS_PAGE_SIZE;
+let currentAuthMode = 'signin';
+let accountAuthUiBound = false;
+let authStateEventsBound = false;
+let lastHandledAuthStateKey = '__init__';
+
+function getAuthApi() {
+    return window.zarzAuth || null;
+}
+
+function getAuthStateKey(user) {
+    return user?.uid
+        ? `${user.uid}|${user.email || ''}|${user.displayName || ''}`
+        : 'guest';
+}
+
+function persistGuestOrders() {
+    localStorage.setItem(GUEST_ORDERS_STORAGE_KEY, JSON.stringify(appState.guestOrders));
+}
+
+function getOrderDisplayId(order) {
+    return order?.orderNumber || order?.id || '-';
+}
+
+function getOrderItemQty(item) {
+    const quantity = Number(item?.qty ?? item?.quantity ?? 1);
+    return Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
+}
+
+function setActiveOrders(nextOrders, source = 'guest') {
+    appState.orders = Array.isArray(nextOrders) ? nextOrders : [];
+    appState.ordersSource = source;
+    visibleRecentOrdersCount = RECENT_ORDERS_PAGE_SIZE;
+    updateOrdersContextCopy();
+    renderOrders();
+}
+
+function getAccountDisplayName(user = appState.user) {
+    if (user?.displayName) return user.displayName;
+    if (user?.email) return String(user.email).split('@')[0];
+    return 'حساب الزائر';
+}
+
+function setAccountFeedback(message = '', type = 'info') {
+    const feedback = document.getElementById('auth-feedback');
+    if (!feedback) return;
+
+    if (!message) {
+        feedback.hidden = true;
+        feedback.textContent = '';
+        return;
+    }
+
+    const colors = {
+        info: 'var(--text-secondary)',
+        success: 'var(--accent-green)',
+        error: 'var(--accent-red)'
+    };
+
+    feedback.hidden = false;
+    feedback.textContent = message;
+    feedback.style.color = colors[type] || colors.info;
+}
+
+function setButtonBusy(button, isBusy, busyText) {
+    if (!button) return;
+
+    if (isBusy) {
+        button.dataset.originalHtml = button.innerHTML;
+        button.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>${busyText}</span>`;
+        button.disabled = true;
+        return;
+    }
+
+    button.innerHTML = button.dataset.originalHtml || button.innerHTML;
+    button.disabled = false;
+}
+
+function updateAuthModeUI(mode = currentAuthMode) {
+    currentAuthMode = mode === 'register' ? 'register' : 'signin';
+
+    const loginTab = document.getElementById('auth-tab-login');
+    const registerTab = document.getElementById('auth-tab-register');
+    const nameField = document.getElementById('auth-name-group');
+    const confirmField = document.getElementById('auth-confirm-group');
+    const submitLabel = document.getElementById('auth-submit-label');
+    const title = document.getElementById('auth-panel-title');
+    const subtitle = document.getElementById('account-sync-hint');
+    const resetBtn = document.getElementById('auth-reset-btn');
+
+    const isRegister = currentAuthMode === 'register';
+    const activeStyles = {
+        background: 'linear-gradient(135deg,var(--accent-primary),var(--accent-secondary))',
+        color: '#fff',
+        borderColor: 'transparent'
+    };
+    const inactiveStyles = {
+        background: 'rgba(255,255,255,0.03)',
+        color: 'var(--text-secondary)',
+        borderColor: 'rgba(255,255,255,0.08)'
+    };
+
+    if (loginTab) Object.assign(loginTab.style, isRegister ? inactiveStyles : activeStyles);
+    if (registerTab) Object.assign(registerTab.style, isRegister ? activeStyles : inactiveStyles);
+    if (nameField) nameField.hidden = !isRegister;
+    if (confirmField) confirmField.hidden = !isRegister;
+    if (resetBtn) resetBtn.hidden = isRegister;
+    if (submitLabel) submitLabel.textContent = isRegister ? 'إنشاء الحساب' : 'تسجيل الدخول';
+    if (title) title.textContent = isRegister ? 'أنشئ حسابًا جديدًا' : 'سجّل الدخول لمزامنة طلباتك';
+    if (subtitle && !appState.user) {
+        subtitle.textContent = isRegister
+            ? 'أنشئ حسابك بالبريد الإلكتروني ثم تابع طلباتك من أي جهاز.'
+            : 'استخدم البريد وكلمة المرور أو حساب Google للوصول إلى طلباتك من أي جهاز.';
+    }
+}
+
+function updateOrdersContextCopy() {
+    const modeNote = document.getElementById('orders-mode-note');
+    const emptyText = document.getElementById('orders-empty-text');
+    const summaryNote = document.getElementById('orders-summary-note');
+
+    if (appState.user) {
+        if (modeNote) {
+            modeNote.textContent = 'هذه الطلبات مرتبطة بحسابك الحالي ومحفوظة على Firebase.';
+        }
+        if (emptyText) {
+            emptyText.textContent = 'لا توجد طلبات مرتبطة بهذا الحساب حتى الآن.';
+        }
+        if (summaryNote && appState.orders.length === 0) {
+            summaryNote.textContent = 'بمجرد تنفيذ أول طلب من هذا الحساب ستظهر التفاصيل هنا تلقائيًا.';
+        }
+        return;
+    }
+
+    if (modeNote) {
+        modeNote.textContent = 'هذه الطلبات محفوظة على هذا الجهاز فقط. سجّل الدخول للمزامنة بين الأجهزة.';
+    }
+    if (emptyText) {
+        emptyText.textContent = 'لا توجد طلبات محفوظة على هذا الجهاز حتى الآن.';
+    }
+    if (summaryNote && appState.orders.length === 0) {
+        summaryNote.textContent = 'ستظهر هنا الطلبات التي تحفظها محليًا على هذا الجهاز، أو سجّل الدخول لرؤية طلبات حسابك.';
+    }
+}
+
+function renderAccountAvatar() {
+    const avatar = document.getElementById('acc-avatar-placeholder');
+    if (!avatar) return;
+
+    avatar.innerHTML = '';
+
+    if (!appState.user) {
+        avatar.innerHTML = '<i class="fa-solid fa-user"></i>';
+        return;
+    }
+
+    if (appState.user.photoURL) {
+        const img = document.createElement('img');
+        img.src = appState.user.photoURL;
+        img.alt = getAccountDisplayName();
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '50%';
+        avatar.appendChild(img);
+        return;
+    }
+
+    const fallback = document.createElement('span');
+    fallback.textContent = Array.from(getAccountDisplayName().trim())[0] || 'Z';
+    fallback.style.fontWeight = '800';
+    fallback.style.fontFamily = 'var(--font-heading)';
+    fallback.style.fontSize = '1.4rem';
+    fallback.style.color = 'var(--text-primary)';
+    avatar.appendChild(fallback);
+}
+
+function updateAccountProfileUI() {
+    const user = appState.user;
+    const guestPanel = document.getElementById('auth-guest-panel');
+    const userPanel = document.getElementById('auth-user-panel');
+    const accName = document.getElementById('acc-name');
+    const accEmail = document.getElementById('acc-email');
+    const userGreeting = document.getElementById('auth-user-greeting');
+    const userMeta = document.getElementById('auth-user-meta');
+    const authEmail = document.getElementById('auth-email');
+
+    if (accName) {
+        accName.textContent = user ? getAccountDisplayName(user) : 'حساب الزائر';
+    }
+
+    if (accEmail) {
+        accEmail.textContent = user
+            ? (user.email || 'تم تسجيل الدخول إلى حسابك')
+            : 'يمكنك تصفح الخدمات والطلبات بسهولة';
+    }
+
+    if (guestPanel) guestPanel.hidden = Boolean(user);
+    if (userPanel) userPanel.hidden = !user;
+
+    if (userGreeting) {
+        userGreeting.textContent = user ? `أهلاً ${getAccountDisplayName(user)}` : '';
+    }
+
+    if (userMeta) {
+        userMeta.textContent = user
+            ? 'طلباتك الحالية متزامنة ويمكنك الوصول إليها من أي جهاز بعد تسجيل الدخول.'
+            : '';
+    }
+
+    if (authEmail && user?.email && !authEmail.value) {
+        authEmail.value = user.email;
+    }
+
+    renderAccountAvatar();
+    updateOrdersContextCopy();
+}
+
+async function refreshOrdersForCurrentContext({ silent = false } = {}) {
+    if (!appState.user) {
+        setActiveOrders([...appState.guestOrders], 'guest');
+        if (!silent) {
+            setAccountFeedback(ARABIC_UI_TEXT.authRequiredForSync, 'info');
+        }
+        return appState.orders;
+    }
+
+    const authApi = getAuthApi();
+
+    if (!authApi || typeof authApi.loadOrdersForCurrentUser !== 'function') {
+        const error = new Error('Auth API is not available.');
+        error.userMessage = ARABIC_UI_TEXT.authLoadOrdersFailed;
+        throw error;
+    }
+
+    const remoteOrders = await authApi.loadOrdersForCurrentUser();
+    setActiveOrders(remoteOrders, 'remote');
+
+    if (!silent) {
+        setAccountFeedback('تم تحديث طلبات حسابك من Firebase.', 'success');
+    }
+
+    return remoteOrders;
+}
+
+async function handleAuthStateChange(user, { silent = true } = {}) {
+    const nextAuthStateKey = getAuthStateKey(user);
+    const authStateChanged = nextAuthStateKey !== lastHandledAuthStateKey;
+    lastHandledAuthStateKey = nextAuthStateKey;
+
+    appState.user = user || null;
+    updateAccountProfileUI();
+
+    if (!authStateChanged && silent) {
+        return;
+    }
+
+    if (!hasAccountUiContext()) {
+        if (!appState.user) {
+            appState.orders = [...appState.guestOrders];
+            appState.ordersSource = 'guest';
+        }
+        return;
+    }
+
+    try {
+        await refreshOrdersForCurrentContext({ silent });
+        if (!appState.user && silent) {
+            setAccountFeedback(ARABIC_UI_TEXT.authRequiredForSync, 'info');
+        }
+    } catch (error) {
+        console.error(error);
+        if (appState.user) {
+            setActiveOrders([], 'remote');
+        } else {
+            setActiveOrders([...appState.guestOrders], 'guest');
+        }
+        setAccountFeedback(error?.userMessage || ARABIC_UI_TEXT.authLoadOrdersFailed, 'error');
+        if (!silent) {
+            showToast(error?.userMessage || ARABIC_UI_TEXT.authLoadOrdersFailed, 'error');
+        }
+    }
+}
+
+function bindAuthStateEvents() {
+    if (authStateEventsBound) return;
+    authStateEventsBound = true;
+
+    window.addEventListener('zarz-auth-changed', (event) => {
+        handleAuthStateChange(event.detail?.user, { silent: true });
+    });
+}
+
+function bindAccountAuthUI() {
+    if (accountAuthUiBound) return;
+    accountAuthUiBound = true;
+
+    const authForm = document.getElementById('auth-form');
+    const loginTab = document.getElementById('auth-tab-login');
+    const registerTab = document.getElementById('auth-tab-register');
+    const googleBtn = document.getElementById('auth-google-btn');
+    const resetBtn = document.getElementById('auth-reset-btn');
+    const signOutBtn = document.getElementById('account-signout-btn');
+    const refreshBtn = document.getElementById('account-refresh-orders-btn');
+
+    if (loginTab) {
+        loginTab.addEventListener('click', () => updateAuthModeUI('signin'));
+    }
+
+    if (registerTab) {
+        registerTab.addEventListener('click', () => updateAuthModeUI('register'));
+    }
+
+    if (authForm) {
+        authForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const authApi = getAuthApi();
+            if (!authApi) {
+                showToast('Firebase Authentication غير جاهز بعد. حاول مرة أخرى بعد قليل.', 'error');
+                return;
+            }
+
+            const nameInput = document.getElementById('auth-name');
+            const emailInput = document.getElementById('auth-email');
+            const passwordInput = document.getElementById('auth-password');
+            const confirmInput = document.getElementById('auth-confirm-password');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const email = String(emailInput?.value || '').trim();
+            const password = String(passwordInput?.value || '');
+            const name = String(nameInput?.value || '').trim();
+            const confirmPassword = String(confirmInput?.value || '');
+            const isRegister = currentAuthMode === 'register';
+
+            if (!email || !password) {
+                showToast('يرجى إدخال البريد الإلكتروني وكلمة المرور.', 'error');
+                return;
+            }
+
+            if (isRegister && name.length < 2) {
+                showToast('يرجى إدخال اسم واضح مكوّن من حرفين على الأقل.', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('كلمة المرور يجب أن تتكون من 6 أحرف أو أكثر.', 'error');
+                return;
+            }
+
+            if (isRegister && password !== confirmPassword) {
+                showToast('تأكيد كلمة المرور غير مطابق.', 'error');
+                return;
+            }
+
+            try {
+                setButtonBusy(submitBtn, true, isRegister ? 'جارٍ إنشاء الحساب...' : 'جارٍ تسجيل الدخول...');
+
+                if (isRegister) {
+                    await authApi.registerWithEmail({ name, email, password });
+                    setAccountFeedback('تم إنشاء الحساب ويمكنك الآن متابعة طلباتك من أي جهاز.', 'success');
+                    showToast(ARABIC_UI_TEXT.authRegisterSuccess, 'success');
+                    updateAuthModeUI('signin');
+                } else {
+                    await authApi.signInWithEmail({ email, password });
+                    setAccountFeedback('تم تسجيل الدخول وربط هذه الجلسة بحسابك.', 'success');
+                    showToast(ARABIC_UI_TEXT.authSignInSuccess, 'success');
+                }
+
+                authForm.reset();
+            } catch (error) {
+                console.error(error);
+                setAccountFeedback(error?.userMessage || 'تعذر تنفيذ العملية المطلوبة الآن.', 'error');
+                showToast(error?.userMessage || 'تعذر تنفيذ العملية المطلوبة الآن.', 'error');
+            } finally {
+                setButtonBusy(submitBtn, false);
+            }
+        });
+    }
+
+    if (googleBtn) {
+        googleBtn.addEventListener('click', async () => {
+            const authApi = getAuthApi();
+            if (!authApi) {
+                showToast('Firebase Authentication غير جاهز بعد. حاول مرة أخرى بعد قليل.', 'error');
+                return;
+            }
+
+            try {
+                setButtonBusy(googleBtn, true, 'جارٍ فتح Google...');
+                await authApi.signInWithGoogle();
+                setAccountFeedback('تم تسجيل الدخول عبر Google وربط الطلبات بهذا الحساب.', 'success');
+                showToast(ARABIC_UI_TEXT.authGoogleSuccess, 'success');
+            } catch (error) {
+                console.error(error);
+                setAccountFeedback(error?.userMessage || 'تعذر تسجيل الدخول عبر Google.', 'error');
+                showToast(error?.userMessage || 'تعذر تسجيل الدخول عبر Google.', 'error');
+            } finally {
+                setButtonBusy(googleBtn, false);
+            }
+        });
+    }
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', async () => {
+            const authApi = getAuthApi();
+            const email = String(document.getElementById('auth-email')?.value || '').trim();
+
+            if (!authApi) {
+                showToast('Firebase Authentication غير جاهز بعد. حاول مرة أخرى بعد قليل.', 'error');
+                return;
+            }
+
+            if (!email) {
+                showToast('أدخل بريدك الإلكتروني أولًا ثم أعد المحاولة.', 'error');
+                return;
+            }
+
+            try {
+                setButtonBusy(resetBtn, true, 'جارٍ الإرسال...');
+                await authApi.sendPasswordReset(email);
+                setAccountFeedback(ARABIC_UI_TEXT.authResetSent, 'success');
+                showToast(ARABIC_UI_TEXT.authResetSent, 'success');
+            } catch (error) {
+                console.error(error);
+                setAccountFeedback(error?.userMessage || 'تعذر إرسال رابط إعادة التعيين.', 'error');
+                showToast(error?.userMessage || 'تعذر إرسال رابط إعادة التعيين.', 'error');
+            } finally {
+                setButtonBusy(resetBtn, false);
+            }
+        });
+    }
+
+    if (signOutBtn) {
+        signOutBtn.addEventListener('click', async () => {
+            const authApi = getAuthApi();
+            if (!authApi) {
+                showToast('Firebase Authentication غير جاهز بعد. حاول مرة أخرى بعد قليل.', 'error');
+                return;
+            }
+
+            try {
+                setButtonBusy(signOutBtn, true, 'جارٍ تسجيل الخروج...');
+                await authApi.signOut();
+                setAccountFeedback(ARABIC_UI_TEXT.authRequiredForSync, 'info');
+                showToast(ARABIC_UI_TEXT.authSignOutSuccess, 'success');
+            } catch (error) {
+                console.error(error);
+                setAccountFeedback(error?.userMessage || 'تعذر تسجيل الخروج الآن.', 'error');
+                showToast(error?.userMessage || 'تعذر تسجيل الخروج الآن.', 'error');
+            } finally {
+                setButtonBusy(signOutBtn, false);
+            }
+        });
+    }
+
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', async () => {
+            try {
+                setButtonBusy(refreshBtn, true, 'جارٍ التحديث...');
+                await refreshOrdersForCurrentContext();
+                showToast('تم تحديث طلبات الحساب.', 'success');
+            } catch (error) {
+                console.error(error);
+                setAccountFeedback(error?.userMessage || ARABIC_UI_TEXT.authLoadOrdersFailed, 'error');
+                showToast(error?.userMessage || ARABIC_UI_TEXT.authLoadOrdersFailed, 'error');
+            } finally {
+                setButtonBusy(refreshBtn, false);
+            }
+        });
+    }
+
+    updateAuthModeUI('signin');
+    updateAccountProfileUI();
+}
 
 function localizeChoice(value) {
     if (value && typeof value === 'object') {
@@ -551,6 +1041,14 @@ function hasView(viewId) {
     return Boolean(document.getElementById(`view-${viewId}`));
 }
 
+function hasAccountUiContext() {
+    return Boolean(
+        document.getElementById('auth-form') ||
+        document.getElementById('auth-guest-panel') ||
+        document.querySelector('.orders-list')
+    );
+}
+
 function buildStorePath(viewId, { category = '', productId = '' } = {}) {
     if (viewId === 'cart') return '/products/cart/';
     if (viewId === 'checkout') return '/products/checkout/';
@@ -581,7 +1079,13 @@ function buildAbsoluteUrl(routePath) {
 }
 
 function redirectToStaticPage(viewId, options = {}) {
-    window.location.assign(buildAbsoluteUrl(buildRoutePath(viewId, options)));
+    const targetUrl = new URL(buildRoutePath(viewId, options), window.location.origin);
+    const targetPathAndSearch = normalizeRoutePath(targetUrl.pathname) + targetUrl.search;
+    const currentPathAndSearch = normalizeRoutePath(window.location.pathname) + window.location.search;
+
+    if (targetPathAndSearch === currentPathAndSearch) return;
+
+    window.location.assign(targetUrl.toString());
 }
 
 function redirectToStore(options = {}) {
@@ -658,9 +1162,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.documentElement.dir = 'rtl';
     fetchExchangeRates();
     renderFeaturedProducts();
+    bindAuthStateEvents();
+    bindAccountAuthUI();
+    updateAccountProfileUI();
     initRouter();
     updateCartCount(false);
     renderOrders();
+
+    const bootstrapAuthState = async () => {
+        if (window.zarzAuthStateReadyPromise) {
+            try {
+                const initialUser = await window.zarzAuthStateReadyPromise;
+                await handleAuthStateChange(initialUser, { silent: true });
+            } catch (error) {
+                console.error(error);
+                setAccountFeedback(ARABIC_UI_TEXT.authRequiredForSync, 'info');
+            }
+            return;
+        }
+
+        try {
+            await handleAuthStateChange(window.zarzCurrentUser || null, { silent: true });
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    bootstrapAuthState();
     
     // Mobile Menu
     const mobileBtn = document.querySelector('.mobile-menu-btn');
@@ -945,6 +1473,11 @@ function updateSeoMeta(viewId) {
 
 // Navigation / Router
 function navigateTo(viewId, options = {}) {
+    const currentDomEvent = typeof event !== 'undefined' ? event : null;
+    if (currentDomEvent && typeof currentDomEvent.preventDefault === 'function') {
+        currentDomEvent.preventDefault();
+    }
+
     const currentPageView = getCurrentStaticPageView();
     const directPageViews = new Set(['home', 'store', 'account', 'contact', 'terms']);
     const storeOnlyViews = new Set(['details', 'cart', 'checkout']);
@@ -2165,15 +2698,20 @@ window.processOrder = async function() {
 window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', submitBtn = null, submitOriginalText = null) {
     const nameInput = sanitizeLettersOnly(document.getElementById('checkout-name').value).trim();
     const phoneInput = sanitizeDigitsOnly(document.getElementById('checkout-phone').value).trim();
-    const orderNum = 'ZARZ-' + Math.floor(Math.random()*10000);
+    const orderNum = 'ZARZ-' + Math.floor(Math.random() * 10000);
     const orderDate = new Date().toISOString();
     const totalStr = document.getElementById('cart-total').textContent;
     const paymentMethodLabel = getPaymentMethodLabel(paymentMethod);
     const detailsStr = buildOrderDetails(appState.cart, true);
-    if (typeof window.createOrder !== 'function') {
-        throw new Error('createOrder is not available.');
+    const shouldSyncOrder = Boolean(appState.user);
+
+    if (shouldSyncOrder && typeof window.createOrder !== 'function') {
+        const syncError = new Error('createOrder is not available.');
+        syncError.userMessage = 'تعذر الوصول إلى خدمة مزامنة الطلبات الآن. حاول مرة أخرى بعد قليل.';
+        throw syncError;
     }
-    if (window.firebaseReadyPromise) {
+
+    if (shouldSyncOrder && window.firebaseReadyPromise) {
         await window.firebaseReadyPromise;
     }
 
@@ -2197,21 +2735,35 @@ window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', subm
         throw validationError;
     }
 
-    await window.createOrder(orderPayload);
+    let savedRemoteOrderId = orderNum;
 
-    let newOrder = {
-        id: orderNum,
+    if (shouldSyncOrder) {
+        const remoteOrderResult = await window.createOrder(orderPayload);
+        savedRemoteOrderId = remoteOrderResult?.id || orderNum;
+    }
+
+    const newOrder = {
+        id: savedRemoteOrderId,
+        orderNumber: orderNum,
         date: orderDate,
         method: paymentMethodLabel,
         mode: paymentMethod,
         paymentReference: transactionLast4 || '-',
         status: 'قيد المعالجة',
         total: totalStr,
-        items: appState.cart.map(i => ({ title: getProductCopy(i.product).title, qty: i.qty }))
+        items: appState.cart.map((item) => ({ title: getProductCopy(item.product).title, qty: item.qty })),
+        remote: shouldSyncOrder
     };
-    appState.orders.unshift(newOrder);
+
+    if (shouldSyncOrder) {
+        appState.orders = [newOrder, ...appState.orders.filter((order) => order.id !== newOrder.id)];
+    } else {
+        appState.guestOrders.unshift(newOrder);
+        persistGuestOrders();
+        appState.orders = [...appState.guestOrders];
+    }
+
     appState.cart = [];
-    localStorage.setItem('zarz_orders', JSON.stringify(appState.orders));
     localStorage.setItem('zarz_cart', JSON.stringify(appState.cart));
     localStorage.removeItem('zarz_checkout');
     updateCartCount();
@@ -2220,12 +2772,12 @@ window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', subm
     const msg = '*طلب جديد*\n*رقم الطلب:* ' + orderNum + '\n*الاسم:* ' + nameInput + '\n*رقم الهاتف:* ' + phoneInput + '\n*طريقة الدفع:* ' + paymentMethodLabel + (transactionLast4 ? ('\n*آخر 4 أرقام من التحويل:* ' + transactionLast4) : '') + '\n\n*تفاصيل الطلب:*\n' + detailsStr + '\n\n*الإجمالي:* ' + totalStr;
 
     navigateTo('account');
-    if(submitBtn) {
+    if (submitBtn) {
         submitBtn.innerHTML = submitOriginalText;
         submitBtn.disabled = false;
     }
 
-    showToast(ARABIC_UI_TEXT.orderSubmitSuccess, 'success');
+    showToast(shouldSyncOrder ? ARABIC_UI_TEXT.orderSubmitSuccess : ARABIC_UI_TEXT.orderSubmitSuccessGuest, 'success');
 
     if (paymentMethod === 'whatsapp') {
         window.open('https://wa.me/201500007300?text=' + encodeURIComponent(msg), '_blank');
@@ -2236,31 +2788,30 @@ function renderOrdersLegacy() {
     const list = document.querySelector('.orders-list');
     if (!list) return;
     const emptyState = list.querySelector('.empty-state');
-    
-    // Remove old orders rendered (keep empty state if exists)
-    Array.from(list.children).forEach(child => {
-        if(!child.classList.contains('empty-state')) child.remove();
+
+    Array.from(list.children).forEach((child) => {
+        if (!child.classList.contains('empty-state')) child.remove();
     });
-    
+
     if (appState.orders.length === 0) {
-        if(emptyState) emptyState.style.display = 'block';
+        if (emptyState) emptyState.style.display = 'block';
         return;
     }
-    
-    if(emptyState) emptyState.style.display = 'none';
-    
-    const ordersHtml = appState.orders.map(order => {
-        const itemsList = order.items && order.items.length > 0 
-            ? order.items.map(i => `- ${i.qty}x ${i.title}`).join('<br>') 
+
+    if (emptyState) emptyState.style.display = 'none';
+
+    const ordersHtml = appState.orders.map((order) => {
+        const itemsList = Array.isArray(order.items) && order.items.length > 0
+            ? order.items.map((item) => `- ${getOrderItemQty(item)}x ${item.title}`).join('<br>')
             : 'لا توجد تفاصيل إضافية';
-            
+
         return `
         <div class="cart-item order-card" onclick="toggleOrderDetails('${order.id}')">
             <div class="order-card-header">
                 <div class="order-card-main">
                     <div class="cart-item-img"><i class="fa-solid fa-check text-green"></i></div>
                     <div class="cart-item-info">
-                        <div class="cart-item-title">طلب #${order.id}</div>
+                        <div class="cart-item-title">طلب #${getOrderDisplayId(order)}</div>
                         <div class="cart-item-meta" style="margin-top:0.3rem;">
                             الإجمالي: <span class="text-accent">${order.total}</span> | التاريخ: ${new Date(order.date).toLocaleDateString('ar-EG')}
                         </div>
@@ -2282,7 +2833,7 @@ function renderOrdersLegacy() {
         </div>
         `;
     }).join('');
-    
+
     list.insertAdjacentHTML('beforeend', ordersHtml);
 }
 
@@ -2351,6 +2902,7 @@ function renderOrders() {
         if (emptyState) emptyState.style.display = 'block';
         if (ordersActions) ordersActions.hidden = true;
         updateRecentOrdersMeta(0, 0);
+        updateOrdersContextCopy();
         return;
     }
 
@@ -2374,8 +2926,8 @@ function renderOrders() {
     const noDetailsText = t('No additional details', 'لا توجد تفاصيل إضافية');
 
     const ordersHtml = visibleOrders.map((order) => {
-        const itemsList = order.items && order.items.length > 0
-            ? order.items.map((item) => `- ${item.qty}x ${item.title}`).join('<br>')
+        const itemsList = Array.isArray(order.items) && order.items.length > 0
+            ? order.items.map((item) => `- ${getOrderItemQty(item)}x ${item.title}`).join('<br>')
             : noDetailsText;
 
         return `
@@ -2384,7 +2936,7 @@ function renderOrders() {
                 <div class="order-card-main">
                     <div class="cart-item-img"><i class="fa-solid fa-check text-green"></i></div>
                     <div class="cart-item-info">
-                        <div class="cart-item-title">${orderTitle} #${order.id}</div>
+                        <div class="cart-item-title">${orderTitle} #${getOrderDisplayId(order)}</div>
                         <div class="cart-item-meta" style="margin-top:0.3rem;">
                             ${totalLabel}: <span class="text-accent">${order.total}</span> | ${dateLabel}: ${new Date(order.date).toLocaleDateString(locale)}
                         </div>
@@ -2412,6 +2964,7 @@ function renderOrders() {
     list.insertAdjacentHTML('beforeend', ordersHtml);
 
     updateRecentOrdersMeta(totalOrders, visibleOrders.length);
+    updateOrdersContextCopy();
 
     const remainingOrders = totalOrders - visibleOrders.length;
     if (showMoreBtn) {
@@ -2422,12 +2975,33 @@ function renderOrders() {
     if (ordersActions) ordersActions.hidden = remainingOrders <= 0;
 }
 
-window.deleteOrder = function(orderId) {
-    if(!confirm('هل أنت متأكد من حذف هذا الطلب من سجل طلباتك؟')) return;
-    appState.orders = appState.orders.filter(o => o.id !== orderId);
-    localStorage.setItem('zarz_orders', JSON.stringify(appState.orders));
-    renderOrders();
-    showToast('تم حذف الطلب بنجاح', 'success');
+window.deleteOrder = async function(orderId) {
+    if (!confirm('هل أنت متأكد من حذف هذا الطلب من سجل طلباتك؟')) return;
+
+    const targetOrder = appState.orders.find((order) => order.id === orderId);
+
+    try {
+        if (targetOrder?.remote && appState.user) {
+            const authApi = getAuthApi();
+
+            if (!authApi || typeof authApi.deleteOrder !== 'function') {
+                throw new Error('deleteOrder API is not available.');
+            }
+
+            await authApi.deleteOrder(orderId);
+            appState.orders = appState.orders.filter((order) => order.id !== orderId);
+        } else {
+            appState.guestOrders = appState.guestOrders.filter((order) => order.id !== orderId);
+            persistGuestOrders();
+            appState.orders = [...appState.guestOrders];
+        }
+
+        renderOrders();
+        showToast('تم حذف الطلب بنجاح', 'success');
+    } catch (error) {
+        console.error(error);
+        showToast(error?.userMessage || 'تعذر حذف الطلب الآن. حاول مرة أخرى بعد قليل.', 'error');
+    }
 };
 
 window.toggleOrderDetails = function(orderId) {
