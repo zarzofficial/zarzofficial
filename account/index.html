@@ -16,17 +16,15 @@
     <meta name="twitter:description" content="تابع طلباتك الأخيرة في زارز أوفشال من صفحة مستقلة وسهلة التصفح.">
 
     <!-- Preconnect to critical third-party origins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
     <!-- Preload the main stylesheet for fastest pickup -->
-    <link rel="preload" href="/style.min.css?v=10" as="style">
+    <link rel="preload" href="/style.min.css?v=11" as="style">
 
     <!-- ===== CRITICAL CSS (inlined for instant FCP) ===== -->
     <style>
     /* Critical CSS – above-the-fold only (navbar + hero + announcement) */
-    :root{--bg-color:#07070a;--surface-color:#111116;--surface-light:rgba(255,255,255,0.04);--border-color:rgba(255,255,255,0.08);--accent-primary:#ff007a;--accent-secondary:#00d4ff;--accent-red:#ff007a;--accent-blue:#00d4ff;--accent-green:#00e676;--text-primary:#fff;--text-secondary:#a0a0b0;--font-heading:'Outfit','Cairo','Tajawal',sans-serif;--font-body:'Tajawal','Inter',sans-serif;--border-radius:12px;--border-radius-lg:20px;--navbar-height:70px;--z-base:1;--z-decor:2;--z-content:5;--z-announcement:20;--z-navbar:9999;--z-navbar-ui:10000;--z-background:-1}
+    :root{--bg-color:#07070a;--surface-color:#111116;--surface-light:rgba(255,255,255,0.04);--border-color:rgba(255,255,255,0.08);--accent-primary:#ff007a;--accent-secondary:#00d4ff;--accent-red:#ff007a;--accent-blue:#00d4ff;--accent-green:#00e676;--text-primary:#fff;--text-secondary:#a0a0b0;--font-heading:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;--font-body:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;--border-radius:12px;--border-radius-lg:20px;--navbar-height:70px;--z-base:1;--z-decor:2;--z-content:5;--z-announcement:20;--z-navbar:9999;--z-navbar-ui:10000;--z-background:-1}
     *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent!important}
     *:focus{outline:none!important}
     html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -105,7 +103,7 @@
         .logo{font-size:1.2rem;letter-spacing:0;gap:.4rem}
         .nav-container{padding:0 1rem}
         .view{padding:1rem 1rem 5rem}
-        .hero{flex-direction:column;text-align:center;margin-top:1rem;padding:3.5rem 0 2.5rem;gap:2rem}
+        .hero{flex-direction:column;text-align:center;margin-top:.5rem;padding:2.4rem 0 1.5rem;gap:1.25rem}
         .hero-title{font-size:clamp(1.85rem,8vw,2.35rem);line-height:1.25}
         .hero-subtitle{margin:0 auto 1.5rem;font-size:1rem}
         .hero-metrics{grid-template-columns:1fr;max-width:100%;margin-bottom:1.5rem}
@@ -114,47 +112,18 @@
         .hero-actions .btn{width:100%}
         .hero-trust{justify-content:center;flex-direction:row;flex-wrap:wrap;align-items:center;gap:.4rem;margin-top:1rem}
         .trust-badge{justify-content:center;font-size:.75rem;padding:.3rem .6rem;gap:.3rem}
-        .hero-graphics{height:auto;min-height:0;width:100%;margin-top:1rem;position:relative;overflow:visible;transform:none}
-        .hero-showcase{width:100%;padding:1.1rem}
-        .hero-showcase h3{font-size:1.15rem}
+        .hero-graphics,.announcement-bar{display:none}
         .floating-icons-layout{display:none}
     }
     </style>
 
     <!-- Full stylesheet (non-blocking: loads async, then applies) -->
-    <link rel="stylesheet" href="/style.min.css?v=10" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="/style.min.css?v=10"></noscript>
-
-    <!-- Google Fonts (non-blocking: swap display, async load) -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Cairo:wght@400;500;700;800&family=Tajawal:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Cairo:wght@400;500;700;800&family=Tajawal:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap"
-        rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Cairo:wght@400;500;700;800&family=Tajawal:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
+    <link rel="stylesheet" href="/style.min.css?v=11" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/style.min.css?v=11"></noscript>
 
     <!-- Font Awesome (non-blocking: loaded async) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
-
-    <style>
-    body[data-app-ready="false"] .navbar,
-    body[data-app-ready="false"] main,
-    body[data-app-ready="false"] footer {
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    .navbar,
-    main,
-    footer {
-        transition: opacity 0.18s ease;
-    }
-    </style>
-
-    <script>
-        window.__zarzRevealFallback = window.setTimeout(function () {
-            if (document.body) document.body.setAttribute('data-app-ready', 'true');
-        }, 1800);
-    </script>
 
     <!-- Favicons -->
     <link rel="icon" type="image/x-icon" href="/icons/favicon.ico">
@@ -166,7 +135,7 @@
 <meta name="robots" content="noindex, nofollow">
 </head>
 
-<body data-app-ready="false">
+<body>
     <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-container">
@@ -224,54 +193,26 @@
             <div class="account-container"
                 style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;">
 
-                <!-- Profile Header -->
-                <div class="glass-panel"
-                    style="padding: 2rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
-                    <div id="acc-avatar-placeholder"
-                        style="width: 70px; height: 70px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--text-secondary);">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-                    <div>
-                        <h3 id="acc-name" data-i18n="account_guest_title"
-                            style="margin: 0 0 0.5rem 0; font-size: 1.5rem;">حساب الزائر</h3>
-                        <p id="acc-email" data-i18n="account_guest_sub"
-                            style="margin: 0; color: var(--text-secondary); font-size: 0.95rem;">يمكنك تصفح الخدمات
-                            والطلبات بسهولة</p>
-                    </div>
-                </div>
-
                 <div class="glass-panel" style="padding: 2rem;">
                     <div id="auth-guest-panel">
-                        <div
-                            style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
-                            <div style="flex: 1 1 320px;">
-                                <span
-                                    style="display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.35rem 0.75rem; border-radius: 999px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 0.85rem;">
-                                    <i class="fa-solid fa-shield-halved" style="color: var(--accent-green);"></i>
-                                    Firebase Auth
-                                </span>
-                                <h3 id="auth-panel-title" style="margin: 0 0 0.6rem 0; font-size: 1.45rem;">سجّل
-                                    الدخول لمزامنة طلباتك</h3>
-                                <p id="account-sync-hint"
-                                    style="margin: 0; color: var(--text-secondary); font-size: 0.96rem; max-width: 560px;">
-                                    استخدم البريد وكلمة المرور أو حساب Google للوصول إلى طلباتك من أي جهاز.</p>
-                            </div>
-                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <div style="max-width: 420px; margin: 0 auto; text-align: center;">
+                            <h3 id="auth-panel-title" style="margin: 0 0 0.6rem 0; font-size: 1.55rem;">تسجيل الدخول</h3>
+                            <p id="account-sync-hint"
+                                style="margin: 0 0 1.5rem; color: var(--text-secondary); font-size: 0.96rem;">
+                                أدخل بياناتك للمتابعة</p>
+                            <div style="display: inline-flex; gap: 0.5rem; padding: 0.35rem; border-radius: 999px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1.5rem;">
                                 <button id="auth-tab-login" type="button" class="btn btn-secondary"
-                                    style="padding: 0.7rem 1rem; border: 1px solid rgba(255,255,255,0.08);">تسجيل
-                                    الدخول</button>
+                                    style="padding: 0.65rem 1rem; border: 0; border-radius: 999px;">تسجيل الدخول</button>
                                 <button id="auth-tab-register" type="button" class="btn btn-secondary"
-                                    style="padding: 0.7rem 1rem; border: 1px solid rgba(255,255,255,0.08);">إنشاء
-                                    حساب</button>
+                                    style="padding: 0.65rem 1rem; border: 0; border-radius: 999px;">إنشاء حساب</button>
                             </div>
                         </div>
 
                         <form id="auth-form"
-                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                            style="display: flex; flex-direction: column; gap: 1rem; max-width: 420px; margin: 0 auto;">
                             <div id="auth-name-group" hidden>
                                 <label for="auth-name"
-                                    style="display: block; margin-bottom: 0.45rem; color: var(--text-secondary); font-size: 0.9rem;">الاسم
-                                    الكامل</label>
+                                    style="display: block; margin-bottom: 0.45rem; color: var(--text-secondary); font-size: 0.9rem;">الاسم الكامل</label>
                                 <input id="auth-name" type="text" autocomplete="name" placeholder="مثال: محمد أحمد"
                                     style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: var(--text-primary); padding: 0.95rem 1rem;">
                             </div>
@@ -293,13 +234,12 @@
                             </div>
                             <div id="auth-confirm-group" hidden>
                                 <label for="auth-confirm-password"
-                                    style="display: block; margin-bottom: 0.45rem; color: var(--text-secondary); font-size: 0.9rem;">تأكيد
-                                    كلمة المرور</label>
+                                    style="display: block; margin-bottom: 0.45rem; color: var(--text-secondary); font-size: 0.9rem;">تأكيد كلمة المرور</label>
                                 <input id="auth-confirm-password" type="password" autocomplete="new-password"
                                     placeholder="أعد إدخال كلمة المرور"
                                     style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: var(--text-primary); padding: 0.95rem 1rem;">
                             </div>
-                            <div style="grid-column: 1 / -1; display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                            <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-top: 0.5rem;">
                                 <button id="auth-submit-btn" class="btn btn-primary" type="submit"
                                     style="padding: 0.9rem 1.35rem;">
                                     <span id="auth-submit-label">تسجيل الدخول</span>
@@ -307,11 +247,10 @@
                                 <button id="auth-google-btn" class="btn btn-secondary" type="button"
                                     style="padding: 0.9rem 1.25rem; border-color: rgba(255,255,255,0.08);">
                                     <i class="fa-brands fa-google"></i>
-                                    <span>متابعة عبر Google</span>
+                                    <span>الدخول عبر Google</span>
                                 </button>
                                 <button id="auth-reset-btn" class="btn btn-secondary" type="button"
-                                    style="padding: 0.9rem 1.2rem; border-color: rgba(255,255,255,0.08);">
-                                    <i class="fa-solid fa-key"></i>
+                                    style="padding: 0.85rem 1.15rem; border-color: rgba(255,255,255,0.08);">
                                     <span>نسيت كلمة المرور؟</span>
                                 </button>
                             </div>
@@ -319,21 +258,11 @@
                     </div>
 
                     <div id="auth-user-panel" hidden>
-                        <div
-                            style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
-                            <div style="flex: 1 1 320px;">
-                                <span
-                                    style="display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.35rem 0.75rem; border-radius: 999px; background: rgba(0,230,118,0.08); border: 1px solid rgba(0,230,118,0.18); color: var(--accent-green); font-size: 0.82rem; margin-bottom: 0.85rem;">
-                                    <i class="fa-solid fa-check-circle"></i>
-                                    تم تسجيل الدخول
-                                </span>
-                                <h3 id="auth-user-greeting" style="margin: 0 0 0.6rem 0; font-size: 1.45rem;">أهلاً
-                                    بك</h3>
-                                <p id="auth-user-meta"
-                                    style="margin: 0; color: var(--text-secondary); font-size: 0.96rem; max-width: 560px;">
-                                    طلباتك الحالية متزامنة ويمكنك الوصول إليها من أي جهاز بعد تسجيل الدخول.</p>
-                            </div>
-                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <div style="max-width: 520px; margin: 0 auto; text-align: center;">
+                            <h3 id="auth-user-greeting" style="margin: 0 0 0.5rem 0; font-size: 1.45rem;">أهلاً بك</h3>
+                            <p id="auth-user-meta" hidden
+                                style="margin: 0 0 1.5rem; color: var(--text-secondary); font-size: 0.96rem;"></p>
+                            <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
                                 <button id="account-refresh-orders-btn" type="button" class="btn btn-secondary"
                                     style="padding: 0.9rem 1.2rem; border-color: rgba(255,255,255,0.08);">
                                     <i class="fa-solid fa-rotate"></i>
@@ -349,7 +278,7 @@
                     </div>
 
                     <p id="auth-feedback" hidden
-                        style="margin: 1rem 0 0; color: var(--text-secondary); font-size: 0.92rem;"></p>
+                        style="margin: 1rem auto 0; color: var(--text-secondary); font-size: 0.92rem; max-width: 420px; text-align: center;"></p>
                 </div>
 
                 <!-- Orders List -->
@@ -361,12 +290,10 @@
                             style="color: var(--accent-primary); font-size: 1.5rem;"></i>
                     </div>
 
-                    <p id="orders-mode-note"
-                        style="margin: -0.75rem 0 0.75rem; color: var(--text-secondary); font-size: 0.95rem;">هذه
-                        الطلبات محفوظة على هذا الجهاز فقط. سجّل الدخول للمزامنة بين الأجهزة.</p>
+                    <p id="orders-mode-note" hidden
+                        style="margin: -0.75rem 0 0.75rem; color: var(--text-secondary); font-size: 0.95rem;">ستظهر طلباتك هنا.</p>
                     <p id="orders-summary-note"
-                        style="margin: 0 0 1.25rem; color: var(--text-secondary); font-size: 0.92rem;">ستظهر هنا
-                        الطلبات التي تحفظها محليًا على هذا الجهاز، أو سجّل الدخول لرؤية طلبات حسابك.</p>
+                        style="margin: 0 0 1.25rem; color: var(--text-secondary); font-size: 0.92rem;">ستظهر أحدث طلباتك هنا.</p>
 
                     <div
                         style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
@@ -467,7 +394,7 @@
     <div id="toast-container"></div>
 
     <script type="module" src="/firebase.js?v=7"></script>
-    <script src="/script.js?v=21" defer></script>
+    <script src="/script.min.js?v=1" defer></script>
 </body>
 
 </html>

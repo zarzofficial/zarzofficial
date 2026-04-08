@@ -66,18 +66,38 @@ const products = [
     }
 ];
 
-function withOptimizedImageAttrs(html) {
+function withOptimizedImageAttrs(html, options = {}) {
     if (typeof html !== 'string' || !html.includes('<img')) return html;
 
-    return html.includes('loading=')
-        ? html
-        : html.replace('<img ', '<img loading="lazy" decoding="async" ');
+    const {
+        loading = 'lazy',
+        decoding = 'async',
+        fetchpriority = 'low',
+        sizes = ''
+    } = options;
+
+    let optimized = html;
+
+    if (!optimized.includes('loading=') && loading) {
+        optimized = optimized.replace('<img ', `<img loading="${loading}" `);
+    }
+    if (!optimized.includes('decoding=') && decoding) {
+        optimized = optimized.replace('<img ', `<img decoding="${decoding}" `);
+    }
+    if (!optimized.includes('fetchpriority=') && fetchpriority) {
+        optimized = optimized.replace('<img ', `<img fetchpriority="${fetchpriority}" `);
+    }
+    if (!optimized.includes('sizes=') && sizes) {
+        optimized = optimized.replace('<img ', `<img sizes="${sizes}" `);
+    }
+
+    return optimized;
 }
 
-function getLocalizedProductImage(product) {
+function getLocalizedProductImage(product, options = {}) {
     const { title } = getProductCopy(product);
     const localizedAlt = String(title || '').replace(/"/g, '&quot;');
-    return withOptimizedImageAttrs(product.icon).replace(/alt="[^"]*"/i, `alt="${localizedAlt}"`);
+    return withOptimizedImageAttrs(product.icon, options).replace(/alt="[^"]*"/i, `alt="${localizedAlt}"`);
 }
 
 const productDisplayMeta = {
@@ -376,8 +396,8 @@ const ARABIC_UI_TEXT = {
 };
 
 Object.assign(ARABIC_UI_TEXT, {
-    orderSubmitSuccessGuest: 'تم حفظ طلبك على هذا الجهاز. سجل دخولك لمزامنته بين الأجهزة.',
-    authRequiredForSync: 'سجل دخولك لمشاهدة طلباتك المتزامنة عبر Firebase من أي جهاز.',
+    orderSubmitSuccessGuest: 'تم حفظ طلبك بنجاح.',
+    authRequiredForSync: 'سجل دخولك للمتابعة.',
     authSignOutSuccess: 'تم تسجيل الخروج بنجاح.',
     authSignInSuccess: 'تم تسجيل الدخول بنجاح.',
     authRegisterSuccess: 'تم إنشاء الحساب وتسجيل الدخول.',
@@ -396,6 +416,7 @@ let currentAuthMode = 'signin';
 let accountAuthUiBound = false;
 let authStateEventsBound = false;
 let lastHandledAuthStateKey = '__init__';
+const CHECKOUT_LOGIN_RETURN_KEY = 'zarz_checkout_return_after_login';
 
 function getAuthApi() {
     return window.zarzAuth || null;
@@ -469,6 +490,124 @@ function setButtonBusy(button, isBusy, busyText) {
     button.disabled = false;
 }
 
+function hasPendingCheckoutLoginReturn() {
+    try {
+        return sessionStorage.getItem(CHECKOUT_LOGIN_RETURN_KEY) === '1';
+    } catch {
+        return false;
+    }
+}
+
+function setPendingCheckoutLoginReturn() {
+    try {
+        sessionStorage.setItem(CHECKOUT_LOGIN_RETURN_KEY, '1');
+    } catch {}
+}
+
+function clearPendingCheckoutLoginReturn() {
+    try {
+        sessionStorage.removeItem(CHECKOUT_LOGIN_RETURN_KEY);
+    } catch {}
+}
+
+function getGuestAccountPromptMessage() {
+    return hasPendingCheckoutLoginReturn()
+        ? 'سجل دخولك ثم عد لإتمام طلبك.'
+        : ARABIC_UI_TEXT.authRequiredForSync;
+}
+
+function maybeResumeCheckoutAfterAuth() {
+    if (!hasPendingCheckoutLoginReturn()) return false;
+
+    clearPendingCheckoutLoginReturn();
+
+    if (appState.cart.length === 0) return false;
+
+    window.setTimeout(() => {
+        showToast('تم تسجيل الدخول. يمكنك الآن إكمال طلبك.', 'success');
+        navigateTo('checkout');
+    }, 120);
+
+    return true;
+}
+
+async function promptCheckoutAccountChoice() {
+    if (appState.user) return 'guest';
+
+    const modalRoot = document.getElementById('modal-root');
+    if (!modalRoot) return 'guest';
+
+    return new Promise((resolve) => {
+        const closePrompt = (choice = 'cancel') => {
+            document.removeEventListener('keydown', handleEscape);
+            modalRoot.innerHTML = '';
+            document.body.style.overflow = '';
+            resolve(choice);
+        };
+
+        const handleEscape = (event) => {
+            if (event.key !== 'Escape') return;
+            event.preventDefault();
+            closePrompt('cancel');
+        };
+
+        modalRoot.innerHTML = `
+            <div class="modal-overlay" id="checkout-auth-choice-modal">
+                <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="checkout-auth-choice-title" style="max-width: 520px; padding: 2rem;">
+                    <button type="button" id="checkout-auth-choice-close" aria-label="إغلاق" style="width: 42px; height: 42px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: var(--text-primary); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; margin-inline-start: auto; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <div style="display: grid; gap: 1rem; text-align: center;">
+                        <div style="width: 64px; height: 64px; margin: 0 auto; border-radius: 18px; background: linear-gradient(135deg, rgba(255,0,122,0.18), rgba(0,212,255,0.18)); display: flex; align-items: center; justify-content: center; color: var(--text-primary); font-size: 1.4rem;">
+                            <i class="fa-solid fa-user-check"></i>
+                        </div>
+                        <div>
+                            <h3 id="checkout-auth-choice-title" style="margin: 0 0 0.45rem; font-size: 1.5rem;">كيف تريد إكمال الطلب؟</h3>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.98rem; line-height: 1.8;">
+                                يمكنك تسجيل الدخول أولاً أو إكمال الطلب الآن كزائر.
+                            </p>
+                        </div>
+                        <div style="display: grid; gap: 0.85rem; margin-top: 0.35rem;">
+                            <button type="button" id="checkout-auth-choice-login" class="btn btn-primary" style="width: 100%; padding: 0.95rem 1.2rem;">
+                                <i class="fa-solid fa-right-to-bracket"></i>
+                                <span>تسجيل الدخول</span>
+                            </button>
+                            <button type="button" id="checkout-auth-choice-guest" class="btn btn-secondary" style="width: 100%; padding: 0.95rem 1.2rem;">
+                                <i class="fa-regular fa-user"></i>
+                                <span>الإكمال كزائر</span>
+                            </button>
+                        </div>
+                        <p style="margin: 0.25rem 0 0; color: var(--text-secondary); font-size: 0.9rem;">
+                            إذا سجلت الدخول سيظهر الطلب داخل حسابك بعد الإرسال.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const overlay = modalRoot.querySelector('#checkout-auth-choice-modal');
+        const closeBtn = modalRoot.querySelector('#checkout-auth-choice-close');
+        const loginBtn = modalRoot.querySelector('#checkout-auth-choice-login');
+        const guestBtn = modalRoot.querySelector('#checkout-auth-choice-guest');
+
+        overlay?.addEventListener('click', (event) => {
+            if (event.target === overlay) {
+                closePrompt('cancel');
+            }
+        });
+        closeBtn?.addEventListener('click', () => closePrompt('cancel'));
+        loginBtn?.addEventListener('click', () => closePrompt('login'));
+        guestBtn?.addEventListener('click', () => closePrompt('guest'));
+
+        document.addEventListener('keydown', handleEscape);
+        document.body.style.overflow = 'hidden';
+
+        window.requestAnimationFrame(() => {
+            loginBtn?.focus();
+        });
+    });
+}
+
 function updateAuthModeUI(mode = currentAuthMode) {
     currentAuthMode = mode === 'register' ? 'register' : 'signin';
 
@@ -484,26 +623,33 @@ function updateAuthModeUI(mode = currentAuthMode) {
     const isRegister = currentAuthMode === 'register';
     const activeStyles = {
         background: 'linear-gradient(135deg,var(--accent-primary),var(--accent-secondary))',
-        color: '#fff',
-        borderColor: 'transparent'
+        color: '#fff'
     };
     const inactiveStyles = {
-        background: 'rgba(255,255,255,0.03)',
-        color: 'var(--text-secondary)',
-        borderColor: 'rgba(255,255,255,0.08)'
+        background: 'transparent',
+        color: 'var(--text-secondary)'
     };
 
-    if (loginTab) Object.assign(loginTab.style, isRegister ? inactiveStyles : activeStyles);
-    if (registerTab) Object.assign(registerTab.style, isRegister ? activeStyles : inactiveStyles);
+    if (loginTab) {
+        loginTab.hidden = false;
+        Object.assign(loginTab.style, isRegister ? inactiveStyles : activeStyles);
+    }
+    if (registerTab) {
+        registerTab.hidden = false;
+        Object.assign(registerTab.style, isRegister ? activeStyles : inactiveStyles);
+    }
     if (nameField) nameField.hidden = !isRegister;
     if (confirmField) confirmField.hidden = !isRegister;
     if (resetBtn) resetBtn.hidden = isRegister;
-    if (submitLabel) submitLabel.textContent = isRegister ? 'إنشاء الحساب' : 'تسجيل الدخول';
-    if (title) title.textContent = isRegister ? 'أنشئ حسابًا جديدًا' : 'سجّل الدخول لمزامنة طلباتك';
+    if (submitLabel) submitLabel.textContent = isRegister ? 'إنشاء حساب' : 'تسجيل الدخول';
+    if (title) title.textContent = isRegister ? 'إنشاء حساب' : 'تسجيل الدخول';
     if (subtitle && !appState.user) {
-        subtitle.textContent = isRegister
-            ? 'أنشئ حسابك بالبريد الإلكتروني ثم تابع طلباتك من أي جهاز.'
-            : 'استخدم البريد وكلمة المرور أو حساب Google للوصول إلى طلباتك من أي جهاز.';
+        subtitle.textContent = isRegister ? 'أنشئ حسابك للمتابعة' : 'أدخل بياناتك للمتابعة';
+    }
+
+    const passwordInput = document.getElementById('auth-password');
+    if (passwordInput) {
+        passwordInput.autocomplete = isRegister ? 'new-password' : 'current-password';
     }
 }
 
@@ -512,27 +658,20 @@ function updateOrdersContextCopy() {
     const emptyText = document.getElementById('orders-empty-text');
     const summaryNote = document.getElementById('orders-summary-note');
 
-    if (appState.user) {
-        if (modeNote) {
-            modeNote.textContent = 'هذه الطلبات مرتبطة بحسابك الحالي ومحفوظة على Firebase.';
-        }
-        if (emptyText) {
-            emptyText.textContent = 'لا توجد طلبات مرتبطة بهذا الحساب حتى الآن.';
-        }
-        if (summaryNote && appState.orders.length === 0) {
-            summaryNote.textContent = 'بمجرد تنفيذ أول طلب من هذا الحساب ستظهر التفاصيل هنا تلقائيًا.';
-        }
-        return;
+    if (modeNote) {
+        modeNote.hidden = true;
+        modeNote.textContent = '';
     }
 
-    if (modeNote) {
-        modeNote.textContent = 'هذه الطلبات محفوظة على هذا الجهاز فقط. سجّل الدخول للمزامنة بين الأجهزة.';
-    }
     if (emptyText) {
-        emptyText.textContent = 'لا توجد طلبات محفوظة على هذا الجهاز حتى الآن.';
+        emptyText.textContent = 'لا توجد طلبات حتى الآن.';
     }
+
     if (summaryNote && appState.orders.length === 0) {
-        summaryNote.textContent = 'ستظهر هنا الطلبات التي تحفظها محليًا على هذا الجهاز، أو سجّل الدخول لرؤية طلبات حسابك.';
+        summaryNote.hidden = false;
+        summaryNote.textContent = appState.user
+            ? 'ستظهر طلبات هذا الحساب هنا.'
+            : 'ستظهر أحدث طلباتك هنا.';
     }
 }
 
@@ -596,9 +735,9 @@ function updateAccountProfileUI() {
     }
 
     if (userMeta) {
-        userMeta.textContent = user
-            ? 'طلباتك الحالية متزامنة ويمكنك الوصول إليها من أي جهاز بعد تسجيل الدخول.'
-            : '';
+        const metaText = user ? (user.email || '') : '';
+        userMeta.textContent = metaText;
+        userMeta.hidden = !metaText;
     }
 
     if (authEmail && user?.email && !authEmail.value) {
@@ -613,7 +752,7 @@ async function refreshOrdersForCurrentContext({ silent = false } = {}) {
     if (!appState.user) {
         setActiveOrders([...appState.guestOrders], 'guest');
         if (!silent) {
-            setAccountFeedback(ARABIC_UI_TEXT.authRequiredForSync, 'info');
+            setAccountFeedback(getGuestAccountPromptMessage(), 'info');
         }
         return appState.orders;
     }
@@ -630,7 +769,7 @@ async function refreshOrdersForCurrentContext({ silent = false } = {}) {
     setActiveOrders(remoteOrders, 'remote');
 
     if (!silent) {
-        setAccountFeedback('تم تحديث طلبات حسابك من Firebase.', 'success');
+        setAccountFeedback('تم تحديث الطلبات.', 'success');
     }
 
     return remoteOrders;
@@ -659,7 +798,7 @@ async function handleAuthStateChange(user, { silent = true } = {}) {
     try {
         await refreshOrdersForCurrentContext({ silent });
         if (!appState.user && silent) {
-            setAccountFeedback(ARABIC_UI_TEXT.authRequiredForSync, 'info');
+            setAccountFeedback(getGuestAccountPromptMessage(), 'info');
         }
     } catch (error) {
         console.error(error);
@@ -710,7 +849,7 @@ function bindAccountAuthUI() {
 
             const authApi = getAuthApi();
             if (!authApi) {
-                showToast('Firebase Authentication غير جاهز بعد. حاول مرة أخرى بعد قليل.', 'error');
+                showToast('الخدمة غير متاحة الآن. حاول مرة أخرى بعد قليل.', 'error');
                 return;
             }
 
@@ -750,13 +889,17 @@ function bindAccountAuthUI() {
 
                 if (isRegister) {
                     await authApi.registerWithEmail({ name, email, password });
-                    setAccountFeedback('تم إنشاء الحساب ويمكنك الآن متابعة طلباتك من أي جهاز.', 'success');
-                    showToast(ARABIC_UI_TEXT.authRegisterSuccess, 'success');
+                    setAccountFeedback('تم إنشاء الحساب بنجاح.', 'success');
+                    if (!maybeResumeCheckoutAfterAuth()) {
+                        showToast(ARABIC_UI_TEXT.authRegisterSuccess, 'success');
+                    }
                     updateAuthModeUI('signin');
                 } else {
                     await authApi.signInWithEmail({ email, password });
-                    setAccountFeedback('تم تسجيل الدخول وربط هذه الجلسة بحسابك.', 'success');
-                    showToast(ARABIC_UI_TEXT.authSignInSuccess, 'success');
+                    setAccountFeedback('تم تسجيل الدخول بنجاح.', 'success');
+                    if (!maybeResumeCheckoutAfterAuth()) {
+                        showToast(ARABIC_UI_TEXT.authSignInSuccess, 'success');
+                    }
                 }
 
                 authForm.reset();
@@ -774,15 +917,17 @@ function bindAccountAuthUI() {
         googleBtn.addEventListener('click', async () => {
             const authApi = getAuthApi();
             if (!authApi) {
-                showToast('Firebase Authentication غير جاهز بعد. حاول مرة أخرى بعد قليل.', 'error');
+                showToast('الخدمة غير متاحة الآن. حاول مرة أخرى بعد قليل.', 'error');
                 return;
             }
 
             try {
                 setButtonBusy(googleBtn, true, 'جارٍ فتح Google...');
                 await authApi.signInWithGoogle();
-                setAccountFeedback('تم تسجيل الدخول عبر Google وربط الطلبات بهذا الحساب.', 'success');
-                showToast(ARABIC_UI_TEXT.authGoogleSuccess, 'success');
+                setAccountFeedback('تم تسجيل الدخول عبر Google.', 'success');
+                if (!maybeResumeCheckoutAfterAuth()) {
+                    showToast(ARABIC_UI_TEXT.authGoogleSuccess, 'success');
+                }
             } catch (error) {
                 console.error(error);
                 setAccountFeedback(error?.userMessage || 'تعذر تسجيل الدخول عبر Google.', 'error');
@@ -799,7 +944,7 @@ function bindAccountAuthUI() {
             const email = String(document.getElementById('auth-email')?.value || '').trim();
 
             if (!authApi) {
-                showToast('Firebase Authentication غير جاهز بعد. حاول مرة أخرى بعد قليل.', 'error');
+                showToast('الخدمة غير متاحة الآن. حاول مرة أخرى بعد قليل.', 'error');
                 return;
             }
 
@@ -827,14 +972,14 @@ function bindAccountAuthUI() {
         signOutBtn.addEventListener('click', async () => {
             const authApi = getAuthApi();
             if (!authApi) {
-                showToast('Firebase Authentication غير جاهز بعد. حاول مرة أخرى بعد قليل.', 'error');
+                showToast('الخدمة غير متاحة الآن. حاول مرة أخرى بعد قليل.', 'error');
                 return;
             }
 
             try {
                 setButtonBusy(signOutBtn, true, 'جارٍ تسجيل الخروج...');
                 await authApi.signOut();
-                setAccountFeedback(ARABIC_UI_TEXT.authRequiredForSync, 'info');
+                setAccountFeedback(getGuestAccountPromptMessage(), 'info');
                 showToast(ARABIC_UI_TEXT.authSignOutSuccess, 'success');
             } catch (error) {
                 console.error(error);
@@ -1160,10 +1305,6 @@ function revealAppShell() {
         window.clearTimeout(window.__zarzRevealFallback);
         window.__zarzRevealFallback = null;
     }
-
-    if (document.body) {
-        document.body.setAttribute('data-app-ready', 'true');
-    }
 }
 
 function scheduleAppReveal(delay = 900) {
@@ -1176,22 +1317,65 @@ function scheduleAppReveal(delay = 900) {
     }, delay);
 }
 
+function scheduleIdleTask(callback, timeout = 1200) {
+    if (typeof callback !== 'function') return;
+
+    if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(() => callback(), { timeout });
+        return;
+    }
+
+    window.setTimeout(callback, timeout);
+}
+
+function scheduleFeaturedProductsRender() {
+    const featContainer = document.getElementById('featured-container');
+    if (!featContainer || featContainer.dataset.rendered === 'true') return;
+
+    const render = () => {
+        if (featContainer.dataset.rendered === 'true') return;
+        featContainer.dataset.rendered = 'true';
+        renderFeaturedProducts();
+    };
+
+    if (!('IntersectionObserver' in window)) {
+        scheduleIdleTask(render, 1000);
+        return;
+    }
+
+    const featuredShell = featContainer.closest('.featured-carousel-shell') || featContainer;
+    const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        render();
+    }, { rootMargin: '260px 0px' });
+
+    observer.observe(featuredShell);
+    scheduleIdleTask(() => {
+        observer.disconnect();
+        render();
+    }, 1800);
+}
+
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
     appState.lang = 'ar';
     document.documentElement.lang = appState.lang;
     document.documentElement.dir = 'rtl';
-    if (document.body) {
-        document.body.setAttribute('data-app-ready', 'false');
-    }
+    const currentPageView = getCurrentStaticPageView();
+    const hasAccountUi = hasAccountUiContext();
+
     fetchExchangeRates();
-    renderFeaturedProducts();
     bindAuthStateEvents();
-    bindAccountAuthUI();
-    updateAccountProfileUI();
+    if (hasAccountUi) {
+        bindAccountAuthUI();
+        updateAccountProfileUI();
+    }
     initRouter();
     updateCartCount(false);
-    renderOrders();
+    if (hasAccountUi) {
+        renderOrders();
+    }
 
     const bootstrapAuthState = async () => {
         if (window.zarzAuthStateReadyPromise) {
@@ -1212,23 +1396,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    const shouldWaitForAuthBootstrap = getCurrentStaticPageView() === 'account';
-    scheduleAppReveal(shouldWaitForAuthBootstrap ? 1800 : 700);
+    if (currentPageView === 'home') {
+        scheduleFeaturedProductsRender();
+    } else if (document.getElementById('featured-container')) {
+        renderFeaturedProducts();
+    }
 
-    const authBootstrapPromise = bootstrapAuthState();
-
-    if (shouldWaitForAuthBootstrap) {
-        authBootstrapPromise.finally(() => {
-            window.requestAnimationFrame(() => {
-                revealAppShell();
-            });
-        });
+    if (currentPageView === 'account') {
+        bootstrapAuthState();
     } else {
-        window.requestAnimationFrame(() => {
-            window.requestAnimationFrame(() => {
-                revealAppShell();
-            });
-        });
+        scheduleIdleTask(() => {
+            bootstrapAuthState();
+        }, 900);
     }
     
     // Mobile Menu
@@ -1763,7 +1942,7 @@ function renderServiceAssurance(product) {
     `;
 }
 
-function generateProductCardHTML(p) {
+function generateProductCardHTML(p, options = {}) {
     const { title, desc } = getProductCopy(p);
     const meta = getProductMeta(p);
     const oldPrice = p.basePrice * 1.25;
@@ -1778,6 +1957,7 @@ function generateProductCardHTML(p) {
     const quickViewText = t('Quick View', 'معاينة سريعة');
     const buyNowText = t('Buy Now', 'اطلب الآن');
     const stockText = getStockText(p, meta);
+    const prioritizeImage = Boolean(options.prioritizeImage);
     const priceHtml = isSoldOut
         ? `<div class="product-price-stack"><span class="product-soldout-text">${stockText}</span></div>`
         : `<div class="product-price-stack">
@@ -1802,7 +1982,12 @@ function generateProductCardHTML(p) {
             <div class="product-image-footer">
                 <span class="product-badge"><i class="fa-solid fa-star"></i> ${p.rating}</span>
             </div>
-            ${getLocalizedProductImage(p)}
+            ${getLocalizedProductImage(p, {
+                loading: prioritizeImage ? 'eager' : 'lazy',
+                decoding: prioritizeImage ? 'sync' : 'async',
+                fetchpriority: prioritizeImage ? 'high' : 'low',
+                sizes: '(max-width: 768px) 78vw, 260px'
+            })}
         </div>
         <div class="product-info${isSoldOut ? ' is-muted' : ''}">
             <div class="product-meta-row">
@@ -1838,7 +2023,10 @@ function renderProducts(items) {
     currentProductList = items;
     const container = document.getElementById('products-container');
     if(container) {
-        container.innerHTML = items.map(generateProductCardHTML).join('');
+        const prioritizeVisibleImages = isStorePage() && hasView('store');
+        container.innerHTML = items.map((item, index) => generateProductCardHTML(item, {
+            prioritizeImage: prioritizeVisibleImages && index < 2
+        })).join('');
     }
 
     refreshPrices();
@@ -1851,7 +2039,7 @@ function renderFeaturedProducts() {
             .map(id => products.find(p => p.id === id && !p.outOfStock))
             .filter(Boolean)
             .slice(0, 4);
-        featContainer.innerHTML = featuredItems.map(generateProductCardHTML).join('');
+        featContainer.innerHTML = featuredItems.map(item => generateProductCardHTML(item)).join('');
     }
 
     initFeaturedCarouselControls();
@@ -2137,7 +2325,12 @@ window.openQuickView = function(productId) {
                 </button>
                 <div class="quick-view-layout">
                     <div class="quick-view-image${product.outOfStock ? ' is-soldout' : ''}"${getProductImageStyleAttr(product, 'quickView')}>
-                        ${getLocalizedProductImage(product)}
+                        ${getLocalizedProductImage(product, {
+                            loading: 'eager',
+                            decoding: 'async',
+                            fetchpriority: 'low',
+                            sizes: '(max-width: 768px) 100vw, 50vw'
+                        })}
                         ${product.outOfStock ? `<div class="product-out-overlay">${t('Out of Stock', 'نفذت الكمية')}</div>` : ''}
                     </div>
                     <div class="quick-view-body">
@@ -2308,7 +2501,12 @@ function viewDetails(productId) {
 
     container.innerHTML = `
         <div class="details-wrapper">
-                <div class="details-image"${getProductImageStyleAttr(product, 'details')}>${getLocalizedProductImage(product)}</div>
+                <div class="details-image"${getProductImageStyleAttr(product, 'details')}>${getLocalizedProductImage(product, {
+                    loading: 'eager',
+                    decoding: 'sync',
+                    fetchpriority: 'high',
+                    sizes: '(max-width: 768px) 100vw, 48vw'
+                })}</div>
             <div class="details-info">
                 <div class="details-cat">${formatCategory(product.category)}</div>
                 <h1>${title}</h1>
@@ -2517,7 +2715,12 @@ function renderCart() {
         
         return `
         <div class="cart-item">
-            <div class="cart-item-img">${getLocalizedProductImage(item.product)}</div>
+            <div class="cart-item-img">${getLocalizedProductImage(item.product, {
+                loading: 'lazy',
+                decoding: 'async',
+                fetchpriority: 'low',
+                sizes: '60px'
+            })}</div>
             <div class="cart-item-info">
                 <div class="cart-item-title">${getProductCopy(item.product).title}</div>
                 <div class="cart-item-meta">${metaParts.join(' | ')}</div>
@@ -2717,6 +2920,20 @@ window.processOrder = async function() {
         return;
     }
 
+    if (!appState.user) {
+        const checkoutChoice = await promptCheckoutAccountChoice();
+
+        if (checkoutChoice === 'login') {
+            setPendingCheckoutLoginReturn();
+            navigateTo('account');
+            return;
+        }
+
+        if (checkoutChoice !== 'guest') {
+            return;
+        }
+    }
+
     const btn = document.querySelector('#checkoutForm button[type="submit"]');
     const originalText = btn ? btn.innerHTML : '';
     if(btn) {
@@ -2748,7 +2965,7 @@ window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', subm
 
     if (shouldSyncOrder && typeof window.createOrder !== 'function') {
         const syncError = new Error('createOrder is not available.');
-        syncError.userMessage = 'تعذر الوصول إلى خدمة مزامنة الطلبات الآن. حاول مرة أخرى بعد قليل.';
+        syncError.userMessage = 'تعذر حفظ الطلب الآن. حاول مرة أخرى بعد قليل.';
         throw syncError;
     }
 
@@ -2897,6 +3114,7 @@ function updateRecentOrdersMeta(totalOrders, visibleOrders) {
             'Your newest orders will appear here once you place your first order.',
             'ستظهر أحدث طلباتك هنا فور تنفيذ أول طلب.'
         );
+        summaryNote.hidden = false;
         return;
     }
 
@@ -2905,6 +3123,7 @@ function updateRecentOrdersMeta(totalOrders, visibleOrders) {
             `Showing ${visibleOrders} of ${totalOrders} orders, newest first.`,
             `يتم عرض ${visibleOrders} من أصل ${totalOrders} طلبات، والأحدث أولاً.`
         );
+        summaryNote.hidden = false;
         return;
     }
 
@@ -2912,6 +3131,7 @@ function updateRecentOrdersMeta(totalOrders, visibleOrders) {
         'All your recent orders are visible here, newest first.',
         'كل طلباتك الأخيرة ظاهرة هنا، والأحدث أولاً.'
     );
+    summaryNote.hidden = false;
 }
 
 window.showMoreOrders = function() {

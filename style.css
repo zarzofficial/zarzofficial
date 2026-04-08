@@ -10,8 +10,8 @@
     --accent-green: #00e676;
     --text-primary: #ffffff;
     --text-secondary: #a0a0b0;
-    --font-heading: 'Outfit', 'Cairo', 'Tajawal', sans-serif;
-    --font-body: 'Tajawal', 'Inter', sans-serif;
+    --font-heading: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
+    --font-body: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
     --border-radius: 12px;
     --border-radius-lg: 20px;
     --navbar-height: 70px;
@@ -711,6 +711,17 @@ main {
     align-items: center;
     justify-content: center;
     gap: 1.5rem;
+}
+
+.process-section,
+.featured-products,
+.why-us,
+.stats,
+.our-work-section,
+.testimonials,
+.faq-section {
+    content-visibility: auto;
+    contain-intrinsic-size: 720px;
 }
 
 .blur-circle {
@@ -2891,9 +2902,9 @@ footer {
     .hero {
         flex-direction: column;
         text-align: center;
-        margin-top: 1rem;
-        padding: 3.5rem 0 2.5rem;
-        gap: 2rem;
+        margin-top: 0.5rem;
+        padding: 2.4rem 0 1.5rem;
+        gap: 1.25rem;
     }
     .hero-title { font-size: clamp(1.85rem, 8vw, 2.35rem); line-height: 1.25; }
     .hero-subtitle { margin: 0 auto 1.5rem; font-size: 1rem; }
@@ -2903,20 +2914,10 @@ footer {
     .hero-actions .btn { width: 100%; }
     .hero-trust { justify-content: center; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin-top: 1rem; }
     .trust-badge { justify-content: center; font-size: 0.75rem; padding: 0.3rem 0.6rem; gap: 0.3rem; }
-    .hero-graphics { 
-        height: auto; 
-        min-height: 0;
-        width: 100%; 
-        margin-top: 1rem; 
-        position: relative; 
-        overflow: visible; 
-        transform: none;
+    .announcement-bar,
+    .hero-graphics {
+        display: none;
     }
-    .hero-showcase {
-        width: 100%;
-        padding: 1.1rem;
-    }
-    .hero-showcase h3 { font-size: 1.15rem; }
     .showcase-item { text-align: start; }
     .glow-icon { width: 55px; height: 55px; font-size: 1.5rem; border-radius: 12px; }
     .floating-icons-layout { display: none; }
@@ -3081,8 +3082,8 @@ footer {
 
 /* RTL Support */
 html[dir="rtl"] {
-    --font-heading: 'Tajawal', sans-serif;
-    --font-body: 'Tajawal', sans-serif;
+    --font-heading: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
+    --font-body: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
 }
 html[dir="rtl"] body {
     font-family: var(--font-body);
@@ -3091,7 +3092,7 @@ html[dir="rtl"] .hero-title, html[dir="rtl"] h1, html[dir="rtl"] h2, html[dir="r
     font-family: var(--font-heading);
 }
 html[dir="rtl"] .logo {
-    font-family: 'Outfit', sans-serif; /* Keep English font for logo */
+    font-family: var(--font-heading);
 }
 html[dir="rtl"] .search-bar i {
     left: auto;
