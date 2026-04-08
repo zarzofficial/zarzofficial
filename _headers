@@ -50,8 +50,32 @@
   Content-Type: text/html; charset=UTF-8
   Cache-Control: no-cache, no-store, must-revalidate
 
-/__/auth/*
+/__/auth/handler
   Content-Type: text/html; charset=UTF-8
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/__/auth/iframe
+  Content-Type: text/html; charset=UTF-8
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/__/auth/links
+  Content-Type: text/html; charset=UTF-8
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/__/auth/experiments.js
+  Content-Type: application/javascript; charset=UTF-8
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/__/auth/handler.js
+  Content-Type: application/javascript; charset=UTF-8
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/__/auth/iframe.js
+  Content-Type: application/javascript; charset=UTF-8
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/__/auth/links.js
+  Content-Type: application/javascript; charset=UTF-8
   Cache-Control: no-cache, no-store, must-revalidate
 
 /__/firebase/init.json
