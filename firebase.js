@@ -26,6 +26,7 @@ import {
 const DEFAULT_AUTH_DOMAIN = "zarzofficial-66638.firebaseapp.com";
 const CUSTOM_AUTH_DOMAIN = "auth.zarzofficial.com";
 const AUTH_DOMAIN_PROBE_CACHE_KEY = "zarz_auth_domain_probe_v1";
+const DEFAULT_AUTH_DOMAIN_RETRY_AFTER_MS = 60 * 1000;
 const firebaseConfig = window.ZARZ_FIREBASE_CONFIG || {
   apiKey: "AIzaSyBJ6g-W2bAQwBkkxA_gngN4TMGR_DlVcgM",
   authDomain: DEFAULT_AUTH_DOMAIN,
@@ -42,15 +43,31 @@ let firebaseServices = null;
 
 function readCachedAuthDomainProbe() {
   try {
-    return window.sessionStorage?.getItem(AUTH_DOMAIN_PROBE_CACHE_KEY) || "";
+    const rawValue = window.sessionStorage?.getItem(AUTH_DOMAIN_PROBE_CACHE_KEY) || "";
+    if (!rawValue) {
+      return null;
+    }
+
+    const parsedValue = JSON.parse(rawValue);
+    if (!parsedValue || typeof parsedValue !== "object") {
+      return null;
+    }
+
+    return parsedValue;
   } catch (error) {
-    return "";
+    return null;
   }
 }
 
 function writeCachedAuthDomainProbe(value) {
   try {
-    window.sessionStorage?.setItem(AUTH_DOMAIN_PROBE_CACHE_KEY, value);
+    window.sessionStorage?.setItem(
+      AUTH_DOMAIN_PROBE_CACHE_KEY,
+      JSON.stringify({
+        value,
+        checkedAt: Date.now()
+      })
+    );
   } catch (error) {
     // Ignore storage failures and continue with runtime probing.
   }
@@ -67,11 +84,15 @@ async function canUseCustomAuthDomain(domain) {
   }
 
   const cachedProbe = readCachedAuthDomainProbe();
-  if (cachedProbe === "custom") {
+  if (cachedProbe?.value === "custom") {
     return true;
   }
 
-  if (cachedProbe === "default") {
+  if (
+    cachedProbe?.value === "default" &&
+    Number.isFinite(cachedProbe.checkedAt) &&
+    Date.now() - cachedProbe.checkedAt < DEFAULT_AUTH_DOMAIN_RETRY_AFTER_MS
+  ) {
     return false;
   }
 
