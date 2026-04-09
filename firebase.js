@@ -120,6 +120,69 @@ function getEmailActionSettings(pathname = "/account/") {
   };
 }
 
+async function sendCustomAuthEmail(type, { email, displayName = "" } = {}) {
+  const normalizedType = String(type || "").trim().toLowerCase();
+  const normalizedEmail = String(email || "").trim();
+
+  if (!normalizedType || !normalizedEmail) {
+    throw enrichFirebaseError(
+      { code: "auth/invalid-request" },
+      "بيانات البريد غير مكتملة."
+    );
+  }
+
+  let response = null;
+  try {
+    response = await window.fetch("/api/auth/email-action", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Zarz-Requested-With": "auth-email"
+      },
+      credentials: "same-origin",
+      body: JSON.stringify({
+        type: normalizedType,
+        email: normalizedEmail,
+        displayName: String(displayName || "").trim()
+      })
+    });
+  } catch (error) {
+    const nextError = enrichFirebaseError(
+      { code: "auth/custom-email-unavailable" },
+      "تعذر الوصول إلى خدمة البريد المخصص الآن."
+    );
+    nextError.allowFallback = true;
+    throw nextError;
+  }
+
+  let responseBody = null;
+  try {
+    responseBody = await response.json();
+  } catch (error) {
+    responseBody = null;
+  }
+
+  if (!response.ok || responseBody?.ok === false) {
+    const nextError = enrichFirebaseError(
+      { code: responseBody?.code || "auth/custom-email-failed" },
+      responseBody?.userMessage || "تعذر إرسال البريد الآن. حاول مرة أخرى بعد قليل."
+    );
+
+    if (
+      response.status >= 500 ||
+      response.status === 404 ||
+      response.status === 405 ||
+      responseBody?.code === "auth/custom-email-unavailable"
+    ) {
+      nextError.allowFallback = true;
+    }
+
+    throw nextError;
+  }
+
+  return true;
+}
+
 async function canUseCustomAuthDomain(domain) {
   if (!domain || domain === DEFAULT_AUTH_DOMAIN || typeof window.fetch !== "function") {
     return false;
@@ -519,10 +582,22 @@ async function registerWithEmail({ name = "", email, password }) {
     }
 
     try {
-      await sendEmailVerification(credential.user, getEmailActionSettings("/account/"));
+      await sendCustomAuthEmail("verify_email", {
+        email: credential.user.email || email,
+        displayName: name.trim() || credential.user.displayName || ""
+      });
       verificationEmailSent = true;
     } catch (verificationError) {
-      console.error("Failed to send verification email:", verificationError);
+      if (verificationError?.allowFallback) {
+        try {
+          await sendEmailVerification(credential.user, getEmailActionSettings("/account/"));
+          verificationEmailSent = true;
+        } catch (fallbackVerificationError) {
+          console.error("Failed to send verification email:", fallbackVerificationError);
+        }
+      } else {
+        console.error("Failed to send custom verification email:", verificationError);
+      }
     }
 
     return {
@@ -574,8 +649,19 @@ async function signOutUser() {
 
 async function sendPasswordReset(email) {
   try {
-    const { auth } = await window.firebaseReadyPromise;
-    await sendPasswordResetEmail(auth, String(email || "").trim(), getEmailActionSettings("/account/"));
+    const normalizedEmail = String(email || "").trim();
+
+    try {
+      await sendCustomAuthEmail("password_reset", { email: normalizedEmail });
+    } catch (customEmailError) {
+      if (!customEmailError?.allowFallback) {
+        throw customEmailError;
+      }
+
+      const { auth } = await window.firebaseReadyPromise;
+      await sendPasswordResetEmail(auth, normalizedEmail, getEmailActionSettings("/account/"));
+    }
+
     return true;
   } catch (error) {
     throw enrichFirebaseError(error, getFriendlyAuthErrorMessage(error, "reset"));

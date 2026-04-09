@@ -1,0 +1,9 @@
+.git/
+.editorconfig
+.firebaserc
+.gitignore
+firebase.json
+firestore.rules
+scripts/
+worker.js
+wrangler.jsonc

@@ -1,12 +1,26 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "zarzofficial",
+  "main": "worker.js",
   "compatibility_date": "2026-04-04",
   "observability": {
     "enabled": true
   },
   "assets": {
-    "directory": "."
+    "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  },
+  "vars": {
+    "FIREBASE_PROJECT_ID": "zarzofficial-66638",
+    "FIREBASE_AUTH_LINK_DOMAIN": "zarzofficial.com",
+    "AUTH_EMAIL_ACTION_URL": "https://zarzofficial.com/account/",
+    "AUTH_EMAIL_BRAND_NAME": "زارز الرسمي",
+    "AUTH_EMAIL_FROM": "زارز الرسمي <team@zarzofficial.com>",
+    "AUTH_EMAIL_REPLY_TO": "team@zarzofficial.com",
+    "ALLOWED_APP_ORIGINS": "zarzofficial.com,www.zarzofficial.com,127.0.0.1,localhost"
   },
   "compatibility_flags": [
     "nodejs_compat"
