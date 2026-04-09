@@ -1830,8 +1830,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         mobileBtn.setAttribute('aria-controls', navLinks.id);
         mobileBtn.setAttribute('aria-expanded', 'false');
         navLinks.setAttribute('aria-hidden', 'true');
+        syncMobileMenuPerformanceMode(navLinks, mobileBtn);
 
         const setMobileMenuState = (isOpen) => {
+            syncMobileMenuPerformanceMode(navLinks, mobileBtn);
             navLinks.classList.toggle('show-mobile-menu', isOpen);
             mobileBtn.classList.toggle('active', isOpen);
             document.body.classList.toggle('nav-open', isOpen && window.innerWidth <= 768);
@@ -1857,6 +1859,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         window.addEventListener('resize', () => {
+            syncMobileMenuPerformanceMode(navLinks, mobileBtn);
             if (window.innerWidth > 768) {
                 setMobileMenuState(false);
             }
@@ -2468,6 +2471,61 @@ function renderFeaturedProducts() {
     refreshPrices();
 }
 
+function isConstrainedMobileDevice() {
+    if (window.innerWidth > 768) return false;
+
+    const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
+    const deviceMemory = Number(window.navigator?.deviceMemory || 0);
+    const hardwareConcurrency = Number(window.navigator?.hardwareConcurrency || 0);
+    const connection = window.navigator?.connection || window.navigator?.mozConnection || window.navigator?.webkitConnection || null;
+    const saveData = Boolean(connection?.saveData);
+    const effectiveType = String(connection?.effectiveType || '').toLowerCase();
+    const weakNetwork = effectiveType.includes('slow-2g') || effectiveType.includes('2g') || effectiveType.includes('3g');
+    const weakMemory = deviceMemory > 0 && deviceMemory <= 4;
+    const weakCpu = hardwareConcurrency > 0 && hardwareConcurrency <= 4;
+
+    return prefersReducedMotion || saveData || weakNetwork || weakMemory || weakCpu;
+}
+
+function isFeaturedCarouselLiteMode() {
+    return isConstrainedMobileDevice();
+}
+
+function syncFeaturedCarouselPerformanceMode(container, controls) {
+    const mode = isFeaturedCarouselLiteMode() ? 'lite' : 'default';
+    const shell = container?.closest('.featured-carousel-shell');
+
+    [shell, container, controls].forEach((element) => {
+        if (!element) return;
+        if (mode === 'lite') {
+            element.dataset.performanceMode = 'lite';
+            return;
+        }
+
+        delete element.dataset.performanceMode;
+    });
+
+    return mode;
+}
+
+function syncMobileMenuPerformanceMode(navLinks, mobileBtn) {
+    const mode = isConstrainedMobileDevice() ? 'lite' : 'default';
+    const body = document.body;
+
+    [body, navLinks, mobileBtn].forEach((element) => {
+        if (!element) return;
+
+        if (mode === 'lite') {
+            element.dataset.mobileMenuPerformance = 'lite';
+            return;
+        }
+
+        delete element.dataset.mobileMenuPerformance;
+    });
+
+    return mode;
+}
+
 function getFeaturedVisibleCardIndex(container, cards) {
     if (!container || !cards.length) return -1;
 
@@ -2495,6 +2553,7 @@ function updateFeaturedCarouselControls() {
     const prevButton = controls?.querySelector('[data-featured-dir="prev"]');
 
     if (!container || !controls || !nextButton || !prevButton) return;
+    syncFeaturedCarouselPerformanceMode(container, controls);
 
     const cards = Array.from(container.querySelectorAll('.product-card'));
     const hasOverflow = container.scrollWidth > container.clientWidth + 8;
@@ -2523,9 +2582,11 @@ function updateFeaturedCarouselControls() {
 function scrollFeaturedCarousel(direction) {
     const container = document.getElementById('featured-container');
     if (!container) return;
+    const controls = document.querySelector('.featured-carousel-controls');
 
     const cards = Array.from(container.querySelectorAll('.product-card'));
     if (!cards.length) return;
+    const performanceMode = syncFeaturedCarouselPerformanceMode(container, controls);
 
     const activeIndex = getFeaturedVisibleCardIndex(container, cards);
     const targetIndex = direction === 'next'
@@ -2542,10 +2603,10 @@ function scrollFeaturedCarousel(direction) {
 
     container.scrollBy({
         left: deltaX,
-        behavior: 'smooth'
+        behavior: performanceMode === 'lite' ? 'auto' : 'smooth'
     });
 
-    window.setTimeout(updateFeaturedCarouselControls, 320);
+    window.setTimeout(updateFeaturedCarouselControls, performanceMode === 'lite' ? 80 : 320);
 }
 
 function initFeaturedCarouselControls() {
@@ -2563,13 +2624,15 @@ function initFeaturedCarouselControls() {
             });
         });
 
-        let frameId = null;
+        let updateTimer = null;
         const scheduleUpdate = () => {
-            if (frameId) cancelAnimationFrame(frameId);
-            frameId = requestAnimationFrame(() => {
-                frameId = null;
+            if (updateTimer !== null) return;
+
+            const performanceMode = syncFeaturedCarouselPerformanceMode(container, controls);
+            updateTimer = window.setTimeout(() => {
+                updateTimer = null;
                 updateFeaturedCarouselControls();
-            });
+            }, performanceMode === 'lite' ? 96 : 56);
         };
 
         container.addEventListener('scroll', scheduleUpdate, { passive: true });
