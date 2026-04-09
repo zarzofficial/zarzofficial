@@ -1,4 +1,4 @@
-﻿// Products Database
+// Products Database
 const products = [
     {
         id: 'sub1', title: 'شات جي بي تي بلس', category: 'subscriptions',
@@ -100,10 +100,10 @@ function getLocalizedProductImage(product, options = {}) {
     return withOptimizedImageAttrs(product.icon, options).replace(/alt="[^"]*"/i, `alt="${localizedAlt}"`);
 }
 
-const MOBILE_PERFORMANCE_MODE_KEY = 'zarz_mobile_performance_mode';
 const MOBILE_VIEWPORT_QUERY = '(max-width: 768px)';
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
-let mobilePerformanceMode = 'balanced';
+const MOBILE_PERFORMANCE_MODE_KEY = 'zarz_mobile_performance_mode';
+let mobilePerformanceMode = 'default';
 let mobilePerformanceProbeAttached = false;
 let mobilePerformanceProbeCompleted = false;
 
@@ -127,7 +127,7 @@ function writeStoredMobilePerformanceMode(mode) {
         }
         window.sessionStorage?.setItem(MOBILE_PERFORMANCE_MODE_KEY, mode);
     } catch (error) {
-        // Ignore storage failures and continue with in-memory mode.
+        // Ignore storage failures and keep working with the detected mode.
     }
 }
 
@@ -137,8 +137,8 @@ function getPreferredMobilePerformanceMode() {
     }
 
     const storedMode = readStoredMobilePerformanceMode();
-    if (storedMode === 'lite' || storedMode === 'balanced') {
-        return storedMode;
+    if (storedMode === 'lite') {
+        return 'lite';
     }
 
     const prefersReducedMotion = window.matchMedia?.(REDUCED_MOTION_QUERY).matches || false;
@@ -147,17 +147,18 @@ function getPreferredMobilePerformanceMode() {
     const connection = window.navigator?.connection || window.navigator?.mozConnection || window.navigator?.webkitConnection || null;
     const saveData = Boolean(connection?.saveData);
     const effectiveType = String(connection?.effectiveType || '').toLowerCase();
-    const constrainedNetwork = effectiveType.includes('2g') || effectiveType.includes('3g');
-    const weakHardware = (deviceMemory > 0 && deviceMemory <= 4) || (hardwareConcurrency > 0 && hardwareConcurrency <= 4);
+    const constrainedNetwork = effectiveType.includes('slow-2g') || effectiveType.includes('2g') || effectiveType.includes('3g');
+    const weakMemory = deviceMemory > 0 && deviceMemory <= 4;
+    const weakCpu = hardwareConcurrency > 0 && hardwareConcurrency <= 4;
 
-    return (prefersReducedMotion || saveData || constrainedNetwork || weakHardware) ? 'lite' : 'balanced';
+    return (prefersReducedMotion || saveData || constrainedNetwork || weakMemory || weakCpu) ? 'lite' : 'balanced';
 }
 
 function applyMobilePerformanceMode(nextMode, { persist = false } = {}) {
     const root = document.documentElement;
     const isMobile = isMobileViewport();
 
-    root.classList.remove('mobile-performance-balanced', 'mobile-performance-lite');
+    root.classList.remove('mobile-performance-lite', 'mobile-performance-balanced');
     root.removeAttribute('data-mobile-performance');
 
     if (!isMobile) {
@@ -171,17 +172,22 @@ function applyMobilePerformanceMode(nextMode, { persist = false } = {}) {
     root.setAttribute('data-mobile-performance', mobilePerformanceMode);
 
     if (persist) {
-        writeStoredMobilePerformanceMode(mobilePerformanceMode);
+        writeStoredMobilePerformanceMode(mobilePerformanceMode === 'lite' ? 'lite' : '');
     }
 }
 
 function syncMobilePerformanceMode({ persist = false } = {}) {
-    const preferredMode = getPreferredMobilePerformanceMode();
-    applyMobilePerformanceMode(preferredMode, { persist });
+    applyMobilePerformanceMode(getPreferredMobilePerformanceMode(), { persist });
 }
 
 function attachMobilePerformanceProbe() {
-    if (mobilePerformanceProbeAttached || mobilePerformanceProbeCompleted || !isMobileViewport() || mobilePerformanceMode === 'lite') {
+    if (
+        mobilePerformanceProbeAttached ||
+        mobilePerformanceProbeCompleted ||
+        !isMobileViewport() ||
+        mobilePerformanceMode === 'lite' ||
+        !('requestAnimationFrame' in window)
+    ) {
         return;
     }
 
@@ -191,44 +197,44 @@ function attachMobilePerformanceProbe() {
         window.removeEventListener('scroll', startProbe, scrollListenerOptions);
         mobilePerformanceProbeAttached = false;
 
-        if (!('requestAnimationFrame' in window) || mobilePerformanceProbeCompleted || mobilePerformanceMode === 'lite') {
+        if (mobilePerformanceProbeCompleted || mobilePerformanceMode === 'lite') {
             mobilePerformanceProbeCompleted = true;
             return;
         }
 
-        let lastTime = 0;
+        let lastFrameTime = 0;
         let sampleCount = 0;
         let longFrames = 0;
         let maxFrameDelta = 0;
-        let totalDelta = 0;
-        const maxSamples = 45;
+        let totalFrameDelta = 0;
+        const sampleLimit = 40;
 
         const measure = (timestamp) => {
-            if (!lastTime) {
-                lastTime = timestamp;
+            if (!lastFrameTime) {
+                lastFrameTime = timestamp;
                 window.requestAnimationFrame(measure);
                 return;
             }
 
-            const delta = timestamp - lastTime;
-            lastTime = timestamp;
+            const delta = timestamp - lastFrameTime;
+            lastFrameTime = timestamp;
             sampleCount += 1;
-            totalDelta += delta;
+            totalFrameDelta += delta;
             maxFrameDelta = Math.max(maxFrameDelta, delta);
 
             if (delta > 22) {
                 longFrames += 1;
             }
 
-            if (sampleCount < maxSamples) {
+            if (sampleCount < sampleLimit) {
                 window.requestAnimationFrame(measure);
                 return;
             }
 
             mobilePerformanceProbeCompleted = true;
-            const averageDelta = totalDelta / sampleCount;
+            const averageDelta = totalFrameDelta / sampleCount;
 
-            if (longFrames >= 8 || averageDelta > 22 || maxFrameDelta > 56) {
+            if (longFrames >= 7 || averageDelta > 21 || maxFrameDelta > 54) {
                 applyMobilePerformanceMode('lite', { persist: true });
             }
         };
@@ -1894,12 +1900,6 @@ function scheduleFeaturedProductsRender() {
         featContainer.dataset.rendered = 'true';
         renderFeaturedProducts();
     };
-
-    const prefersMobileFeaturedPreload = window.matchMedia?.('(max-width: 768px)').matches;
-    if (prefersMobileFeaturedPreload) {
-        scheduleIdleTask(render, 320);
-        return;
-    }
 
     if (!('IntersectionObserver' in window)) {
         scheduleIdleTask(render, 1000);
