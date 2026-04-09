@@ -3511,16 +3511,8 @@ footer {
     .hero-actions .btn { width: 100%; }
     .hero-trust { justify-content: center; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin-top: 1rem; }
     .trust-badge { justify-content: center; font-size: 0.75rem; padding: 0.3rem 0.6rem; gap: 0.3rem; }
-    .announcement-bar,
-    .hero-graphics {
-        display: none;
-    }
     .showcase-item { text-align: start; }
     .glow-icon { width: 55px; height: 55px; font-size: 1.5rem; border-radius: 12px; }
-    .floating-icons-layout { display: none; }
-    .icon-social { box-shadow: 0 10px 20px rgba(225, 48, 108, 0.4); animation: floatSlow 6s ease-in-out infinite; }
-    .icon-gaming { width: 75px; height: 75px; font-size: 2rem; margin-bottom: 2rem; z-index: var(--z-decor); box-shadow: 0 10px 20px rgba(0, 212, 255, 0.4); animation: floatFast 4s ease-in-out infinite; }
-    .icon-web { box-shadow: 0 10px 20px rgba(38, 208, 206, 0.4); animation: floatMed 5s ease-in-out infinite; }
     .circle-1 { width: 250px; height: 250px; }
     .circle-2 { width: 250px; height: 250px; }
     .circle-3 { width: 200px; height: 200px; left: 50%; transform: translateX(-50%); }
@@ -4216,162 +4208,6 @@ html[dir="rtl"] .quick-view-close {
     }
 }
 
-/* Base Mobile Performance Optimizations */
-@media (max-width: 768px) {
-    html {
-        scroll-behavior: auto;
-    }
-
-    /* Remove decorative layers that keep repainting on mobile */
-    body::before,
-    .blur-circle,
-    .floating-icons-layout,
-    .glow-icon,
-    .main-category-card::after,
-    .process-card::after,
-    .review-grid .glass-panel::after,
-    .trust-grid .glass-panel::after,
-    .value-grid .category-card::after,
-    .cta-banner::before {
-        display: none !important;
-    }
-
-    /* Disable heavy GPU blurring/filters to prevent freezing */
-    .glow-icon, .glass-panel, .navbar, .trust-badge, .announcement-bar, .modal-overlay, .product-status-badge, .product-badge, .variation-chip {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        background-color: var(--surface-color) !important;
-    }
-
-    /* Disable expensive concurrent animations and hover motion on touch devices */
-    .view,
-    .announcement-bar,
-    .icon-social,
-    .icon-gaming,
-    .icon-web,
-    .modal-overlay,
-    .modal-content,
-    .toast {
-        animation: none !important;
-    }
-
-    .btn,
-    .icon-btn,
-    .product-card,
-    .category-card,
-    .faq-item,
-    .info-card,
-    .pay-method,
-    .variation-option,
-    .announcement-badge {
-    }
-
-    /* Disable expensive concurrent animations and hover motion on touch devices */
-    .view,
-    .announcement-bar,
-    .icon-social,
-    .icon-gaming,
-    .icon-web,
-    .modal-overlay,
-    .modal-content,
-    .toast {
-        animation: none !important;
-    }
-
-    .btn,
-    .icon-btn,
-    .product-card,
-    .category-card,
-    .faq-item,
-    .info-card,
-    .pay-method,
-    .variation-option,
-    .announcement-badge {
-        transition: none !important;
-    }
-
-    .icon-social,
-    .icon-gaming,
-    .icon-web,
-    .product-card:hover,
-    .category-card:hover,
-    .info-card:hover,
-    .pay-method:hover,
-    .btn-primary:hover,
-    .announcement-badge:hover {
-        transform: none !important;
-        box-shadow: none !important;
-    }
-
-    .category-card,
-    .product-card,
-    .process-card,
-    .faq-item[open],
-    .glass-panel,
-    .info-card,
-    .toast,
-    .quick-view-content,
-    .modal-content {
-        box-shadow: none !important;
-    }
-
-    /* Reduce repetitive repaints on grid items */
-    .category-card, .product-card {
-        animation: none !important;
-        transition: opacity 0.2s ease !important;
-    }
-
-    /* Prevent mobile browsers from showing tap/focus highlight boxes */
-    a,
-    button,
-    [role="button"],
-    summary,
-    input,
-    select,
-    textarea,
-    .btn,
-    .icon-btn,
-    .mobile-menu-btn,
-    .product-overlay-btn,
-    .variation-option {
-        -webkit-tap-highlight-color: transparent !important;
-        -webkit-touch-callout: none;
-    }
-
-    a:focus,
-    button:focus,
-    [role="button"]:focus,
-    summary:focus,
-    input:focus,
-    select:focus,
-    textarea:focus,
-    .btn:focus,
-    .icon-btn:focus,
-    .mobile-menu-btn:focus,
-    .product-overlay-btn:focus,
-    .variation-option:focus,
-    .btn:focus-visible,
-    .icon-btn:focus-visible,
-    .mobile-menu-btn:focus-visible,
-    .product-overlay-btn:focus-visible,
-    .product-actions .btn:focus-visible,
-    .variation-option:focus-visible {
-        outline: none !important;
-        box-shadow: none !important;
-    }
-
-    .product-overlay-btn:focus-visible,
-    .product-actions .btn:focus-visible,
-    .variation-option:focus-visible {
-        transform: none !important;
-    }
-
-    .variation-option:not(.active):focus-visible {
-        border-color: var(--border-color) !important;
-        background: rgba(255, 255, 255, 0.04) !important;
-    }
-}
-
 /* Our Work Section Styles */
 .our-work-section {
     margin-top: 5rem;
@@ -4697,5 +4533,293 @@ html[dir="rtl"] .quick-view-close {
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
+    }
+}
+
+/* DO NOT OVERRIDE THIS BLOCK WITHOUT MOBILE PERFORMANCE REVIEW */
+/* Mobile Performance Guard */
+@media (max-width: 768px) {
+    html {
+        scroll-behavior: auto !important;
+    }
+
+    body::before {
+        content: none !important;
+        display: none !important;
+    }
+
+    body.nav-open::after {
+        background: rgba(7, 7, 10, 0.58) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    .navbar {
+        background: rgba(12, 11, 16, 0.96) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        transform: none !important;
+    }
+
+    .announcement-bar,
+    .hero-graphics,
+    .blur-circle,
+    .floating-icons-layout,
+    .glow-icon,
+    .icon-social,
+    .icon-gaming,
+    .icon-web {
+        display: none !important;
+        animation: none !important;
+        transform: none !important;
+        filter: none !important;
+        box-shadow: none !important;
+    }
+
+    .main-category-card::after,
+    .value-grid .category-card::after,
+    .trust-grid .glass-panel::after,
+    .review-grid .glass-panel::after,
+    .process-card::after,
+    .work-card::before,
+    .cta-banner::before,
+    .mobile-menu-account-card::before {
+        content: none !important;
+        display: none !important;
+    }
+
+    .nav-links,
+    .mobile-menu-account-card,
+    .nav-link,
+    .mobile-menu-btn,
+    .featured-scroll-btn,
+    .product-card,
+    .category-card,
+    .glass-panel,
+    .toast,
+    .modal-overlay,
+    .modal-content,
+    .product-status-badge,
+    .product-badge,
+    .variation-chip,
+    .info-card,
+    .pay-method,
+    .variation-option,
+    .work-card,
+    .process-card,
+    .faq-item,
+    .cta-banner {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        filter: none !important;
+    }
+
+    .mobile-menu-account-card,
+    .nav-link,
+    .product-card,
+    .category-card,
+    .glass-panel,
+    .info-card,
+    .toast,
+    .modal-content,
+    .work-card,
+    .process-card,
+    .faq-item,
+    .cta-banner {
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18) !important;
+    }
+
+    .product-card,
+    .category-card,
+    .glass-panel,
+    .info-card,
+    .pay-method,
+    .variation-option,
+    .work-card,
+    .process-card,
+    .faq-item,
+    .cta-banner,
+    .toast,
+    .modal-content,
+    .product-status-badge,
+    .product-badge,
+    .variation-chip,
+    .btn,
+    .icon-btn,
+    .product-overlay-btn,
+    .announcement-badge {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+    }
+
+    .product-card:hover,
+    .category-card:hover,
+    .glass-panel:hover,
+    .info-card:hover,
+    .pay-method:hover,
+    .variation-option:hover,
+    .work-card:hover,
+    .process-card:hover,
+    .faq-item:hover,
+    .cta-banner:hover,
+    .btn:hover,
+    .icon-btn:hover,
+    .product-overlay-btn:hover,
+    .announcement-badge:hover,
+    .mobile-menu-account-card:hover,
+    .nav-link:hover,
+    .featured-scroll-btn:hover,
+    .featured-scroll-btn:focus-visible {
+        transform: none !important;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18) !important;
+    }
+
+    .product-card:hover .product-image > .full-cover-img,
+    .product-card:hover .product-image > picture > .full-cover-img,
+    #featured-container .product-card:hover .product-image > .full-cover-img,
+    #featured-container .product-card:hover .product-image > picture > .full-cover-img {
+        transform: none !important;
+    }
+
+    .modal-overlay {
+        background: rgba(7, 7, 10, 0.74) !important;
+    }
+
+    .nav-links {
+        background: linear-gradient(180deg, rgba(14, 13, 20, 0.98), rgba(8, 8, 12, 0.98)) !important;
+        box-shadow: -12px 0 28px rgba(0, 0, 0, 0.24) !important;
+        contain: layout paint style;
+        will-change: transform, opacity;
+    }
+
+    .nav-links.show-mobile-menu .mobile-menu-account-card,
+    .nav-links.show-mobile-menu .nav-link {
+        animation: none !important;
+    }
+
+    .mobile-menu-account-card,
+    .nav-link {
+        background: linear-gradient(145deg, rgba(20, 20, 28, 0.98), rgba(12, 12, 18, 0.96)) !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .mobile-menu-account-avatar,
+    .nav-link::before {
+        box-shadow: none !important;
+    }
+
+    .mobile-menu-btn {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .featured-carousel-controls {
+        contain: paint;
+    }
+
+    #featured-container {
+        scroll-snap-type: x proximity !important;
+        contain: layout paint;
+    }
+
+    #featured-container .product-card {
+        content-visibility: auto;
+        contain: layout paint style;
+        contain-intrinsic-size: 320px 540px;
+        background: linear-gradient(160deg, rgba(16, 16, 24, 0.96), rgba(10, 10, 15, 0.95)) !important;
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18) !important;
+    }
+
+    .featured-scroll-btn {
+        background: rgba(14, 20, 29, 0.94) !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.18) !important;
+    }
+
+    .product-status-badge,
+    .product-badge,
+    .variation-chip {
+        box-shadow: none !important;
+        background: rgba(17, 17, 22, 0.96) !important;
+    }
+
+    html.mobile-performance-lite body.nav-open::after {
+        background: rgba(7, 7, 10, 0.42) !important;
+    }
+
+    html.mobile-performance-lite .nav-links,
+    html.mobile-performance-lite .mobile-menu-btn,
+    html.mobile-performance-lite .mobile-menu-account-card,
+    html.mobile-performance-lite .nav-link,
+    html.mobile-performance-lite .product-card,
+    html.mobile-performance-lite .category-card,
+    html.mobile-performance-lite .glass-panel,
+    html.mobile-performance-lite .info-card,
+    html.mobile-performance-lite .work-card,
+    html.mobile-performance-lite .process-card,
+    html.mobile-performance-lite .faq-item,
+    html.mobile-performance-lite .cta-banner,
+    html.mobile-performance-lite .modal-content,
+    html.mobile-performance-lite .toast,
+    html.mobile-performance-lite .featured-scroll-btn,
+    html.mobile-performance-lite .product-status-badge,
+    html.mobile-performance-lite .product-badge,
+    html.mobile-performance-lite .variation-chip,
+    html.mobile-performance-lite .trust-badge,
+    html.mobile-performance-lite .hero-metric {
+        box-shadow: none !important;
+        background-image: none !important;
+    }
+
+    html.mobile-performance-lite .nav-links,
+    html.mobile-performance-lite .mobile-menu-account-card,
+    html.mobile-performance-lite .nav-link,
+    html.mobile-performance-lite .product-card,
+    html.mobile-performance-lite .category-card,
+    html.mobile-performance-lite .glass-panel,
+    html.mobile-performance-lite .info-card,
+    html.mobile-performance-lite .work-card,
+    html.mobile-performance-lite .process-card,
+    html.mobile-performance-lite .faq-item,
+    html.mobile-performance-lite .cta-banner,
+    html.mobile-performance-lite .modal-content,
+    html.mobile-performance-lite .toast,
+    html.mobile-performance-lite .hero-metric,
+    html.mobile-performance-lite .product-image,
+    html.mobile-performance-lite #featured-container .product-image {
+        background: rgba(16, 16, 22, 0.98) !important;
+    }
+
+    html.mobile-performance-lite .hero-metric::after,
+    html.mobile-performance-lite .hero-metric::before,
+    html.mobile-performance-lite .product-image::after,
+    html.mobile-performance-lite .featured-carousel-controls,
+    html.mobile-performance-lite .featured-scroll-btn,
+    html.mobile-performance-lite .trust-badge i {
+        display: none !important;
+    }
+
+    html.mobile-performance-lite .nav-links,
+    html.mobile-performance-lite .mobile-menu-account-card,
+    html.mobile-performance-lite .nav-link,
+    html.mobile-performance-lite .product-card,
+    html.mobile-performance-lite .category-card,
+    html.mobile-performance-lite .glass-panel,
+    html.mobile-performance-lite .info-card,
+    html.mobile-performance-lite .work-card,
+    html.mobile-performance-lite .process-card,
+    html.mobile-performance-lite .faq-item,
+    html.mobile-performance-lite .cta-banner,
+    html.mobile-performance-lite .modal-content,
+    html.mobile-performance-lite .toast,
+    html.mobile-performance-lite .btn,
+    html.mobile-performance-lite .icon-btn,
+    html.mobile-performance-lite .product-overlay-btn {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    html.mobile-performance-lite #featured-container {
+        scroll-snap-type: none !important;
     }
 }
