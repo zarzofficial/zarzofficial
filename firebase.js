@@ -6,6 +6,7 @@ import {
   getAuth,
   getRedirectResult,
   onAuthStateChanged,
+  sendEmailVerification,
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
@@ -94,6 +95,29 @@ function writeCachedAuthDomainProbe(domain, value) {
   } catch (error) {
     // Ignore storage failures and continue with runtime probing.
   }
+}
+
+function getCanonicalAppOrigin() {
+  const currentOrigin = String(window.location.origin || "").trim();
+  const hostname = String(window.location.hostname || "").trim().toLowerCase();
+
+  if (!currentOrigin) {
+    return "https://zarzofficial.com";
+  }
+
+  if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1" || hostname === "[::1]") {
+    return "https://zarzofficial.com";
+  }
+
+  return currentOrigin;
+}
+
+function getEmailActionSettings(pathname = "/account/") {
+  const normalizedPath = String(pathname || "/").startsWith("/") ? String(pathname || "/") : `/${String(pathname || "")}`;
+  return {
+    url: new URL(normalizedPath, getCanonicalAppOrigin()).toString(),
+    handleCodeInApp: false
+  };
 }
 
 async function canUseCustomAuthDomain(domain) {
@@ -488,12 +512,23 @@ async function registerWithEmail({ name = "", email, password }) {
   try {
     const { auth } = await window.firebaseReadyPromise;
     const credential = await createUserWithEmailAndPassword(auth, String(email || "").trim(), password);
+    let verificationEmailSent = false;
 
     if (name.trim()) {
       await updateProfile(credential.user, { displayName: name.trim() });
     }
 
-    return dispatchAuthChange(auth.currentUser || credential.user);
+    try {
+      await sendEmailVerification(credential.user, getEmailActionSettings("/account/"));
+      verificationEmailSent = true;
+    } catch (verificationError) {
+      console.error("Failed to send verification email:", verificationError);
+    }
+
+    return {
+      user: dispatchAuthChange(auth.currentUser || credential.user),
+      verificationEmailSent
+    };
   } catch (error) {
     throw enrichFirebaseError(error, getFriendlyAuthErrorMessage(error, "register"));
   }
@@ -540,7 +575,7 @@ async function signOutUser() {
 async function sendPasswordReset(email) {
   try {
     const { auth } = await window.firebaseReadyPromise;
-    await sendPasswordResetEmail(auth, String(email || "").trim());
+    await sendPasswordResetEmail(auth, String(email || "").trim(), getEmailActionSettings("/account/"));
     return true;
   } catch (error) {
     throw enrichFirebaseError(error, getFriendlyAuthErrorMessage(error, "reset"));

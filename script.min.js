@@ -420,7 +420,8 @@ Object.assign(ARABIC_UI_TEXT, {
     authRequiredForSync: 'سجل دخولك للمتابعة.',
     authSignOutSuccess: 'تم تسجيل الخروج بنجاح.',
     authSignInSuccess: 'تم تسجيل الدخول بنجاح.',
-    authRegisterSuccess: 'تم إنشاء الحساب وتسجيل الدخول.',
+    authRegisterVerificationSent: 'تم إنشاء الحساب وإرسال رسالة التحقق إلى بريدك الإلكتروني.',
+    authRegisterVerificationPending: 'تم إنشاء الحساب، لكن تعذر إرسال رسالة التحقق حالياً.',
     authGoogleSuccess: 'تم تسجيل الدخول عبر Google.',
     authGoogleRedirectProgress: 'سيتم تحويلك إلى Google لإكمال تسجيل الدخول...',
     authGoogleRedirectCancelled: 'لم يكتمل تسجيل الدخول عبر Google. حاول مرة أخرى.',
@@ -1279,10 +1280,13 @@ function bindAccountAuthUI() {
                 setButtonBusy(submitBtn, true, isRegister ? 'جارٍ إنشاء الحساب...' : 'جارٍ تسجيل الدخول...');
 
                 if (isRegister) {
-                    await authApi.registerWithEmail({ name, email, password });
-                    setAccountFeedback('تم إنشاء الحساب بنجاح.', 'success');
+                    const registerResult = await authApi.registerWithEmail({ name, email, password });
+                    const registerMessage = registerResult?.verificationEmailSent
+                        ? ARABIC_UI_TEXT.authRegisterVerificationSent
+                        : ARABIC_UI_TEXT.authRegisterVerificationPending;
+                    setAccountFeedback(registerMessage, registerResult?.verificationEmailSent ? 'success' : 'info');
                     if (!maybeResumeCheckoutAfterAuth()) {
-                        showToast(ARABIC_UI_TEXT.authRegisterSuccess, 'success');
+                        showToast(registerMessage, registerResult?.verificationEmailSent ? 'success' : 'info');
                     }
                     updateAuthModeUI('signin');
                 } else {
