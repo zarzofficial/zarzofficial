@@ -386,6 +386,10 @@ function isRetryableUserSyncError(error) {
     code.includes("unauthenticated") ||
     code.includes("not-authenticated") ||
     code.includes("failed-precondition") ||
+    code.includes("unavailable") ||
+    code.includes("deadline-exceeded") ||
+    code.includes("aborted") ||
+    message.includes("not confirmed on the server") ||
     message.includes("missing or insufficient permissions")
   );
 }
@@ -405,7 +409,7 @@ async function writeUserRecordToFirestore(user) {
         await activeUser.getIdToken(attempt > 1);
       }
 
-      const snapshot = await firestore.getDoc(userRef);
+      const snapshot = await firestore.getDocFromServer(userRef);
       const existingData = snapshot.exists() ? snapshot.data() || {} : null;
       const payload = buildUserRecordPayload(user, existingData, firestore);
 
@@ -414,7 +418,12 @@ async function writeUserRecordToFirestore(user) {
       }
 
       await firestore.setDoc(userRef, payload, { merge: true });
-      return payload;
+      const confirmedSnapshot = await firestore.getDocFromServer(userRef);
+      if (!confirmedSnapshot.exists()) {
+        throw new Error("User record was not confirmed on the server.");
+      }
+
+      return confirmedSnapshot.data() || payload;
     } catch (error) {
       if (attempt >= maxAttempts || !isRetryableUserSyncError(error)) {
         throw error;
@@ -628,6 +637,7 @@ async function getFirestoreServices(app) {
           deleteDoc: firestoreModule.deleteDoc,
           doc: firestoreModule.doc,
           getDoc: firestoreModule.getDoc,
+          getDocFromServer: firestoreModule.getDocFromServer,
           getDocs: firestoreModule.getDocs,
           orderBy: firestoreModule.orderBy,
           query: firestoreModule.query,

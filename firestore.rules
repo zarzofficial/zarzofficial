@@ -130,7 +130,7 @@ service cloud.firestore {
       allow get: if isAdmin() || isOwnUser(userId);
       allow list: if isAdmin();
       allow create: if validUser(request.resource.data, userId) &&
-        (isAdmin() || (isOwnUser(userId) && request.resource.data.role == null));
+        (isBootstrapAdmin() || (isOwnUser(userId) && request.resource.data.role == null));
       allow update: if validUser(request.resource.data, userId) &&
         (isAdmin() || (
           isOwnUser(userId) &&
