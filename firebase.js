@@ -5,6 +5,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   getRedirectResult,
+  onIdTokenChanged,
   onAuthStateChanged,
   sendPasswordResetEmail,
   setPersistence,
@@ -36,6 +37,7 @@ let firestoreServicesPromise = null;
 const USER_COLLECTION_NAME = "users";
 const pendingUserRecordSyncs = new Map();
 const queuedUserRecordSyncs = new Map();
+let userRecordSyncListenerBound = false;
 const GOOGLE_REDIRECT_PENDING_KEY = "zarz_google_redirect_pending";
 const GOOGLE_REDIRECT_RESULT_KEY = "zarz_google_redirect_result";
 
@@ -395,7 +397,7 @@ async function writeUserRecordToFirestore(user) {
   const firestore = await getFirestoreServices(app);
   const userRef = firestore.doc(firestore.db, USER_COLLECTION_NAME, String(user.uid));
   const activeUser = auth.currentUser?.uid === user.uid ? auth.currentUser : user;
-  const maxAttempts = 3;
+  const maxAttempts = 5;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     try {
@@ -425,6 +427,40 @@ async function writeUserRecordToFirestore(user) {
   return null;
 }
 
+function bindUserRecordSyncListener(auth) {
+  if (userRecordSyncListenerBound || typeof onIdTokenChanged !== "function") {
+    return;
+  }
+
+  userRecordSyncListenerBound = true;
+  onIdTokenChanged(auth, (user) => {
+    if (user) {
+      queueUserRecordSync(user);
+    }
+  });
+}
+
+async function waitForAuthUserReady(auth, expectedUid) {
+  const timeoutMs = 6000;
+  const startTime = Date.now();
+
+  while (Date.now() - startTime < timeoutMs) {
+    const activeUser = auth.currentUser;
+    if (activeUser?.uid === expectedUid) {
+      if (typeof activeUser.getIdToken === "function") {
+        await activeUser.getIdToken();
+      }
+
+      await new Promise((resolve) => window.setTimeout(resolve, 250));
+      return activeUser;
+    }
+
+    await new Promise((resolve) => window.setTimeout(resolve, 150));
+  }
+
+  return auth.currentUser?.uid === expectedUid ? auth.currentUser : null;
+}
+
 function queueUserRecordSync(user) {
   if (!user?.uid) return Promise.resolve(null);
 
@@ -448,6 +484,16 @@ function queueUserRecordSync(user) {
     return result;
   })()
     .catch((error) => {
+      if (isRetryableUserSyncError(error)) {
+        queuedUserRecordSyncs.set(userId, user);
+        window.setTimeout(() => {
+          if (!pendingUserRecordSyncs.has(userId) && queuedUserRecordSyncs.has(userId)) {
+            queueUserRecordSync(queuedUserRecordSyncs.get(userId));
+          }
+        }, 500);
+        return null;
+      }
+
       console.error("Failed to sync user record to Firestore:", error);
       return null;
     })
@@ -614,6 +660,7 @@ window.firebaseReadyPromise = (async () => {
     const auth = getAuth(app);
     auth.languageCode = "ar";
     await setPersistence(auth, browserLocalPersistence);
+    bindUserRecordSyncListener(auth);
     await resolvePendingGoogleRedirect(auth);
     firebaseServices = { app, auth, db: null, firestore: null };
     console.log("Firebase ready");
@@ -631,10 +678,6 @@ window.zarzAuthStateReadyPromise = new Promise((resolve) => {
     .then(({ auth }) => {
       let resolved = false;
       onAuthStateChanged(auth, (user) => {
-        if (user) {
-          queueUserRecordSync(user);
-        }
-
         const publicUser = dispatchAuthChange(user);
         if (!resolved) {
           resolved = true;
@@ -655,6 +698,7 @@ async function registerWithEmail({ name = "", email, password }) {
     }
 
     const resolvedUser = auth.currentUser || credential.user;
+    await waitForAuthUserReady(auth, resolvedUser.uid);
     await queueUserRecordSync(resolvedUser);
     return dispatchAuthChange(resolvedUser);
   } catch (error) {
@@ -667,6 +711,7 @@ async function signInWithEmail({ email, password }) {
     const { auth } = await window.firebaseReadyPromise;
     const credential = await signInWithEmailAndPassword(auth, String(email || "").trim(), password);
     const resolvedUser = auth.currentUser || credential.user;
+    await waitForAuthUserReady(auth, resolvedUser.uid);
     queueUserRecordSync(resolvedUser);
     return dispatchAuthChange(resolvedUser);
   } catch (error) {
@@ -687,6 +732,7 @@ async function signInWithGoogle() {
 
     const credential = await signInWithPopup(auth, provider);
     const resolvedUser = auth.currentUser || credential.user;
+    await waitForAuthUserReady(auth, resolvedUser.uid);
     queueUserRecordSync(resolvedUser);
     return dispatchAuthChange(resolvedUser);
   } catch (error) {
