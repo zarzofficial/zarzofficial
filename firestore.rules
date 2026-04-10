@@ -1,29 +1,75 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isBootstrapAdmin() {
+      return isSignedIn()
+        && request.auth.token.email != null
+        && (request.auth.token.email == "medozxc7@gmail.com" || request.auth.token.email == "ezh37156@gmail.com");
+    }
+
+    function currentUserRecord() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function hasAdminRole() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && currentUserRecord().data.role == "admin";
+    }
+
+    function isAdmin() {
+      return isBootstrapAdmin() || hasAdminRole();
+    }
+
+    function isOwnUser(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
     function optionalString(value) {
       return value == null || value is string;
     }
 
-    function validOrder(data) {
+    function optionalStringWithin(value, maxLength) {
+      return value == null || (value is string && value.size() <= maxLength);
+    }
+
+    function validUser(data, userId) {
       return data.keys().hasAll([
-        'orderNumber',
-        'productId',
-        'quantity',
+        'uid',
         'name',
+        'email',
         'phone',
-        'paymentMethod',
-        'paymentMethodLabel',
-        'paymentReference',
-        'total',
-        'currency',
-        'items',
-        'details',
-        'date',
-        'userId',
-        'userEmail'
+        'photoURL',
+        'createdAt',
+        'role'
       ]) &&
       data.keys().hasOnly([
+        'uid',
+        'name',
+        'email',
+        'phone',
+        'photoURL',
+        'createdAt',
+        'role'
+      ]) &&
+      data.uid is string &&
+      data.uid == userId &&
+      data.uid.size() > 0 &&
+      data.uid.size() <= 128 &&
+      optionalStringWithin(data.name, 100) &&
+      optionalStringWithin(data.email, 200) &&
+      optionalStringWithin(data.phone, 40) &&
+      optionalStringWithin(data.photoURL, 500) &&
+      optionalStringWithin(data.role, 40) &&
+      data.createdAt is timestamp;
+    }
+
+    function validOrder(data) {
+      return data.keys().hasAll([
         'orderNumber',
         'productId',
         'quantity',
@@ -75,18 +121,35 @@ service cloud.firestore {
       data.userId.size() > 0 &&
       data.userId.size() <= 128 &&
       data.userEmail is string &&
-      data.userEmail.size() > 0 &&
+      data.userEmail.size() >= 0 &&
       data.userEmail.size() <= 200 &&
       data.date is timestamp;
     }
 
+    match /users/{userId} {
+      allow get: if isAdmin() || isOwnUser(userId);
+      allow list: if isAdmin();
+      allow create: if validUser(request.resource.data, userId) &&
+        (isAdmin() || (isOwnUser(userId) && request.resource.data.role == null));
+      allow update: if validUser(request.resource.data, userId) &&
+        (isAdmin() || (
+          isOwnUser(userId) &&
+          request.resource.data.uid == resource.data.uid &&
+          request.resource.data.createdAt == resource.data.createdAt &&
+          request.resource.data.role == resource.data.role
+        ));
+      allow delete: if isAdmin();
+    }
+
     match /orders/{orderId} {
-      allow create: if request.auth != null &&
-        request.resource.data.userId == request.auth.uid &&
-        validOrder(request.resource.data);
-      allow get, list, delete: if request.auth != null &&
-        resource.data.userId == request.auth.uid;
-      allow update: if false;
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid && validOrder(request.resource.data);
+      allow update: if isAdmin();
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

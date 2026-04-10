@@ -432,6 +432,34 @@ function t(en, ar) {
     return ar || en || '';
 }
 
+function getOrderDateObject(value) {
+    if (value && typeof value.toDate === 'function') {
+        return value.toDate();
+    }
+
+    if (value instanceof Date) {
+        return value;
+    }
+
+    if (typeof value === 'string' || typeof value === 'number') {
+        const parsed = new Date(value);
+        if (!Number.isNaN(parsed.getTime())) {
+            return parsed;
+        }
+    }
+
+    return null;
+}
+
+function getOrderDateSortValue(order) {
+    return getOrderDateObject(order?.date || order)?.getTime() || 0;
+}
+
+function formatOrderDate(order, locale = 'ar-EG') {
+    const parsed = getOrderDateObject(order?.date || order);
+    return parsed ? parsed.toLocaleDateString(locale) : t('Unavailable', 'غير متوفر');
+}
+
 const RECENT_ORDERS_PAGE_SIZE = 5;
 let visibleRecentOrdersCount = RECENT_ORDERS_PAGE_SIZE;
 let currentAuthMode = 'signin';
@@ -3606,7 +3634,7 @@ function renderOrdersLegacy() {
                     <div class="cart-item-info">
                         <div class="cart-item-title">طلب #${getOrderDisplayId(order)}</div>
                         <div class="cart-item-meta" style="margin-top:0.3rem;">
-                            الإجمالي: <span class="text-accent">${order.total}</span> | التاريخ: ${new Date(order.date).toLocaleDateString('ar-EG')}
+                            الإجمالي: <span class="text-accent">${order.total}</span> | التاريخ: ${formatOrderDate(order, 'ar-EG')}
                         </div>
                     </div>
                 </div>
@@ -3695,7 +3723,7 @@ function renderOrders() {
     });
 
     const sortedOrders = [...appState.orders].sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        (a, b) => getOrderDateSortValue(b) - getOrderDateSortValue(a)
     );
     const totalOrders = sortedOrders.length;
 
@@ -3740,7 +3768,7 @@ function renderOrders() {
                     <div class="cart-item-info">
                         <div class="cart-item-title">${orderTitle} #${getOrderDisplayId(order)}</div>
                         <div class="cart-item-meta" style="margin-top:0.3rem;">
-                            ${totalLabel}: <span class="text-accent">${order.total}</span> | ${dateLabel}: ${new Date(order.date).toLocaleDateString(locale)}
+                            ${totalLabel}: <span class="text-accent">${order.total}</span> | ${dateLabel}: ${formatOrderDate(order, locale)}
                         </div>
                     </div>
                 </div>
