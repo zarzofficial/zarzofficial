@@ -33,6 +33,9 @@ const firebaseConfig = window.ZARZ_FIREBASE_CONFIG || {
 window.zarzCurrentUser = null;
 let firebaseServices = null;
 let firestoreServicesPromise = null;
+const USER_COLLECTION_NAME = "users";
+const pendingUserRecordSyncs = new Map();
+const queuedUserRecordSyncs = new Map();
 const GOOGLE_REDIRECT_PENDING_KEY = "zarz_google_redirect_pending";
 const GOOGLE_REDIRECT_RESULT_KEY = "zarz_google_redirect_result";
 
@@ -334,6 +337,140 @@ function mapOrderSnapshot(snapshot) {
   };
 }
 
+function sanitizeProfileField(value, maxLength = 0) {
+  const text = value == null ? "" : String(value).trim();
+  return maxLength > 0 ? text.slice(0, maxLength) : text;
+}
+
+function resolveUserCreatedAt(user) {
+  const rawCreationTime = String(user?.metadata?.creationTime || "").trim();
+  const parsedDate = rawCreationTime ? new Date(rawCreationTime) : new Date();
+  return Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
+}
+
+function normalizeStoredTimestamp(value) {
+  if (value && typeof value.toDate === "function") {
+    return value.toDate().getTime();
+  }
+
+  if (value instanceof Date) {
+    return value.getTime();
+  }
+
+  return null;
+}
+
+function buildUserRecordPayload(user, existingData, firestore) {
+  return {
+    uid: sanitizeProfileField(user?.uid, 128),
+    name: sanitizeProfileField(user?.displayName || existingData?.name, 100),
+    email: sanitizeProfileField(user?.email || existingData?.email, 200),
+    phone: sanitizeProfileField(user?.phoneNumber || existingData?.phone, 40),
+    photoURL: sanitizeProfileField(user?.photoURL || existingData?.photoURL, 500),
+    createdAt: existingData?.createdAt || firestore.Timestamp.fromDate(resolveUserCreatedAt(user))
+  };
+}
+
+function shouldWriteUserRecord(existingData, payload) {
+  if (!existingData) return true;
+
+  return (
+    String(existingData.uid || "") !== String(payload.uid || "") ||
+    String(existingData.name || "") !== String(payload.name || "") ||
+    String(existingData.email || "") !== String(payload.email || "") ||
+    String(existingData.phone || "") !== String(payload.phone || "") ||
+    String(existingData.photoURL || "") !== String(payload.photoURL || "") ||
+    normalizeStoredTimestamp(existingData.createdAt) !== normalizeStoredTimestamp(payload.createdAt)
+  );
+}
+
+function isRetryableUserSyncError(error) {
+  const code = getFirebaseErrorCode(error);
+  const message = getFirebaseErrorText(error);
+
+  return (
+    code.includes("permission-denied") ||
+    code.includes("unauthenticated") ||
+    code.includes("not-authenticated") ||
+    message.includes("Missing or insufficient permissions")
+  );
+}
+
+async function writeUserRecordToFirestore(user) {
+  if (!user?.uid) return null;
+
+  const { app, auth } = await window.firebaseReadyPromise;
+  const firestore = await getFirestoreServices(app);
+  const userRef = firestore.doc(firestore.db, USER_COLLECTION_NAME, String(user.uid));
+  const activeUser = auth.currentUser?.uid === user.uid ? auth.currentUser : user;
+  const maxAttempts = 3;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      if (typeof activeUser?.getIdToken === "function") {
+        await activeUser.getIdToken(attempt > 1);
+      }
+
+      const snapshot = await firestore.getDoc(userRef);
+      const existingData = snapshot.exists() ? snapshot.data() || {} : null;
+      const payload = buildUserRecordPayload(user, existingData, firestore);
+
+      if (!shouldWriteUserRecord(existingData, payload)) {
+        return existingData || payload;
+      }
+
+      await firestore.setDoc(userRef, payload, { merge: true });
+      return payload;
+    } catch (error) {
+      if (attempt >= maxAttempts || !isRetryableUserSyncError(error)) {
+        throw error;
+      }
+
+      await new Promise((resolve) => window.setTimeout(resolve, attempt * 250));
+    }
+  }
+
+  return null;
+}
+
+function queueUserRecordSync(user) {
+  if (!user?.uid) return Promise.resolve(null);
+
+  const userId = String(user.uid);
+  queuedUserRecordSyncs.set(userId, user);
+
+  const existingSync = pendingUserRecordSyncs.get(userId);
+  if (existingSync) {
+    return existingSync;
+  }
+
+  const syncPromise = (async () => {
+    let result = null;
+
+    while (queuedUserRecordSyncs.has(userId)) {
+      const nextUser = queuedUserRecordSyncs.get(userId);
+      queuedUserRecordSyncs.delete(userId);
+      result = await writeUserRecordToFirestore(nextUser);
+    }
+
+    return result;
+  })()
+    .catch((error) => {
+      console.error("Failed to sync user record to Firestore:", error);
+      return null;
+    })
+    .finally(() => {
+      pendingUserRecordSyncs.delete(userId);
+
+      if (queuedUserRecordSyncs.has(userId)) {
+        queueUserRecordSync(queuedUserRecordSyncs.get(userId));
+      }
+    });
+
+  pendingUserRecordSyncs.set(userId, syncPromise);
+  return syncPromise;
+}
+
 function ensureAuthenticatedUser(auth) {
   if (auth.currentUser) {
     return auth.currentUser;
@@ -428,8 +565,11 @@ async function getFirestoreServices(app) {
           collection: firestoreModule.collection,
           deleteDoc: firestoreModule.deleteDoc,
           doc: firestoreModule.doc,
+          getDoc: firestoreModule.getDoc,
           getDocs: firestoreModule.getDocs,
           query: firestoreModule.query,
+          setDoc: firestoreModule.setDoc,
+          Timestamp: firestoreModule.Timestamp,
           where: firestoreModule.where
         };
 
@@ -474,6 +614,10 @@ window.zarzAuthStateReadyPromise = new Promise((resolve) => {
     .then(({ auth }) => {
       let resolved = false;
       onAuthStateChanged(auth, (user) => {
+        if (user) {
+          queueUserRecordSync(user);
+        }
+
         const publicUser = dispatchAuthChange(user);
         if (!resolved) {
           resolved = true;
@@ -493,7 +637,9 @@ async function registerWithEmail({ name = "", email, password }) {
       await updateProfile(credential.user, { displayName: name.trim() });
     }
 
-    return dispatchAuthChange(auth.currentUser || credential.user);
+    const resolvedUser = auth.currentUser || credential.user;
+    await queueUserRecordSync(resolvedUser);
+    return dispatchAuthChange(resolvedUser);
   } catch (error) {
     throw enrichFirebaseError(error, getFriendlyAuthErrorMessage(error, "register"));
   }
@@ -503,7 +649,9 @@ async function signInWithEmail({ email, password }) {
   try {
     const { auth } = await window.firebaseReadyPromise;
     const credential = await signInWithEmailAndPassword(auth, String(email || "").trim(), password);
-    return dispatchAuthChange(auth.currentUser || credential.user);
+    const resolvedUser = auth.currentUser || credential.user;
+    queueUserRecordSync(resolvedUser);
+    return dispatchAuthChange(resolvedUser);
   } catch (error) {
     throw enrichFirebaseError(error, getFriendlyAuthErrorMessage(error, "signin"));
   }
@@ -521,7 +669,9 @@ async function signInWithGoogle() {
     }
 
     const credential = await signInWithPopup(auth, provider);
-    return dispatchAuthChange(auth.currentUser || credential.user);
+    const resolvedUser = auth.currentUser || credential.user;
+    queueUserRecordSync(resolvedUser);
+    return dispatchAuthChange(resolvedUser);
   } catch (error) {
     throw enrichFirebaseError(error, getFriendlyAuthErrorMessage(error, "google"));
   }
