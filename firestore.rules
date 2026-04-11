@@ -80,6 +80,7 @@ service cloud.firestore {
         'paymentReference',
         'total',
         'currency',
+        'status',
         'items',
         'details',
         'date',
@@ -111,6 +112,8 @@ service cloud.firestore {
       data.currency is string &&
       data.currency.size() > 0 &&
       data.currency.size() <= 10 &&
+      data.status is string &&
+      data.status == 'pending' &&
       data.items is list &&
       data.items.size() > 0 &&
       data.items.size() <= 50 &&

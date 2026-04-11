@@ -460,6 +460,64 @@ function formatOrderDate(order, locale = 'ar-EG') {
     return parsed ? parsed.toLocaleDateString(locale) : t('Unavailable', 'غير متوفر');
 }
 
+const DEFAULT_ORDER_STATUS = 'pending';
+const ORDER_STATUS_COPY = Object.freeze({
+    pending: { en: 'Pending review', ar: 'قيد المعالجة' },
+    confirmed: { en: 'Confirmed', ar: 'تم التأكيد' },
+    in_progress: { en: 'In progress', ar: 'جاري التنفيذ' },
+    completed: { en: 'Completed', ar: 'مكتمل' },
+    cancelled: { en: 'Cancelled', ar: 'ملغي' }
+});
+const ORDER_STATUS_ALIASES = Object.freeze({
+    pending: 'pending',
+    'pending review': 'pending',
+    processing: 'pending',
+    received: 'pending',
+    new: 'pending',
+    'قيد المعالجة': 'pending',
+    'قيد المراجعة': 'pending',
+    confirmed: 'confirmed',
+    'تم التأكيد': 'confirmed',
+    'مؤكد': 'confirmed',
+    'تم تاكيد الطلب': 'confirmed',
+    in_progress: 'in_progress',
+    'in progress': 'in_progress',
+    progressing: 'in_progress',
+    'جاري التنفيذ': 'in_progress',
+    'قيد التنفيذ': 'in_progress',
+    completed: 'completed',
+    delivered: 'completed',
+    done: 'completed',
+    مكتمل: 'completed',
+    'تم التسليم': 'completed',
+    cancelled: 'cancelled',
+    canceled: 'cancelled',
+    'تم الإلغاء': 'cancelled',
+    ملغي: 'cancelled'
+});
+
+function normalizeStoredOrderStatus(value) {
+    const rawStatus = String(value || '').trim();
+    if (!rawStatus) return DEFAULT_ORDER_STATUS;
+
+    const normalizedKey = rawStatus.toLowerCase().replace(/\s+/g, ' ');
+    return ORDER_STATUS_ALIASES[normalizedKey] || rawStatus;
+}
+
+function getOrderStatusText(value) {
+    const normalizedStatus = normalizeStoredOrderStatus(value);
+    const copy = ORDER_STATUS_COPY[normalizedStatus];
+    return copy ? t(copy.en, copy.ar) : String(value || t('Pending review', 'قيد المعالجة'));
+}
+
+function normalizeOrderRecord(order) {
+    if (!order || typeof order !== 'object') return order;
+    return {
+        ...order,
+        status: normalizeStoredOrderStatus(order.status)
+    };
+}
+
 const RECENT_ORDERS_PAGE_SIZE = 5;
 let visibleRecentOrdersCount = RECENT_ORDERS_PAGE_SIZE;
 let currentAuthMode = 'signin';
@@ -490,6 +548,9 @@ function getAuthStateKey(user) {
 }
 
 function persistGuestOrders() {
+    appState.guestOrders = Array.isArray(appState.guestOrders)
+        ? appState.guestOrders.map(normalizeOrderRecord)
+        : [];
     localStorage.setItem(GUEST_ORDERS_STORAGE_KEY, JSON.stringify(appState.guestOrders));
 }
 
@@ -503,7 +564,7 @@ function getOrderItemQty(item) {
 }
 
 function setActiveOrders(nextOrders, source = 'guest') {
-    appState.orders = Array.isArray(nextOrders) ? nextOrders : [];
+    appState.orders = Array.isArray(nextOrders) ? nextOrders.map(normalizeOrderRecord) : [];
     appState.ordersSource = source;
     visibleRecentOrdersCount = RECENT_ORDERS_PAGE_SIZE;
     updateOrdersContextCopy();
@@ -3339,6 +3400,7 @@ function buildOrderPayload({
         paymentReference: transactionLast4 || null,
         total: totalStr,
         currency: appState.currency,
+        status: DEFAULT_ORDER_STATUS,
         items,
         details: buildOrderDetails(appState.cart, false),
         date: new Date()
@@ -3356,6 +3418,7 @@ const ORDER_VALIDATION_RULES = {
     paymentMethodLabelMax: 40,
     totalMax: 50,
     currencyMax: 10,
+    statusMax: 40,
     maxItems: 50,
     detailsMax: 5000
 };
@@ -3407,6 +3470,14 @@ function getOrderValidationError(orderPayload) {
 
     if (typeof orderPayload.currency !== 'string' || orderPayload.currency.length === 0 || orderPayload.currency.length > ORDER_VALIDATION_RULES.currencyMax) {
         return t('Currency is invalid.', 'العملة غير صالحة.');
+    }
+
+    if (typeof orderPayload.status !== 'string' || orderPayload.status.length === 0 || orderPayload.status.length > ORDER_VALIDATION_RULES.statusMax) {
+        return t('Order status is invalid.', 'حالة الطلب غير صالحة.');
+    }
+
+    if (normalizeStoredOrderStatus(orderPayload.status) !== DEFAULT_ORDER_STATUS) {
+        return t('The submitted order status is not allowed.', 'حالة الطلب المرسلة غير مسموح بها.');
     }
 
     if (!Array.isArray(orderPayload.items) || orderPayload.items.length === 0 || orderPayload.items.length > ORDER_VALIDATION_RULES.maxItems) {
@@ -3540,7 +3611,7 @@ window.finalizeOrder = async function(paymentMethod, transactionLast4 = '', subm
         method: paymentMethodLabel,
         mode: paymentMethod,
         paymentReference: transactionLast4 || '-',
-        status: 'قيد المعالجة',
+        status: orderPayload.status,
         total: totalStr,
         items: appState.cart.map((item) => ({ title: getProductCopy(item.product).title, qty: item.qty })),
         remote: shouldSyncOrder
@@ -3625,6 +3696,7 @@ function renderOrdersLegacy() {
         const itemsList = Array.isArray(order.items) && order.items.length > 0
             ? order.items.map((item) => `- ${getOrderItemQty(item)}x ${item.title}`).join('<br>')
             : 'لا توجد تفاصيل إضافية';
+        const statusText = getOrderStatusText(order.status);
 
         return `
         <div class="cart-item order-card" onclick="toggleOrderDetails('${order.id}')">
@@ -3649,7 +3721,7 @@ function renderOrdersLegacy() {
                 <strong style="color:var(--text-primary);">الخدمات المطلوبة:</strong><br>
                 ${itemsList}
                 <br><br>
-                <strong style="color:var(--text-primary);">حالة الطلب:</strong> قيد المعالجة (تواصل معنا عبر واتساب)
+                <strong style="color:var(--text-primary);">حالة الطلب:</strong> ${statusText}
             </div>
         </div>
         `;
@@ -3747,7 +3819,6 @@ function renderOrders() {
     const locale = 'ar-EG';
     const detailsLabel = t('Requested services:', 'الخدمات المطلوبة:');
     const statusLabel = t('Order status:', 'حالة الطلب:');
-    const inProgressText = t('In progress (contact us on WhatsApp)', 'قيد المعالجة (تواصل معنا عبر واتساب)');
     const orderTitle = t('Order', 'طلب');
     const totalLabel = t('Total', 'الإجمالي');
     const dateLabel = t('Date', 'التاريخ');
@@ -3759,6 +3830,7 @@ function renderOrders() {
         const itemsList = Array.isArray(order.items) && order.items.length > 0
             ? order.items.map((item) => `- ${getOrderItemQty(item)}x ${item.title}`).join('<br>')
             : noDetailsText;
+        const statusText = getOrderStatusText(order.status);
 
         return `
         <div class="cart-item order-card" onclick="toggleOrderDetails('${order.id}')">
@@ -3785,7 +3857,7 @@ function renderOrders() {
                 <strong style="color:var(--text-primary);">${detailsLabel}</strong><br>
                 ${itemsList}
                 <br><br>
-                <strong style="color:var(--text-primary);">${statusLabel}</strong> ${inProgressText}
+                <strong style="color:var(--text-primary);">${statusLabel}</strong> ${statusText}
             </div>
         </div>
         `;

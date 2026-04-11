@@ -535,7 +535,7 @@ function mapOrderSnapshot(snapshot) {
     method: data.paymentMethodLabel || data.paymentMethod || "-",
     mode: data.paymentMethod || "",
     paymentReference: data.paymentReference || "-",
-    status: "قيد المعالجة",
+    status: String(data.status || "pending").trim() || "pending",
     total: data.total || "",
     items: mappedItems,
     remote: true
@@ -816,6 +816,7 @@ window.createOrder = async function(orderData) {
     const { db, addDoc, collection } = await getFirestoreServices(app);
     const payload = {
       ...orderData,
+      status: "pending",
       userId: user.uid,
       userEmail: user.email || ""
     };
