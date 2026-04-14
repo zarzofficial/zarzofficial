@@ -195,7 +195,6 @@ function StoreProductCard({
               <span
                 className="ml-auto rounded-full bg-[#ff3b30] px-3 py-1 text-xs font-bold tracking-wider text-white shadow-sm"
                 style={{ marginRight: "auto", marginLeft: "0" }}
-
               >
                 {`-${discountPercent}%`}
               </span>
