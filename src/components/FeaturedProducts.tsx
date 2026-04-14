@@ -58,7 +58,7 @@ export function FeaturedProducts() {
                   ></div>
                 )}
 
-                <div className="relative h-56 w-full overflow-hidden bg-[#0c0a10] md:h-60">
+                <div className="relative aspect-square w-full overflow-hidden bg-[#0c0a10]">
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-t from-[#0c0a10] to-transparent"></div>
 
                   {product.outOfStock && (
