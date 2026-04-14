@@ -18,6 +18,8 @@ import {
   formatOrderDate,
   getOrderStatusText,
   readGuestOrders,
+  setHideGuestOrdersAfterLogout,
+  shouldHideGuestOrdersAfterLogout,
   writeGuestOrders,
   type OrderRecord,
 } from "../lib/order-utils";
@@ -41,7 +43,7 @@ export function Account() {
     setLoadingOrders(true);
     try {
       if (!currentUser) {
-        setOrders(readGuestOrders());
+        setOrders(shouldHideGuestOrdersAfterLogout() ? [] : readGuestOrders());
         return;
       }
       setOrders(await loadOrdersForCurrentUser());
@@ -176,7 +178,8 @@ export function Account() {
   async function handleSignOut() {
     try {
       await signOutUser();
-      setOrders(readGuestOrders());
+      setHideGuestOrdersAfterLogout(true);
+      setOrders([]);
       setFeedback("تم تسجيل الخروج بنجاح.");
       setFeedbackType("success");
     } catch (error) {

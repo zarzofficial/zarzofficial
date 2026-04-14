@@ -3,6 +3,7 @@ import type { CartItem } from "./CartContext";
 export const GUEST_ORDERS_STORAGE_KEY = "zarz_orders";
 export const CART_CHECKOUT_DRAFT_KEY = "zarz_cart_checkout_draft";
 export const CART_LOGIN_RETURN_KEY = "zarz_cart_login_return";
+export const HIDE_GUEST_ORDERS_AFTER_LOGOUT_KEY = "zarz_hide_guest_orders_after_logout";
 
 export type PaymentMethod = "bankak" | "cash";
 
@@ -52,6 +53,33 @@ function safeLocalStorageSet(key: string, value: string) {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(key, value);
+  } catch {
+    // Ignore storage failures.
+  }
+}
+
+function safeSessionStorageGet(key: string) {
+  if (typeof window === "undefined") return "";
+  try {
+    return window.sessionStorage.getItem(key) || "";
+  } catch {
+    return "";
+  }
+}
+
+function safeSessionStorageSet(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(key, value);
+  } catch {
+    // Ignore storage failures.
+  }
+}
+
+function safeSessionStorageRemove(key: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.removeItem(key);
   } catch {
     // Ignore storage failures.
   }
@@ -160,6 +188,19 @@ export function readGuestOrders() {
 
 export function writeGuestOrders(orders: OrderRecord[]) {
   safeLocalStorageSet(GUEST_ORDERS_STORAGE_KEY, JSON.stringify(orders));
+}
+
+export function shouldHideGuestOrdersAfterLogout() {
+  return safeSessionStorageGet(HIDE_GUEST_ORDERS_AFTER_LOGOUT_KEY) === "1";
+}
+
+export function setHideGuestOrdersAfterLogout(value: boolean) {
+  if (value) {
+    safeSessionStorageSet(HIDE_GUEST_ORDERS_AFTER_LOGOUT_KEY, "1");
+    return;
+  }
+
+  safeSessionStorageRemove(HIDE_GUEST_ORDERS_AFTER_LOGOUT_KEY);
 }
 
 export function formatOrderDate(value: string) {

@@ -12,6 +12,7 @@ import {
   createOrderRecord,
   generateOrderNumber,
   readGuestOrders,
+  setHideGuestOrdersAfterLogout,
   writeGuestOrders,
   type PaymentMethod,
 } from "../lib/order-utils";
@@ -120,6 +121,7 @@ export function Cart() {
         const guestOrders = readGuestOrders();
         guestOrders.unshift(createOrderRecord(orderPayload, false));
         writeGuestOrders(guestOrders);
+        setHideGuestOrdersAfterLogout(false);
       }
 
       const detailsText = buildCartDetailsLines(items);
