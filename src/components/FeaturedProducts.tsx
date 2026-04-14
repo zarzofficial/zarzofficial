@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { products } from "../data/products";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
+import { SiteIcon } from "./SiteIcon";
 
 const categoryMap: Record<string, { label: string; color: string }> = {
   ai: { label: "الذكاء الاصطناعي", color: "#8b5cf6" },
@@ -154,9 +155,10 @@ export function FeaturedProducts() {
                       }`}
                     >
                       تفاصيل
-                      <span className="material-symbols-outlined text-sm transition-transform md:group-hover:-translate-x-1">
-                        arrow_back
-                      </span>
+                      <SiteIcon
+                        name="arrow_back"
+                        className="text-sm transition-transform md:group-hover:-translate-x-1"
+                      />
                     </span>
                   </div>
                 </div>

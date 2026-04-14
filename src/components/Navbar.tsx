@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../lib/CartContext";
+import { SiteIcon } from "./SiteIcon";
 
 export function Navbar() {
   const { items } = useCart();
@@ -51,10 +52,10 @@ export function Navbar() {
         <div className="flex items-center gap-5 md:gap-6">
           {/* Mobile Products Icon */}
           <Link to="/products" className="md:hidden text-[#d0bcff] hover:text-white transition-colors">
-            <span className="material-symbols-outlined" data-icon="storefront">storefront</span>
+            <SiteIcon name="storefront" className="text-[24px]" />
           </Link>
           <Link to="/cart" className="relative text-[#d0bcff] hover:text-white transition-colors group">
-            <span className="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+            <SiteIcon name="shopping_cart" className="text-[24px]" />
             {totalItems > 0 && (
               <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full group-hover:scale-110 transition-transform">
                 {totalItems}
@@ -62,7 +63,7 @@ export function Navbar() {
             )}
           </Link>
           <Link to="/account" className="md:hidden text-[#d0bcff] hover:text-white transition-colors">
-            <span className="material-symbols-outlined" data-icon="person">person</span>
+            <SiteIcon name="person" className="text-[24px]" />
           </Link>
         </div>
 

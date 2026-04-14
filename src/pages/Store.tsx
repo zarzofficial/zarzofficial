@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { products, Category, type Product } from "../data/products";
 import { useCart } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
+import { SiteIcon } from "../components/SiteIcon";
 
 const categories = [
   { id: "all", name: "الكل" },
@@ -257,9 +258,7 @@ function StoreProductCard({
               onClick={() => onAddToCart(product)}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-outline-variant/30 bg-surface-container-highest text-primary shadow-sm transition-colors active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-transparent sm:h-12 sm:w-12 md:hover:bg-primary/10"
             >
-              <span aria-hidden="true" className="material-symbols-outlined text-lg sm:text-xl">
-                add_shopping_cart
-              </span>
+              <SiteIcon name="add_shopping_cart" className="text-lg sm:text-xl" />
             </button>
           </div>
         </div>
@@ -479,9 +478,7 @@ export function Store() {
 
       {toastMessage && (
         <div className="fixed bottom-8 left-1/2 z-[100] flex w-[90%] max-w-sm -translate-x-1/2 items-center gap-3 rounded-full bg-[#25D366] px-6 py-4 font-bold text-white shadow-[0_10px_30px_rgba(37,211,102,0.4)] md:w-auto">
-          <span aria-hidden="true" className="material-symbols-outlined">
-            check_circle
-          </span>
+          <SiteIcon name="check_circle" className="text-[24px]" />
           <span className="text-sm md:text-base">{toastMessage}</span>
         </div>
       )}

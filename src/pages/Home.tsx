@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
+import { SiteIcon } from "../components/SiteIcon";
 
 function FaqItem({ faq, isOpen, onClick }: { key?: React.Key, faq: { question: string, answer: string }, isOpen: boolean, onClick: () => void }) {
   return (
@@ -10,9 +11,10 @@ function FaqItem({ faq, isOpen, onClick }: { key?: React.Key, faq: { question: s
     >
       <div className="p-6 flex items-center justify-between">
         <h3 className="text-lg font-bold text-on-surface">{faq.question}</h3>
-        <span className={`material-symbols-outlined transition-transform duration-300 ${isOpen ? 'text-[#e11d48]' : 'text-[#0ea5e9]'}`}>
-          {isOpen ? 'remove' : 'add'}
-        </span>
+        <SiteIcon
+          name={isOpen ? "remove" : "add"}
+          className={`transition-transform duration-300 ${isOpen ? "text-[#e11d48]" : "text-[#0ea5e9]"}`}
+        />
       </div>
       <div
         className={`grid transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
@@ -132,7 +134,7 @@ export function Home() {
               {/* Feature 2 */}
               <div className="perf-card p-4 rounded-[1.25rem] bg-white/5 border border-white/5 flex items-center gap-4 hover:bg-white/10 transition-colors">
                 <div className="w-12 h-12 rounded-xl bg-[#3b82f6] shrink-0 flex items-center justify-center text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]">
-                  <span className="material-symbols-outlined text-2xl fill-1">bolt</span>
+                  <SiteIcon name="bolt" className="text-2xl" />
                 </div>
                 <div className="text-start">
                   <h4 className="font-bold text-on-surface mb-1 text-sm">شحن واشتراكات مباشرة</h4>
@@ -143,7 +145,7 @@ export function Home() {
               {/* Feature 3 */}
               <div className="perf-card p-4 rounded-[1.25rem] bg-white/5 border border-white/5 flex items-center gap-4 hover:bg-white/10 transition-colors">
                 <div className="w-12 h-12 rounded-xl bg-[#10b981] shrink-0 flex items-center justify-center text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-                  <span className="material-symbols-outlined text-2xl">laptop_mac</span>
+                  <SiteIcon name="laptop_mac" className="text-2xl" />
                 </div>
                 <div className="text-start">
                   <h4 className="font-bold text-on-surface mb-1 text-sm">تنفيذ مواقع ومتاجر حسب الطلب</h4>
@@ -491,12 +493,12 @@ export function Home() {
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 w-full xl:w-auto shrink-0 pb-0 xl:pb-2">
               <a href="https://wa.me/201500007300" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 bg-surface/50 backdrop-blur-md text-on-background border border-outline-variant/30 px-8 py-5 rounded-xl font-bold text-lg hover:bg-white/10 transition-all w-full sm:w-auto">
-                <span className="material-symbols-outlined text-xl">forum</span>
+                <SiteIcon name="forum" className="text-xl" />
                 تواصل عبر واتساب
               </a>
               <Link to="/products" className="primary-gradient text-on-primary font-bold px-8 py-5 rounded-xl text-lg hover:shadow-[0_0_30px_rgba(208,188,255,0.4)] transition-all scale-100 active:scale-95 text-center flex items-center justify-center gap-3 w-full sm:w-auto">
                 استعرض المنتجات
-                <span className="material-symbols-outlined text-xl">arrow_back</span>
+                <SiteIcon name="arrow_back" className="text-xl" />
               </Link>
             </div>
           </div>
