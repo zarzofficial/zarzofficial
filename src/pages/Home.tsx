@@ -6,21 +6,22 @@ import { SiteIcon } from "../components/SiteIcon";
 function FaqItem({ faq, isOpen, onClick }: { key?: React.Key, faq: { question: string, answer: string }, isOpen: boolean, onClick: () => void }) {
   return (
     <div
-      className={`perf-card cyber-glass-card rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 border ${isOpen ? 'border-[#e11d48]/30 bg-[#e11d48]/5' : 'border-outline-variant/10 hover:border-outline-variant/30 bg-surface-container-low/30'}`}
+      className={`perf-card cyber-glass-card rounded-2xl overflow-hidden cursor-pointer transition-colors duration-300 border ${isOpen ? 'border-[#e11d48]/30 bg-[#e11d48]/5' : 'border-outline-variant/10 hover:border-outline-variant/30 bg-surface-container-low/30'}`}
       onClick={onClick}
+      style={{ contain: "content" }}
     >
-      <div className="p-6 flex items-center justify-between">
+      <div className="p-6 flex items-center justify-between transform-gpu">
         <h3 className="text-lg font-bold text-on-surface">{faq.question}</h3>
         <SiteIcon
           name={isOpen ? "remove" : "add"}
-          className={`transition-transform duration-300 ${isOpen ? "text-[#e11d48]" : "text-[#0ea5e9]"}`}
+          className={`transition-transform duration-300 ${isOpen ? "text-[#e11d48] rotate-180" : "text-[#0ea5e9] rotate-0"}`}
         />
       </div>
       <div
-        className={`grid transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+        className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[grid-template-rows,opacity] ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
       >
         <div className="overflow-hidden">
-          <p className="px-6 pb-6 text-[#cbc3d9] leading-relaxed">
+          <p className="px-6 pb-6 text-[#cbc3d9] leading-relaxed transform-gpu">
             {faq.answer}
           </p>
         </div>
