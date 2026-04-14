@@ -1,16 +1,18 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
 import {
   GoogleAuthProvider,
+  browserLocalPersistence,
   createUserWithEmailAndPassword,
   getAuth,
+  getRedirectResult,
   onAuthStateChanged as firebaseOnAuthStateChanged,
   sendPasswordResetEmail,
   setPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
   updateProfile,
-  browserLocalPersistence,
   type User,
 } from "firebase/auth";
 import {
@@ -29,9 +31,25 @@ import {
 } from "firebase/firestore";
 import type { OrderPayload, OrderRecord } from "./order-utils";
 
+const DEFAULT_AUTH_DOMAIN = "zarzofficial-66638.firebaseapp.com";
+const CUSTOM_AUTH_DOMAIN = "auth.zarzofficial.com";
+const GOOGLE_REDIRECT_PENDING_KEY = "zarz_google_redirect_pending";
+const USER_COLLECTION_NAME = "users";
+
+function resolveAuthDomain() {
+  if (typeof window === "undefined") return CUSTOM_AUTH_DOMAIN;
+
+  const runtimeHost = String(window.location.hostname || "").trim().toLowerCase();
+  if (runtimeHost.endsWith("firebaseapp.com") || runtimeHost.endsWith("web.app")) {
+    return DEFAULT_AUTH_DOMAIN;
+  }
+
+  return CUSTOM_AUTH_DOMAIN;
+}
+
 const firebaseConfig = {
   apiKey: "AIzaSyBJ6g-W2bAQwBkkxA_gngN4TMGR_DlVcgM",
-  authDomain: "zarzofficial-66638.firebaseapp.com",
+  authDomain: resolveAuthDomain(),
   projectId: "zarzofficial-66638",
   databaseURL: "https://zarzofficial-66638-default-rtdb.europe-west1.firebasedatabase.app",
   storageBucket: "zarzofficial-66638.firebasestorage.app",
@@ -39,8 +57,6 @@ const firebaseConfig = {
   appId: "1:1041600161752:web:1130c415a1ad37cfdc74ad",
   measurementId: "G-MC300PCDPS",
 };
-
-const USER_COLLECTION_NAME = "users";
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
@@ -50,6 +66,13 @@ export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
 
 let initialized = false;
+
+function shouldPreferGoogleRedirect() {
+  if (typeof window === "undefined") return false;
+  const coarsePointer = typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches;
+  const userAgent = String(window.navigator?.userAgent || "").toLowerCase();
+  return coarsePointer || /android|iphone|ipad|ipod|mobile/.test(userAgent);
+}
 
 function getErrorCode(error: unknown) {
   return String((error as { code?: string })?.code || "").toLowerCase();
@@ -72,6 +95,7 @@ function getFriendlyAuthError(error: unknown, action: "signin" | "register" | "g
   if (code.includes("invalid-email")) return "صيغة البريد الإلكتروني غير صحيحة.";
   if (code.includes("email-already-in-use")) return "هذا البريد الإلكتروني مستخدم بالفعل.";
   if (code.includes("weak-password")) return "كلمة المرور ضعيفة. استخدم 6 أحرف أو أكثر.";
+
   if (
     code.includes("wrong-password") ||
     code.includes("invalid-credential") ||
@@ -81,10 +105,31 @@ function getFriendlyAuthError(error: unknown, action: "signin" | "register" | "g
       ? "لا يوجد حساب مرتبط بهذا البريد الإلكتروني."
       : "البريد الإلكتروني أو كلمة المرور غير صحيحين.";
   }
-  if (code.includes("popup-blocked")) return "المتصفح حظر نافذة Google. اسمح بالنوافذ المنبثقة ثم حاول مرة أخرى.";
-  if (code.includes("popup-closed-by-user")) return "تم إغلاق نافذة Google قبل إكمال تسجيل الدخول.";
-  if (code.includes("too-many-requests")) return "تم إيقاف المحاولات مؤقتًا. حاول مرة أخرى بعد قليل.";
-  if (text.includes("network")) return "تعذر الاتصال بالشبكة. تحقق من الإنترنت ثم حاول مرة أخرى.";
+
+  if (code.includes("popup-blocked")) {
+    return "المتصفح حظر نافذة Google. اسمح بالنوافذ المنبثقة ثم حاول مرة أخرى.";
+  }
+
+  if (code.includes("popup-closed-by-user")) {
+    return "تم إغلاق نافذة Google قبل إكمال تسجيل الدخول.";
+  }
+
+  if (code.includes("unauthorized-domain") || code.includes("auth-domain-config-required")) {
+    return "دومين الموقع غير مفعل داخل Firebase Authentication.";
+  }
+
+  if (text.includes("redirect_uri_mismatch")) {
+    return "تم اكتشاف خطأ redirect_uri_mismatch في Google Sign-In. تم تحويل المصادقة إلى auth.zarzofficial.com، أعد المحاولة الآن.";
+  }
+
+  if (code.includes("too-many-requests")) {
+    return "تم إيقاف المحاولات مؤقتًا. حاول مرة أخرى بعد قليل.";
+  }
+
+  if (text.includes("network")) {
+    return "تعذر الاتصال بالشبكة. تحقق من الإنترنت ثم حاول مرة أخرى.";
+  }
+
   if (action === "register") return "تعذر إنشاء الحساب الآن. حاول مرة أخرى بعد قليل.";
   if (action === "google") return "تعذر تسجيل الدخول عبر Google الآن.";
   if (action === "reset") return "تعذر إرسال رابط إعادة تعيين كلمة المرور الآن.";
@@ -115,6 +160,19 @@ async function initializeFirebase() {
   initialized = true;
   auth.languageCode = "ar";
   await setPersistence(auth, browserLocalPersistence);
+
+  if (typeof window !== "undefined") {
+    try {
+      const redirectResult = await getRedirectResult(auth);
+      window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING_KEY);
+      if (redirectResult?.user) {
+        await syncUserRecord(redirectResult.user);
+      }
+    } catch (error) {
+      window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING_KEY);
+      console.error("Google redirect result failed", error);
+    }
+  }
 }
 
 export const firebaseReadyPromise = initializeFirebase();
@@ -197,6 +255,13 @@ export async function signInWithEmail(input: { email: string; password: string }
 export async function signInWithGoogleFlow() {
   try {
     await firebaseReadyPromise;
+
+    if (typeof window !== "undefined" && shouldPreferGoogleRedirect()) {
+      window.sessionStorage.setItem(GOOGLE_REDIRECT_PENDING_KEY, "1");
+      await signInWithRedirect(auth, googleProvider);
+      return null;
+    }
+
     const result = await signInWithPopup(auth, googleProvider);
     await syncUserRecord(result.user);
     return result.user;

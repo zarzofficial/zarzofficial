@@ -6,14 +6,100 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="shortcut icon" href="/favicon.png" />
     <title>زارز | ZARZ | الرئيسية</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #0c0a10;
+      }
+
+      #app-boot {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+          radial-gradient(circle at center, rgba(124, 58, 237, 0.12), transparent 44%),
+          #0c0a10;
+        color: #f5d9fe;
+        transition: opacity 220ms ease;
+      }
+
+      #app-boot.app-boot--fade,
+      .app-mounted #app-boot {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .app-boot__inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        font-family: Cairo, system-ui, sans-serif;
+      }
+
+      .app-boot__brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+      }
+
+      .app-boot__brand-en {
+        font-size: clamp(2rem, 5vw, 3rem);
+        background: linear-gradient(135deg, #d0bcff 0%, #f5d9fe 50%, #d0bcff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .app-boot__divider {
+        color: rgba(255, 255, 255, 0.18);
+        font-size: clamp(1.8rem, 4vw, 2.4rem);
+        font-weight: 300;
+      }
+
+      .app-boot__brand-ar {
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .app-boot__spinner {
+        width: 32px;
+        height: 32px;
+        border-radius: 9999px;
+        border: 2px solid rgba(255, 255, 255, 0.06);
+        border-top-color: #d0bcff;
+        animation: app-boot-spin 0.85s linear infinite;
+      }
+
+      @keyframes app-boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Be+Vietnam+Pro:wght@400;500;700;900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
   </head>
   <body>
+    <div id="app-boot" aria-hidden="true">
+      <div class="app-boot__inner">
+        <div class="app-boot__brand">
+          <span class="app-boot__brand-en">ZARZ</span>
+          <span class="app-boot__divider">|</span>
+          <span class="app-boot__brand-ar">زارز</span>
+        </div>
+        <div class="app-boot__spinner"></div>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

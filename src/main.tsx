@@ -5,7 +5,13 @@ import './index.css';
 import { AuthProvider } from './lib/AuthContext';
 import { CartProvider } from './lib/CartContext';
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('Missing root element');
+}
+
+createRoot(rootElement).render(
   <StrictMode>
     <AuthProvider>
       <CartProvider>
@@ -14,3 +20,7 @@ createRoot(document.getElementById('root')!).render(
     </AuthProvider>
   </StrictMode>,
 );
+
+window.requestAnimationFrame(() => {
+  document.documentElement.classList.add('app-mounted');
+});

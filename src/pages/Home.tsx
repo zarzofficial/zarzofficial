@@ -15,11 +15,13 @@ function FaqItem({ faq, isOpen, onClick }: { key?: React.Key, faq: { question: s
         </span>
       </div>
       <div
-        className={`px-6 overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-40 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}
+        className={`grid transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
       >
-        <p className="text-[#cbc3d9] leading-relaxed">
-          {faq.answer}
-        </p>
+        <div className="overflow-hidden">
+          <p className="px-6 pb-6 text-[#cbc3d9] leading-relaxed">
+            {faq.answer}
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -4,36 +4,22 @@ export function IntroLoader({ onFinished }: { onFinished: () => void }) {
   const [phase, setPhase] = useState<"loading" | "fadeout" | "done">("loading");
 
   useEffect(() => {
-    let minTimePassed = false;
-    let isLoaded = document.readyState === "complete";
-
-    const tryFinish = () => {
-      if (minTimePassed && isLoaded) {
-        setPhase("fadeout");
-      }
-    };
-
     const minTimer = setTimeout(() => {
-      minTimePassed = true;
-      tryFinish();
-    }, 3000);
-
-    const handleLoad = () => {
-      isLoaded = true;
-      tryFinish();
-    };
-
-    if (document.readyState === "complete") {
-      isLoaded = true;
-      tryFinish();
-    } else {
-      window.addEventListener("load", handleLoad);
-    }
+      setPhase("fadeout");
+    }, 1800);
 
     return () => {
       clearTimeout(minTimer);
-      window.removeEventListener("load", handleLoad);
     };
+  }, []);
+
+  useEffect(() => {
+    const bootLoader = document.getElementById("app-boot");
+    if (bootLoader) {
+      bootLoader.classList.add("app-boot--fade");
+      const removeTimer = window.setTimeout(() => bootLoader.remove(), 280);
+      return () => window.clearTimeout(removeTimer);
+    }
   }, []);
 
   useEffect(() => {
