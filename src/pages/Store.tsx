@@ -188,6 +188,8 @@ function StoreProductCard({
           decoding="async"
           fetchPriority="low"
           referrerPolicy="no-referrer"
+          width={634}
+          height={634}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/20 flex flex-col justify-between p-4 pointer-events-none z-10">
           <div className="flex justify-end w-full">

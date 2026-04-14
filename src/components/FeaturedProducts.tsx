@@ -79,6 +79,8 @@ export function FeaturedProducts() {
                     decoding="async"
                     fetchPriority="low"
                     referrerPolicy="no-referrer"
+                    width={634}
+                    height={634}
                   />
 
                   <div className="absolute top-3 left-3 z-20">

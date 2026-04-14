@@ -161,7 +161,7 @@ export function ProductDetails() {
         <div className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 -translate-x-1/2 translate-y-1/2 rounded-full bg-secondary/5 blur-3xl"></div>
 
         <div className="relative z-10 aspect-square overflow-hidden rounded-2xl border border-white/5 bg-background/50 shadow-inner">
-          <img src={product.image} alt={product.title} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+          <img src={product.image} alt={product.title} className="h-full w-full object-cover" width={634} height={634} referrerPolicy="no-referrer" />
         </div>
 
         <div className="z-10 flex flex-col">
