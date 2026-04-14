@@ -179,11 +179,12 @@ export function ProductDetails() {
                 <select
                   value={selectedPackageIndex}
                   onChange={(event) => setSelectedPackageIndex(Number(event.target.value))}
-                  className="w-full appearance-none rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                  className="w-full appearance-none rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={product.outOfStock}
                 >
                   {packageOptions.map((option, index) => (
                     <option key={option.label} value={index} className="bg-background">
-                      {option.label} - {formatSudanesePrice(option.price)} ج.س
+                      {option.label} {!product.outOfStock && `- ${formatSudanesePrice(option.price)} ج.س`}
                     </option>
                   ))}
                 </select>
@@ -196,7 +197,8 @@ export function ProductDetails() {
                 <select
                   value={selectedVariations[group.id] || group.options[0]?.id || group.options[0]?.label}
                   onChange={(event) => setVariation(group.id, event.target.value)}
-                  className="w-full appearance-none rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                  className="w-full appearance-none rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={product.outOfStock}
                 >
                   {group.options.map((option) => (
                     <option key={option.id || option.label} value={option.id || option.label} className="bg-background">
@@ -217,7 +219,8 @@ export function ProductDetails() {
                     value={targetLink}
                     onChange={(event) => setTargetLink(event.target.value)}
                     placeholder="https://... أو @username"
-                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={product.outOfStock}
                   />
                 </div>
                 <div className="space-y-2">
@@ -228,7 +231,8 @@ export function ProductDetails() {
                     min={1}
                     value={quantity}
                     onChange={(event) => setQuantity(Number(event.target.value))}
-                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={product.outOfStock}
                   />
                 </div>
               </>
@@ -241,7 +245,8 @@ export function ProductDetails() {
                   <select
                     value={server}
                     onChange={(event) => setServer(event.target.value)}
-                    className="w-full appearance-none rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                    className="w-full appearance-none rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={product.outOfStock}
                   >
                     <option value="global" className="bg-background">عالمي</option>
                     <option value="mena" className="bg-background">الشرق الأوسط</option>
@@ -255,7 +260,8 @@ export function ProductDetails() {
                     value={playerId}
                     onChange={(event) => setPlayerId(event.target.value)}
                     placeholder="مثال: 512345678"
-                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={product.outOfStock}
                   />
                 </div>
               </>
@@ -270,7 +276,8 @@ export function ProductDetails() {
                   value={recipientPhone}
                   onChange={(event) => setRecipientPhone(event.target.value.replace(/[^\d+]/g, ""))}
                   placeholder="مثال: 249..."
-                  className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                  className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={product.outOfStock}
                 />
               </div>
             )}
@@ -284,7 +291,8 @@ export function ProductDetails() {
                     value={requirements}
                     onChange={(event) => setRequirements(event.target.value)}
                     placeholder="اشرح ما تحتاجه بالتفصيل..."
-                    className="w-full resize-none rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                    className="w-full resize-none rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={product.outOfStock}
                   />
                 </div>
                 <div className="space-y-2">
@@ -294,7 +302,8 @@ export function ProductDetails() {
                     value={referenceLink}
                     onChange={(event) => setReferenceLink(event.target.value)}
                     placeholder="https://..."
-                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={product.outOfStock}
                   />
                 </div>
               </>
@@ -343,22 +352,28 @@ export function ProductDetails() {
             <div className="mb-6 border-b border-white/5 pb-5 text-right" dir="rtl">
               <span className="mb-3 block text-sm font-bold text-muted-foreground font-sans">السعر الإجمالي</span>
               <div className="flex flex-wrap items-end justify-between gap-4">
-                <div className="flex flex-col items-start gap-2 text-left" dir="ltr">
-                  <div className="flex items-end gap-2">
-                    <span className="font-heading text-4xl font-black leading-none text-white md:text-5xl">
-                      {formatSudanesePrice(totalPrice)}
-                    </span>
-                    <span className="pb-1 text-sm font-bold text-primary/80">ج.س</span>
+                {!product.outOfStock ? (
+                  <div className="flex flex-col items-start gap-2 text-left" dir="ltr">
+                    <div className="flex items-end gap-2">
+                      <span className="font-heading text-4xl font-black leading-none text-white md:text-5xl">
+                        {formatSudanesePrice(totalPrice)}
+                      </span>
+                      <span className="pb-1 text-sm font-bold text-primary/80">ج.س</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-sans text-sm text-muted-foreground/80 line-through">
+                        {formatSudanesePrice(totalOriginalPrice)} ج.س
+                      </span>
+                      <span className="rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2.5 py-1 text-[10px] font-bold text-[#ff857d]">
+                        {`وفر ${discountPercent}%`}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-sans text-sm text-muted-foreground/80 line-through">
-                      {formatSudanesePrice(totalOriginalPrice)} ج.س
-                    </span>
-                    <span className="rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2.5 py-1 text-[10px] font-bold text-[#ff857d]">
-                      {`وفر ${discountPercent}%`}
-                    </span>
+                ) : (
+                  <div className="flex w-full items-center justify-center py-4">
+                    <span className="text-xl font-bold tracking-widest text-[#e11d48]/70">غیر متوفر حالياً</span>
                   </div>
-                </div>
+                )}
               </div>
             </div>
 
