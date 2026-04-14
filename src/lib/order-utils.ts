@@ -219,6 +219,7 @@ export function buildOrderWhatsAppLink(input: {
   orderNumber: string;
   customerName: string;
   customerPhone: string;
+  paymentReference?: string;
   paymentMethodLabel: string;
   detailsText: string;
   totalText: string;
@@ -229,6 +230,7 @@ export function buildOrderWhatsAppLink(input: {
     `الاسم: ${input.customerName}`,
     `الرقم: ${input.customerPhone}`,
     `طريقة الدفع: ${input.paymentMethodLabel}`,
+    input.paymentReference ? `مرجع الدفع: ${input.paymentReference}` : "",
     "",
     "الطلبات:",
     input.detailsText,

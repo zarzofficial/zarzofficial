@@ -17,6 +17,27 @@ import {
   type PaymentMethod,
 } from "../lib/order-utils";
 
+function closeReservedWindow(target: Window | null | undefined) {
+  if (!target || target.closed) return;
+  target.close();
+}
+
+function openReservedWindow() {
+  if (typeof window === "undefined") return null;
+  return window.open("", "_blank");
+}
+
+function redirectReservedWindow(target: Window | null | undefined, nextUrl: string) {
+  if (typeof window === "undefined") return;
+
+  if (target && !target.closed) {
+    target.location.replace(nextUrl);
+    return;
+  }
+
+  window.open(nextUrl, "_blank", "noopener,noreferrer");
+}
+
 function renderMeta(item: ReturnType<typeof useCart>["items"][number]) {
   const parts = [
     item.customData.packageLabel,
@@ -96,7 +117,13 @@ export function Cart() {
     phone.trim() !== "" &&
     (paymentMethod === "cash" || /^\d{4}$/.test(receiptNumber));
 
-  async function finalizeOrder(forceGuest = false) {
+  async function finalizeOrder({
+    forceGuest = false,
+    reservedWindow = null,
+  }: {
+    forceGuest?: boolean;
+    reservedWindow?: Window | null;
+  } = {}) {
     if (!items.length || !isFormValid) return;
 
     setLoading(true);
@@ -114,6 +141,7 @@ export function Cart() {
 
     try {
       const shouldSyncAccountOrder = Boolean(currentUser) && !forceGuest;
+      const shouldOpenWhatsApp = paymentMethod === "cash" || !shouldSyncAccountOrder;
 
       if (shouldSyncAccountOrder) {
         await createOrder(orderPayload);
@@ -129,6 +157,7 @@ export function Cart() {
         orderNumber: orderPayload.orderNumber,
         customerName: name.trim(),
         customerPhone: phone.trim(),
+        paymentReference: receiptNumber.trim(),
         paymentMethodLabel: orderPayload.paymentMethodLabel,
         detailsText,
         totalText: `${finalTotal.toFixed(2)} ج.س`,
@@ -144,12 +173,13 @@ export function Cart() {
       );
 
       window.setTimeout(() => {
-        if (paymentMethod === "cash") {
-          window.open(whatsappLink, "_blank", "noopener,noreferrer");
+        if (shouldOpenWhatsApp) {
+          redirectReservedWindow(reservedWindow, whatsappLink);
         }
         navigate("/account");
       }, 1400);
     } catch (submissionError) {
+      closeReservedWindow(reservedWindow);
       console.error(submissionError);
       setError(
         (submissionError as Error & { userMessage?: string }).userMessage ||
@@ -180,7 +210,8 @@ export function Cart() {
       return;
     }
 
-    void finalizeOrder(false);
+    const reservedWindow = paymentMethod === "cash" ? openReservedWindow() : null;
+    void finalizeOrder({ forceGuest: false, reservedWindow });
   }
 
   function handleLoginRedirect() {
@@ -441,7 +472,15 @@ export function Cart() {
                 <span className="material-symbols-outlined text-[20px]">login</span>
                 تسجيل الدخول / إنشاء حساب
               </button>
-              <button data-testid="checkout-continue-as-guest" onClick={() => void finalizeOrder(true)} className="w-full py-4 bg-surface-container-highest rounded-full text-on-surface font-bold hover:bg-white/5 transition-all text-center border border-outline-variant/10" type="button">
+              <button
+                data-testid="checkout-continue-as-guest"
+                onClick={() => {
+                  const reservedWindow = openReservedWindow();
+                  void finalizeOrder({ forceGuest: true, reservedWindow });
+                }}
+                className="w-full py-4 bg-surface-container-highest rounded-full text-on-surface font-bold hover:bg-white/5 transition-all text-center border border-outline-variant/10"
+                type="button"
+              >
                 المتابعة كزائر
               </button>
             </div>
