@@ -64,14 +64,27 @@ function DynamicTitle() {
 
 export default function App() {
   const [loaded, setLoaded] = useState(false);
+  const [startMountingApp, setStartMountingApp] = useState(false);
+
   const handleIntroFinished = useCallback(() => setLoaded(true), []);
+
+  useEffect(() => {
+    // Defer the heavy mounting of the main DOM tree by one tick.
+    // This guarantees the IntroLoader paints instantly first, 
+    // solving the "frozen page" issue while background loads.
+    const t = setTimeout(() => {
+      setStartMountingApp(true);
+    }, 10);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <Router>
       <DynamicTitle />
       <ScrollToTop />
       {!loaded && <IntroLoader onFinished={handleIntroFinished} />}
-      <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30 flex flex-col">
+      {startMountingApp && (
+        <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30 flex flex-col">
         <Navbar />
         <main className="flex-1">
           <Routes>
@@ -93,7 +106,8 @@ export default function App() {
           </Routes>
         </main>
         <Footer />
-      </div>
+        </div>
+      )}
     </Router>
   );
 }
