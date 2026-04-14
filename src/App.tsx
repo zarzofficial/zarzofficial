@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
@@ -10,7 +10,7 @@ import { Contact } from "./pages/Contact";
 import { Terms } from "./pages/Terms";
 import { ProductDetails } from "./pages/ProductDetails";
 import { ScrollToTop } from "./components/ScrollToTop";
-import { IntroLoader } from "./components/IntroLoader";
+
 import { getProductBySlugOrId } from "./data/products";
 
 function DynamicTitle() {
@@ -63,14 +63,10 @@ function DynamicTitle() {
 }
 
 export default function App() {
-  const [loaded, setLoaded] = useState(false);
-  const handleIntroFinished = useCallback(() => setLoaded(true), []);
-
   return (
     <Router>
       <DynamicTitle />
       <ScrollToTop />
-      {!loaded && <IntroLoader onFinished={handleIntroFinished} />}
       <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30 flex flex-col">
         <Navbar />
         <main className="flex-1">
