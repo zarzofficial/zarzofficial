@@ -478,7 +478,7 @@ export function Store() {
       </main>
 
       {toastMessage && (
-        <div className="fixed bottom-8 left-1/2 z-[100] flex w-[90%] max-w-sm -translate-x-1/2 items-center gap-3 rounded-full bg-[#25D366] px-6 py-4 font-bold text-white shadow-[0_10px_30px_rgba(37,211,102,0.4)] animate-in slide-in-from-bottom-5 fade-in duration-300 md:w-auto">
+        <div className="fixed bottom-8 left-1/2 z-[100] flex w-[90%] max-w-sm -translate-x-1/2 items-center gap-3 rounded-full bg-[#25D366] px-6 py-4 font-bold text-white shadow-[0_10px_30px_rgba(37,211,102,0.4)] md:w-auto">
           <span aria-hidden="true" className="material-symbols-outlined">
             check_circle
           </span>

@@ -84,7 +84,7 @@ export function Contact() {
             <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-tertiary/5 rounded-full blur-[80px]"></div>
             
             {success ? (
-              <div className="h-full flex flex-col items-center justify-center relative z-10 space-y-6 animate-in fade-in zoom-in duration-500">
+            <div className="h-full flex flex-col items-center justify-center relative z-10 space-y-6">
                 <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="material-symbols-outlined text-5xl text-primary">check_circle</span>
                 </div>

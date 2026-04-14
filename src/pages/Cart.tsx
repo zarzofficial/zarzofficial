@@ -325,7 +325,7 @@ export function Cart() {
             </div>
 
             {paymentMethod === "bankak" && (
-              <div className="p-6 bg-primary/5 rounded-2xl border border-primary/20 space-y-4 animate-in fade-in slide-in-from-top-4">
+              <div className="p-6 bg-primary/5 rounded-2xl border border-primary/20 space-y-4">
                 <div className="flex items-center gap-3 text-primary mb-2">
                   <span className="material-symbols-outlined">info</span>
                   <h3 className="font-bold">بيانات حساب التحويل (بنكك)</h3>
@@ -345,7 +345,7 @@ export function Cart() {
             )}
 
             {paymentMethod === "cash" && (
-              <div className="p-6 bg-[#3b82f6]/5 rounded-2xl border border-[#3b82f6]/20 space-y-4 animate-in fade-in slide-in-from-top-4">
+              <div className="p-6 bg-[#3b82f6]/5 rounded-2xl border border-[#3b82f6]/20 space-y-4">
                 <div className="flex items-center gap-3 text-[#3b82f6] mb-2">
                   <span className="material-symbols-outlined">support_agent</span>
                   <h3 className="font-bold">الدفع كاش (مباشر)</h3>
@@ -367,7 +367,7 @@ export function Cart() {
         </div>
 
         <div className="lg:col-span-4">
-          <div className="flex justify-center -mt-2 mb-8 lg:hidden relative z-10 w-full animate-bounce">
+          <div className="flex justify-center -mt-2 mb-8 lg:hidden relative z-10 w-full">
             <div className="perf-card bg-primary/10 border border-primary/30 backdrop-blur-md rounded-full px-5 py-2.5 shadow-[0_10px_20px_rgba(208,188,255,0.15)] flex items-center gap-3 text-primary">
               <span className="material-symbols-outlined text-lg">check_circle</span>
               <span className="text-sm font-bold tracking-wide">الخطوة الأخيرة: ملخص الطلب</span>
@@ -425,7 +425,7 @@ export function Cart() {
       </div>
 
       {showGuestPrompt && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in zoom-in duration-300 px-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm px-4">
           <div className="perf-modal-card bg-surface-container rounded-[40px] p-8 md:p-12 max-w-lg w-full text-center border border-outline-variant/10 shadow-[0_32px_80px_rgba(86,0,202,0.4)] relative">
             <button onClick={() => setShowGuestPrompt(false)} className="absolute top-6 left-6 text-outline hover:text-white transition-colors" type="button">
               <span className="material-symbols-outlined">close</span>
@@ -450,7 +450,7 @@ export function Cart() {
       )}
 
       {success && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in zoom-in duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm">
           <div className="perf-modal-card bg-surface-container rounded-[40px] p-12 max-w-md w-full text-center border border-primary/20 shadow-[0_32px_80px_rgba(86,0,202,0.4)]">
             <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-8">
               <span className="material-symbols-outlined text-5xl text-primary">check_circle</span>

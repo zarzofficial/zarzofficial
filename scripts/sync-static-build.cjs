@@ -45,6 +45,46 @@ const routeDirectories = [
 
 const legacyHtmlFiles = ["404.html", "account.html", "contact.html", "terms.html", "store.html"];
 const supportFiles = ["CNAME", "robots.txt", "sitemap.xml", "_headers"];
+const titlePrefix = "زارز | ZARZ | ";
+const defaultTitle = `${titlePrefix}الرئيسية`;
+
+const routeTitles = new Map([
+  ["account", `${titlePrefix}حسابي`],
+  ["contact", `${titlePrefix}تواصل معنا`],
+  ["terms", `${titlePrefix}الشروط والأحكام`],
+  ["products", `${titlePrefix}المنتجات`],
+  ["products/cart", `${titlePrefix}سلة المشتريات`],
+  ["products/checkout", `${titlePrefix}إتمام الطلب`],
+  ["404.html", `${titlePrefix}الصفحة غير موجودة`],
+  ["account.html", `${titlePrefix}حسابي`],
+  ["contact.html", `${titlePrefix}تواصل معنا`],
+  ["terms.html", `${titlePrefix}الشروط والأحكام`],
+  ["store.html", `${titlePrefix}المنتجات`],
+]);
+
+const productTitles = [
+  [productSlugs[0], "شات جي بي تي بلس (ChatGPT Plus) - شهر واحد"],
+  [productSlugs[1], "جيميني برو (Gemini Pro)"],
+  [productSlugs[2], "إنشاء متاجر إلكترونية"],
+  [productSlugs[3], "تأجير موقع إلكتروني"],
+  [productSlugs[4], "تعديل وتطوير المواقع"],
+  [productSlugs[5], "زيادة متابعين إنستغرام"],
+  [productSlugs[6], "زيادة متابعين تيك توك"],
+  [productSlugs[7], "زيادة متابعين فيسبوك"],
+  [productSlugs[8], "شحن شدات UC ببجي موبايل"],
+  [productSlugs[9], "شحن مجوهرات فري فاير"],
+];
+
+for (const [slug, title] of productTitles) {
+  routeTitles.set(`products/${slug}`, `${titlePrefix}${title}`);
+}
+
+for (let index = 0; index < legacyProductSlugs.length; index += 1) {
+  const legacySlug = legacyProductSlugs[index];
+  const productTitle = productTitles[index]?.[1];
+  if (!legacySlug || !productTitle) continue;
+  routeTitles.set(`products/${legacySlug}`, `${titlePrefix}${productTitle}`);
+}
 
 function ensureDirectory(targetPath) {
   fs.mkdirSync(targetPath, { recursive: true });
@@ -55,18 +95,28 @@ function writeFile(targetPath, contents) {
   fs.writeFileSync(targetPath, contents);
 }
 
+function withTitle(html, title) {
+  return html.replace(/<title>.*?<\/title>/, `<title>${title || defaultTitle}</title>`);
+}
+
 if (!fs.existsSync(docsIndexPath)) {
   throw new Error(`Missing build output: ${docsIndexPath}`);
 }
 
 const shellHtml = fs.readFileSync(docsIndexPath, "utf8");
+const rootHtml = withTitle(shellHtml, defaultTitle);
+
+writeFile(docsIndexPath, rootHtml);
 
 for (const relativeDir of routeDirectories) {
-  writeFile(path.join(docsDir, relativeDir, "index.html"), shellHtml);
+  writeFile(
+    path.join(docsDir, relativeDir, "index.html"),
+    withTitle(shellHtml, routeTitles.get(relativeDir) || defaultTitle),
+  );
 }
 
 for (const filename of legacyHtmlFiles) {
-  writeFile(path.join(docsDir, filename), shellHtml);
+  writeFile(path.join(docsDir, filename), withTitle(shellHtml, routeTitles.get(filename) || defaultTitle));
 }
 
 for (const filename of supportFiles) {

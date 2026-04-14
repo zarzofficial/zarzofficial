@@ -196,8 +196,10 @@ export function Account() {
       <div className="container mx-auto px-4 pt-28 pb-12 md:pt-36 md:pb-20 relative min-h-screen overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
         <div className="max-w-4xl mx-auto">
-          <div className="perf-panel bg-card/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-[0_0_30px_rgba(0,0,0,0.5)] text-center">
-            <p className="text-lg font-bold text-on-surface">جاري تجهيز الحساب...</p>
+          <div className="perf-panel bg-card/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-[0_0_30px_rgba(0,0,0,0.5)]" aria-hidden="true">
+            <div className="mx-auto mb-6 h-20 w-20 rounded-full bg-white/5"></div>
+            <div className="mx-auto mb-4 h-6 w-48 rounded-full bg-white/5"></div>
+            <div className="mx-auto h-4 w-32 rounded-full bg-white/5"></div>
           </div>
         </div>
       </div>
