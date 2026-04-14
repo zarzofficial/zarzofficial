@@ -1,6 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export function Footer() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleFaqClick = () => {
+    if (location.pathname === '/') {
+      const faqSection = document.getElementById('faq');
+      if (faqSection) faqSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/', { state: { scrollToFaq: true } });
+    }
+  };
+
   return (
     <footer className="w-full pt-20 pb-10 mt-auto bg-[#1d0c26] bg-gradient-to-t from-[#26142f] to-[#1d0c26]">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12 px-12 max-w-7xl mx-auto text-start rtl font-body leading-relaxed">
@@ -23,7 +35,8 @@ export function Footer() {
           <h4 className="text-white font-bold mb-2">روابط سريعة</h4>
           <Link to="/" className="text-[#958da2] hover:text-white transition-colors duration-200">الرئيسية</Link>
           <Link to="/products" className="text-[#958da2] hover:text-white transition-colors duration-200">المنتجات</Link>
-          <Link to="/contact" className="text-[#958da2] hover:text-white transition-colors duration-200">الأسئلة الشائعة</Link>
+          <Link to="/contact" className="text-[#958da2] hover:text-white transition-colors duration-200">اتصل بنا</Link>
+          <button onClick={handleFaqClick} className="text-[#958da2] hover:text-white transition-colors duration-200 text-start">الأسئلة الشائعة</button>
         </div>
 
         <div className="flex flex-col gap-4 text-start">
@@ -34,8 +47,11 @@ export function Footer() {
         </div>
 
       </div>
-      <div className="border-t border-white/5 mt-16 pt-8 text-center text-[#958da2] text-sm">
-        © ٢٠٢٤ زارز. جميع الحقوق محفوظة
+      <div className="border-t border-white/5 mt-16 pt-8 pb-4 flex items-center justify-center gap-1.5 text-[#958da2] text-sm" dir="rtl">
+        <span>جميع الحقوق محفوظة</span>
+        <span>&copy;</span>
+        <span>2024</span>
+        <span className="font-bold">زارز</span>
       </div>
     </footer>
   );

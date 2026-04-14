@@ -3,6 +3,7 @@ import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { products, Category, type Product } from "../data/products";
 import { useCart } from "../lib/CartContext";
+import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 
 const categories = [
   { id: "all", name: "الكل" },
@@ -156,36 +157,47 @@ function StoreProductCard({
   onAddToCart: (product: Product) => void;
   metrics: StoreViewportMetrics;
 } & Attributes) {
+  const discountPercent = getDiscountPercent();
+  const originalPrice = getLegacyOriginalPrice(product.basePrice);
+
   return (
     <div
       className={`perf-card group flex h-full flex-col overflow-hidden rounded-2xl border border-outline-variant/10 bg-surface-container-low ${
         metrics.reduceEffects
           ? "shadow-sm"
           : "shadow-md transition-transform duration-300 md:hover:-translate-y-1 md:hover:shadow-[0_18px_38px_rgba(86,0,202,0.14)]"
-      }`}
+      } ${product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : ""}`}
     >
       <Link
         to={`/products/${product.id}`}
         className="block relative w-full overflow-hidden bg-surface-container-highest"
         style={{ height: metrics.imageHeight }}
       >
+        {product.outOfStock && (
+           <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+             <span className="rounded-full border border-destructive/50 bg-destructive/10 px-6 py-2 font-headline text-xl font-black text-destructive shadow-[0_0_20px_rgba(255,0,0,0.2)]">
+               نفدت الكمية
+             </span>
+           </div>
+        )}
         <img
           alt={product.title}
-          className="w-full h-full object-cover transition-transform duration-300 md:group-hover:scale-[1.03]"
+          className={`w-full h-full object-cover transition-transform duration-300 md:group-hover:scale-[1.03] ${product.outOfStock ? "opacity-50" : ""}`}
           src={product.image || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"}
           loading="lazy"
           decoding="async"
           fetchPriority="low"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/20 flex flex-col justify-between p-4 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/20 flex flex-col justify-between p-4 pointer-events-none z-10">
           <div className="flex justify-end w-full">
-            {product.originalPrice && (
+            {discountPercent && !product.outOfStock && (
               <span
                 className="ml-auto rounded-full bg-[#ff3b30] px-3 py-1 text-xs font-bold tracking-wider text-white shadow-sm"
                 style={{ marginRight: "auto", marginLeft: "0" }}
+
               >
-                -40%
+                {`-${discountPercent}%`}
               </span>
             )}
           </div>
@@ -202,36 +214,47 @@ function StoreProductCard({
       </Link>
 
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="mb-2 line-clamp-1 text-xl font-bold">{product.title}</h3>
+        <h3 className={`mb-2 line-clamp-1 text-xl font-bold ${product.outOfStock ? "text-outline" : ""}`}>{product.title}</h3>
         <p className="mb-4 line-clamp-2 text-sm text-outline">{product.desc}</p>
 
         <div className="mt-auto flex flex-col gap-4 border-t border-outline-variant/10 pt-4">
-          <div className="flex w-full items-start justify-between">
-            <div className="flex flex-col text-right">
-              <span className={`text-2xl font-bold text-tertiary ${metrics.reduceEffects ? "" : "drop-shadow-sm"}`}>
-                {product.basePrice} ج.س
-              </span>
-              {product.originalPrice && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-outline/60 line-through">{product.originalPrice} ج.س</span>
-                  <span className="text-[10px] font-bold text-[#ff3b30]">خصم حصري</span>
-                </div>
-              )}
-            </div>
+          <div className="flex w-full min-h-[66px] items-end justify-between">
+            {!product.outOfStock ? (
+                <div className="flex flex-col items-start gap-1.5" dir="rtl">
+                 <div className="flex items-baseline gap-1.5">
+                   <span className={`text-[1.9rem] font-black leading-none text-white ${metrics.reduceEffects ? "" : "drop-shadow-sm"}`}>
+                     {formatSudanesePrice(product.basePrice)}
+                   </span>
+                   <span className="text-[11px] font-bold text-primary/75">ج.س</span>
+                 </div>
+                 <div className="flex items-center gap-2">
+                   <span className="flex items-baseline gap-1 text-xs text-outline/60 line-through">
+                     <span>{formatSudanesePrice(originalPrice)}</span>
+                     <span>ج.س</span>
+                   </span>
+                   <span className="flex items-center gap-1 rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2 py-0.5 text-[10px] font-bold text-[#ff857d]">
+                     <span>وفر</span>
+                     <span dir="ltr">{discountPercent}%</span>
+                   </span>
+                 </div>
+               </div>
+            ) : (
+                <span className="text-xs font-bold text-outline/50">غير متوفر</span>
+            )}
           </div>
 
           <div className="flex w-full items-center gap-2 sm:gap-3">
             <button
               disabled={product.outOfStock}
               onClick={() => onOrderNow(product)}
-              className="flex-1 rounded-full primary-gradient py-3 text-center text-[13px] font-bold text-on-primary shadow-sm transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 md:text-base md:hover:scale-[1.02]"
+              className="flex-1 rounded-full primary-gradient py-3 text-center text-[13px] font-bold text-on-primary shadow-sm transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale md:text-base md:hover:scale-[1.02]"
             >
               اطلب الآن
             </button>
             <button
               disabled={product.outOfStock}
               onClick={() => onAddToCart(product)}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-outline-variant/30 bg-surface-container-highest text-primary shadow-sm transition-colors active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 sm:h-12 sm:w-12 md:hover:bg-primary/10"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-outline-variant/30 bg-surface-container-highest text-primary shadow-sm transition-colors active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-transparent sm:h-12 sm:w-12 md:hover:bg-primary/10"
             >
               <span aria-hidden="true" className="material-symbols-outlined text-lg sm:text-xl">
                 add_shopping_cart

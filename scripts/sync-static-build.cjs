@@ -3,6 +3,7 @@ const path = require("path");
 
 const rootDir = process.cwd();
 const docsDir = path.join(rootDir, "docs");
+const distDir = path.join(rootDir, "dist");
 const docsIndexPath = path.join(docsDir, "index.html");
 
 const productSlugs = [
@@ -72,6 +73,9 @@ for (const filename of supportFiles) {
   const sourcePath = path.join(rootDir, filename);
   if (!fs.existsSync(sourcePath)) continue;
   fs.copyFileSync(sourcePath, path.join(docsDir, filename));
+  if (fs.existsSync(distDir)) {
+    fs.copyFileSync(sourcePath, path.join(distDir, filename));
+  }
 }
 
 writeFile(path.join(docsDir, ".nojekyll"), "");

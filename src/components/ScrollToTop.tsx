@@ -5,7 +5,10 @@ export function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Small delay ensures the new page has rendered before we scroll
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }, 0);
   }, [pathname]);
 
   return null;

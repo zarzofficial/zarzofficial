@@ -1,4 +1,5 @@
 export type Category = "social" | "ai" | "web" | "gaming";
+import { getLegacyOriginalPrice } from "../lib/pricing";
 
 export interface ProductOption {
   label: string;
@@ -42,15 +43,15 @@ export interface Product {
   variationGroups?: ProductVariationGroup[];
 }
 
-export const products: Product[] = [
+const rawProducts: Product[] = [
   {
     id: "شات-جي-بي-تي-بلس",
     slug: "شات-جي-بي-تي-بلس",
     title: "شات جي بي تي بلس (ChatGPT Plus) - شهر واحد",
     category: "ai",
     desc: "استمتع بأقوى نسخة من شات جي بي تي مع سرعة وأداء متقدم. دخول بجهازين، تجديد اشتراك أوفر، ضمان كامل المدة، ودعم فني مستمر.",
-    basePrice: 20000,
-    originalPrice: 33500,
+    basePrice: 12600,
+    originalPrice: 20000,
     image: "/assets/chatgpt-plus-v4.webp",
     rating: "5.0",
     outOfStock: false,
@@ -59,7 +60,7 @@ export const products: Product[] = [
       type: "حساب خاص",
       duration: "شهر واحد",
       delivery: "واتساب",
-      options: [{ label: "اشتراك شهر واحد", price: 20000 }],
+      options: [{ label: "اشتراك شهر واحد", price: 12600 }],
     },
     reviewCount: 222,
     stock: 14,
@@ -81,8 +82,8 @@ export const products: Product[] = [
     title: "جيميني برو (Gemini Pro)",
     category: "ai",
     desc: "وصول إلى النسخة المتقدمة من جيميني. أداء فائق وتحليل أعمق للبيانات مع تسليم مباشر ومتابعة سريعة.",
-    basePrice: 15000,
-    originalPrice: 25000,
+    basePrice: 8300,
+    originalPrice: 15000,
     image: "/assets/gemini-pro-v3.webp",
     rating: "5.0",
     outOfStock: false,
@@ -91,7 +92,7 @@ export const products: Product[] = [
       type: "حساب خاص",
       duration: "شهر واحد",
       delivery: "واتساب",
-      options: [{ label: "اشتراك شهر واحد", price: 15000 }],
+      options: [{ label: "اشتراك شهر واحد", price: 8300 }],
     },
     reviewCount: 154,
     stock: 18,
@@ -301,6 +302,7 @@ export const products: Product[] = [
       ],
     },
     reviewCount: 504,
+    featured: true,
     stock: 0,
   },
   {
@@ -326,9 +328,15 @@ export const products: Product[] = [
       ],
     },
     reviewCount: 391,
+    featured: true,
     stock: 0,
   },
 ];
+
+export const products: Product[] = rawProducts.map((product) => ({
+  ...product,
+  originalPrice: getLegacyOriginalPrice(product.basePrice),
+}));
 
 export const productById = new Map(products.map((product) => [product.id, product]));
 export const productBySlug = new Map(products.map((product) => [product.slug, product]));

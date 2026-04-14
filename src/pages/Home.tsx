@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 
 function FaqItem({ faq, isOpen, onClick }: { key?: React.Key, faq: { question: string, answer: string }, isOpen: boolean, onClick: () => void }) {
@@ -43,10 +43,24 @@ function FaqAccordion({ faqs }: { faqs: { question: string, answer: string }[] }
 }
 
 export function Home() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state && (location.state as any).scrollToFaq) {
+      setTimeout(() => {
+        const faqSection = document.getElementById('faq');
+        if (faqSection) faqSection.scrollIntoView({ behavior: 'smooth' });
+        
+        // Remove state so a page refresh doesn't trigger scroll
+        window.history.replaceState({}, document.title);
+      }, 100);
+    }
+  }, [location]);
+
   return (
-    <div className="pt-12 md:pt-14 animate-in fade-in duration-700">
+    <div className="animate-in fade-in pt-12 md:pt-14 duration-700">
       {/* Hero Section */}
-      <section className="relative min-h-0 py-6 md:py-12 lg:py-20 flex items-center px-6 md:px-12 overflow-hidden">
+      <section className="relative min-h-0 overflow-hidden px-4 pb-2 pt-16 sm:px-6 sm:py-10 md:px-12 md:py-12 lg:py-20">
         <div className="absolute inset-0 z-0">
           <img
             alt="Hero Background"
@@ -54,28 +68,29 @@ export function Home() {
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_V8C1X5Y5GJtZ6TmyhE1V8o9zPZDTjiBfIHyLuwq8yStU5rjHntzzZmYKveVgO4NOCqe9qpcuwbPLDLb143PhrmcccmLHDPwjhqJ971uvr4MZDc4ZFuLT9DlECkBmu3u3NpaEI57fNO9PDe4Oa1EuwecaMWvNXnJbQkzezI7C2_oJtxRthxt1X_3d9JGecxAYEwlYHjH8_NO8XEISqGjJ_AcNw8mioPN4qoxuie9czflyupK_iRz6tKWVwFb8I0-JvW7wcF6T6qAI"
           />
           <div className="absolute inset-0 bg-gradient-to-l from-background via-transparent to-background/50"></div>
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-background/70 to-background sm:h-28"></div>
         </div>
-        <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-10 xl:gap-16">
+        <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch justify-between gap-10 lg:flex-row lg:items-center xl:gap-16">
 
           {/* Main Hero Text */}
-          <div className="text-start flex-1 min-w-0">
-            <h1 className="max-w-[18rem] text-[1.9rem] font-black font-headline text-on-background leading-[1.22] tracking-[-0.02em] sm:max-w-none sm:text-[2.35rem] sm:leading-[1.16] md:text-4xl md:leading-tight xl:text-6xl mb-3 md:mb-6 text-glow">
-              تسوق كل ما تحتاجه في <br />
+          <div className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right lg:mx-0 lg:max-w-none lg:text-start" dir="rtl">
+            <h1 className="mb-5 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.18] tracking-[-0.02em] text-glow sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.2] md:mb-6 md:max-w-none md:text-4xl md:leading-tight xl:text-6xl">
+              تسوق كل ما تحتاجه في <br className="hidden sm:block" />
               <span className="mt-1 block text-primary not-italic md:mt-0 md:italic">مكان واحد</span>
             </h1>
-            <p className="text-sm md:text-base xl:text-lg text-outline mb-5 md:mb-8 max-w-2xl leading-relaxed">
+            <p className="mb-7 px-1 text-[0.95rem] leading-7 text-outline sm:mb-8 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem] md:max-w-2xl md:text-base xl:text-lg">
               مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-start">
+            <div className="flex w-full flex-col gap-4 sm:flex-row sm:gap-4 md:justify-start md:gap-6">
               <Link
                 to="/products"
-                className="primary-gradient text-on-primary font-bold px-8 py-4 md:px-10 md:py-5 rounded-full text-base md:text-lg hover:shadow-[0_0_30px_rgba(208,188,255,0.4)] transition-all scale-100 active:scale-95 text-center"
+                className="primary-gradient w-full rounded-full px-8 py-4 text-center text-base font-bold text-on-primary transition-all scale-100 active:scale-95 hover:shadow-[0_0_30px_rgba(208,188,255,0.4)] sm:min-w-[12rem] sm:w-auto md:px-10 md:py-5 md:text-lg"
               >
                 عروضنا الحصرية
               </Link>
               <Link
                 to="/contact"
-                className="border-[1.5px] border-outline/40 text-on-background px-8 py-4 md:px-10 md:py-5 rounded-full text-base md:text-lg hover:bg-white/5 transition-all text-center"
+                className="w-full rounded-full border-[1.5px] border-outline/40 px-8 py-4 text-center text-base text-on-background transition-all hover:bg-white/5 sm:min-w-[12rem] sm:w-auto md:px-10 md:py-5 md:text-lg"
               >
                 تواصل معنا
               </Link>
@@ -419,7 +434,7 @@ export function Home() {
 
 
       {/* FAQ Section */}
-      <section className="py-24 px-6 md:px-12 bg-background relative overflow-hidden">
+      <section id="faq" className="py-24 px-6 md:px-12 bg-background relative overflow-hidden">
         <div className="absolute top-1/2 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none -translate-y-1/2"></div>
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">

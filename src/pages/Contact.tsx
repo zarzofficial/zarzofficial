@@ -28,38 +28,52 @@ export function Contact() {
       {/* Main Content Layout (Asymmetric Bento) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* Contact Details Sidebar (3/12) */}
-        <aside className="lg:col-span-4 space-y-8">
+        <aside className="lg:col-span-4 space-y-6">
           
-          {/* Info Card 1 */}
-          <div className="perf-panel bg-surface-container-low p-8 rounded-[2rem] transition-transform hover:scale-[1.02] duration-500">
-            <div className="w-12 h-12 primary-gradient rounded-xl flex items-center justify-center mb-6 shadow-[0_8px_20px_rgba(125,60,255,0.3)]">
-              <span className="material-symbols-outlined text-on-primary text-xl">mail</span>
+          {/* Email */}
+          <div className="perf-panel bg-surface-container-low p-6 rounded-3xl transition-transform hover:scale-[1.02] duration-500 flex items-center gap-6">
+            <div className="w-14 h-14 shrink-0 bg-[#E91E63]/20 rounded-[1rem] flex items-center justify-center shadow-inner">
+              <span className="material-symbols-outlined text-[#E91E63] text-2xl">mail</span>
             </div>
-            <h3 className="font-headline text-xl font-bold mb-2">تواصل معنا عبر البريد</h3>
-            <p className="text-on-surface-variant mb-4">راسلنا في أي وقت وسنقوم بالرد خلال ٢٤ ساعة.</p>
-            <a href="mailto:support@zarz.com" className="text-tertiary font-bold text-lg hover:underline underline-offset-4">support@zarz.com</a>
+            <div className="overflow-hidden">
+              <h3 className="font-headline text-lg font-bold mb-1">البريد الإلكتروني</h3>
+              <a href="mailto:medozxc7@gmail.com" className="text-on-surface-variant font-medium text-[15px] hover:text-primary transition-colors block truncate w-full" dir="ltr">medozxc7@gmail.com</a>
+            </div>
           </div>
 
-          {/* Info Card 2 */}
-          <div className="perf-panel bg-surface-container-low p-8 rounded-[2rem] transition-transform hover:scale-[1.02] duration-500">
-            <div className="w-12 h-12 primary-gradient rounded-xl flex items-center justify-center mb-6 shadow-[0_8px_20px_rgba(125,60,255,0.3)]">
-              <span className="material-symbols-outlined text-on-primary text-xl">chat_bubble</span>
+          {/* Saudi Phone */}
+          <div className="perf-panel bg-surface-container-low p-6 rounded-3xl transition-transform hover:scale-[1.02] duration-500 flex items-center gap-6">
+            <div className="w-14 h-14 shrink-0 bg-[#E91E63]/20 rounded-[1rem] flex items-center justify-center shadow-inner">
+              <span className="material-symbols-outlined text-[#E91E63] text-2xl">call</span>
             </div>
-            <h3 className="font-headline text-xl font-bold mb-2">واتساب مباشر</h3>
-            <p className="text-on-surface-variant mb-4">تواصل سريع وفوري مع فريق الدعم الفني.</p>
-            <a href="https://wa.me/966500000000" className="text-tertiary font-bold text-lg hover:underline underline-offset-4" dir="ltr">+966 50 000 0000</a>
+            <div className="overflow-hidden">
+              <h3 className="font-headline text-lg font-bold mb-1">هاتف السعودية</h3>
+              <a href="tel:+966504663493" className="text-on-surface-variant font-medium text-[15px] hover:text-primary transition-colors block truncate w-full" dir="ltr">+966 50 466 3493</a>
+            </div>
           </div>
 
-          {/* Decorative Asset */}
-          <div className="hidden lg:block relative h-48 rounded-[2rem] overflow-hidden group">
-            <img 
-              alt="Decorative Abstract"
-              className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-60 transition-all duration-700" 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXgF0z5f0-DoCcOlyqmUOdqIl603LMuwWVfAIDlGfHlAMS1R6Bi9hX-0RLiABd98wJLtbJthOc5TD3du1FAaGJIu70RgbUzcbM6aBiuHrDKE72Be-e4Lo1FKxQ5esyAKkWWjRQSFLD0WcQCbhW56yQcWGN4p1oBrg8Di5sStHR67GleZZGnQgnk9KBTLOl5NtnblFMNNRcCXIUbZTIprzUPEOdM5P55Uyrh9YOMNlUJ5sPIxR5PBWrd8HhNlJnKhz6SNAVCLhD2KTd"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent"></div>
+          {/* WhatsApp */}
+          <div className="perf-panel bg-surface-container-low p-6 rounded-3xl transition-transform hover:scale-[1.02] duration-500 flex items-center gap-6">
+            <div className="w-14 h-14 shrink-0 bg-[#E91E63]/20 rounded-[1rem] flex items-center justify-center shadow-inner">
+              <span className="material-symbols-outlined text-[#E91E63] text-2xl">support_agent</span>
+            </div>
+            <div className="overflow-hidden">
+              <h3 className="font-headline text-lg font-bold mb-1">واتساب ودعم مباشر</h3>
+              <a href="https://wa.me/201500007300" className="text-on-surface-variant font-medium text-[15px] hover:text-primary transition-colors block truncate w-full" dir="ltr">+20 150 000 7300</a>
+            </div>
           </div>
+
+          {/* Local Phone */}
+          <div className="perf-panel bg-surface-container-low p-6 rounded-3xl transition-transform hover:scale-[1.02] duration-500 flex items-center gap-6">
+            <div className="w-14 h-14 shrink-0 bg-[#E91E63]/20 rounded-[1rem] flex items-center justify-center shadow-inner">
+              <span className="material-symbols-outlined text-[#E91E63] text-2xl">phone_iphone</span>
+            </div>
+            <div className="overflow-hidden">
+              <h3 className="font-headline text-lg font-bold mb-1">رقم محلي</h3>
+              <a href="tel:0116976827" className="text-on-surface-variant font-medium text-[15px] hover:text-primary transition-colors block truncate w-full" dir="ltr">011 697 6827</a>
+            </div>
+          </div>
+
         </aside>
 
         {/* Contact Form Container (8/12) */}

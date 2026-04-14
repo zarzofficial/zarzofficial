@@ -5,26 +5,26 @@ import { motion } from "motion/react";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-24 pb-32 md:pt-32 md:pb-40">
+    <section className="relative overflow-hidden pt-24 pb-12 md:pt-32 md:pb-40">
       {/* Cyber-Luxe Background gradients */}
       <div className="absolute inset-0 -z-10 bg-background"></div>
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px] -z-10"></div>
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[120px] -z-10"></div>
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay -z-10"></div>
 
-      <div className="container mx-auto px-4 md:px-6">
+      <div className="container mx-auto px-6 sm:px-8 md:px-10 lg:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-right"
+            className="flex flex-col items-center text-center lg:items-start lg:text-right"
           >
             <motion.div 
                initial={{ opacity: 0, scale: 0.8 }}
                animate={{ opacity: 1, scale: 1 }}
                transition={{ duration: 0.5, delay: 0.2 }}
-               className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-8 shadow-[0_0_15px_rgba(255,0,122,0.2)]"
+               className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-bold text-primary mb-8 shadow-[0_0_15px_rgba(255,0,122,0.2)]"
             >
               <Zap className="ml-2 h-4 w-4" />
               <span className="font-sans">أسرع متجر للخدمات الرقمية</span>
@@ -34,17 +34,17 @@ export function Hero() {
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ duration: 0.6, delay: 0.3 }}
-               className="text-4xl font-black tracking-tight sm:text-5xl md:text-6xl lg:text-7xl mb-6 leading-[1.1] font-heading"
+               className="text-4xl font-black tracking-tight sm:text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight lg:leading-[1.1] font-heading w-full"
             >
               تسوق كل ما تحتاجه في{" "}
-              <span className="bg-clip-text text-transparent bg-gradient-to-l from-primary to-secondary">مكان واحد</span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-l from-primary to-secondary inline-block mt-2 sm:mt-0">مكان واحد</span>
             </motion.h1>
 
             <motion.p 
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ duration: 0.6, delay: 0.4 }}
-               className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed max-w-lg font-sans"
+               className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed max-w-lg font-sans px-2 sm:px-0"
             >
               تجربة أسرع وأوضح للطلبات الرقمية. شحن ألعاب، اشتراكات، تطوير
               مواقع، وخدمات السوشيال ميديا بضغطة زر.
@@ -54,11 +54,11 @@ export function Hero() {
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ duration: 0.6, delay: 0.5 }}
-               className="flex flex-col sm:flex-row items-center gap-4"
+               className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full lg:w-auto"
             >
               <Button
                 size="lg"
-                className="w-full sm:w-auto h-14 px-8 text-lg rounded-full shadow-[0_0_20px_rgba(255,0,122,0.4)] hover:shadow-[0_0_30px_rgba(255,0,122,0.6)] transition-all"
+                className="w-full sm:w-auto h-14 px-8 text-lg font-bold rounded-full shadow-[0_0_20px_rgba(255,0,122,0.4)] hover:shadow-[0_0_30px_rgba(255,0,122,0.6)] transition-all"
                 render={<Link to="/products" />}
               >
                 تصفح الخدمات
@@ -67,7 +67,7 @@ export function Hero() {
               <Button
                 size="lg"
                 variant="outline"
-                className="w-full sm:w-auto h-14 px-8 text-lg rounded-full border-white/10 hover:bg-white/5 hover:border-secondary/50 hover:shadow-[0_0_15px_rgba(0,212,255,0.2)] transition-all backdrop-blur-md"
+                className="w-full sm:w-auto h-14 px-8 text-lg font-bold rounded-full border-white/10 hover:bg-white/5 hover:border-secondary/50 hover:shadow-[0_0_15px_rgba(0,212,255,0.2)] transition-all backdrop-blur-md"
                 render={<Link to="/contact" />}
               >
                 تواصل معنا

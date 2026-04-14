@@ -4,6 +4,7 @@ import { ArrowRight, ShoppingCart, ShieldCheck, HeadphonesIcon, Zap, CheckCircle
 import { Button } from "../components/ui/button";
 import { getCategoryLabel, getProductBySlugOrId, type ProductVariationGroup } from "../data/products";
 import { useCart, type CartVariationSelection } from "../lib/CartContext";
+import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 
 function buildVariationDefaults(groups: ProductVariationGroup[]) {
   return Object.fromEntries(
@@ -27,6 +28,9 @@ export function ProductDetails() {
   const [referenceLink, setReferenceLink] = useState("");
   const [feedback, setFeedback] = useState("");
   const [selectedVariations, setSelectedVariations] = useState<Record<string, string>>({});
+  const visibleVariationGroups = (product?.variationGroups || []).filter(
+    (group) => group.id !== "support" && group.label !== "الدعم",
+  );
 
   useEffect(() => {
     if (!product) return;
@@ -40,14 +44,14 @@ export function ProductDetails() {
     setRequirements("");
     setReferenceLink("");
     setFeedback("");
-    setSelectedVariations(buildVariationDefaults(product.variationGroups || []));
+    setSelectedVariations(buildVariationDefaults(visibleVariationGroups));
   }, [product]);
 
   if (!product) {
     return (
       <div className="container mx-auto px-4 py-24 text-center">
-        <h1 className="text-3xl font-black mb-4 font-heading">المنتج غير موجود</h1>
-        <p className="text-muted-foreground mb-8">الرابط المطلوب غير مطابق لأي خدمة حالية داخل المتجر.</p>
+        <h1 className="mb-4 font-heading text-3xl font-black">المنتج غير موجود</h1>
+        <p className="mb-8 text-muted-foreground">الرابط المطلوب غير مطابق لأي خدمة حالية داخل المتجر.</p>
         <Button render={<Link to="/products" />}>العودة إلى المتجر</Button>
       </div>
     );
@@ -58,13 +62,15 @@ export function ProductDetails() {
   const safeQuantity = Math.max(1, Number(quantity) || 1);
   const unitPrice = selectedPackage?.price ?? product.basePrice;
   const totalPrice = unitPrice * safeQuantity;
+  const totalOriginalPrice = getLegacyOriginalPrice(totalPrice);
+  const discountPercent = getDiscountPercent();
 
   function setVariation(groupId: string, value: string) {
     setSelectedVariations((currentValue) => ({ ...currentValue, [groupId]: value }));
   }
 
   function collectVariationSelections() {
-    return (product.variationGroups || [])
+    return visibleVariationGroups
       .map<CartVariationSelection | null>((group) => {
         const selectedValue = selectedVariations[group.id] || group.options[0]?.id || group.options[0]?.label;
         const option = group.options.find((entry) => (entry.id || entry.label) === selectedValue) || group.options[0];
@@ -141,46 +147,57 @@ export function ProductDetails() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 md:py-20">
-      <Link to="/products" className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors mb-8">
-        <ArrowRight className="ml-2 h-4 w-4" />
-        العودة للمتجر
-      </Link>
+    <div className="container mx-auto cursor-default px-4 pb-12 pt-24 md:py-20">
+      <button
+        onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/products"))}
+        className="mb-6 inline-flex w-fit cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-card/70 px-4 py-2 text-sm font-bold text-on-background shadow-[0_10px_25px_rgba(0,0,0,0.22)] backdrop-blur-md transition-colors hover:border-primary/30 hover:text-primary md:mb-8"
+      >
+        <ArrowRight className="h-4 w-4" />
+        رجوع
+      </button>
 
-      <div className="perf-panel grid grid-cols-1 lg:grid-cols-2 gap-12 bg-card/40 backdrop-blur-xl border border-white/10 rounded-[2rem] p-6 md:p-10 shadow-[0_0_40px_rgba(0,0,0,0.5)] relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+      <div className="perf-panel relative grid grid-cols-1 gap-12 overflow-hidden rounded-[2rem] border border-white/10 bg-card/40 p-6 shadow-[0_0_40px_rgba(0,0,0,0.5)] backdrop-blur-xl lg:grid-cols-2 md:p-10">
+        <div className="pointer-events-none absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl"></div>
+        <div className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 -translate-x-1/2 translate-y-1/2 rounded-full bg-secondary/5 blur-3xl"></div>
 
-        <div className="relative rounded-2xl overflow-hidden aspect-square bg-background/50 border border-white/5 shadow-inner z-10">
-          <img src={product.image} alt={product.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+        <div className="relative z-10 aspect-square overflow-hidden rounded-2xl border border-white/5 bg-background/50 shadow-inner">
+          <img src={product.image} alt={product.title} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
         </div>
 
-        <div className="flex flex-col z-10">
-          <div className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-bold mb-4 w-fit border border-primary/20 shadow-[0_0_10px_rgba(255,0,122,0.1)]">
+        <div className="z-10 flex flex-col">
+          <div className="mb-4 inline-block w-fit rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-sm font-bold text-primary shadow-[0_0_10px_rgba(255,0,122,0.1)]">
             {getCategoryLabel(product.category)}
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-black mb-4 font-heading">{product.title}</h1>
-          <p className="text-lg text-muted-foreground mb-8 leading-relaxed font-sans">{product.desc}</p>
+          <h1 className="mb-4 font-heading text-3xl font-black md:text-4xl">{product.title}</h1>
+          <p className="mb-8 text-lg leading-relaxed text-muted-foreground font-sans">{product.desc}</p>
 
           <div className="mb-8 space-y-4">
             {packageOptions.length > 0 && (
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground font-sans">اختر الباقة</label>
-                <select value={selectedPackageIndex} onChange={(event) => setSelectedPackageIndex(Number(event.target.value))} className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none backdrop-blur-sm font-sans">
+                <select
+                  value={selectedPackageIndex}
+                  onChange={(event) => setSelectedPackageIndex(Number(event.target.value))}
+                  className="w-full appearance-none rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                >
                   {packageOptions.map((option, index) => (
                     <option key={option.label} value={index} className="bg-background">
-                      {option.label} - {option.price.toLocaleString()} ج.س
+                      {option.label} - {formatSudanesePrice(option.price)} ج.س
                     </option>
                   ))}
                 </select>
               </div>
             )}
 
-            {(product.variationGroups || []).map((group) => (
+            {visibleVariationGroups.map((group) => (
               <div key={group.id} className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground font-sans">{group.label}</label>
-                <select value={selectedVariations[group.id] || group.options[0]?.id || group.options[0]?.label} onChange={(event) => setVariation(group.id, event.target.value)} className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none backdrop-blur-sm font-sans">
+                <select
+                  value={selectedVariations[group.id] || group.options[0]?.id || group.options[0]?.label}
+                  onChange={(event) => setVariation(group.id, event.target.value)}
+                  className="w-full appearance-none rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                >
                   {group.options.map((option) => (
                     <option key={option.id || option.label} value={option.id || option.label} className="bg-background">
                       {option.label}
@@ -194,11 +211,25 @@ export function ProductDetails() {
               <>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground font-sans">رابط الحساب أو اسم المستخدم</label>
-                  <input data-testid="product-target-link" type="text" value={targetLink} onChange={(event) => setTargetLink(event.target.value)} placeholder="https://... أو @username" className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all backdrop-blur-sm font-sans" />
+                  <input
+                    data-testid="product-target-link"
+                    type="text"
+                    value={targetLink}
+                    onChange={(event) => setTargetLink(event.target.value)}
+                    placeholder="https://... أو @username"
+                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground font-sans">الكمية</label>
-                  <input data-testid="product-quantity-input" type="number" min={1} value={quantity} onChange={(event) => setQuantity(Number(event.target.value))} className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all backdrop-blur-sm font-sans" />
+                  <input
+                    data-testid="product-quantity-input"
+                    type="number"
+                    min={1}
+                    value={quantity}
+                    onChange={(event) => setQuantity(Number(event.target.value))}
+                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                  />
                 </div>
               </>
             )}
@@ -207,7 +238,11 @@ export function ProductDetails() {
               <>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground font-sans">السيرفر أو الدولة</label>
-                  <select value={server} onChange={(event) => setServer(event.target.value)} className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none backdrop-blur-sm font-sans">
+                  <select
+                    value={server}
+                    onChange={(event) => setServer(event.target.value)}
+                    className="w-full appearance-none rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                  >
                     <option value="global" className="bg-background">عالمي</option>
                     <option value="mena" className="bg-background">الشرق الأوسط</option>
                     <option value="asia" className="bg-background">آسيا</option>
@@ -215,7 +250,13 @@ export function ProductDetails() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground font-sans">رقم اللاعب (الآيدي)</label>
-                  <input type="text" value={playerId} onChange={(event) => setPlayerId(event.target.value)} placeholder="مثال: 512345678" className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all backdrop-blur-sm font-sans" />
+                  <input
+                    type="text"
+                    value={playerId}
+                    onChange={(event) => setPlayerId(event.target.value)}
+                    placeholder="مثال: 512345678"
+                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                  />
                 </div>
               </>
             )}
@@ -223,7 +264,14 @@ export function ProductDetails() {
             {product.category === "ai" && (
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground font-sans">رقم المستلم أو التواصل</label>
-                <input data-testid="product-recipient-phone" type="tel" value={recipientPhone} onChange={(event) => setRecipientPhone(event.target.value.replace(/[^\d+]/g, ""))} placeholder="مثال: 249..." className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all backdrop-blur-sm font-sans" />
+                <input
+                  data-testid="product-recipient-phone"
+                  type="tel"
+                  value={recipientPhone}
+                  onChange={(event) => setRecipientPhone(event.target.value.replace(/[^\d+]/g, ""))}
+                  placeholder="مثال: 249..."
+                  className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                />
               </div>
             )}
 
@@ -231,11 +279,23 @@ export function ProductDetails() {
               <>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground font-sans">وصف الخدمة أو المتطلبات</label>
-                  <textarea rows={4} value={requirements} onChange={(event) => setRequirements(event.target.value)} placeholder="اشرح ما تحتاجه بالتفصيل..." className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none backdrop-blur-sm font-sans" />
+                  <textarea
+                    rows={4}
+                    value={requirements}
+                    onChange={(event) => setRequirements(event.target.value)}
+                    placeholder="اشرح ما تحتاجه بالتفصيل..."
+                    className="w-full resize-none rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground font-sans">رابط مرجعي (اختياري)</label>
-                  <input type="url" value={referenceLink} onChange={(event) => setReferenceLink(event.target.value)} placeholder="https://..." className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all backdrop-blur-sm font-sans" />
+                  <input
+                    type="url"
+                    value={referenceLink}
+                    onChange={(event) => setReferenceLink(event.target.value)}
+                    placeholder="https://..."
+                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm"
+                  />
                 </div>
               </>
             )}
@@ -243,11 +303,11 @@ export function ProductDetails() {
 
           {product.features && product.features.length > 0 && (
             <div className="mb-8">
-              <h3 className="text-xl font-black mb-4 font-heading">مميزات الخدمة</h3>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <h3 className="mb-4 font-heading text-xl font-black">مميزات الخدمة</h3>
+              <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {product.features.map((feature, index) => (
                   <li key={`${feature}-${index}`} className="flex items-center gap-2 text-muted-foreground font-sans">
-                    <CheckCircle2 className="h-5 w-5 text-success shrink-0 drop-shadow-[0_0_5px_rgba(0,230,118,0.5)]" />
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-success drop-shadow-[0_0_5px_rgba(0,230,118,0.5)]" />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -255,22 +315,22 @@ export function ProductDetails() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="perf-card flex items-center gap-3 p-4 rounded-xl bg-background/50 border border-white/5 backdrop-blur-sm">
+          <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="perf-card flex items-center gap-3 rounded-xl border border-white/5 bg-background/50 p-4 backdrop-blur-sm">
               <Zap className="h-6 w-6 text-primary drop-shadow-[0_0_8px_rgba(255,0,122,0.5)]" />
               <div>
                 <strong className="block text-sm font-heading">بدء سريع</strong>
                 <span className="text-xs text-muted-foreground font-sans">تنفيذ فوري للطلب</span>
               </div>
             </div>
-            <div className="perf-card flex items-center gap-3 p-4 rounded-xl bg-background/50 border border-white/5 backdrop-blur-sm">
+            <div className="perf-card flex items-center gap-3 rounded-xl border border-white/5 bg-background/50 p-4 backdrop-blur-sm">
               <ShieldCheck className="h-6 w-6 text-secondary drop-shadow-[0_0_8px_rgba(0,212,255,0.5)]" />
               <div>
                 <strong className="block text-sm font-heading">دفع آمن</strong>
                 <span className="text-xs text-muted-foreground font-sans">بوابات موثوقة</span>
               </div>
             </div>
-            <div className="perf-card flex items-center gap-3 p-4 rounded-xl bg-background/50 border border-white/5 backdrop-blur-sm">
+            <div className="perf-card flex items-center gap-3 rounded-xl border border-white/5 bg-background/50 p-4 backdrop-blur-sm">
               <HeadphonesIcon className="h-6 w-6 text-success drop-shadow-[0_0_8px_rgba(0,230,118,0.5)]" />
               <div>
                 <strong className="block text-sm font-heading">دعم 24/7</strong>
@@ -279,31 +339,61 @@ export function ProductDetails() {
             </div>
           </div>
 
-          <div className="perf-card mt-auto bg-background/40 p-6 rounded-2xl border border-white/5 backdrop-blur-md">
-            <div className="flex justify-between items-end mb-6">
-              <div>
-                <span className="block text-sm text-muted-foreground font-bold mb-1 font-sans">السعر الإجمالي</span>
-                {product.originalPrice && (
-                  <span className="text-sm text-muted-foreground line-through mr-2 font-sans">{product.originalPrice.toLocaleString()} ج.س</span>
-                )}
-              </div>
-              <div className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary font-heading">
-                {totalPrice.toLocaleString()} ج.س
+          <div className="perf-card mt-auto rounded-2xl border border-white/5 bg-background/40 p-6 backdrop-blur-md">
+            <div className="mb-6 border-b border-white/5 pb-5 text-right" dir="rtl">
+              <span className="mb-3 block text-sm font-bold text-muted-foreground font-sans">السعر الإجمالي</span>
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <div className="flex flex-col items-start gap-2 text-left" dir="ltr">
+                  <div className="flex items-end gap-2">
+                    <span className="font-heading text-4xl font-black leading-none text-white md:text-5xl">
+                      {formatSudanesePrice(totalPrice)}
+                    </span>
+                    <span className="pb-1 text-sm font-bold text-primary/80">ج.س</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-sans text-sm text-muted-foreground/80 line-through">
+                      {formatSudanesePrice(totalOriginalPrice)} ج.س
+                    </span>
+                    <span className="rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2.5 py-1 text-[10px] font-bold text-[#ff857d]">
+                      {`وفر ${discountPercent}%`}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
             {feedback && (
-              <div data-testid="product-feedback" className={`mb-4 rounded-xl px-4 py-3 text-sm ${feedback.includes("تمت") ? "border border-success/20 bg-green-500/10 text-green-400" : "border border-destructive/20 bg-destructive/10 text-destructive"}`}>
+              <div
+                data-testid="product-feedback"
+                className={`mb-4 rounded-xl px-4 py-3 text-sm ${
+                  feedback.includes("تمت")
+                    ? "border border-success/20 bg-green-500/10 text-green-400"
+                    : "border border-destructive/20 bg-destructive/10 text-destructive"
+                }`}
+              >
                 {feedback}
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button data-testid="add-to-cart-button" onClick={handleAddToCart} size="lg" variant="outline" className="flex-1 h-14 text-lg rounded-xl border-white/10 hover:bg-white/5 backdrop-blur-md hover:text-primary transition-all" disabled={product.outOfStock}>
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <Button
+                data-testid="add-to-cart-button"
+                onClick={handleAddToCart}
+                size="lg"
+                variant="outline"
+                className="h-14 flex-1 rounded-xl border-white/10 text-lg transition-all hover:bg-white/5 hover:text-primary backdrop-blur-md"
+                disabled={product.outOfStock}
+              >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 أضف للسلة
               </Button>
-              <Button data-testid="buy-now-button" onClick={handleBuyNow} size="lg" className="flex-1 h-14 text-lg rounded-xl shadow-[0_0_20px_rgba(255,0,122,0.4)] hover:shadow-[0_0_30px_rgba(255,0,122,0.6)] transition-all" disabled={product.outOfStock}>
+              <Button
+                data-testid="buy-now-button"
+                onClick={handleBuyNow}
+                size="lg"
+                className="h-14 flex-1 rounded-xl text-lg shadow-[0_0_20px_rgba(255,0,122,0.4)] transition-all hover:shadow-[0_0_30px_rgba(255,0,122,0.6)]"
+                disabled={product.outOfStock}
+              >
                 <Zap className="mr-2 h-5 w-5" />
                 {product.outOfStock ? "غير متوفر" : "اطلب الآن"}
               </Button>

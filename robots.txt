@@ -1,5 +1,17 @@
 User-agent: *
 Allow: /
-Allow: /icons/
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: Google-InspectionTool
+Allow: /
 
 Sitemap: https://zarzofficial.com/sitemap.xml
+Host: zarzofficial.com
