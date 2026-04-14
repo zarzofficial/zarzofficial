@@ -36,7 +36,7 @@ function renderMeta(item: ReturnType<typeof useCart>["items"][number]) {
 
 export function Cart() {
   const { items, removeItem, updateQty, total, clearCart } = useCart();
-  const { currentUser } = useAuth();
+  const { currentUser, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [success, setSuccess] = useState("");
   const [showGuestPrompt, setShowGuestPrompt] = useState(false);
@@ -163,6 +163,7 @@ export function Cart() {
   function handleCheckoutClick(event?: MouseEvent<HTMLButtonElement>) {
     event?.preventDefault();
     if (items.length === 0) return;
+    if (authLoading) return;
 
     if (!name.trim() || !phone.trim()) {
       setError("يرجى إدخال الاسم ورقم الجوال قبل المتابعة.");
@@ -196,7 +197,7 @@ export function Cart() {
   if (hasItems && hasValidDetails) currentStep = 3;
 
   return (
-    <div className="pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto min-h-screen animate-in fade-in duration-700">
+    <div className="pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto min-h-screen">
       <div className="flex items-center justify-center mb-16 gap-2 sm:gap-4 rtl">
         <div className="flex flex-col items-center gap-2 transition-all duration-500">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${currentStep >= 1 ? "primary-gradient shadow-[0_0_20px_rgba(208,188,255,0.3)]" : "bg-surface-container border border-outline-variant/30"}`}>
@@ -397,7 +398,7 @@ export function Cart() {
                 </div>
               </div>
 
-              <button data-testid="checkout-submit" onClick={handleCheckoutClick} disabled={items.length === 0 || !isFormValid || loading} className={`w-full mt-8 py-5 rounded-full text-on-primary font-bold text-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed ${paymentMethod === "bankak" ? "primary-gradient shadow-[0_10px_30px_rgba(125,60,255,0.4)]" : "bg-[#25D366] shadow-[0_10px_30px_rgba(37,211,102,0.4)]"}`}>
+              <button data-testid="checkout-submit" onClick={handleCheckoutClick} disabled={items.length === 0 || !isFormValid || loading || authLoading} className={`w-full mt-8 py-5 rounded-full text-on-primary font-bold text-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed ${paymentMethod === "bankak" ? "primary-gradient shadow-[0_10px_30px_rgba(125,60,255,0.4)]" : "bg-[#25D366] shadow-[0_10px_30px_rgba(37,211,102,0.4)]"}`}>
                 <span>{loading ? "جاري إرسال الطلب..." : paymentMethod === "bankak" ? "تأكيد وشراء" : "التأكيد عبر واتساب"}</span>
                 <span className="material-symbols-outlined" data-icon={paymentMethod === "bankak" ? "arrow_back" : "forum"}>
                   {paymentMethod === "bankak" ? "arrow_back" : "forum"}

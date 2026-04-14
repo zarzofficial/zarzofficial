@@ -20,7 +20,3 @@ createRoot(rootElement).render(
     </AuthProvider>
   </StrictMode>,
 );
-
-window.requestAnimationFrame(() => {
-  document.documentElement.classList.add('app-mounted');
-});

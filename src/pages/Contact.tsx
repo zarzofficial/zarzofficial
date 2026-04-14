@@ -11,7 +11,7 @@ export function Contact() {
   };
 
   return (
-    <div className="pt-32 pb-20 px-6 max-w-7xl mx-auto w-full animate-in fade-in duration-700 min-h-screen">
+    <div className="pt-32 pb-20 px-6 max-w-7xl mx-auto w-full min-h-screen">
       
       {/* Hero Section */}
       <section className="mb-20 text-center md:text-right relative">

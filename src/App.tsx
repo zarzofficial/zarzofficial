@@ -1,17 +1,19 @@
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { Home } from "./pages/Home";
-import { Store } from "./pages/Store";
-import { Cart } from "./pages/Cart";
-import { Account } from "./pages/Account";
-import { Contact } from "./pages/Contact";
-import { Terms } from "./pages/Terms";
-import { ProductDetails } from "./pages/ProductDetails";
 import { ScrollToTop } from "./components/ScrollToTop";
-
 import { getProductBySlugOrId } from "./data/products";
+
+const Store = lazy(() => import("./pages/Store").then((module) => ({ default: module.Store })));
+const Cart = lazy(() => import("./pages/Cart").then((module) => ({ default: module.Cart })));
+const Account = lazy(() => import("./pages/Account").then((module) => ({ default: module.Account })));
+const Contact = lazy(() => import("./pages/Contact").then((module) => ({ default: module.Contact })));
+const Terms = lazy(() => import("./pages/Terms").then((module) => ({ default: module.Terms })));
+const ProductDetails = lazy(() =>
+  import("./pages/ProductDetails").then((module) => ({ default: module.ProductDetails })),
+);
 
 function DynamicTitle() {
   const location = useLocation();
@@ -70,23 +72,25 @@ export default function App() {
       <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30 flex flex-col">
         <Navbar />
         <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/products" element={<Store />} />
-            <Route path="/products/:id" element={<ProductDetails />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/products/cart" element={<Navigate to="/cart" replace />} />
-            <Route path="/checkout" element={<Navigate to="/cart" replace />} />
-            <Route path="/products/checkout" element={<Navigate to="/cart" replace />} />
-            <Route path="/account" element={<Account />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/store.html" element={<Navigate to="/products" replace />} />
-            <Route path="/account.html" element={<Navigate to="/account" replace />} />
-            <Route path="/contact.html" element={<Navigate to="/contact" replace />} />
-            <Route path="/terms.html" element={<Navigate to="/terms" replace />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <Suspense fallback={<div className="min-h-[40vh]" aria-hidden="true" />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/products" element={<Store />} />
+              <Route path="/products/:id" element={<ProductDetails />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/products/cart" element={<Navigate to="/cart" replace />} />
+              <Route path="/checkout" element={<Navigate to="/cart" replace />} />
+              <Route path="/products/checkout" element={<Navigate to="/cart" replace />} />
+              <Route path="/account" element={<Account />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/store.html" element={<Navigate to="/products" replace />} />
+              <Route path="/account.html" element={<Navigate to="/account" replace />} />
+              <Route path="/contact.html" element={<Navigate to="/contact" replace />} />
+              <Route path="/terms.html" element={<Navigate to="/terms" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
         </main>
         <Footer />
       </div>

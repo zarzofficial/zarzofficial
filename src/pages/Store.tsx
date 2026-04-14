@@ -376,7 +376,7 @@ export function Store() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24 pt-24 text-on-background animate-in fade-in duration-700">
+    <div className="min-h-screen bg-background pb-24 pt-24 text-on-background">
       <header className="mx-auto max-w-screen-2xl px-6 pb-16 pt-16 md:px-12">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <div className="space-y-6">

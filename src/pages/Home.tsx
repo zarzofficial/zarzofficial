@@ -60,7 +60,7 @@ export function Home() {
   }, [location]);
 
   return (
-    <div className="animate-in fade-in pt-12 md:pt-14 duration-700">
+    <div className="pt-12 md:pt-14">
       {/* Hero Section */}
       <section className="relative min-h-0 overflow-hidden px-4 pb-2 pt-16 sm:px-6 sm:py-10 md:px-12 md:py-12 lg:py-20">
         <div className="absolute inset-0 z-0">

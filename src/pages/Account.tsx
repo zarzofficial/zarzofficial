@@ -25,7 +25,7 @@ import {
 } from "../lib/order-utils";
 
 export function Account() {
-  const { currentUser } = useAuth();
+  const { currentUser, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
@@ -59,15 +59,17 @@ export function Account() {
   }
 
   useEffect(() => {
+    if (authLoading) return;
     void fetchOrders();
-  }, [currentUser]);
+  }, [authLoading, currentUser]);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!currentUser || typeof window === "undefined") return;
     if (window.sessionStorage.getItem(CART_LOGIN_RETURN_KEY) !== "1") return;
     window.sessionStorage.removeItem(CART_LOGIN_RETURN_KEY);
     navigate("/cart");
-  }, [currentUser, navigate]);
+  }, [authLoading, currentUser, navigate]);
 
   const orderVirtualizer = useVirtualizer({
     count: orders.length,
@@ -187,6 +189,19 @@ export function Account() {
       setFeedback("تعذر تسجيل الخروج الآن.");
       setFeedbackType("error");
     }
+  }
+
+  if (authLoading) {
+    return (
+      <div className="container mx-auto px-4 pt-28 pb-12 md:pt-36 md:pb-20 relative min-h-screen overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
+        <div className="max-w-4xl mx-auto">
+          <div className="perf-panel bg-card/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-[0_0_30px_rgba(0,0,0,0.5)] text-center">
+            <p className="text-lg font-bold text-on-surface">جاري تجهيز الحساب...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (currentUser) {

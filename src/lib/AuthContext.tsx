@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { auth, onAuthStateChanged } from "./firebase";
 import { User } from "firebase/auth";
 
 interface AuthContextType {
@@ -19,17 +18,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      setLoading(false);
-    });
+    let active = true;
+    let unsubscribe = () => {};
 
-    return unsubscribe;
+    void import("./firebase")
+      .then(({ auth, onAuthStateChanged }) => {
+        if (!active) return;
+
+        unsubscribe = onAuthStateChanged(auth, (user) => {
+          if (!active) return;
+          setCurrentUser(user);
+          setLoading(false);
+        });
+      })
+      .catch((error) => {
+        console.error("Auth bootstrap failed", error);
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
   }, []);
 
   return (
     <AuthContext.Provider value={{ currentUser, loading }}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };

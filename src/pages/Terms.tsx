@@ -1,6 +1,6 @@
 export function Terms() {
   return (
-    <div className="relative pt-40 pb-24 px-6 md:px-12 max-w-5xl mx-auto animate-in fade-in duration-700 min-h-screen">
+    <div className="relative pt-40 pb-24 px-6 md:px-12 max-w-5xl mx-auto min-h-screen">
       
       {/* Hero Header */}
       <header className="mb-20 text-center md:text-right">
