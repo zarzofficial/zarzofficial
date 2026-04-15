@@ -29,15 +29,59 @@
         min-height: 100svh;
         isolation: isolate;
       }
+
+      .boot-frame {
+        min-height: 100svh;
+        color: #f5d9fe;
+        font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      }
+
+      .boot-frame__nav {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        min-height: 82px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 18px 24px;
+        border-bottom: 1px solid rgba(208, 188, 255, 0.08);
+        background: rgba(29, 12, 38, 0.6);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 8px 40px rgba(86, 0, 202, 0.12);
+      }
+
+      .boot-frame__brand {
+        margin-inline-start: auto;
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 900;
+        letter-spacing: -0.04em;
+        color: #d0bcff;
+        line-height: 1;
+      }
+
+      .boot-frame__ambient {
+        height: calc(100svh - 82px);
+        background:
+          radial-gradient(circle at 82% 16%, rgba(125, 60, 255, 0.1), transparent 26%),
+          radial-gradient(circle at 12% 100%, rgba(59, 130, 246, 0.08), transparent 28%);
+      }
     </style>
     <link rel="preload" href="/fonts/cairo/cairo-arabic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/cairo/cairo-latin-ext-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/cairo/cairo-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/material-symbols/material-symbols-outlined-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <script type="module" crossorigin src="/assets/index-DEDzneXv.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-79sIu9Iq.css">
+    <script type="module" crossorigin src="/assets/index-Do4sVyxP.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-2Lzf0Eap.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot-frame" aria-hidden="true">
+        <div class="boot-frame__nav">
+          <div class="boot-frame__brand">زارز</div>
+        </div>
+        <div class="boot-frame__ambient"></div>
+      </div>
+    </div>
   </body>
 </html>

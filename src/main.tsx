@@ -81,29 +81,17 @@ if (!rootElement) {
   throw new Error('Missing root element');
 }
 
-const root = createRoot(rootElement);
+void cleanupLegacyServiceWorkers();
+void preloadStartupRoute().catch((error) => {
+  console.error("Startup route preload failed", error);
+});
 
-async function bootstrap() {
-  void cleanupLegacyServiceWorkers();
-
-  try {
-    await Promise.race([
-      preloadStartupRoute(),
-      new Promise((resolve) => window.setTimeout(resolve, 180)),
-    ]);
-  } catch (error) {
-    console.error("Startup route preload failed", error);
-  }
-
-  root.render(
-    <StrictMode>
-      <AuthProvider>
-        <CartProvider>
-          <App />
-        </CartProvider>
-      </AuthProvider>
-    </StrictMode>,
-  );
-}
-
-void bootstrap();
+createRoot(rootElement).render(
+  <StrictMode>
+    <AuthProvider>
+      <CartProvider>
+        <App />
+      </CartProvider>
+    </AuthProvider>
+  </StrictMode>,
+);
