@@ -87,6 +87,22 @@ function CanonicalPath() {
   return null;
 }
 
+function RouteSkeleton() {
+  return (
+    <div className="mx-auto flex min-h-[52vh] w-full max-w-screen-2xl flex-col gap-5 px-6 pb-12 pt-28 md:px-12 md:pt-32" aria-hidden="true">
+      <div className="h-5 w-24 rounded-full bg-white/8" />
+      <div className="h-12 w-full max-w-[20rem] rounded-full bg-white/8" />
+      <div className="h-4 w-full max-w-2xl rounded-full bg-white/6" />
+      <div className="h-4 w-full max-w-xl rounded-full bg-white/6" />
+      <div className="grid grid-cols-1 gap-4 pt-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="aspect-[4/5] rounded-[1.5rem] border border-white/6 bg-surface-container-low/70 shadow-[0_10px_24px_rgba(8,6,18,0.16)]" />
+        <div className="aspect-[4/5] rounded-[1.5rem] border border-white/6 bg-surface-container-low/70 shadow-[0_10px_24px_rgba(8,6,18,0.16)]" />
+        <div className="hidden aspect-[4/5] rounded-[1.5rem] border border-white/6 bg-surface-container-low/70 shadow-[0_10px_24px_rgba(8,6,18,0.16)] lg:block" />
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <Router>
@@ -96,7 +112,7 @@ export default function App() {
       <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30 flex flex-col">
         <Navbar />
         <main className="flex-1">
-          <Suspense fallback={<div className="min-h-[40vh]" aria-hidden="true" />}>
+          <Suspense fallback={<RouteSkeleton />}>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/products" element={<Store />} />

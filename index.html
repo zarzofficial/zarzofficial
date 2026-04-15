@@ -15,6 +15,181 @@
         margin: 0;
         min-height: 100%;
         background: #0c0a10;
+        color-scheme: dark;
+      }
+
+      #root {
+        min-height: 100svh;
+      }
+
+      .boot-shell {
+        min-height: 100svh;
+        background:
+          radial-gradient(circle at top right, rgba(125, 60, 255, 0.18), transparent 28%),
+          radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.12), transparent 24%),
+          linear-gradient(180deg, #140a1b 0%, #0c0a10 100%);
+        color: #f5d9fe;
+        font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      }
+
+      .boot-shell__nav {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        backdrop-filter: blur(18px);
+        background: rgba(29, 12, 38, 0.68);
+        border-bottom: 1px solid rgba(208, 188, 255, 0.08);
+      }
+
+      .boot-shell__nav-inner,
+      .boot-shell__hero,
+      .boot-shell__grid {
+        margin: 0 auto;
+        max-width: 1280px;
+      }
+
+      .boot-shell__nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 24px;
+      }
+
+      .boot-shell__logo {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: #d0bcff;
+      }
+
+      .boot-shell__nav-group,
+      .boot-shell__actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .boot-shell__pill,
+      .boot-shell__line,
+      .boot-shell__button,
+      .boot-shell__card,
+      .boot-shell__product {
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.06));
+        background-size: 200% 100%;
+        animation: boot-shimmer 1.8s linear infinite;
+      }
+
+      .boot-shell__pill {
+        height: 12px;
+        border-radius: 999px;
+      }
+
+      .boot-shell__pill--lg { width: 92px; }
+      .boot-shell__pill--md { width: 72px; }
+      .boot-shell__pill--sm { width: 48px; }
+
+      .boot-shell__hero {
+        display: grid;
+        gap: 22px;
+        padding: 36px 24px 28px;
+      }
+
+      .boot-shell__hero-copy,
+      .boot-shell__hero-panel {
+        border: 1px solid rgba(208, 188, 255, 0.08);
+        background: rgba(37, 23, 47, 0.62);
+        border-radius: 28px;
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+      }
+
+      .boot-shell__hero-copy {
+        padding: 22px;
+      }
+
+      .boot-shell__line {
+        display: block;
+        height: 14px;
+        border-radius: 999px;
+      }
+
+      .boot-shell__line + .boot-shell__line {
+        margin-top: 12px;
+      }
+
+      .boot-shell__line--eyebrow { width: 86px; height: 11px; }
+      .boot-shell__line--title { width: min(100%, 320px); height: 28px; }
+      .boot-shell__line--title-sm { width: min(82%, 240px); height: 28px; }
+      .boot-shell__line--copy { width: min(100%, 520px); }
+      .boot-shell__line--copy-sm { width: min(88%, 460px); }
+
+      .boot-shell__actions {
+        margin-top: 18px;
+        flex-wrap: wrap;
+      }
+
+      .boot-shell__button {
+        height: 50px;
+        width: 160px;
+        border-radius: 999px;
+      }
+
+      .boot-shell__button--primary {
+        background: linear-gradient(135deg, rgba(208, 188, 255, 0.96) 0%, rgba(125, 60, 255, 0.92) 100%);
+      }
+
+      .boot-shell__hero-panel {
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .boot-shell__card {
+        height: 74px;
+        border-radius: 22px;
+        background-color: rgba(255, 255, 255, 0.04);
+      }
+
+      .boot-shell__grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 0 24px 28px;
+      }
+
+      .boot-shell__product {
+        aspect-ratio: 4 / 5;
+        border-radius: 22px;
+        border: 1px solid rgba(208, 188, 255, 0.08);
+        background-color: rgba(38, 20, 47, 0.76);
+      }
+
+      @keyframes boot-shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+
+      @media (min-width: 768px) {
+        .boot-shell__hero {
+          grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.9fr);
+          align-items: stretch;
+          padding-top: 54px;
+          padding-bottom: 34px;
+        }
+
+        .boot-shell__grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .boot-shell__product {
+          aspect-ratio: 1 / 1;
+        }
+      }
+
+      @media (max-width: 767px) {
+        .boot-shell__nav-group {
+          display: none;
+        }
       }
     </style>
     <link rel="preload" href="/fonts/cairo/cairo-arabic-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
@@ -24,7 +199,47 @@
   </head>
   <body>
 
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot-shell">
+        <div class="boot-shell__nav">
+          <div class="boot-shell__nav-inner">
+            <div class="boot-shell__logo">زارز</div>
+            <div class="boot-shell__nav-group" aria-hidden="true">
+              <span class="boot-shell__pill boot-shell__pill--lg"></span>
+              <span class="boot-shell__pill boot-shell__pill--md"></span>
+              <span class="boot-shell__pill boot-shell__pill--md"></span>
+              <span class="boot-shell__pill boot-shell__pill--sm"></span>
+            </div>
+          </div>
+        </div>
+        <main>
+          <section class="boot-shell__hero" aria-hidden="true">
+            <div class="boot-shell__hero-copy">
+              <span class="boot-shell__line boot-shell__line--eyebrow"></span>
+              <span class="boot-shell__line boot-shell__line--title" style="margin-top: 16px;"></span>
+              <span class="boot-shell__line boot-shell__line--title-sm"></span>
+              <span class="boot-shell__line boot-shell__line--copy" style="margin-top: 18px;"></span>
+              <span class="boot-shell__line boot-shell__line--copy-sm"></span>
+              <span class="boot-shell__line boot-shell__line--copy-sm"></span>
+              <div class="boot-shell__actions">
+                <span class="boot-shell__button boot-shell__button--primary"></span>
+                <span class="boot-shell__button"></span>
+              </div>
+            </div>
+            <div class="boot-shell__hero-panel" aria-hidden="true">
+              <div class="boot-shell__card"></div>
+              <div class="boot-shell__card"></div>
+              <div class="boot-shell__card"></div>
+            </div>
+          </section>
+          <section class="boot-shell__grid" aria-hidden="true">
+            <div class="boot-shell__product"></div>
+            <div class="boot-shell__product"></div>
+            <div class="boot-shell__product"></div>
+          </section>
+        </main>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
