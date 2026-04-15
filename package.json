@@ -6,7 +6,7 @@
   "homepage": "https://zarzofficial.github.io/zarzofficial-up/",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build && node scripts/sync-static-build.cjs",
+    "build": "vite build && node scripts/sync-static-build.cjs && tsx scripts/prerender.tsx",
     "preview": "vite preview",
     "clean": "node -e \"const fs=require('fs');['dist','docs'].forEach((dir)=>fs.rmSync(dir,{recursive:true,force:true}));\"",
     "lint": "tsc --noEmit",

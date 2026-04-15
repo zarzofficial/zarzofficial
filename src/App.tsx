@@ -1,10 +1,9 @@
 import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter as Router, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { Navbar } from "./components/Navbar";
-import { Footer } from "./components/Footer";
 import { Home } from "./pages/Home";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { getProductBySlugOrId } from "./data/products";
+import { AppFrame } from "./app/AppFrame";
 
 const Store = lazy(() => import("./pages/Store").then((module) => ({ default: module.Store })));
 const Cart = lazy(() => import("./pages/Cart").then((module) => ({ default: module.Cart })));
@@ -97,9 +96,7 @@ export default function App() {
       <CanonicalPath />
       <DynamicTitle />
       <ScrollToTop />
-      <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30 flex flex-col">
-        <Navbar />
-        <main className="flex-1">
+      <AppFrame>
           <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<Home />} />
@@ -119,9 +116,7 @@ export default function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
-        </main>
-        <Footer />
-      </div>
+      </AppFrame>
     </Router>
   );
 }

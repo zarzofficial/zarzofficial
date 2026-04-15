@@ -140,6 +140,17 @@ function readStoredCart() {
   }
 }
 
+function readInitialCart() {
+  if (typeof window === "undefined") return [];
+
+  const rootElement = document.getElementById("root");
+  if (rootElement?.dataset.prerendered === "true") {
+    return [];
+  }
+
+  return readStoredCart();
+}
+
 function sameItemSignature(left: CartItem, right: AddItemInput) {
   return (
     left.productId === right.productId &&
@@ -155,7 +166,11 @@ export function useCart() {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(readStoredCart);
+  const [items, setItems] = useState<CartItem[]>(readInitialCart);
+
+  useEffect(() => {
+    setItems(readStoredCart());
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

@@ -1,10 +1,10 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type Attributes } from "react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { products, Category, type Product } from "../data/products";
+import { products, type Category, type Product } from "../data/products";
+import { SiteIcon } from "../components/SiteIcon";
 import { useCart } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
-import { SiteIcon } from "../components/SiteIcon";
 
 const categories = [
   { id: "all", name: "الكل" },
@@ -43,11 +43,11 @@ type StoreViewportMetrics = {
 
 const viewportMetricsByColumns: Record<1 | 2 | 3 | 4, StoreViewportMetrics> = {
   1: {
-    cardHeight: 536,
-    imageHeight: 244,
-    rowGap: 20,
-    rowHeight: 556,
-    overscan: 8,
+    cardHeight: 440,
+    imageHeight: 224,
+    rowGap: 16,
+    rowHeight: 456,
+    overscan: 6,
     headerHeight: 88,
     spacedHeaderHeight: 184,
     reduceEffects: true,
@@ -152,11 +152,13 @@ function StoreProductCard({
   onOrderNow,
   onAddToCart,
   metrics,
+  staticLayout = false,
 }: {
   product: Product;
   onOrderNow: (product: Product) => void;
   onAddToCart: (product: Product) => void;
   metrics: StoreViewportMetrics;
+  staticLayout?: boolean;
 } & Attributes) {
   const discountPercent = getDiscountPercent();
   const originalPrice = getLegacyOriginalPrice(product.basePrice);
@@ -172,14 +174,15 @@ function StoreProductCard({
       <Link
         to={`/products/${product.id}`}
         className="block relative w-full overflow-hidden bg-surface-container-highest"
-        style={{ height: metrics.imageHeight }}
+        style={staticLayout ? undefined : { height: metrics.imageHeight }}
       >
+        {staticLayout && <div className="h-[244px] sm:h-[224px] lg:h-[200px] xl:h-[184px]" aria-hidden="true" />}
         {product.outOfStock && (
-           <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-sm">
-             <span className="rounded-full border border-destructive/50 bg-destructive/10 px-6 py-2 font-headline text-xl font-black text-destructive shadow-[0_0_20px_rgba(255,0,0,0.2)]">
-               نفدت الكمية
-             </span>
-           </div>
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+            <span className="rounded-full border border-destructive/50 bg-destructive/10 px-6 py-2 font-headline text-xl font-black text-destructive shadow-[0_0_20px_rgba(255,0,0,0.2)]">
+              نفدت الكمية
+            </span>
+          </div>
         )}
         <img
           alt={product.title}
@@ -216,32 +219,34 @@ function StoreProductCard({
       </Link>
 
       <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <h3 className={`mb-2 line-clamp-1 text-[1.05rem] font-bold sm:text-xl ${product.outOfStock ? "text-outline" : ""}`}>{product.title}</h3>
+        <h3 className={`mb-2 line-clamp-1 text-[1.05rem] font-bold sm:text-xl ${product.outOfStock ? "text-outline" : ""}`}>
+          {product.title}
+        </h3>
         <p className="mb-3 line-clamp-2 text-[13px] text-outline sm:mb-4 sm:text-sm">{product.desc}</p>
 
         <div className="mt-auto flex flex-col gap-3 border-t border-outline-variant/10 pt-3 sm:gap-4 sm:pt-4">
           <div className="flex w-full min-h-[66px] items-end justify-between">
             {!product.outOfStock ? (
-                <div className="flex flex-col items-start gap-1.5" dir="rtl">
-                 <div className="flex items-baseline gap-1.5">
-                   <span className={`text-[1.7rem] font-black leading-none text-white sm:text-[1.9rem] ${metrics.reduceEffects ? "" : "drop-shadow-sm"}`}>
-                     {formatSudanesePrice(product.basePrice)}
-                   </span>
-                   <span className="text-[10px] font-bold text-primary/75 sm:text-[11px]">ج.س</span>
-                 </div>
-                 <div className="flex items-center gap-1.5 sm:gap-2">
-                   <span className="flex items-baseline gap-1 text-[11px] text-outline/60 line-through sm:text-xs">
-                     <span>{formatSudanesePrice(originalPrice)}</span>
-                     <span>ج.س</span>
-                   </span>
-                   <span className="flex items-center gap-1 rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2 py-0.5 text-[9px] font-bold text-[#ff857d] sm:text-[10px]">
-                     <span>وفر</span>
-                     <span dir="ltr">{discountPercent}%</span>
-                   </span>
-                 </div>
-               </div>
+              <div className="flex flex-col items-start gap-1.5" dir="rtl">
+                <div className="flex items-baseline gap-1.5">
+                  <span className={`text-[1.7rem] font-black leading-none text-white sm:text-[1.9rem] ${metrics.reduceEffects ? "" : "drop-shadow-sm"}`}>
+                    {formatSudanesePrice(product.basePrice)}
+                  </span>
+                  <span className="text-[10px] font-bold text-primary/75 sm:text-[11px]">ج.س</span>
+                </div>
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <span className="flex items-baseline gap-1 text-[11px] text-outline/60 line-through sm:text-xs">
+                    <span>{formatSudanesePrice(originalPrice)}</span>
+                    <span>ج.س</span>
+                  </span>
+                  <span className="flex items-center gap-1 rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2 py-0.5 text-[9px] font-bold text-[#ff857d] sm:text-[10px]">
+                    <span>وفر</span>
+                    <span dir="ltr">{discountPercent}%</span>
+                  </span>
+                </div>
+              </div>
             ) : (
-                <span className="text-xs font-bold text-outline/50">غير متوفر</span>
+              <span className="text-xs font-bold text-outline/50">غير متوفر</span>
             )}
           </div>
 
@@ -267,21 +272,149 @@ function StoreProductCard({
   );
 }
 
+function StoreStaticSections({
+  groupedProducts,
+  onOrderNow,
+  onAddToCart,
+  metrics,
+}: {
+  groupedProducts: Record<string, Product[]>;
+  onOrderNow: (product: Product) => void;
+  onAddToCart: (product: Product) => void;
+  metrics: StoreViewportMetrics;
+}) {
+  return (
+    <main className="mx-auto max-w-screen-2xl px-6 md:px-12">
+      {Object.entries(groupedProducts).map(([categoryId, categoryProducts]) => (
+        <section key={categoryId} className="pb-12 first:pt-0">
+          <div className="flex h-full items-end pb-8">
+            <div className="flex w-full items-center justify-between">
+              <h2 className="border-r-4 border-primary pr-4 font-headline text-3xl font-bold">
+                {getCategoryName(categoryId)}
+              </h2>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8 xl:grid-cols-4">
+            {categoryProducts.map((product) => (
+              <StoreProductCard
+                key={product.id}
+                product={product}
+                onOrderNow={onOrderNow}
+                onAddToCart={onAddToCart}
+                metrics={metrics}
+                staticLayout
+              />
+            ))}
+          </div>
+        </section>
+      ))}
+    </main>
+  );
+}
+
+function StoreVirtualizedSections({
+  activeCategory,
+  virtualItems,
+  viewportMetrics,
+  onOrderNow,
+  onAddToCart,
+}: {
+  activeCategory: VisibleCategory;
+  virtualItems: VirtualStoreItem[];
+  viewportMetrics: StoreViewportMetrics;
+  onOrderNow: (product: Product) => void;
+  onAddToCart: (product: Product) => void;
+}) {
+  const [scrollMargin, setScrollMargin] = useState(0);
+  const listRef = useRef<HTMLElement | null>(null);
+
+  useLayoutEffect(() => {
+    const updateScrollMargin = () => {
+      if (!listRef.current) return;
+      setScrollMargin(listRef.current.getBoundingClientRect().top + window.scrollY);
+    };
+
+    updateScrollMargin();
+    window.addEventListener("resize", updateScrollMargin, { passive: true });
+
+    return () => window.removeEventListener("resize", updateScrollMargin);
+  }, [activeCategory, virtualItems.length]);
+
+  const rowVirtualizer = useWindowVirtualizer({
+    count: virtualItems.length,
+    estimateSize: (index) => getVirtualItemSize(virtualItems[index], viewportMetrics),
+    overscan: viewportMetrics.overscan,
+    scrollMargin,
+    getItemKey: (index) => virtualItems[index]?.key ?? index,
+  });
+
+  return (
+    <main ref={listRef} className="mx-auto max-w-screen-2xl px-6 md:px-12">
+      <div className="relative w-full" style={{ height: rowVirtualizer.getTotalSize() }}>
+        {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+          const item = virtualItems[virtualRow.index];
+
+          if (!item) return null;
+
+          const itemHeight = getVirtualItemSize(item, viewportMetrics);
+
+          return (
+            <div
+              key={item.key}
+              data-index={virtualRow.index}
+              className="absolute top-0 left-0 w-full"
+              style={{
+                height: itemHeight,
+                transform: `translate3d(0, ${virtualRow.start - scrollMargin}px, 0)`,
+              }}
+            >
+              {item.kind === "header" ? (
+                <div className="flex h-full items-end pb-8">
+                  <div className="flex w-full items-center justify-between">
+                    <h2 className="border-r-4 border-primary pr-4 font-headline text-3xl font-bold">{item.title}</h2>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex h-full flex-col" style={{ paddingBottom: item.isLastRow ? 0 : viewportMetrics.rowGap }}>
+                  <div className="grid h-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8 xl:grid-cols-4">
+                    {item.products.map((product) => (
+                      <StoreProductCard
+                        key={product.id}
+                        product={product}
+                        onOrderNow={onOrderNow}
+                        onAddToCart={onAddToCart}
+                        metrics={viewportMetrics}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </main>
+  );
+}
+
 export function Store() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
+
   const initialCategory = (searchParams.get("category") as VisibleCategory) || "all";
   const [activeCategory, setActiveCategory] = useState<VisibleCategory>(initialCategory);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [columns, setColumns] = useState(() => (typeof window === "undefined" ? 1 : getColumnCount(window.innerWidth)));
-  const [scrollMargin, setScrollMargin] = useState(0);
+  const [columns, setColumns] = useState(1);
+  const [enableVirtualLayout, setEnableVirtualLayout] = useState(false);
   const toastTimeoutRef = useRef<number | undefined>(undefined);
-  const listRef = useRef<HTMLElement | null>(null);
-  const { addToCart } = useCart();
 
   const viewportMetrics = getViewportMetrics(columns);
+  const staticMetrics = viewportMetricsByColumns[1];
 
   useEffect(() => {
+    setEnableVirtualLayout(true);
+
     const handleResize = () => {
       const nextColumns = getColumnCount(window.innerWidth);
       setColumns((currentColumns) => (currentColumns === nextColumns ? currentColumns : nextColumns));
@@ -294,8 +427,8 @@ export function Store() {
   }, []);
 
   useEffect(() => {
-    const categoryQuery = searchParams.get("category") as VisibleCategory;
-    if (categoryQuery && categoryQuery !== activeCategory) {
+    const categoryQuery = (searchParams.get("category") as VisibleCategory) || "all";
+    if (categoryQuery !== activeCategory) {
       setActiveCategory(categoryQuery);
     }
   }, [activeCategory, searchParams]);
@@ -326,26 +459,6 @@ export function Store() {
   );
 
   const virtualItems = useMemo(() => buildVirtualItems(groupedProducts, columns), [columns, groupedProducts]);
-
-  useLayoutEffect(() => {
-    const updateScrollMargin = () => {
-      if (!listRef.current) return;
-      setScrollMargin(listRef.current.getBoundingClientRect().top + window.scrollY);
-    };
-
-    updateScrollMargin();
-    window.addEventListener("resize", updateScrollMargin, { passive: true });
-
-    return () => window.removeEventListener("resize", updateScrollMargin);
-  }, [activeCategory, columns, virtualItems.length]);
-
-  const rowVirtualizer = useWindowVirtualizer({
-    count: virtualItems.length,
-    estimateSize: (index) => getVirtualItemSize(virtualItems[index], viewportMetrics),
-    overscan: viewportMetrics.overscan,
-    scrollMargin,
-    getItemKey: (index) => virtualItems[index]?.key ?? index,
-  });
 
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId as VisibleCategory);
@@ -396,7 +509,7 @@ export function Store() {
               <img
                 alt="digital abstract"
                 className="h-full w-full object-cover mix-blend-screen"
-                src={import.meta.env.BASE_URL + "store-header.png"}
+                src="/store-header.png"
                 loading="lazy"
                 decoding="async"
                 fetchPriority="low"
@@ -426,55 +539,26 @@ export function Store() {
         </div>
       </section>
 
-      <main ref={listRef} className="mx-auto max-w-screen-2xl px-6 md:px-12">
-        {filteredProducts.length === 0 ? (
+      {filteredProducts.length === 0 ? (
+        <main className="mx-auto max-w-screen-2xl px-6 md:px-12">
           <div className="py-20 text-center text-outline">لا توجد منتجات متاحة في هذا القسم حالياً.</div>
-        ) : (
-          <div className="relative w-full" style={{ height: rowVirtualizer.getTotalSize() }}>
-            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-              const item = virtualItems[virtualRow.index];
-
-              if (!item) return null;
-
-              const itemHeight = getVirtualItemSize(item, viewportMetrics);
-
-              return (
-                <div
-                  key={item.key}
-                  data-index={virtualRow.index}
-                  className="absolute top-0 left-0 w-full"
-                  style={{
-                    height: itemHeight,
-                    transform: `translate3d(0, ${virtualRow.start - scrollMargin}px, 0)`,
-                  }}
-                >
-                  {item.kind === "header" ? (
-                    <div className="flex h-full items-end pb-8">
-                      <div className="flex w-full items-center justify-between">
-                        <h2 className="border-r-4 border-primary pr-4 font-headline text-3xl font-bold">{item.title}</h2>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex h-full flex-col" style={{ paddingBottom: item.isLastRow ? 0 : viewportMetrics.rowGap }}>
-                      <div className="grid h-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8 xl:grid-cols-4">
-                        {item.products.map((product) => (
-                          <StoreProductCard
-                            key={product.id}
-                            product={product}
-                            onOrderNow={handleOrderNow}
-                            onAddToCart={handleAddToCart}
-                            metrics={viewportMetrics}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </main>
+        </main>
+      ) : enableVirtualLayout ? (
+        <StoreVirtualizedSections
+          activeCategory={activeCategory}
+          virtualItems={virtualItems}
+          viewportMetrics={viewportMetrics}
+          onOrderNow={handleOrderNow}
+          onAddToCart={handleAddToCart}
+        />
+      ) : (
+        <StoreStaticSections
+          groupedProducts={groupedProducts}
+          onOrderNow={handleOrderNow}
+          onAddToCart={handleAddToCart}
+          metrics={staticMetrics}
+        />
+      )}
 
       {toastMessage && (
         <div className="fixed bottom-8 left-1/2 z-[100] flex w-[90%] max-w-sm -translate-x-1/2 items-center gap-3 rounded-full bg-[#25D366] px-6 py-4 font-bold text-white shadow-[0_10px_30px_rgba(37,211,102,0.4)] md:w-auto">

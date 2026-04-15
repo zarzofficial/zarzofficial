@@ -48,10 +48,10 @@ export function FeaturedProducts() {
               <Link
                 key={product.id}
                 to={`/products/${product.id}`}
-                className={`perf-card group relative flex aspect-[4/5] flex-col overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] sm:min-h-[390px] sm:aspect-auto sm:rounded-[1.5rem] sm:shadow-sm md:shadow-lg md:transition-all md:duration-300 md:hover:-translate-y-1 md:hover:border-primary/30 md:hover:shadow-[0_18px_40px_rgba(208,188,255,0.08)] ${
+                className={`perf-card group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] sm:min-h-[390px] sm:rounded-[1.5rem] sm:shadow-sm md:shadow-lg md:transition-all md:duration-300 md:hover:-translate-y-1 md:hover:border-primary/30 md:hover:shadow-[0_18px_40px_rgba(208,188,255,0.08)] ${
                   product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : "bg-surface-container-low/80"
                 }`}
-                style={{ contain: "content", contentVisibility: "auto", containIntrinsicSize: "390px" }}
+                style={{ contain: "content", contentVisibility: "auto" }}
               >
                 {!product.outOfStock && (
                   <div
@@ -60,7 +60,7 @@ export function FeaturedProducts() {
                   ></div>
                 )}
 
-                <div className="relative min-h-0 basis-[56%] overflow-hidden bg-[#0c0a10] sm:aspect-square sm:basis-auto">
+                <div className="relative min-h-0 aspect-[4/3] w-full overflow-hidden bg-[#0c0a10] sm:aspect-square">
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-14 bg-gradient-to-t from-[#0c0a10] to-transparent sm:h-16"></div>
 
                   {product.outOfStock && (

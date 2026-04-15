@@ -1,9 +1,8 @@
 import {StrictMode} from 'react';
-import {createRoot} from 'react-dom/client';
+import {createRoot, hydrateRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import { AuthProvider } from './lib/AuthContext';
-import { CartProvider } from './lib/CartContext';
+import { AppProviders } from './app/AppProviders';
 
 async function cleanupLegacyServiceWorkers() {
   if (typeof window === "undefined") return;
@@ -81,17 +80,30 @@ if (!rootElement) {
   throw new Error('Missing root element');
 }
 
-void cleanupLegacyServiceWorkers();
-void preloadStartupRoute().catch((error) => {
-  console.error("Startup route preload failed", error);
-});
-
-createRoot(rootElement).render(
+const appTree = (
   <StrictMode>
-    <AuthProvider>
-      <CartProvider>
-        <App />
-      </CartProvider>
-    </AuthProvider>
-  </StrictMode>,
+    <AppProviders>
+      <App />
+    </AppProviders>
+  </StrictMode>
 );
+
+const isPrerendered = rootElement.dataset.prerendered === "true";
+
+void cleanupLegacyServiceWorkers();
+
+if (isPrerendered) {
+  void preloadStartupRoute()
+    .catch((error) => {
+      console.error("Startup route preload failed", error);
+    })
+    .finally(() => {
+      hydrateRoot(rootElement, appTree);
+    });
+} else {
+  void preloadStartupRoute().catch((error) => {
+    console.error("Startup route preload failed", error);
+  });
+
+  createRoot(rootElement).render(appTree);
+}
