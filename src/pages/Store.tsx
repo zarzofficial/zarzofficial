@@ -165,11 +165,12 @@ function StoreProductCard({
 
   return (
     <div
-      className={`perf-card group flex h-full flex-col overflow-hidden rounded-[1.35rem] border border-outline-variant/10 bg-surface-container-low sm:rounded-2xl ${
+      className={`perf-card perf-mobile-card group flex h-full flex-col overflow-hidden rounded-[1.35rem] border border-outline-variant/10 bg-surface-container-low sm:rounded-2xl ${
         metrics.reduceEffects
           ? "shadow-sm"
           : "shadow-md transition-transform duration-300 md:hover:-translate-y-1 md:hover:shadow-[0_18px_38px_rgba(86,0,202,0.14)]"
       } ${product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : ""}`}
+      style={{ contentVisibility: "auto", containIntrinsicSize: `1px ${metrics.cardHeight}px` }}
     >
       <Link
         to={`/products/${product.id}`}
@@ -286,7 +287,7 @@ function StoreStaticSections({
   return (
     <main className="mx-auto max-w-screen-2xl px-6 md:px-12">
       {Object.entries(groupedProducts).map(([categoryId, categoryProducts]) => (
-        <section key={categoryId} className="pb-12 first:pt-0">
+        <section key={categoryId} className="perf-mobile-section pb-12 first:pt-0" data-perf-size="tall">
           <div className="flex h-full items-end pb-8">
             <div className="flex w-full items-center justify-between">
               <h2 className="border-r-4 border-primary pr-4 font-headline text-3xl font-bold">
@@ -521,7 +522,7 @@ export function Store() {
         </div>
       </header>
 
-      <section className="mx-auto mb-16 max-w-screen-2xl overflow-x-auto px-6 no-scrollbar md:px-12">
+      <section className="perf-scroll-strip mx-auto mb-16 max-w-screen-2xl overflow-x-auto px-6 no-scrollbar md:px-12">
         <div className="flex gap-4 pb-4">
           {categories.map((category) => (
             <button

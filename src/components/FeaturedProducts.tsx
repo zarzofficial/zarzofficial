@@ -25,7 +25,7 @@ export function FeaturedProducts() {
     .filter(Boolean) as typeof products;
 
   return (
-    <section className="relative overflow-hidden bg-background px-6 pt-4 pb-20 md:px-12 md:py-28">
+    <section className="perf-mobile-section relative overflow-hidden bg-background px-6 pt-4 pb-20 md:px-12 md:py-28" data-perf-size="medium">
       <div className="pointer-events-none absolute top-0 right-1/4 h-[260px] w-[260px] rounded-full bg-primary/5 blur-[36px] md:h-[500px] md:w-[500px] md:blur-[120px]"></div>
       <div className="pointer-events-none absolute bottom-0 left-1/3 h-[220px] w-[220px] rounded-full bg-tertiary/5 blur-[32px] md:h-[400px] md:w-[400px] md:blur-[100px]"></div>
 
@@ -48,10 +48,10 @@ export function FeaturedProducts() {
               <Link
                 key={product.id}
                 to={`/products/${product.id}`}
-                className={`perf-card group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] sm:min-h-[390px] sm:rounded-[1.5rem] sm:shadow-sm md:shadow-lg md:transition-all md:duration-300 md:hover:-translate-y-1 md:hover:border-primary/30 md:hover:shadow-[0_18px_40px_rgba(208,188,255,0.08)] ${
+                className={`perf-card perf-mobile-card group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] sm:min-h-[390px] sm:rounded-[1.5rem] sm:shadow-sm md:shadow-lg md:transition-all md:duration-300 md:hover:-translate-y-1 md:hover:border-primary/30 md:hover:shadow-[0_18px_40px_rgba(208,188,255,0.08)] ${
                   product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : "bg-surface-container-low/80"
                 }`}
-                style={{ contain: "content", contentVisibility: "auto" }}
+                style={{ contain: "content", contentVisibility: "auto", containIntrinsicSize: "1px 420px" }}
               >
                 {!product.outOfStock && (
                   <div

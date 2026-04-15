@@ -69,7 +69,7 @@ export function Terms() {
           </section>
 
           {/* Section: Terms of Use */}
-          <section id="usage" className="perf-panel p-10 bg-surface-container-low rounded-[2.5rem] border border-outline-variant/10 shadow-2xl shadow-primary/5">
+          <section id="usage" className="perf-mobile-section perf-panel rounded-[2.5rem] border border-outline-variant/10 bg-surface-container-low p-10 shadow-2xl shadow-primary/5" data-perf-size="medium">
             <div className="flex items-center gap-4 mb-8">
               <span className="w-12 h-[1px] bg-secondary"></span>
               <h2 className="font-headline text-3xl font-bold text-on-background">شروط الاستخدام</h2>
@@ -97,7 +97,7 @@ export function Terms() {
           </section>
 
           {/* Image Break: Royal Scrim Aesthetic */}
-          <div className="relative h-64 md:h-80 w-full overflow-hidden rounded-[2.5rem] group">
+          <div className="perf-mobile-section relative h-64 w-full overflow-hidden rounded-[2.5rem] group md:h-80" data-perf-size="compact">
             <img 
               alt="Decorative Cyber Security" 
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
@@ -110,7 +110,7 @@ export function Terms() {
           </div>
 
           {/* Section: Data Protection */}
-          <section id="data">
+          <section id="data" className="perf-mobile-section" data-perf-size="medium">
             <div className="flex items-center gap-4 mb-8">
               <span className="w-12 h-[1px] bg-primary"></span>
               <h2 className="font-headline text-3xl font-bold text-on-background">حماية البيانات</h2>
@@ -128,7 +128,7 @@ export function Terms() {
           </section>
 
           {/* Section: Limitation of Liability */}
-          <section id="liability" className="perf-panel relative overflow-hidden p-10 bg-gradient-to-br from-surface-container-low to-surface rounded-[2.5rem] border border-outline-variant/10">
+          <section id="liability" className="perf-mobile-section perf-panel relative overflow-hidden rounded-[2.5rem] border border-outline-variant/10 bg-gradient-to-br from-surface-container-low to-surface p-10" data-perf-size="compact">
             <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/5 blur-[80px] rounded-full"></div>
             <div className="flex items-center gap-4 mb-8 relative z-10">
               <span className="w-12 h-[1px] bg-error"></span>

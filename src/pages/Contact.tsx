@@ -154,7 +154,7 @@ export function Contact() {
       </div>
 
       {/* Location Section (Asymmetric Detail) */}
-      <section className="mt-32 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <section className="perf-mobile-section mt-32 grid grid-cols-1 gap-12 items-center md:grid-cols-2" data-perf-size="medium">
         <div className="perf-panel order-2 md:order-1 h-96 rounded-[3rem] overflow-hidden bg-surface-container-low shadow-xl">
           <div className="w-full h-full bg-surface-container-high flex items-center justify-center relative group">
             <img 

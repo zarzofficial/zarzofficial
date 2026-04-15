@@ -186,7 +186,7 @@ export function Home() {
       <FeaturedProducts />
 
       {/* Bento Services Grid */}
-      <section className="px-6 md:px-12 py-32 bg-surface-container-low">
+      <section className="perf-mobile-section px-6 py-32 bg-surface-container-low md:px-12" data-perf-size="tall">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-end mb-20">
             <div className="text-start">
@@ -403,7 +403,7 @@ export function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-24 px-6 md:px-12 relative overflow-hidden">
+      <section className="perf-mobile-section relative overflow-hidden px-6 py-24 md:px-12" data-perf-size="compact">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-1/2 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]"></div>
           <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-tertiary/10 rounded-full blur-[120px]"></div>
@@ -458,7 +458,7 @@ export function Home() {
 
 
       {/* FAQ Section */}
-      <section id="faq" className="py-24 px-6 md:px-12 bg-background relative overflow-hidden">
+      <section id="faq" className="perf-mobile-section relative overflow-hidden bg-background px-6 py-24 md:px-12" data-perf-size="medium">
         <div className="absolute top-1/2 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none -translate-y-1/2"></div>
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">
@@ -490,7 +490,7 @@ export function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 md:py-32 px-6 md:px-12">
+      <section className="perf-mobile-section px-6 py-24 md:px-12 md:py-32" data-perf-size="compact">
         <div className="perf-panel max-w-7xl mx-auto cyber-glass-card rounded-[2.5rem] p-8 md:p-14 relative overflow-hidden group border border-outline-variant/20 shadow-2xl">
           <div className="mesh-gradient-bg opacity-30"></div>
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
