@@ -1,34 +1,26 @@
-const CACHE_NAME = "zarz-pwa-v1";
+const LEGACY_CACHE_PREFIXES = ["zarz-pwa"];
 
-self.addEventListener("install", (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      // Offline fallback files
-      return cache.addAll(["/", "/index.html", "/favicon.svg", "/favicon.png"]);
-    })
+async function clearLegacyCaches() {
+  const cacheKeys = await caches.keys();
+  await Promise.all(
+    cacheKeys
+      .filter((cacheKey) => LEGACY_CACHE_PREFIXES.some((prefix) => cacheKey.startsWith(prefix)))
+      .map((cacheKey) => caches.delete(cacheKey)),
   );
+}
+
+self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
-self.addEventListener("activate", (e) => {
-  e.waitUntil(
-    caches.keys().then((keyList) => {
-      return Promise.all(
-        keyList.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim();
-});
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    (async () => {
+      await clearLegacyCaches();
+      await self.registration.unregister();
 
-self.addEventListener("fetch", (e) => {
-  e.respondWith(
-    caches.match(e.request).then((response) => {
-      return response || fetch(e.request);
-    })
+      const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      await Promise.all(clients.map((client) => client.navigate(client.url)));
+    })(),
   );
 });

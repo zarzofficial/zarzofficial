@@ -156,12 +156,27 @@ export function ProductDetails() {
         رجوع
       </button>
 
-      <div className="perf-panel relative grid grid-cols-1 gap-12 overflow-hidden rounded-[2rem] border border-white/10 bg-card/40 p-6 shadow-[0_0_40px_rgba(0,0,0,0.5)] backdrop-blur-xl lg:grid-cols-2 md:p-10">
+      <div className="perf-panel relative grid grid-cols-1 gap-8 overflow-hidden rounded-[1.75rem] border border-white/10 bg-card/40 p-5 shadow-[0_16px_40px_rgba(0,0,0,0.32)] backdrop-blur-xl lg:grid-cols-2 md:gap-12 md:rounded-[2rem] md:p-10 md:shadow-[0_0_40px_rgba(0,0,0,0.5)]">
         <div className="pointer-events-none absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl"></div>
         <div className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 -translate-x-1/2 translate-y-1/2 rounded-full bg-secondary/5 blur-3xl"></div>
 
-        <div className="relative z-10 aspect-square overflow-hidden rounded-2xl border border-white/5 bg-background/50 shadow-inner">
-          <img src={product.image} alt={product.title} className="h-full w-full object-cover" width={634} height={634} referrerPolicy="no-referrer" />
+        <div
+          className="relative z-10 mx-auto aspect-square w-full max-w-[28rem] overflow-hidden rounded-[1.5rem] border border-white/5 bg-background/50 shadow-inner lg:max-w-none lg:rounded-2xl"
+          style={{ contain: "content" }}
+        >
+          <img
+            src={product.image}
+            alt={product.title}
+            className="h-full w-full object-cover"
+            width={634}
+            height={634}
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+            referrerPolicy="no-referrer"
+            sizes="(max-width: 1023px) calc(100vw - 2rem), 46vw"
+            draggable={false}
+          />
         </div>
 
         <div className="z-10 flex flex-col">

@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect } from "react";
-import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { Home } from "./pages/Home";
@@ -20,7 +20,7 @@ function DynamicTitle() {
 
   useEffect(() => {
     let pageName = "الرئيسية";
-    const path = location.pathname;
+    const path = location.pathname === "/" ? "/" : location.pathname.replace(/\/+$/, "");
 
     if (path === "/cart" || path === "/products/cart") {
       pageName = "سلة المشتريات";
@@ -64,9 +64,33 @@ function DynamicTitle() {
   return null;
 }
 
+function CanonicalPath() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.pathname === "/") return;
+
+    const normalizedPath = location.pathname.replace(/\/+$/, "");
+    if (!normalizedPath || normalizedPath === location.pathname) return;
+
+    navigate(
+      {
+        pathname: normalizedPath,
+        search: location.search,
+        hash: location.hash,
+      },
+      { replace: true, state: location.state },
+    );
+  }, [location.hash, location.pathname, location.search, location.state, navigate]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <Router>
+      <CanonicalPath />
       <DynamicTitle />
       <ScrollToTop />
       <div className="min-h-screen bg-background font-sans text-foreground selection:bg-primary/30 flex flex-col">

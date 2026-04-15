@@ -60,15 +60,26 @@ export function Home() {
 
   useEffect(() => {
     if (location.state && (location.state as any).scrollToFaq) {
-      setTimeout(() => {
+      const timer = window.setTimeout(() => {
         const faqSection = document.getElementById('faq');
         if (faqSection) faqSection.scrollIntoView({ behavior: 'smooth' });
-        
-        // Remove state so a page refresh doesn't trigger scroll
-        window.history.replaceState({}, document.title);
+
+        const currentHistoryState = window.history.state;
+        const nextHistoryState =
+          currentHistoryState && typeof currentHistoryState === "object"
+            ? { ...currentHistoryState, usr: null }
+            : currentHistoryState;
+
+        window.history.replaceState(
+          nextHistoryState,
+          document.title,
+          `${location.pathname}${location.search}`,
+        );
       }, 100);
+
+      return () => window.clearTimeout(timer);
     }
-  }, [location]);
+  }, [location.pathname, location.search, location.state]);
 
   return (
     <div className="pt-12 md:pt-14">

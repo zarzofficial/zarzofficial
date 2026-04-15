@@ -43,10 +43,10 @@ type StoreViewportMetrics = {
 
 const viewportMetricsByColumns: Record<1 | 2 | 3 | 4, StoreViewportMetrics> = {
   1: {
-    cardHeight: 548,
-    imageHeight: 264,
-    rowGap: 24,
-    rowHeight: 572,
+    cardHeight: 536,
+    imageHeight: 244,
+    rowGap: 20,
+    rowHeight: 556,
     overscan: 8,
     headerHeight: 88,
     spacedHeaderHeight: 184,
@@ -163,7 +163,7 @@ function StoreProductCard({
 
   return (
     <div
-      className={`perf-card group flex h-full flex-col overflow-hidden rounded-2xl border border-outline-variant/10 bg-surface-container-low ${
+      className={`perf-card group flex h-full flex-col overflow-hidden rounded-[1.35rem] border border-outline-variant/10 bg-surface-container-low sm:rounded-2xl ${
         metrics.reduceEffects
           ? "shadow-sm"
           : "shadow-md transition-transform duration-300 md:hover:-translate-y-1 md:hover:shadow-[0_18px_38px_rgba(86,0,202,0.14)]"
@@ -192,11 +192,11 @@ function StoreProductCard({
           width={634}
           height={634}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/20 flex flex-col justify-between p-4 pointer-events-none z-10">
+        <div className="absolute inset-0 z-10 flex flex-col justify-between bg-gradient-to-b from-black/60 via-transparent to-black/20 p-3 pointer-events-none sm:p-4">
           <div className="flex justify-end w-full">
             {discountPercent && !product.outOfStock && (
               <span
-                className="ml-auto rounded-full bg-[#ff3b30] px-3 py-1 text-xs font-bold tracking-wider text-white shadow-sm"
+                className="ml-auto rounded-full bg-[#ff3b30] px-2.5 py-1 text-[11px] font-bold tracking-wider text-white shadow-sm sm:px-3 sm:text-xs"
                 style={{ marginRight: "auto", marginLeft: "0" }}
               >
                 {`-${discountPercent}%`}
@@ -205,7 +205,7 @@ function StoreProductCard({
           </div>
           <div className="mt-auto flex items-end">
             <span
-              className={`rounded-lg border border-white/10 bg-black/60 px-2 py-1 text-xs font-bold text-white ${
+              className={`rounded-lg border border-white/10 bg-black/60 px-2 py-1 text-[11px] font-bold text-white sm:text-xs ${
                 metrics.reduceEffects ? "" : "sm:backdrop-blur-sm"
               }`}
             >
@@ -215,26 +215,26 @@ function StoreProductCard({
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className={`mb-2 line-clamp-1 text-xl font-bold ${product.outOfStock ? "text-outline" : ""}`}>{product.title}</h3>
-        <p className="mb-4 line-clamp-2 text-sm text-outline">{product.desc}</p>
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <h3 className={`mb-2 line-clamp-1 text-[1.05rem] font-bold sm:text-xl ${product.outOfStock ? "text-outline" : ""}`}>{product.title}</h3>
+        <p className="mb-3 line-clamp-2 text-[13px] text-outline sm:mb-4 sm:text-sm">{product.desc}</p>
 
-        <div className="mt-auto flex flex-col gap-4 border-t border-outline-variant/10 pt-4">
+        <div className="mt-auto flex flex-col gap-3 border-t border-outline-variant/10 pt-3 sm:gap-4 sm:pt-4">
           <div className="flex w-full min-h-[66px] items-end justify-between">
             {!product.outOfStock ? (
                 <div className="flex flex-col items-start gap-1.5" dir="rtl">
                  <div className="flex items-baseline gap-1.5">
-                   <span className={`text-[1.9rem] font-black leading-none text-white ${metrics.reduceEffects ? "" : "drop-shadow-sm"}`}>
+                   <span className={`text-[1.7rem] font-black leading-none text-white sm:text-[1.9rem] ${metrics.reduceEffects ? "" : "drop-shadow-sm"}`}>
                      {formatSudanesePrice(product.basePrice)}
                    </span>
-                   <span className="text-[11px] font-bold text-primary/75">ج.س</span>
+                   <span className="text-[10px] font-bold text-primary/75 sm:text-[11px]">ج.س</span>
                  </div>
-                 <div className="flex items-center gap-2">
-                   <span className="flex items-baseline gap-1 text-xs text-outline/60 line-through">
+                 <div className="flex items-center gap-1.5 sm:gap-2">
+                   <span className="flex items-baseline gap-1 text-[11px] text-outline/60 line-through sm:text-xs">
                      <span>{formatSudanesePrice(originalPrice)}</span>
                      <span>ج.س</span>
                    </span>
-                   <span className="flex items-center gap-1 rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2 py-0.5 text-[10px] font-bold text-[#ff857d]">
+                   <span className="flex items-center gap-1 rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2 py-0.5 text-[9px] font-bold text-[#ff857d] sm:text-[10px]">
                      <span>وفر</span>
                      <span dir="ltr">{discountPercent}%</span>
                    </span>
@@ -249,16 +249,16 @@ function StoreProductCard({
             <button
               disabled={product.outOfStock}
               onClick={() => onOrderNow(product)}
-              className="flex-1 rounded-full primary-gradient py-3 text-center text-[13px] font-bold text-on-primary shadow-sm transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale md:text-base md:hover:scale-[1.02]"
+              className="flex-1 rounded-full primary-gradient py-2.5 text-center text-[12px] font-bold text-on-primary shadow-sm transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale sm:py-3 sm:text-[13px] md:text-base md:hover:scale-[1.02]"
             >
               اطلب الآن
             </button>
             <button
               disabled={product.outOfStock}
               onClick={() => onAddToCart(product)}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-outline-variant/30 bg-surface-container-highest text-primary shadow-sm transition-colors active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-transparent sm:h-12 sm:w-12 md:hover:bg-primary/10"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-outline-variant/30 bg-surface-container-highest text-primary shadow-sm transition-colors active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-transparent sm:h-12 sm:w-12 md:hover:bg-primary/10"
             >
-              <SiteIcon name="add_shopping_cart" className="text-lg sm:text-xl" />
+              <SiteIcon name="add_shopping_cart" className="text-base sm:text-xl" />
             </button>
           </div>
         </div>

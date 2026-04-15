@@ -34,6 +34,8 @@ const legacyProductSlugs = [
 
 const routeDirectories = [
   "account",
+  "cart",
+  "checkout",
   "contact",
   "terms",
   "products",
@@ -61,6 +63,9 @@ const routeTitles = new Map([
   ["terms.html", `${titlePrefix}الشروط والأحكام`],
   ["store.html", `${titlePrefix}المنتجات`],
 ]);
+
+routeTitles.set("cart", routeTitles.get("products/cart"));
+routeTitles.set("checkout", routeTitles.get("products/checkout"));
 
 const productTitles = [
   [productSlugs[0], "شات جي بي تي بلس (ChatGPT Plus) - شهر واحد"],

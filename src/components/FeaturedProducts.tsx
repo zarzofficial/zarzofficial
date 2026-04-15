@@ -38,7 +38,7 @@ export function FeaturedProducts() {
           <p className="mx-auto max-w-md text-base font-medium text-outline md:text-lg">اكتشف أكثر الخدمات طلبًا لدينا</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:gap-6 lg:grid-cols-3">
           {featured.map((product) => {
             const category = categoryMap[product.category] || { label: product.category, color: "#d0bcff" };
             const discountPercent = getDiscountPercent();
@@ -48,23 +48,24 @@ export function FeaturedProducts() {
               <Link
                 key={product.id}
                 to={`/products/${product.id}`}
-                className={`perf-card group relative flex min-h-[390px] flex-col overflow-hidden rounded-[1.5rem] border border-outline-variant/10 shadow-sm md:shadow-lg md:transition-all md:duration-300 md:hover:-translate-y-1 md:hover:border-primary/30 md:hover:shadow-[0_18px_40px_rgba(208,188,255,0.08)] ${
+                className={`perf-card group relative flex aspect-[4/5] flex-col overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] sm:min-h-[390px] sm:aspect-auto sm:rounded-[1.5rem] sm:shadow-sm md:shadow-lg md:transition-all md:duration-300 md:hover:-translate-y-1 md:hover:border-primary/30 md:hover:shadow-[0_18px_40px_rgba(208,188,255,0.08)] ${
                   product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : "bg-surface-container-low/80"
                 }`}
+                style={{ contain: "content", contentVisibility: "auto", containIntrinsicSize: "390px" }}
               >
                 {!product.outOfStock && (
                   <div
-                    className="pointer-events-none absolute -top-10 -right-10 hidden h-40 w-40 rounded-full opacity-0 blur-[60px] transition-opacity duration-500 md:block md:group-hover:opacity-100"
+                    className="pointer-events-none absolute -top-10 -right-10 hidden h-32 w-32 rounded-full opacity-0 blur-[42px] transition-opacity duration-500 lg:block lg:group-hover:opacity-100"
                     style={{ backgroundColor: `${category.color}15` }}
                   ></div>
                 )}
 
-                <div className="relative aspect-square w-full overflow-hidden bg-[#0c0a10]">
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-t from-[#0c0a10] to-transparent"></div>
+                <div className="relative min-h-0 basis-[56%] overflow-hidden bg-[#0c0a10] sm:aspect-square sm:basis-auto">
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-14 bg-gradient-to-t from-[#0c0a10] to-transparent sm:h-16"></div>
 
                   {product.outOfStock && (
                     <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-sm">
-                      <span className="rounded-full border border-destructive/50 bg-destructive/10 px-6 py-2 font-headline text-xl font-black text-destructive shadow-[0_0_20px_rgba(255,0,0,0.2)]">
+                      <span className="rounded-full border border-destructive/50 bg-destructive/10 px-5 py-2 font-headline text-lg font-black text-destructive shadow-[0_0_14px_rgba(255,0,0,0.16)] sm:px-6 sm:text-xl sm:shadow-[0_0_20px_rgba(255,0,0,0.2)]">
                         نفدت الكمية
                       </span>
                     </div>
@@ -80,12 +81,14 @@ export function FeaturedProducts() {
                     decoding="async"
                     fetchPriority="low"
                     referrerPolicy="no-referrer"
+                    sizes="(max-width: 639px) 88vw, (max-width: 1023px) 44vw, 30vw"
+                    draggable={false}
                     width={634}
                     height={634}
                   />
 
                   <div className="absolute top-3 left-3 z-20">
-                    <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/60 px-2.5 py-1 sm:backdrop-blur-sm">
+                    <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/60 px-2.5 py-1">
                       <span className="text-xs text-[#fbbf24]">★</span>
                       <span className="text-xs font-bold text-white">{product.rating}</span>
                     </div>
@@ -93,17 +96,17 @@ export function FeaturedProducts() {
 
                   {discountPercent && !product.outOfStock && (
                     <div className="absolute top-3 right-3 z-20">
-                      <span className="rounded-full bg-[#ff3b30] px-3 py-1 text-xs font-bold tracking-wider text-white shadow-sm">
+                      <span className="rounded-full bg-[#ff3b30] px-3 py-1 text-xs font-bold tracking-wider text-white shadow-[0_6px_16px_rgba(255,59,48,0.18)] sm:shadow-sm">
                         {`خصم ${discountPercent}%`}
                       </span>
                     </div>
                   )}
                 </div>
 
-                <div className="flex flex-1 flex-col p-5 text-right" dir="rtl">
-                  <div className="mb-3 flex items-center justify-between">
+                <div className="flex min-h-0 flex-1 flex-col p-3.5 text-right sm:p-5" dir="rtl">
+                  <div className="mb-2 flex items-center justify-between gap-2 sm:mb-3">
                     <span
-                      className="rounded-full border px-3 py-1 text-xs font-bold"
+                      className="rounded-full border px-2.5 py-1 text-[10px] font-bold sm:px-3 sm:text-xs"
                       style={{
                         color: category.color,
                         borderColor: `${category.color}30`,
@@ -112,34 +115,34 @@ export function FeaturedProducts() {
                     >
                       {category.label}
                     </span>
-                    <span className="text-xs font-medium text-outline/60">{product.reviewCount || 100} تقييم</span>
+                    <span className="text-[11px] font-medium text-outline/60 sm:text-xs">{product.reviewCount || 100} تقييم</span>
                   </div>
 
                   <h3
-                    className={`mb-2.5 line-clamp-2 text-[15px] font-black leading-snug transition-colors md:text-base ${
+                    className={`mb-1.5 line-clamp-2 text-[14px] font-black leading-snug transition-colors sm:mb-2.5 sm:text-[15px] md:text-base ${
                       product.outOfStock ? "text-outline" : "text-on-surface md:group-hover:text-primary"
                     }`}
                   >
                     {product.title}
                   </h3>
 
-                  <p className="mb-4 line-clamp-2 text-xs leading-relaxed text-outline">{product.desc}</p>
+                  <p className="mb-3 line-clamp-2 text-[11px] leading-relaxed text-outline sm:mb-4 sm:text-xs">{product.desc}</p>
 
-                  <div className="mt-auto flex min-h-[66px] items-end justify-between border-t border-outline-variant/10 pt-3">
+                  <div className="mt-auto flex min-h-[56px] items-end justify-between border-t border-outline-variant/10 pt-2.5 sm:min-h-[66px] sm:pt-3">
                     {!product.outOfStock ? (
                       <div className="flex flex-col items-start gap-1.5" dir="rtl">
                         <div className="flex items-baseline gap-1.5">
-                          <span className="text-2xl font-black leading-none text-white md:text-[1.95rem]">
+                          <span className="text-[1.6rem] font-black leading-none text-white sm:text-2xl md:text-[1.95rem]">
                             {formatSudanesePrice(product.basePrice)}
                           </span>
-                          <span className="text-[11px] font-bold text-primary/75">ج.س</span>
+                          <span className="text-[10px] font-bold text-primary/75 sm:text-[11px]">ج.س</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="flex items-baseline gap-1 text-[11px] text-outline/60 line-through">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
+                          <span className="flex items-baseline gap-1 text-[10px] text-outline/60 line-through sm:text-[11px]">
                             <span>{formatSudanesePrice(originalPrice)}</span>
                             <span>ج.س</span>
                           </span>
-                          <span className="flex items-center gap-1 rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2 py-0.5 text-[10px] font-bold text-[#ff857d]">
+                          <span className="flex items-center gap-1 rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2 py-0.5 text-[9px] font-bold text-[#ff857d] sm:text-[10px]">
                             <span>وفر</span>
                             <span dir="ltr">{discountPercent}%</span>
                           </span>
@@ -150,7 +153,7 @@ export function FeaturedProducts() {
                     )}
 
                     <span
-                      className={`flex items-center gap-1 text-xs font-bold transition-colors ${
+                      className={`flex items-center gap-1 text-[10px] font-bold transition-colors sm:text-xs ${
                         product.outOfStock ? "text-outline/40" : "text-primary/70 md:group-hover:text-primary"
                       }`}
                     >
