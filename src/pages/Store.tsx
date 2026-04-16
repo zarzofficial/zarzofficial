@@ -7,13 +7,14 @@ import { useCart } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 
 const categories = [
+  { id: "all", name: "الكل", desktopOnly: true },
   { id: "social", name: "التواصل الاجتماعي" },
   { id: "ai", name: "الذكاء الاصطناعي" },
   { id: "web", name: "المواقع والمتاجر" },
   { id: "gaming", name: "الألعاب" },
 ] as const;
 
-type VisibleCategory = Category;
+type VisibleCategory = Category | "all";
 
 type VirtualStoreItem =
   | {
@@ -496,7 +497,7 @@ export function Store() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
-  const initialCategory = (searchParams.get("category") as VisibleCategory) || "social";
+  const initialCategory = (searchParams.get("category") as VisibleCategory) || "all";
   const [activeCategory, setActiveCategory] = useState<VisibleCategory>(initialCategory);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [columns, setColumns] = useState(1);
@@ -521,11 +522,19 @@ export function Store() {
   }, []);
 
   useEffect(() => {
-    const categoryQuery = (searchParams.get("category") as VisibleCategory) || "social";
+    const categoryQuery = (searchParams.get("category") as VisibleCategory) || "all";
     if (categoryQuery !== activeCategory) {
       setActiveCategory(categoryQuery);
     }
   }, [activeCategory, searchParams]);
+
+  // On mobile, redirect 'all' to 'social'
+  useEffect(() => {
+    if (columns === 1 && activeCategory === "all") {
+      setActiveCategory("social");
+      setSearchParams({ category: "social" }, { replace: true, preventScrollReset: true });
+    }
+  }, [columns, activeCategory, setSearchParams]);
 
   useEffect(() => {
     return () => {
@@ -536,6 +545,7 @@ export function Store() {
   }, []);
 
   const filteredProducts = useMemo(() => {
+    if (activeCategory === "all") return products;
     return products.filter((product) => product.category === activeCategory);
   }, [activeCategory]);
 
@@ -615,7 +625,9 @@ export function Store() {
 
       <section className="perf-scroll-strip mx-auto mb-16 max-w-screen-2xl overflow-x-auto px-6 no-scrollbar md:px-12">
         <div className="flex gap-4 pb-4">
-          {categories.map((category) => (
+          {categories
+            .filter((cat) => columns > 1 || !("desktopOnly" in cat && cat.desktopOnly))
+            .map((category) => (
             <button
               key={category.id}
               onClick={() => handleCategoryChange(category.id)}
@@ -637,6 +649,7 @@ export function Store() {
         </main>
       ) : enableVirtualLayout ? (
         <StoreVirtualizedSections
+          key={activeCategory}
           activeCategory={activeCategory}
           virtualItems={virtualItems}
           viewportMetrics={viewportMetrics}
