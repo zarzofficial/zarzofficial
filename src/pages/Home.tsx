@@ -55,16 +55,15 @@ function FaqAccordion({ faqs }: { faqs: { question: string, answer: string }[] }
   );
 }
 const categoryCardVariants = {
-  hidden: { opacity: 0, y: 50 },
-  visible: (i: number) => ({
+  hidden: { opacity: 0, y: 30 },
+  visible: {
     opacity: 1,
     y: 0,
     transition: {
-      delay: i * 0.15 + 0.1,
-      duration: 0.6,
+      duration: 0.4,
       ease: [0.22, 1, 0.36, 1]
     }
-  })
+  }
 };
 
 const techLogos = Array.from({ length: 8 }).map((_, i) => (
@@ -318,10 +317,9 @@ export function Home() {
               return (
                 <motion.div 
                   key={srv.id}
-                  custom={idx}
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, margin: "-50px" }}
+                  viewport={{ once: true, margin: "200px" }}
                   variants={categoryCardVariants}
                   className="block snap-start snap-always shrink-0 w-[280px] md:w-auto"
                   onClick={() => setActiveIndex(idx)}

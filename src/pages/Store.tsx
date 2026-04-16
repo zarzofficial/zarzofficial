@@ -46,7 +46,7 @@ const viewportMetricsByColumns: Record<1 | 2 | 3 | 4, StoreViewportMetrics> = {
     imageHeight: 284,
     rowGap: 16,
     rowHeight: 516,
-    overscan: 6,
+    overscan: 15,
     headerHeight: 88,
     spacedHeaderHeight: 184,
     reduceEffects: true,
