@@ -267,18 +267,13 @@ const desktopTechLogos = techLogoNames.map((logo) => (
   </div>
 ));
 
-const mobileTechLogos = techLogoNames.map((logo) => (
-  <div key={`${logo.id}-mobile`} className="flex items-center justify-center gap-1.5 whitespace-nowrap text-white/[0.24]">
-    <SiteIcon
-      name={logo.iconName}
-      className="text-[0.95rem] opacity-90 [filter:drop-shadow(0_1px_0_rgba(255,255,255,0.05))_drop-shadow(0_-1px_0_rgba(0,0,0,0.55))]"
-      strokeWidth={2}
-    />
-    <span className="font-black text-[0.6rem] tracking-[0.14em] font-headline [text-shadow:0_1px_0_rgba(255,255,255,0.05),0_-1px_0_rgba(0,0,0,0.55)]">
-      {logo.label}
+const mobileTechLogos = (
+  <div className="flex items-center justify-center whitespace-nowrap text-white/[0.24]">
+    <span className="font-black text-[0.78rem] tracking-[0.22em] font-headline [text-shadow:0_1px_0_rgba(255,255,255,0.05),0_-1px_0_rgba(0,0,0,0.55)]">
+      WRAITH
     </span>
   </div>
-));
+);
 
 export function Home() {
   const location = useLocation();
@@ -732,7 +727,7 @@ export function Home() {
           className="md:hidden pointer-events-none select-none px-1 py-2"
           dir="ltr"
         >
-          <div className="grid grid-cols-4 gap-x-3 gap-y-5 opacity-80 grayscale [mask-image:linear-gradient(to_right,transparent_0,black_8%,black_92%,transparent_100%)]">
+          <div className="flex items-center justify-center opacity-80 grayscale [mask-image:linear-gradient(to_right,transparent_0,black_8%,black_92%,transparent_100%)]">
             {mobileTechLogos}
           </div>
         </div>
