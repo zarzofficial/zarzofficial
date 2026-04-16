@@ -13,9 +13,15 @@ export function useHorizontalTouchScroll(containerRef: RefObject<HTMLElement | n
     const touchState = {
       startX: 0,
       startY: 0,
-      lastX: 0,
       axisLock: null as AxisLock,
       suppressClick: false,
+      resetClickTimeout: 0,
+    };
+
+    const clearResetClickTimeout = () => {
+      if (!touchState.resetClickTimeout) return;
+      window.clearTimeout(touchState.resetClickTimeout);
+      touchState.resetClickTimeout = 0;
     };
 
     const resetTouchState = () => {
@@ -23,17 +29,22 @@ export function useHorizontalTouchScroll(containerRef: RefObject<HTMLElement | n
       railElement.removeAttribute("data-touch-axis");
     };
 
+    const resetSuppressClick = () => {
+      clearResetClickTimeout();
+      touchState.suppressClick = false;
+    };
+
     const handleTouchStart = (event: TouchEvent) => {
       if (event.touches.length !== 1) {
         resetTouchState();
-        touchState.suppressClick = false;
+        resetSuppressClick();
         return;
       }
 
       const touch = event.touches[0];
+      clearResetClickTimeout();
       touchState.startX = touch.clientX;
       touchState.startY = touch.clientY;
-      touchState.lastX = touch.clientX;
       touchState.axisLock = null;
       touchState.suppressClick = false;
       railElement.removeAttribute("data-touch-axis");
@@ -48,7 +59,6 @@ export function useHorizontalTouchScroll(containerRef: RefObject<HTMLElement | n
 
       if (!touchState.axisLock) {
         if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
-          touchState.lastX = touch.clientX;
           return;
         }
 
@@ -57,12 +67,20 @@ export function useHorizontalTouchScroll(containerRef: RefObject<HTMLElement | n
       }
 
       if (touchState.axisLock === "x") {
-        event.preventDefault();
         touchState.suppressClick = true;
-        railElement.scrollBy({ left: touchState.lastX - touch.clientX, behavior: "auto" });
       }
+    };
 
-      touchState.lastX = touch.clientX;
+    const handleTouchEnd = () => {
+      resetTouchState();
+
+      if (!touchState.suppressClick) return;
+
+      clearResetClickTimeout();
+      touchState.resetClickTimeout = window.setTimeout(() => {
+        touchState.suppressClick = false;
+        touchState.resetClickTimeout = 0;
+      }, 250);
     };
 
     const handleClickCapture = (event: MouseEvent) => {
@@ -70,20 +88,21 @@ export function useHorizontalTouchScroll(containerRef: RefObject<HTMLElement | n
 
       event.preventDefault();
       event.stopPropagation();
-      touchState.suppressClick = false;
+      resetSuppressClick();
     };
 
     railElement.addEventListener("touchstart", handleTouchStart, { passive: true });
-    railElement.addEventListener("touchmove", handleTouchMove, { passive: false });
-    railElement.addEventListener("touchend", resetTouchState, { passive: true });
-    railElement.addEventListener("touchcancel", resetTouchState, { passive: true });
+    railElement.addEventListener("touchmove", handleTouchMove, { passive: true });
+    railElement.addEventListener("touchend", handleTouchEnd, { passive: true });
+    railElement.addEventListener("touchcancel", handleTouchEnd, { passive: true });
     railElement.addEventListener("click", handleClickCapture, true);
 
     return () => {
+      clearResetClickTimeout();
       railElement.removeEventListener("touchstart", handleTouchStart);
       railElement.removeEventListener("touchmove", handleTouchMove);
-      railElement.removeEventListener("touchend", resetTouchState);
-      railElement.removeEventListener("touchcancel", resetTouchState);
+      railElement.removeEventListener("touchend", handleTouchEnd);
+      railElement.removeEventListener("touchcancel", handleTouchEnd);
       railElement.removeEventListener("click", handleClickCapture, true);
       railElement.removeAttribute("data-touch-axis");
     };
