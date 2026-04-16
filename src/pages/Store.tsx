@@ -165,7 +165,7 @@ function StoreProductCard({
 
   return (
     <div
-      className={`perf-card perf-mobile-card group flex h-full flex-col overflow-hidden rounded-[1.35rem] border border-outline-variant/10 bg-surface-container-low sm:rounded-2xl ${
+      className={`perf-card group flex h-full flex-col overflow-hidden rounded-[1.35rem] border border-outline-variant/10 bg-surface-container-low sm:rounded-2xl ${
         metrics.reduceEffects
           ? "shadow-sm"
           : "shadow-md transition-transform duration-300 md:hover:-translate-y-1 md:hover:shadow-[0_18px_38px_rgba(86,0,202,0.14)]"
@@ -478,7 +478,7 @@ function MobileCategorySlider({
         style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
       >
         {products.map((product) => (
-          <div key={product.id} className="perf-card shrink-0 snap-center w-[290px] h-full" style={{ contain: "content" }}>
+          <div key={product.id} className="shrink-0 snap-center w-[290px] h-full">
             <StoreProductCard 
               product={product} 
               onOrderNow={onOrderNow} 
