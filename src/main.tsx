@@ -42,7 +42,10 @@ async function preloadStartupRoute() {
 
   const path = normalizeStartupPath(window.location.pathname);
 
-  if (path === "/" ) return;
+  if (path === "/") {
+    await import("./pages/Home");
+    return;
+  }
 
   if (path === "/products" || path === "/store.html" || path === "/products/catalog" || path.startsWith("/products/catalog/")) {
     await import("./pages/Store");

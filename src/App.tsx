@@ -1,11 +1,11 @@
 import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter as Router, Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { Home } from "./pages/Home";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { getProductBySlugOrId } from "./data/products";
 import { AppFrame } from "./app/AppFrame";
 import { getCatalogPath, getCatalogRouteCategory, getCategoryName } from "./lib/storeCatalog";
 
+const Home = lazy(() => import("./pages/Home").then((module) => ({ default: module.Home })));
 const Store = lazy(() => import("./pages/Store").then((module) => ({ default: module.Store })));
 const Cart = lazy(() => import("./pages/Cart").then((module) => ({ default: module.Cart })));
 const Account = lazy(() => import("./pages/Account").then((module) => ({ default: module.Account })));
