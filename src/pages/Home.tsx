@@ -1,34 +1,34 @@
 import { Link, useLocation } from "react-router-dom";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon } from "../components/SiteIcon";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useScroll, useSpring, useMotionValueEvent, useTransform } from "motion/react";
+
 
 function FaqItem({ faq, isOpen, onClick }: { key?: React.Key, faq: { question: string, answer: string }, isOpen: boolean, onClick: () => void }) {
   return (
     <motion.div
-      className={`perf-card cyber-glass-card rounded-2xl overflow-hidden cursor-pointer transition-colors duration-300 border ${isOpen ? 'border-[#e11d48]/30 bg-[#e11d48]/5' : 'border-outline-variant/10 hover:border-outline-variant/30 bg-surface-container-low/30'}`}
+      className={`perf-card cyber-glass-card rounded-2xl overflow-hidden cursor-pointer transition-colors duration-500 border ${isOpen ? 'border-[#e11d48]/30 bg-[#e11d48]/5 shadow-[0_4px_30px_rgba(225,29,72,0.1)]' : 'border-outline-variant/10 hover:border-outline-variant/30 bg-surface-container-low/30'}`}
       onClick={onClick}
-      style={{ contain: "content" }}
-      layout
+      layout="position"
     >
-      <motion.div className="p-6 flex items-center justify-between transform-gpu" layout="position">
+      <motion.div className="p-6 flex items-center justify-between" layout="position">
         <h3 className="text-lg font-bold text-on-surface">{faq.question}</h3>
         <SiteIcon
           name={isOpen ? "remove" : "add"}
-          className={`transition-transform duration-300 origin-center ${isOpen ? "text-[#e11d48] rotate-180" : "text-[#0ea5e9] rotate-0"}`}
+          className={`transition-transform duration-500 origin-center ${isOpen ? "text-[#e11d48] rotate-180" : "text-[#0ea5e9] rotate-0"}`}
         />
       </motion.div>
       <AnimatePresence initial={false}>
         {isOpen && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.04, 0.62, 0.23, 0.98] }}
+            initial={{ height: 0, opacity: 0, filter: "blur(4px)", y: -10 }}
+            animate={{ height: "auto", opacity: 1, filter: "blur(0px)", y: 0 }}
+            exit={{ height: 0, opacity: 0, filter: "blur(4px)", y: -10 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
-            <div className="px-6 pb-6 text-[#cbc3d9] leading-relaxed transform-gpu">
+            <div className="px-6 pb-6 text-[#cbc3d9] leading-relaxed">
               {faq.answer}
             </div>
           </motion.div>
@@ -54,9 +54,58 @@ function FaqAccordion({ faqs }: { faqs: { question: string, answer: string }[] }
     </div>
   );
 }
+const categoryCardVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: i * 0.15 + 0.1,
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1]
+    }
+  })
+};
+
+const techLogos = Array.from({ length: 8 }).map((_, i) => (
+  <div key={`wraith-${i}`} className="group flex items-center gap-4 md:gap-8">
+    <span className="font-black text-xl md:text-3xl tracking-[0.25em] text-white opacity-80 font-headline drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
+      WRAITH
+    </span>
+    <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary/40"></span>
+  </div>
+));
 
 export function Home() {
   const location = useLocation();
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const [isAtStart, setIsAtStart] = useState(true);
+  const [isAtEnd, setIsAtEnd] = useState(false);
+
+  const { scrollXProgress } = useScroll({ container: scrollContainerRef });
+
+  useMotionValueEvent(scrollXProgress, "change", (latest) => {
+    setIsAtStart(latest <= 0.02);
+    setIsAtEnd(latest >= 0.98);
+  });
+
+  // Map progress (0 to 1) to a pixel translation. 
+  // Container is 256px (w-64), thumb is 64px (w-16). Max travel is -192px.
+  const indicatorX = useTransform(scrollXProgress, [0, 1], [0, -192]);
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -360, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 360, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     if (location.state && (location.state as any).scrollToFaq) {
@@ -185,124 +234,175 @@ export function Home() {
 
       <FeaturedProducts />
 
-      {/* Bento Services Grid */}
-      <section className="perf-mobile-section px-6 py-32 bg-surface-container-low md:px-12" data-perf-size="tall">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-end mb-20">
+      {/* Services Grid (Horizontal Carousel) */}
+      <section className="perf-mobile-section px-6 py-32 bg-surface-container-low md:px-12 relative overflow-hidden" data-perf-size="tall">
+        <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-background to-transparent pointer-events-none z-0 border-t border-background"></div>
+        <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-background to-transparent pointer-events-none z-0 border-b border-background"></div>
+        
+        <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-row justify-between items-end mb-12 gap-4">
             <div className="text-start">
-              <span className="text-primary font-bold tracking-widest text-sm uppercase block mb-4">تخصصاتنا</span>
-              <h2 className="text-4xl md:text-5xl font-black font-headline text-on-background">أقسامنا الرئيسية</h2>
+              <span className="text-primary font-bold tracking-widest text-sm md:text-base uppercase block mb-1">تخصصاتنا</span>
+              <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background">أقسامنا الرئيسية</h2>
             </div>
-            <div className="hidden md:block h-[1px] flex-grow bg-outline-variant/30 mx-12 mb-4"></div>
+            
+            <div className="flex gap-2 md:gap-3 mb-1 md:hidden" dir="ltr">
+              <button 
+                onClick={scrollLeft}
+                disabled={isAtEnd}
+                className={`flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full transition-all ${
+                  !isAtEnd 
+                    ? "bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]" 
+                    : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
+                }`}
+              >
+                <span className="material-symbols-outlined text-2xl">chevron_left</span>
+              </button>
+              <button 
+                onClick={scrollRight}
+                disabled={isAtStart}
+                className={`flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full transition-all ${
+                  !isAtStart 
+                    ? "bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]" 
+                    : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
+                }`}
+              >
+                <span className="material-symbols-outlined text-2xl">chevron_right</span>
+              </button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-12 md:gap-8">
-            {/* AI Service - Large Card */}
-            <div
-              className="perf-panel main-service-card main-service-card--wide md:col-span-8 cyber-glass-card rounded-[2.5rem] p-7 md:p-12 group flex min-h-[24rem] md:min-h-[28rem] flex-col justify-between overflow-hidden"
-              style={{ contain: "layout paint style" }}
-            >
-              <div className="main-service-card__bg mesh-gradient-bg"></div>
-              <div className="main-service-card__accent glowing-border-accent"></div>
-              <div className="relative z-20">
-                <div className="main-service-card__icon-shell icon-glow-container mb-8 flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/5 md:group-hover:scale-110 md:transition-transform">
-                  <span className="material-symbols-outlined icon-gradient text-5xl md:drop-shadow-[0_0_15px_rgba(208,188,255,0.6)]" data-icon="neurology">neurology</span>
-                </div>
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="rounded-full border border-primary/30 bg-primary/20 px-4 py-1 text-xs font-bold text-[#f5d9fe] sm:backdrop-blur-md">حصري</span>
-                  <span className="text-primary/50 text-[10px] uppercase tracking-widest font-bold">Neural Core v2.0</span>
-                </div>
-                <h3 className="text-3xl md:text-5xl font-black mb-6 text-on-background tracking-tight text-glow">الذكاء الاصطناعي</h3>
-                <p className="text-[#cbc3d9] text-lg md:text-xl leading-relaxed mb-8 max-w-xl">
-                  أتمتة ذكية وحلول تحليلية مبنية على أحدث تقنيات، لتطوير أعمالك بشكل غير مسبوق وتحقيق قفزات نوعية في الإنتاجية.
-                </p>
-              </div>
-              <div className="relative z-20 mt-auto">
-                <Link to="/products?category=ai" className="main-service-card__link group/link inline-flex items-center gap-3 text-xl font-black text-primary transition-[gap,transform,color] duration-300 md:hover:gap-6">
-                  <span>تفاصيل الخدمة</span>
-                  <span className="material-symbols-outlined transition-transform duration-300 md:group-hover/link:-translate-x-2">arrow_back</span>
-                </Link>
-              </div>
-            </div>
-
-            {/* Social Media - Small Vertical */}
-            <div
-              className="perf-panel main-service-card main-service-card--tall md:col-span-4 cyber-glass-card rounded-[2.5rem] p-7 md:p-12 group flex min-h-[24rem] md:min-h-[28rem] flex-col items-center justify-center overflow-hidden text-center"
-              style={{ contain: "layout paint style" }}
-            >
-              <div className="main-service-card__bg mesh-gradient-bg"></div>
-              <div className="main-service-card__accent glowing-border-accent"></div>
-              <div className="relative z-20">
-                <div className="main-service-card__icon-shell icon-glow-container mx-auto mb-10 flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-white/5 md:group-hover:rotate-12 md:transition-transform">
-                  <span className="material-symbols-outlined icon-gradient text-5xl md:drop-shadow-[0_0_15px_rgba(208,188,255,0.6)]" data-icon="campaign">campaign</span>
-                </div>
-                <h3 className="text-2xl md:text-3xl font-black mb-6 text-on-background tracking-tight">إدارة المنصات</h3>
-                <p className="text-[#cbc3d9] text-lg leading-relaxed mb-8">
-                  نصنع محتوى يتفاعل معه العالم بأسلوب احترافي وجذاب يضمن وصول رسالتك للجمهور المستهدف.
-                </p>
-                <div className="mt-auto">
-                  <Link to="/products?category=social" className="main-service-card__link group/link inline-flex items-center gap-3 font-black text-primary transition-[gap,transform,color] duration-300 md:hover:gap-6">
-                    <span>تصفح الباقات</span>
-                    <span className="material-symbols-outlined text-sm transition-transform duration-300 md:group-hover/link:-translate-x-2">arrow_back</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* Gaming - Small Vertical */}
-            <div
-              className="perf-panel main-service-card main-service-card--tall md:col-span-4 cyber-glass-card rounded-[2.5rem] p-7 md:p-12 group flex min-h-[24rem] md:min-h-[28rem] flex-col items-center justify-center overflow-hidden text-center"
-              style={{ contain: "layout paint style" }}
-            >
-              <div className="main-service-card__bg mesh-gradient-bg"></div>
-              <div className="main-service-card__accent glowing-border-accent"></div>
-              <div className="relative z-20">
-                <div className="main-service-card__icon-shell icon-glow-container mx-auto mb-10 flex h-24 w-24 items-center justify-center rounded-full border border-white/10 bg-white/5 md:group-hover:scale-110 md:transition-transform">
-                  <span className="material-symbols-outlined icon-gradient text-5xl md:drop-shadow-[0_0_15px_rgba(208,188,255,0.6)]" data-icon="sports_esports">sports_esports</span>
-                </div>
-                <h3 className="text-2xl md:text-3xl font-black mb-6 text-on-background tracking-tight">خدمات الألعاب</h3>
-                <p className="text-[#cbc3d9] text-lg leading-relaxed mb-8">
-                  شحن، اشتراكات، وأدوات احترافية لأفضل تجربة لعب. كل ما يحتاجه المحترفون في مكان واحد.
-                </p>
-                <div className="mt-auto">
-                  <Link to="/products?category=gaming" className="main-service-card__link group/link inline-flex items-center gap-3 font-black text-primary transition-[gap,transform,color] duration-300 md:hover:gap-6">
-                    <span>تصفح العروض</span>
-                    <span className="material-symbols-outlined text-sm transition-transform duration-300 md:group-hover/link:-translate-x-2">arrow_back</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            {/* Web Services - Medium Landscape */}
-            <div
-              className="perf-panel main-service-card main-service-card--wide md:col-span-8 cyber-glass-card rounded-[2.5rem] p-7 md:p-12 group flex min-h-[24rem] md:min-h-[28rem] flex-col justify-between overflow-hidden"
-              style={{ contain: "layout paint style" }}
-            >
-              <div className="main-service-card__bg mesh-gradient-bg"></div>
-              <div className="main-service-card__accent glowing-border-accent"></div>
-              <div className="relative z-20">
-                <div className="flex items-start justify-between gap-8">
-                  <div className="flex-1">
-                    <div className="main-service-card__icon-shell icon-glow-container mb-8 flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/5 md:group-hover:translate-x-4 md:transition-transform">
-                      <span className="material-symbols-outlined icon-gradient text-5xl md:drop-shadow-[0_0_15px_rgba(208,188,255,0.6)]" data-icon="terminal">terminal</span>
+          <div 
+            ref={scrollContainerRef}
+            className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-6 lg:gap-8 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none no-scrollbar pb-12 pt-4 px-4 -mx-4 md:px-0 md:-mx-0"
+          >
+            {[
+              {
+                id: "ai",
+                title: "الذكاء الاصطناعي",
+                description: "أتمتة ذكية وحلول تحليلية مبنية على أحدث تقنيات، لتطوير أعمالك بشكل غير مسبوق وتحقيق قفزات نوعية في الإنتاجية.",
+                iconName: "neurology",
+                link: "/products?category=ai",
+                linkText: "تفاصيل الخدمة",
+                badge: "حصري",
+                subBadge: "Neural Core v2.0"
+              },
+              {
+                id: "social",
+                title: "إدارة المنصات",
+                description: "نصنع محتوى يتفاعل معه العالم بأسلوب احترافي وجذاب يضمن وصول رسالتك للجمهور المستهدف.",
+                iconName: "campaign",
+                link: "/products?category=social",
+                linkText: "تصفح الباقات"
+              },
+              {
+                id: "gaming",
+                title: "خدمات الألعاب",
+                description: "شحن، اشتراكات، وأدوات احترافية لأفضل تجربة لعب. كل ما يحتاجه المحترفون في مكان واحد.",
+                iconName: "sports_esports",
+                link: "/products?category=gaming",
+                linkText: "تصفح العروض"
+              },
+              {
+                id: "web",
+                title: "خدمات الويب",
+                description: "برمجة وتصميم واجهات عصرية تضمن أفضل تجربة مستخدم وأداء فائق السرعة مع بنية تحتية رقمية متينة.",
+                iconName: "terminal",
+                link: "/products?category=web",
+                linkText: "اكتشف المزيد",
+                bgIcon: "code"
+              }
+            ].map((srv, idx) => {
+              const isActive = activeIndex === idx;
+              return (
+                <motion.div 
+                  key={srv.id}
+                  custom={idx}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-50px" }}
+                  variants={categoryCardVariants}
+                  className="block snap-start snap-always shrink-0 w-[280px] md:w-auto"
+                  onClick={() => setActiveIndex(idx)}
+                >
+                  <div
+                    className={`perf-panel cyber-glass-card rounded-[2.5rem] p-6 md:p-8 group relative flex h-[360px] md:h-[400px] w-full flex-col justify-between overflow-hidden transition-all duration-500 cursor-pointer ${
+                      isActive 
+                        ? "border-primary scale-[1.02] shadow-[0_20px_50px_rgba(208,188,255,0.15)] z-10" 
+                        : "border-outline-variant/10 hover:border-primary/30 hover:-translate-y-1"
+                    }`}
+                    style={{ contain: "layout paint style" }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <div className={`main-service-card__bg mesh-gradient-bg transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-40'}`}></div>
+                    
+                    {/* Top Right Arrow */}
+                    <div className={`absolute top-6 left-6 p-2 rounded-xl border transition-colors z-20 ${
+                      isActive ? "border-primary/50 text-white bg-primary/20" : "border-outline-variant/20 text-outline-variant group-hover:border-primary/30"
+                    }`}>
+                      <span className="material-symbols-outlined text-lg">arrow_outward</span>
                     </div>
-                    <h3 className="text-3xl md:text-5xl font-black mb-6 text-on-background tracking-tight">خدمات الويب</h3>
-                    <p className="text-[#cbc3d9] text-xl leading-relaxed mb-8 max-w-xl">
-                      برمجة وتصميم واجهات عصرية تضمن أفضل تجربة مستخدم وأداء فائق السرعة مع بنية تحتية رقمية متينة.
-                    </p>
+
+                    <div className="relative z-20">
+                      <div className={`main-service-card__icon-shell icon-glow-container mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-500 ${
+                        isActive ? "border-primary/40 bg-primary/20 scale-110 shadow-inner" : "border-white/10 bg-white/5"
+                      }`}>
+                        <span className={`material-symbols-outlined text-3xl transition-colors ${
+                          isActive ? "text-primary drop-shadow-[0_0_15px_rgba(208,188,255,0.8)]" : "icon-gradient"
+                        }`} data-icon={srv.iconName}>{srv.iconName}</span>
+                      </div>
+                      
+                      {srv.badge && (
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className={`rounded-full border px-3 py-1 text-xs font-bold sm:backdrop-blur-md transition-colors ${
+                            isActive ? "border-transparent bg-primary text-on-primary" : "border-primary/30 bg-primary/20 text-primary"
+                          }`}>{srv.badge}</span>
+                          {srv.subBadge && <span className={`text-[10px] uppercase tracking-widest font-bold transition-colors ${
+                            isActive ? "text-primary text-glow" : "text-primary/50"
+                          }`}>{srv.subBadge}</span>}
+                        </div>
+                      )}
+                      
+                      <h3 className={`text-2xl md:text-3xl font-black mb-3 tracking-tight transition-colors ${
+                        isActive ? "text-primary text-glow" : "text-on-background"
+                      }`}>{srv.title}</h3>
+                      
+                      <p className={`text-sm md:text-base leading-relaxed line-clamp-3 transition-colors ${
+                        isActive ? "text-white" : "text-outline"
+                      }`}>
+                        {srv.description}
+                      </p>
+                    </div>
+                    
+                    <div className="relative z-20 mt-auto pt-6 border-t border-outline-variant/10">
+                      <Link to={srv.link} className={`main-service-card__link group/link inline-flex items-center gap-2 font-black transition-all duration-300 ${
+                        isActive ? "text-primary gap-4 text-glow" : "text-on-surface hover:text-primary"
+                      }`}>
+                        <span className="text-sm md:text-base">{srv.linkText}</span>
+                        <span className="material-symbols-outlined text-sm transition-transform duration-300 md:group-hover/link:-translate-x-1">arrow_back</span>
+                      </Link>
+                    </div>
+                    
+                    {srv.bgIcon && (
+                      <div className="hidden lg:block">
+                        <span className={`material-symbols-outlined absolute -left-8 -bottom-8 select-none pointer-events-none rotate-12 transition-all duration-1000 ${
+                          isActive ? "text-primary/10 text-[180px]" : "text-on-surface/5 text-[140px]"
+                        }`} data-icon={srv.bgIcon}>{srv.bgIcon}</span>
+                      </div>
+                    )}
                   </div>
-                  <div className="hidden lg:block">
-                    <span className="material-symbols-outlined text-primary/5 text-[180px] absolute -left-12 -top-12 select-none pointer-events-none rotate-12" data-icon="code">code</span>
-                  </div>
-                </div>
-              </div>
-              <div className="relative z-20">
-                <Link to="/products?category=web" className="main-service-card__link group/link inline-flex items-center gap-3 text-xl font-black text-primary transition-[gap,transform,color] duration-300 md:hover:gap-6">
-                  <span>اكتشف المزيد</span>
-                  <span className="material-symbols-outlined transition-transform duration-300 md:group-hover/link:-translate-x-2">arrow_back</span>
-                </Link>
-              </div>
-            </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          <div className="block md:hidden w-64 h-1.5 bg-outline-variant/10 rounded-full mx-auto mt-8 relative shadow-inner overflow-hidden" dir="rtl">
+            <motion.div
+              className="absolute top-0 right-0 bottom-0 w-16 bg-primary rounded-full shadow-[0_0_8px_rgba(208,188,255,0.6)]"
+              style={{ x: indicatorX }}
+            />
           </div>
         </div>
       </section>
@@ -401,6 +501,46 @@ export function Home() {
           </div>
         </div>
       </section>
+
+      {/* Tech Marquee Section */}
+      <div className="z-20 w-full max-w-6xl mx-auto pt-4 pb-12 md:pt-10 md:pb-20 relative">
+        <div className="flex flex-col items-center justify-center text-center mb-10 md:mb-16 relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs md:text-sm font-bold mb-4 backdrop-blur-md shadow-[0_0_15px_rgba(208,188,255,0.1)]">
+            <span className="relative flex h-2 w-2 mb-0.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            </span>
+            شركاء النجاح
+          </div>
+          <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
+            <span className="text-on-background">شركات ملهمة </span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#8b5cf6] drop-shadow-[0_0_20px_rgba(208,188,255,0.4)]">وثقت بنا</span>
+          </h2>
+        </div>
+        <div 
+          className="group w-full inline-flex flex-nowrap overflow-x-auto md:overflow-hidden no-scrollbar [mask-image:_linear-gradient(to_right,transparent_0,_black_40px,_black_calc(100%-40px),transparent_100%)] md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] opacity-70 grayscale hover:grayscale-0 transition-all duration-700 bg-surface/0"
+          dir="ltr"
+        >
+          <style>{`
+            @keyframes infinite-scroll {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+            @media (min-width: 768px) {
+              .animate-infinite-scroll {
+                animation: infinite-scroll 30s linear infinite;
+              }
+              .group:hover .animate-infinite-scroll {
+                animation-play-state: paused;
+              }
+            }
+          `}</style>
+          <div className="flex items-center justify-start [&>div]:mx-6 md:[&>div]:mx-10 w-max animate-infinite-scroll">
+            {techLogos}
+            {techLogos}
+          </div>
+        </div>
+      </div>
 
       {/* Stats Section */}
       <section className="perf-mobile-section relative overflow-hidden px-6 py-24 md:px-12" data-perf-size="compact">

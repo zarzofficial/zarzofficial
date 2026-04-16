@@ -58,7 +58,7 @@ export function ScrollToTop() {
       window.cancelAnimationFrame(secondFrame);
       window.clearTimeout(timeoutId);
     };
-  }, [location.key, location.pathname, location.search]);
+  }, [location.pathname]);
 
   return null;
 }

@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
+import React, { useRef } from "react";
 import { products } from "../data/products";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 import { SiteIcon } from "./SiteIcon";
+import { motion, useScroll, useTransform, useMotionValueEvent } from "motion/react";
 
 const categoryMap: Record<string, { label: string; color: string }> = {
   ai: { label: "الذكاء الاصطناعي", color: "#8b5cf6" },
@@ -24,21 +26,51 @@ export function FeaturedProducts() {
     .map((id) => products.find((product) => product.id === id))
     .filter(Boolean) as typeof products;
 
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  const { scrollXProgress } = useScroll({ container: scrollContainerRef });
+  const indicatorX = useTransform(scrollXProgress, [0, 1], [0, -192]);
+
+  const [isAtStart, setIsAtStart] = React.useState(true);
+  const [isAtEnd, setIsAtEnd] = React.useState(false);
+
+  useMotionValueEvent(scrollXProgress, "change", (latest) => {
+    setIsAtStart(latest <= 0.02);
+    setIsAtEnd(latest >= 0.98);
+  });
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -360, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 360, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section className="perf-mobile-section relative overflow-hidden bg-background px-6 pt-4 pb-20 md:px-12 md:py-28" data-perf-size="medium">
+    <section className="perf-mobile-section relative overflow-hidden bg-background px-6 pt-4 pb-4 md:px-12 md:py-28" data-perf-size="medium">
       <div className="pointer-events-none absolute top-0 right-1/4 h-[260px] w-[260px] rounded-full bg-primary/5 blur-[36px] md:h-[500px] md:w-[500px] md:blur-[120px]"></div>
       <div className="pointer-events-none absolute bottom-0 left-1/3 h-[220px] w-[220px] rounded-full bg-tertiary/5 blur-[32px] md:h-[400px] md:w-[400px] md:blur-[100px]"></div>
 
       <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="mb-14 text-center">
-          <span className="mb-6 inline-block rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-bold text-primary sm:backdrop-blur-md">
-            الأكثر طلبًا
-          </span>
-          <h2 className="mb-4 font-headline text-3xl font-black text-on-background md:text-5xl">منتجات مميزة</h2>
-          <p className="mx-auto max-w-md text-base font-medium text-outline md:text-lg">اكتشف أكثر الخدمات طلبًا لدينا</p>
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 gap-6">
+          <div className="flex flex-col items-center md:items-start text-center md:text-start w-full md:w-auto">
+            <span className="mb-6 inline-block rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-bold text-primary sm:backdrop-blur-md">
+              الأكثر طلبًا
+            </span>
+            <h2 className="mb-4 font-headline text-3xl font-black text-on-background md:text-5xl">منتجات مميزة</h2>
+            <p className="max-w-md text-base font-medium text-outline md:text-lg">اكتشف أكثر الخدمات طلبًا لدينا</p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:gap-6 lg:grid-cols-3">
+        <div 
+          ref={scrollContainerRef}
+          className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 lg:gap-8 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none no-scrollbar pb-8 pt-4 px-4 -mx-4 md:px-0 md:-mx-0"
+          dir="rtl"
+        >
           {featured.map((product) => {
             const category = categoryMap[product.category] || { label: product.category, color: "#d0bcff" };
             const discountPercent = getDiscountPercent();
@@ -48,7 +80,7 @@ export function FeaturedProducts() {
               <Link
                 key={product.id}
                 to={`/products/${product.id}`}
-                className={`perf-card perf-mobile-card group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] sm:min-h-[390px] sm:rounded-[1.5rem] sm:shadow-sm md:shadow-lg md:transition-all md:duration-300 md:hover:-translate-y-1 md:hover:border-primary/30 md:hover:shadow-[0_18px_40px_rgba(208,188,255,0.08)] ${
+                className={`perf-card perf-mobile-card shrink-0 snap-center w-[290px] md:w-auto group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] sm:min-h-[390px] sm:rounded-[1.5rem] sm:shadow-sm md:shadow-lg md:transition-all md:duration-300 md:hover:-translate-y-1 md:hover:border-primary/30 md:hover:shadow-[0_18px_40px_rgba(208,188,255,0.08)] ${
                   product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : "bg-surface-container-low/80"
                 }`}
                 style={{ contain: "content", contentVisibility: "auto", containIntrinsicSize: "1px 420px" }}
@@ -170,6 +202,30 @@ export function FeaturedProducts() {
           })}
         </div>
       </div>
+        <div className="flex gap-3 justify-center mt-6 md:hidden" dir="ltr">
+          <button 
+            onClick={scrollLeft}
+            disabled={isAtEnd}
+            className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${
+              !isAtEnd 
+                ? "bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]" 
+                : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
+            }`}
+          >
+            <span className="material-symbols-outlined text-2xl">chevron_left</span>
+          </button>
+          <button 
+            onClick={scrollRight}
+            disabled={isAtStart}
+            className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${
+              !isAtStart 
+                ? "bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]" 
+                : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
+            }`}
+          >
+            <span className="material-symbols-outlined text-2xl">chevron_right</span>
+          </button>
+        </div>
     </section>
   );
 }

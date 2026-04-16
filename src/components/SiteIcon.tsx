@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import {
   ArrowLeft,
+  ArrowRight,
   Bolt,
   CheckCircle2,
   Laptop,
@@ -17,6 +18,7 @@ type SiteIconName =
   | "add"
   | "add_shopping_cart"
   | "arrow_back"
+  | "arrow_forward"
   | "bolt"
   | "check_circle"
   | "forum"
@@ -30,6 +32,7 @@ const iconMap = {
   add: Plus,
   add_shopping_cart: ShoppingCart,
   arrow_back: ArrowLeft,
+  arrow_forward: ArrowRight,
   bolt: Bolt,
   check_circle: CheckCircle2,
   forum: MessageCircle,

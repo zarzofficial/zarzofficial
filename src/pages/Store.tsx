@@ -7,14 +7,13 @@ import { useCart } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 
 const categories = [
-  { id: "all", name: "الكل" },
   { id: "social", name: "التواصل الاجتماعي" },
   { id: "ai", name: "الذكاء الاصطناعي" },
   { id: "web", name: "المواقع والمتاجر" },
   { id: "gaming", name: "الألعاب" },
 ] as const;
 
-type VisibleCategory = Category | "all";
+type VisibleCategory = Category;
 
 type VirtualStoreItem =
   | {
@@ -43,10 +42,10 @@ type StoreViewportMetrics = {
 
 const viewportMetricsByColumns: Record<1 | 2 | 3 | 4, StoreViewportMetrics> = {
   1: {
-    cardHeight: 440,
-    imageHeight: 224,
+    cardHeight: 500,
+    imageHeight: 284,
     rowGap: 16,
-    rowHeight: 456,
+    rowHeight: 516,
     overscan: 6,
     headerHeight: 88,
     spacedHeaderHeight: 184,
@@ -177,7 +176,7 @@ function StoreProductCard({
         className="block relative w-full overflow-hidden bg-surface-container-highest"
         style={staticLayout ? undefined : { height: metrics.imageHeight }}
       >
-        {staticLayout && <div className="h-[244px] sm:h-[224px] lg:h-[200px] xl:h-[184px]" aria-hidden="true" />}
+        {staticLayout && <div className="h-[284px] sm:h-[224px] lg:h-[200px] xl:h-[184px]" aria-hidden="true" />}
         {product.outOfStock && (
           <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-sm">
             <span className="rounded-full border border-destructive/50 bg-destructive/10 px-6 py-2 font-headline text-xl font-black text-destructive shadow-[0_0_20px_rgba(255,0,0,0.2)]">
@@ -397,13 +396,107 @@ function StoreVirtualizedSections({
     </main>
   );
 }
+function MobileCategorySlider({
+  category,
+  products,
+  onOrderNow,
+  onAddToCart,
+  metrics,
+}: {
+  category: { id: string; name: string };
+  products: Product[];
+  onOrderNow: (product: Product) => void;
+  onAddToCart: (product: Product) => void;
+  metrics: StoreViewportMetrics;
+}) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isAtStart, setIsAtStart] = useState(true);
+  const [isAtEnd, setIsAtEnd] = useState(false);
+
+  const checkScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      const currentScroll = Math.abs(scrollLeft);
+      setIsAtStart(currentScroll <= 10);
+      setIsAtEnd(currentScroll >= scrollWidth - clientWidth - 10);
+    }
+  };
+
+  useLayoutEffect(() => {
+    checkScroll();
+  }, [products]);
+
+  const scrollLeftBtn = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -260, behavior: "smooth" });
+    }
+  };
+
+  const scrollRightBtn = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 260, behavior: "smooth" });
+    }
+  };
+
+  if (!products.length) return null;
+
+  return (
+    <div id={`category-${category.id}`} className="mb-14">
+      <div className="mx-auto max-w-screen-2xl px-6 md:px-12 flex items-center justify-between mb-8">
+        <h2 className="border-r-4 border-primary pr-4 font-headline text-2xl font-bold">{category.name}</h2>
+        <div className="flex gap-2" dir="ltr">
+          <button
+            onClick={scrollLeftBtn}
+            disabled={isAtEnd}
+            className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${
+              !isAtEnd
+                ? "bg-primary text-white shadow-[0_0_15px_rgba(208,188,255,0.3)] hover:scale-105 active:scale-95"
+                : "border border-primary/20 bg-surface-container/50 opacity-40 cursor-not-allowed"
+            }`}
+          >
+            <span className="material-symbols-outlined text-2xl">chevron_left</span>
+          </button>
+          <button
+            onClick={scrollRightBtn}
+            disabled={isAtStart}
+            className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${
+              !isAtStart
+                ? "bg-primary text-white shadow-[0_0_15px_rgba(208,188,255,0.3)] hover:scale-105 active:scale-95"
+                : "border border-primary/20 bg-surface-container/50 opacity-40 cursor-not-allowed"
+            }`}
+          >
+            <span className="material-symbols-outlined text-2xl">chevron_right</span>
+          </button>
+        </div>
+      </div>
+      <div
+        ref={scrollContainerRef}
+        onScroll={checkScroll}
+        className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar px-6 md:px-12 w-full pb-4"
+        dir="rtl"
+        style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
+      >
+        {products.map((product) => (
+          <div key={product.id} className="perf-card shrink-0 snap-center w-[290px] h-full" style={{ contain: "content" }}>
+            <StoreProductCard 
+              product={product} 
+              onOrderNow={onOrderNow} 
+              onAddToCart={onAddToCart} 
+              metrics={metrics} 
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export function Store() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
-  const initialCategory = (searchParams.get("category") as VisibleCategory) || "all";
+  const initialCategory = (searchParams.get("category") as VisibleCategory) || "social";
   const [activeCategory, setActiveCategory] = useState<VisibleCategory>(initialCategory);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [columns, setColumns] = useState(1);
@@ -428,7 +521,7 @@ export function Store() {
   }, []);
 
   useEffect(() => {
-    const categoryQuery = (searchParams.get("category") as VisibleCategory) || "all";
+    const categoryQuery = (searchParams.get("category") as VisibleCategory) || "social";
     if (categoryQuery !== activeCategory) {
       setActiveCategory(categoryQuery);
     }
@@ -442,10 +535,10 @@ export function Store() {
     };
   }, []);
 
-  const filteredProducts = useMemo(
-    () => (activeCategory === "all" ? products : products.filter((product) => product.category === activeCategory)),
-    [activeCategory],
-  );
+  const filteredProducts = useMemo(() => {
+    if (columns === 1) return products;
+    return products.filter((product) => product.category === activeCategory);
+  }, [activeCategory, columns]);
 
   const groupedProducts = useMemo(
     () =>
@@ -463,11 +556,10 @@ export function Store() {
 
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId as VisibleCategory);
-    if (categoryId === "all") {
-      setSearchParams({});
-      return;
-    }
     setSearchParams({ category: categoryId });
+    if (columns > 1) {
+      window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
   };
 
   const handleOrderNow = (product: Product) => {
@@ -544,7 +636,7 @@ export function Store() {
         <main className="mx-auto max-w-screen-2xl px-6 md:px-12">
           <div className="py-20 text-center text-outline">لا توجد منتجات متاحة في هذا القسم حالياً.</div>
         </main>
-      ) : enableVirtualLayout ? (
+      ) : enableVirtualLayout && columns > 1 ? (
         <StoreVirtualizedSections
           activeCategory={activeCategory}
           virtualItems={virtualItems}
@@ -552,6 +644,19 @@ export function Store() {
           onOrderNow={handleOrderNow}
           onAddToCart={handleAddToCart}
         />
+      ) : enableVirtualLayout && columns === 1 ? (
+        <div className="flex flex-col gap-6 pb-8 w-full -mx-6 px-6 md:-mx-12 md:px-12">
+          {categories.map((cat) => (
+            <MobileCategorySlider
+              key={cat.id}
+              category={cat}
+              products={groupedProducts[cat.id] || []}
+              onOrderNow={handleOrderNow}
+              onAddToCart={handleAddToCart}
+              metrics={viewportMetrics}
+            />
+          ))}
+        </div>
       ) : (
         <StoreStaticSections
           groupedProducts={groupedProducts}

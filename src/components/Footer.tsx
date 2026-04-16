@@ -14,13 +14,13 @@ export function Footer() {
   };
 
   return (
-    <footer className="w-full pt-20 pb-10 mt-auto bg-[#1d0c26] bg-gradient-to-t from-[#26142f] to-[#1d0c26]">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 px-12 max-w-7xl mx-auto text-start rtl font-body leading-relaxed">
+    <footer className="w-full pt-8 md:pt-20 pb-10 mt-auto bg-[#1d0c26] bg-gradient-to-t from-[#26142f] to-[#1d0c26]">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 px-12 max-w-7xl mx-auto text-center md:text-start rtl font-body leading-relaxed">
         
-        <div>
-          <span className="text-2xl font-bold text-[#d0bcff] mb-4 block text-start">زارز</span>
-          <p className="text-[#958da2] mb-8 max-w-sm text-start">خدمات رقمية متكاملة تشمل شحن الألعاب، تنمية حسابات التواصل الاجتماعي، الاشتراكات المميزة، وتطوير المواقع والمتاجر مع تنفيذ سريع ومتابعة واضحة من أول الطلب حتى التسليم.</p>
-          <div className="flex gap-3 justify-start mt-2">
+        <div className="flex flex-col items-center md:items-start text-center md:text-start">
+          <span className="text-2xl font-bold text-[#d0bcff] mb-4 block">زارز</span>
+          <p className="text-[#958da2] mb-8 max-w-sm">خدمات رقمية متكاملة تشمل شحن الألعاب، تنمية حسابات التواصل الاجتماعي، الاشتراكات المميزة، وتطوير المواقع والمتاجر مع تنفيذ سريع ومتابعة واضحة من أول الطلب حتى التسليم.</p>
+          <div className="flex gap-3 justify-center md:justify-start mt-2">
             <a href="https://web.facebook.com/zarzofficial/" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#d0bcff] hover:bg-[#d0bcff]/15 hover:border-[#d0bcff]/30 hover:text-white hover:shadow-[0_0_20px_rgba(208,188,255,0.15)] transition-all duration-300" title="صفحتنا على فيسبوك">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg>
             </a>
@@ -31,15 +31,15 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 text-start">
+        <div className="flex flex-col gap-4 text-center md:text-start items-center md:items-start">
           <h4 className="text-white font-bold mb-2">روابط سريعة</h4>
           <Link to="/" className="text-[#958da2] hover:text-white transition-colors duration-200">الرئيسية</Link>
           <Link to="/products" className="text-[#958da2] hover:text-white transition-colors duration-200">المنتجات</Link>
           <Link to="/contact" className="text-[#958da2] hover:text-white transition-colors duration-200">اتصل بنا</Link>
-          <button onClick={handleFaqClick} className="text-[#958da2] hover:text-white transition-colors duration-200 text-start">الأسئلة الشائعة</button>
+          <button onClick={handleFaqClick} className="text-[#958da2] hover:text-white transition-colors duration-200">الأسئلة الشائعة</button>
         </div>
 
-        <div className="flex flex-col gap-4 text-start">
+        <div className="flex flex-col gap-4 text-center md:text-start items-center md:items-start">
           <h4 className="text-white font-bold mb-2">قد تهمك</h4>
           <Link to="/terms" className="text-[#958da2] hover:text-white transition-colors duration-200">الشروط والأحكام</Link>
           <Link to="/terms" className="text-[#958da2] hover:text-white transition-colors duration-200">سياسة الخصوصية</Link>
