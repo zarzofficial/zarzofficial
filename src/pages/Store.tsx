@@ -1,10 +1,12 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type Attributes } from "react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
+import { LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { products, type Product } from "../data/products";
 import { SiteIcon } from "../components/SiteIcon";
 import { useCart } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
+import { useCoarsePointer } from "../lib/useCoarsePointer";
 import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
 import {
   getCatalogPath,
@@ -15,6 +17,8 @@ import {
 } from "../lib/storeCatalog";
 
 const categories = storeCategories;
+const mobileOverviewBatchSize = 2;
+const mobileSectionTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const };
 
 
 type VirtualStoreItem =
@@ -196,6 +200,7 @@ function StoreProductCard({
           decoding="async"
           fetchPriority="low"
           referrerPolicy="no-referrer"
+          draggable={false}
           width={634}
           height={634}
         />
@@ -402,34 +407,69 @@ function StoreVirtualizedSections({
     </main>
   );
 }
+
 function MobileCategorySlider({
   category,
   products,
+  categoryPath,
   onOrderNow,
   onAddToCart,
   metrics,
 }: {
   category: { id: string; name: string };
   products: Product[];
+  categoryPath: string;
   onOrderNow: (product: Product) => void;
   onAddToCart: (product: Product) => void;
   metrics: StoreViewportMetrics;
 }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  useHorizontalTouchScroll(scrollContainerRef);
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
+  const edgeStateRef = useRef({ isAtStart: true, isAtEnd: false, frameId: 0 });
 
-  const checkScroll = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      const currentScroll = Math.abs(scrollLeft);
-      setIsAtStart(currentScroll <= 10);
-      setIsAtEnd(currentScroll >= scrollWidth - clientWidth - 10);
-    }
-  };
+  useEffect(() => {
+    const railElement = scrollContainerRef.current;
+    if (!railElement) return;
 
-  useLayoutEffect(() => {
-    checkScroll();
+    const updateEdgeState = () => {
+      const maxScroll = Math.max(0, railElement.scrollWidth - railElement.clientWidth);
+      const currentScroll = Math.min(maxScroll, Math.abs(railElement.scrollLeft));
+      const nextIsAtStart = currentScroll <= 10;
+      const nextIsAtEnd = currentScroll >= maxScroll - 10;
+
+      if (edgeStateRef.current.isAtStart !== nextIsAtStart) {
+        edgeStateRef.current.isAtStart = nextIsAtStart;
+        setIsAtStart(nextIsAtStart);
+      }
+
+      if (edgeStateRef.current.isAtEnd !== nextIsAtEnd) {
+        edgeStateRef.current.isAtEnd = nextIsAtEnd;
+        setIsAtEnd(nextIsAtEnd);
+      }
+    };
+
+    const queueUpdate = () => {
+      if (edgeStateRef.current.frameId) return;
+      edgeStateRef.current.frameId = window.requestAnimationFrame(() => {
+        edgeStateRef.current.frameId = 0;
+        updateEdgeState();
+      });
+    };
+
+    updateEdgeState();
+    railElement.addEventListener("scroll", queueUpdate, { passive: true });
+    window.addEventListener("resize", queueUpdate, { passive: true });
+
+    return () => {
+      if (edgeStateRef.current.frameId) {
+        window.cancelAnimationFrame(edgeStateRef.current.frameId);
+        edgeStateRef.current.frameId = 0;
+      }
+      railElement.removeEventListener("scroll", queueUpdate);
+      window.removeEventListener("resize", queueUpdate);
+    };
   }, [products]);
 
   const scrollLeftBtn = () => {
@@ -448,7 +488,7 @@ function MobileCategorySlider({
 
   return (
     <div id={`category-${category.id}`} className="mb-14">
-      <div className="mx-auto max-w-screen-2xl px-6 md:px-12 flex items-center justify-between mb-8">
+      <div className="mx-auto mb-8 flex max-w-screen-2xl items-center justify-between px-6 md:px-12">
         <h2 className="border-r-4 border-primary pr-4 font-headline text-2xl font-bold">{category.name}</h2>
         <div className="flex gap-2" dir="ltr">
           <button
@@ -477,23 +517,96 @@ function MobileCategorySlider({
       </div>
       <div
         ref={scrollContainerRef}
-        onScroll={checkScroll}
-        className="perf-horizontal-cards flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar px-6 md:px-12 w-full pb-4"
+        className="perf-horizontal-cards flex w-full gap-4 overflow-x-auto snap-x snap-proximity no-scrollbar px-6 pb-4 md:px-12"
         dir="rtl"
-        style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
+        style={{ scrollBehavior: "smooth", WebkitOverflowScrolling: "touch" }}
       >
         {products.map((product) => (
-          <div key={product.id} className="shrink-0 snap-center w-[290px] h-full">
-            <StoreProductCard 
-              product={product} 
-              onOrderNow={onOrderNow} 
-              onAddToCart={onAddToCart} 
-              metrics={metrics} 
-            />
+          <div key={product.id} className="h-full w-[290px] shrink-0 snap-center">
+            <StoreProductCard product={product} onOrderNow={onOrderNow} onAddToCart={onAddToCart} metrics={metrics} />
           </div>
         ))}
       </div>
+      <div className="mx-auto mt-5 flex max-w-screen-2xl px-6 md:px-12">
+        <Link
+          to={categoryPath}
+          className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-surface-container-low px-5 py-3 text-sm font-bold text-primary transition-transform active:scale-95"
+        >
+          عرض كل القسم
+          <SiteIcon name="arrow_back" className="text-base" />
+        </Link>
+      </div>
     </div>
+  );
+}
+
+function StoreMobileOverviewSections({
+  groupedProducts,
+  visibleSectionCount,
+  onLoadMore,
+  onOrderNow,
+  onAddToCart,
+  metrics,
+}: {
+  groupedProducts: Record<string, Product[]>;
+  visibleSectionCount: number;
+  onLoadMore: () => void;
+  onOrderNow: (product: Product) => void;
+  onAddToCart: (product: Product) => void;
+  metrics: StoreViewportMetrics;
+}) {
+  const prefersReducedMotion = useReducedMotion();
+  const orderedCategorySections = categories
+    .filter((category) => category.id !== "all")
+    .map((category) => ({
+      category,
+      products: groupedProducts[category.id] ?? [],
+    }))
+    .filter((section) => section.products.length > 0);
+
+  const visibleSections = orderedCategorySections.slice(0, visibleSectionCount);
+  const hasMoreSections = visibleSectionCount < orderedCategorySections.length;
+  const sectionRevealProps = prefersReducedMotion
+    ? {}
+    : {
+        initial: { opacity: 0, y: 18 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true, amount: 0.18 },
+        transition: mobileSectionTransition,
+      };
+
+  return (
+    <LazyMotion features={domAnimation}>
+      <main className="mx-auto max-w-screen-2xl">
+        {visibleSections.map(({ category, products }) => (
+          <m.section key={category.id} {...sectionRevealProps}>
+            <MobileCategorySlider
+              category={category}
+              products={products}
+              categoryPath={getCatalogPath(category.id)}
+              onOrderNow={onOrderNow}
+              onAddToCart={onAddToCart}
+              metrics={metrics}
+            />
+          </m.section>
+        ))}
+
+        {hasMoreSections && (
+          <m.div
+            {...sectionRevealProps}
+            className="mx-auto flex max-w-screen-2xl justify-center px-6 pb-6 md:px-12"
+          >
+            <button
+              onClick={onLoadMore}
+              className="inline-flex items-center gap-2 rounded-full primary-gradient px-6 py-3 text-sm font-bold text-on-primary shadow-[0_10px_24px_rgba(86,0,202,0.18)] transition-transform active:scale-95"
+            >
+              عرض المزيد
+              <SiteIcon name="keyboard_double_arrow_down" className="text-base" />
+            </button>
+          </m.div>
+        )}
+      </main>
+    </LazyMotion>
   );
 }
 
@@ -501,6 +614,7 @@ export function Store() {
   const { category: categoryParam } = useParams<{ category?: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const isCoarsePointer = useCoarsePointer();
   const categoryStripRef = useRef<HTMLElement | null>(null);
   useHorizontalTouchScroll(categoryStripRef);
   const routeCategory = getCatalogRouteCategory(categoryParam);
@@ -510,11 +624,13 @@ export function Store() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [columns, setColumns] = useState(1);
   const [enableVirtualLayout, setEnableVirtualLayout] = useState(false);
+  const [visibleMobileSections, setVisibleMobileSections] = useState(mobileOverviewBatchSize);
   const toastTimeoutRef = useRef<number | undefined>(undefined);
 
   const viewportMetrics = getViewportMetrics(columns);
   const staticMetrics = getViewportMetrics(columns);
   const effectiveCategory = activeCategory;
+  const isMobileAllOverview = isCoarsePointer && columns === 1 && effectiveCategory === "all";
   const shouldUseVirtualLayout = enableVirtualLayout && columns > 1;
 
   useEffect(() => {
@@ -548,6 +664,10 @@ export function Store() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    setVisibleMobileSections(mobileOverviewBatchSize);
+  }, [effectiveCategory, isMobileAllOverview]);
 
   const filteredProducts = useMemo(() => {
     if (effectiveCategory === "all") return products;
@@ -590,6 +710,10 @@ export function Store() {
     toastTimeoutRef.current = window.setTimeout(() => {
       setToastMessage(null);
     }, 3000);
+  };
+
+  const handleLoadMoreSections = () => {
+    setVisibleMobileSections((currentCount) => currentCount + mobileOverviewBatchSize);
   };
 
   return (
@@ -648,6 +772,15 @@ export function Store() {
         <main className="mx-auto max-w-screen-2xl px-6 md:px-12">
           <div className="py-20 text-center text-outline">لا توجد منتجات متاحة في هذا القسم حالياً.</div>
         </main>
+      ) : isMobileAllOverview ? (
+        <StoreMobileOverviewSections
+          groupedProducts={groupedProducts}
+          visibleSectionCount={visibleMobileSections}
+          onLoadMore={handleLoadMoreSections}
+          onOrderNow={handleOrderNow}
+          onAddToCart={handleAddToCart}
+          metrics={staticMetrics}
+        />
       ) : shouldUseVirtualLayout ? (
         <StoreVirtualizedSections
           key={effectiveCategory}
