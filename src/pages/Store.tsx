@@ -195,7 +195,7 @@ function StoreProductCard({
         <img
           alt={product.title}
           className={`w-full h-full object-cover transition-transform duration-300 md:group-hover:scale-[1.03] ${product.outOfStock ? "opacity-50" : ""}`}
-          src={product.image || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop"}
+          src={product.image || "/assets/store-fallback.svg"}
           loading="lazy"
           decoding="async"
           fetchPriority="low"

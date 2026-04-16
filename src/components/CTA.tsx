@@ -8,7 +8,7 @@ export function CTA() {
       <div className="absolute inset-0 bg-background"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[120px] -z-10"></div>
       <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-secondary/20 rounded-full blur-[100px] -z-10"></div>
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay -z-10"></div>
+      <div className="absolute inset-0 bg-[url('/assets/noise-pattern.svg')] opacity-20 mix-blend-overlay -z-10"></div>
 
       <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 font-heading">

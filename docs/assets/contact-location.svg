@@ -1,0 +1,60 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mapBg" x1="0" y1="0" x2="1200" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="0.46" stop-color="#111827"/>
+      <stop offset="1" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <radialGradient id="mapGlowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(252 176) rotate(48.159) scale(350 245)">
+      <stop stop-color="#38BDF8" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#38BDF8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="mapGlowB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(948 688) rotate(-143.41) scale(370 260)">
+      <stop stop-color="#E11D48" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#E11D48" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#mapBg)"/>
+  <circle cx="260" cy="176" r="230" fill="url(#mapGlowA)"/>
+  <circle cx="948" cy="688" r="260" fill="url(#mapGlowB)"/>
+  <g opacity="0.16" stroke="#93C5FD">
+    <path d="M0 145H1200"/>
+    <path d="M0 285H1200"/>
+    <path d="M0 425H1200"/>
+    <path d="M0 565H1200"/>
+    <path d="M0 705H1200"/>
+    <path d="M130 0V900"/>
+    <path d="M310 0V900"/>
+    <path d="M490 0V900"/>
+    <path d="M670 0V900"/>
+    <path d="M850 0V900"/>
+    <path d="M1030 0V900"/>
+  </g>
+  <g opacity="0.3" stroke="#E2E8F0" stroke-width="14" stroke-linecap="round">
+    <path d="M66 640C148 624 230 622 306 664C374 701 440 760 525 760C603 760 658 724 734 686C806 651 880 639 948 656C1014 672 1067 716 1134 742"/>
+    <path d="M136 168C206 196 286 251 338 316C392 382 455 430 540 430C640 430 700 356 780 315C853 277 941 278 1031 334"/>
+    <path d="M246 82C250 186 219 276 148 352"/>
+  </g>
+  <g opacity="0.75" stroke="#38BDF8" stroke-width="10" stroke-linecap="round">
+    <path d="M200 605C286 590 347 620 406 678"/>
+    <path d="M527 433C607 436 665 394 734 338"/>
+    <path d="M736 688C806 650 880 637 947 655"/>
+  </g>
+  <g>
+    <circle cx="642" cy="438" r="120" fill="#0F172A" fill-opacity="0.72"/>
+    <circle cx="642" cy="438" r="84" fill="#E11D48" fill-opacity="0.2"/>
+    <path d="M642 286C581.8 286 533 334.8 533 395C533 477.5 642 588 642 588C642 588 751 477.5 751 395C751 334.8 702.2 286 642 286Z" fill="#FB7185"/>
+    <circle cx="642" cy="395" r="38" fill="#FFF1F2"/>
+    <circle cx="642" cy="395" r="16" fill="#E11D48"/>
+  </g>
+  <g fill="#FFFFFF" opacity="0.3">
+    <circle cx="107" cy="118" r="2"/>
+    <circle cx="203" cy="204" r="2.2"/>
+    <circle cx="874" cy="108" r="2"/>
+    <circle cx="1048" cy="222" r="1.8"/>
+    <circle cx="961" cy="541" r="2"/>
+    <circle cx="794" cy="790" r="2"/>
+    <circle cx="336" cy="808" r="2"/>
+    <circle cx="146" cy="726" r="1.8"/>
+  </g>
+</svg>

@@ -103,7 +103,7 @@ export function Terms() {
             <img 
               alt="Decorative Cyber Security" 
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbuuEa8JhjmV5Fo7GYGVggrO37P4dF3v_wPNs1iY7P6cZgHoldqbAXPCF8-4L3AnpQ2LynbEcZhNM7p6HHGQz3QL3u4M7KCVKLUXcqGD6NJZSC7lsS8UaXywofAsAYo19mTHMuDaRBh4IIW86FeIJDkxyKhHyIiSEdtBRfiNWGtYU_0GrgZAsup7wl6g81nPC_gozJ2UNpOxmfQpwTOVBEukWdskeWD-erYoR6OvHfz33z4GM_iw3UoUGCj5IWqApY7FfpEIAHkVId"
+              src="/assets/terms-security.svg"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-80"></div>
             <div className="absolute bottom-8 right-8">

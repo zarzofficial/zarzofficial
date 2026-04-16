@@ -161,7 +161,7 @@ export function Contact() {
             <img 
               alt="Map"
               className="w-full h-full object-cover opacity-50 transition-transform duration-1000 group-hover:scale-110" 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUfNQURvgTvvVEp0-MrgzZhc1EhgaG6M0GXAAqfhzbpv8r4LdJUtupCCh5HzBOC1sfBr5e4Gn1iITvkFDcttsflR-zhvofyboJ3RbO0fYpIwF0j4XSNLOQwBAbCs2-lFy3l9yYs1rWrCV9AsuH5Dxj8t8rI9rTUbWafKXjvGlMxrkWXhaR-3m1k21OXkDxblgcRhBdTy4O97LKUY2BeGnYJvFw7HPuzVz69MPRrMnPPHEWuHemwplBlL_1OMEdosdLzDTtsJMoc1vw" 
+              src="/assets/contact-location.svg" 
             />
             <div className="absolute inset-0 primary-gradient opacity-10"></div>
             <div className="perf-card absolute bg-surface-container p-4 rounded-2xl shadow-2xl flex items-center gap-4">
