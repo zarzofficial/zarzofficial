@@ -108,7 +108,7 @@ export function FeaturedProducts() {
           className="perf-mobile-horizontal-cards flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 lg:gap-8 overflow-x-auto md:overflow-visible snap-x snap-proximity md:snap-none no-scrollbar pb-8 pt-4 px-4 -mx-4 md:px-0 md:-mx-0"
           dir="rtl"
         >
-          {featured.map((product) => {
+          {featured.map((product, index) => {
             const category = categoryMap[product.category] || { label: product.category, color: "#d0bcff" };
             const discountPercent = getDiscountPercent();
             const originalPrice = getLegacyOriginalPrice(product.basePrice);
@@ -145,9 +145,9 @@ export function FeaturedProducts() {
                     className={`h-full w-full object-cover transition-transform duration-300 md:group-hover:scale-[1.03] ${
                       product.outOfStock ? "opacity-50" : ""
                     }`}
-                    loading="eager"
-                    decoding="auto"
-                    fetchPriority="high"
+                    loading={index === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    fetchPriority={index === 0 ? "high" : "low"}
                     referrerPolicy="no-referrer"
                     sizes="(max-width: 639px) 88vw, (max-width: 1023px) 44vw, 30vw"
                     draggable={false}

@@ -228,8 +228,18 @@
 
 .main-service-card__icon-shell,
 .main-service-card__link {
-    transform: translateZ(0);
-    backface-visibility: hidden;
+    backface-visibility: visible;
+}
+
+.lucide {
+    overflow: visible;
+    shape-rendering: geometricPrecision;
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.lucide * {
+    vector-effect: non-scaling-stroke;
 }
 
 .perf-scroll-strip {
@@ -396,9 +406,8 @@
 
     .faq-mobile-card,
     .why-choose-mobile-card {
-        transform: translateZ(0);
-        backface-visibility: hidden;
-        will-change: transform, opacity;
+        backface-visibility: visible;
+        will-change: auto;
         contain: layout style;
     }
 

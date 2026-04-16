@@ -538,7 +538,7 @@ export function Home() {
                         ? "border-primary scale-[1.02] shadow-[0_20px_50px_rgba(208,188,255,0.15)] z-10" 
                         : "border-outline-variant/10 hover:border-primary/30 hover:-translate-y-1"
                     }`}
-                    style={{ contain: "layout paint style" }}
+                    style={{ contain: "layout style" }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     
