@@ -165,6 +165,7 @@ function StoreProductCard({
 } & Attributes) {
   const discountPercent = getDiscountPercent();
   const originalPrice = getLegacyOriginalPrice(product.basePrice);
+  const imageFrameClassName = staticLayout ? "h-[284px] sm:h-[224px] lg:h-[200px] xl:h-[184px]" : "";
 
   return (
     <div
@@ -181,10 +182,9 @@ function StoreProductCard({
     >
       <Link
         to={`/products/${product.id}`}
-        className="block relative w-full overflow-hidden bg-surface-container-highest"
+        className={`block relative w-full overflow-hidden bg-surface-container-highest ${imageFrameClassName}`}
         style={staticLayout ? undefined : { height: metrics.imageHeight }}
       >
-        {staticLayout && <div className="h-[284px] sm:h-[224px] lg:h-[200px] xl:h-[184px]" aria-hidden="true" />}
         {product.outOfStock && (
           <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-sm">
             <span className="rounded-full border border-destructive/50 bg-destructive/10 px-6 py-2 font-headline text-xl font-black text-destructive shadow-[0_0_20px_rgba(255,0,0,0.2)]">
@@ -618,9 +618,6 @@ export function Store() {
   const categoryStripRef = useRef<HTMLElement | null>(null);
   useHorizontalTouchScroll(categoryStripRef);
   const routeCategory = getCatalogRouteCategory(categoryParam);
-
-  const initialCategory = routeCategory ?? "all";
-  const [activeCategory, setActiveCategory] = useState<VisibleCategory>(initialCategory);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [columns, setColumns] = useState(1);
   const [enableVirtualLayout, setEnableVirtualLayout] = useState(false);
@@ -629,7 +626,7 @@ export function Store() {
 
   const viewportMetrics = getViewportMetrics(columns);
   const staticMetrics = getViewportMetrics(columns);
-  const effectiveCategory = activeCategory;
+  const effectiveCategory: VisibleCategory = routeCategory ?? "all";
   const isMobileAllOverview = isCoarsePointer && columns === 1 && effectiveCategory === "all";
   const shouldUseVirtualLayout = enableVirtualLayout && columns > 1;
 
@@ -649,13 +646,8 @@ export function Store() {
   useEffect(() => {
     if (routeCategory === null) {
       navigate("/products", { replace: true });
-      return;
     }
-
-    if (routeCategory !== activeCategory) {
-      setActiveCategory(routeCategory);
-    }
-  }, [activeCategory, navigate, routeCategory]);
+  }, [navigate, routeCategory]);
 
   useEffect(() => {
     return () => {
@@ -665,8 +657,10 @@ export function Store() {
     };
   }, []);
 
-  useEffect(() => {
-    setVisibleMobileSections(mobileOverviewBatchSize);
+  useLayoutEffect(() => {
+    setVisibleMobileSections((currentCount) =>
+      currentCount === mobileOverviewBatchSize ? currentCount : mobileOverviewBatchSize,
+    );
   }, [effectiveCategory, isMobileAllOverview]);
 
   const filteredProducts = useMemo(() => {
@@ -690,8 +684,10 @@ export function Store() {
 
   const handleCategoryChange = (categoryId: string) => {
     const nextCategory = categoryId as VisibleCategory;
-    setActiveCategory(nextCategory);
-    navigate(getCatalogPath(nextCategory), { preventScrollReset: true });
+    if (nextCategory === effectiveCategory) return;
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    navigate(getCatalogPath(nextCategory));
   };
 
   const handleOrderNow = (product: Product) => {
@@ -774,6 +770,7 @@ export function Store() {
         </main>
       ) : isMobileAllOverview ? (
         <StoreMobileOverviewSections
+          key={effectiveCategory}
           groupedProducts={groupedProducts}
           visibleSectionCount={visibleMobileSections}
           onLoadMore={handleLoadMoreSections}
@@ -792,6 +789,7 @@ export function Store() {
         />
       ) : (
         <StoreStaticSections
+          key={effectiveCategory}
           groupedProducts={groupedProducts}
           onOrderNow={handleOrderNow}
           onAddToCart={handleAddToCart}

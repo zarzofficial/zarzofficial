@@ -145,9 +145,9 @@ export function FeaturedProducts() {
                     className={`h-full w-full object-cover transition-transform duration-300 md:group-hover:scale-[1.03] ${
                       product.outOfStock ? "opacity-50" : ""
                     }`}
-                    loading="lazy"
-                    decoding="async"
-                    fetchPriority="low"
+                    loading="eager"
+                    decoding="auto"
+                    fetchPriority="high"
                     referrerPolicy="no-referrer"
                     sizes="(max-width: 639px) 88vw, (max-width: 1023px) 44vw, 30vw"
                     draggable={false}

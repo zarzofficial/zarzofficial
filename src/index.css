@@ -180,9 +180,7 @@
 .perf-panel,
 .perf-card,
 .perf-modal-card {
-    contain: layout paint style;
-    transform: translateZ(0);
-    backface-visibility: hidden;
+    contain: layout style;
 }
 
 .mesh-gradient-bg {
@@ -220,8 +218,7 @@
 .cyber-glass-card:hover .glowing-border-accent { transform: translateX(100%); }
 
 .main-service-card {
-    contain: layout paint style;
-    transform: translateZ(0);
+    contain: layout style;
 }
 
 .main-service-card__bg,
