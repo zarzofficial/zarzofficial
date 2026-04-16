@@ -86,7 +86,7 @@ export function Categories() {
 
         <div 
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-8 -mx-4 px-4 md:-mx-6 md:px-6"
+          className="perf-horizontal-cards flex gap-6 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-8 -mx-4 px-4 md:-mx-6 md:px-6"
         >
           {categories.map((category, idx) => {
             const isActive = activeIndex === idx;

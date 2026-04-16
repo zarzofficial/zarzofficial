@@ -68,7 +68,7 @@ export function FeaturedProducts() {
 
         <div 
           ref={scrollContainerRef}
-          className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 lg:gap-8 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none no-scrollbar pb-8 pt-4 px-4 -mx-4 md:px-0 md:-mx-0"
+          className="perf-mobile-horizontal-cards flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 lg:gap-8 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none no-scrollbar pb-8 pt-4 px-4 -mx-4 md:px-0 md:-mx-0"
           dir="rtl"
         >
           {featured.map((product) => {

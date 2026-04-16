@@ -267,7 +267,57 @@
     touch-action: pan-x;
 }
 
+/* Horizontal card rails must not keep paint/content containment or forced GPU layers,
+   otherwise some browsers may skip repainting offscreen cards and bring them back blank. */
+.perf-horizontal-cards {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x;
+}
+
+.perf-mobile-horizontal-cards {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x;
+}
+
+.perf-horizontal-cards .perf-panel,
+.perf-horizontal-cards .perf-card,
+.perf-horizontal-cards .perf-modal-card,
+.perf-horizontal-cards [data-slot="card"],
+.perf-horizontal-cards .cyber-glass-card {
+    contain: layout style !important;
+    content-visibility: visible !important;
+    contain-intrinsic-size: none !important;
+    transform: none !important;
+    backface-visibility: visible !important;
+}
+
+.perf-horizontal-cards .main-service-card__icon-shell,
+.perf-horizontal-cards .main-service-card__link {
+    transform: none;
+    backface-visibility: visible;
+}
+
 @media (max-width: 767px) {
+    .perf-mobile-horizontal-cards .perf-panel,
+    .perf-mobile-horizontal-cards .perf-card,
+    .perf-mobile-horizontal-cards .perf-modal-card,
+    .perf-mobile-horizontal-cards [data-slot="card"],
+    .perf-mobile-horizontal-cards .cyber-glass-card {
+        contain: layout style !important;
+        content-visibility: visible !important;
+        contain-intrinsic-size: none !important;
+        transform: none !important;
+        backface-visibility: visible !important;
+    }
+
+    .perf-mobile-horizontal-cards .main-service-card__icon-shell,
+    .perf-mobile-horizontal-cards .main-service-card__link {
+        transform: none;
+        backface-visibility: visible;
+    }
+
     .perf-mobile-section {
         contain: layout style;
     }

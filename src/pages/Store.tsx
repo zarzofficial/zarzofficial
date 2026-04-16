@@ -320,6 +320,7 @@ function StoreVirtualizedSections({
   onOrderNow,
   onAddToCart,
 }: {
+  key?: string | number;
   activeCategory: VisibleCategory;
   virtualItems: VirtualStoreItem[];
   viewportMetrics: StoreViewportMetrics;
@@ -473,7 +474,7 @@ function MobileCategorySlider({
       <div
         ref={scrollContainerRef}
         onScroll={checkScroll}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar px-6 md:px-12 w-full pb-4"
+        className="perf-horizontal-cards flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar px-6 md:px-12 w-full pb-4"
         dir="rtl"
         style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
       >
