@@ -536,9 +536,8 @@ export function Store() {
   }, []);
 
   const filteredProducts = useMemo(() => {
-    if (columns === 1) return products;
     return products.filter((product) => product.category === activeCategory);
-  }, [activeCategory, columns]);
+  }, [activeCategory]);
 
   const groupedProducts = useMemo(
     () =>
@@ -556,10 +555,10 @@ export function Store() {
 
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId as VisibleCategory);
-    setSearchParams({ category: categoryId });
-    if (columns > 1) {
-      window.scrollTo({ top: 300, behavior: 'smooth' });
-    }
+    setSearchParams(
+      { category: categoryId }, 
+      { replace: true, preventScrollReset: true }
+    );
   };
 
   const handleOrderNow = (product: Product) => {
@@ -636,7 +635,7 @@ export function Store() {
         <main className="mx-auto max-w-screen-2xl px-6 md:px-12">
           <div className="py-20 text-center text-outline">لا توجد منتجات متاحة في هذا القسم حالياً.</div>
         </main>
-      ) : enableVirtualLayout && columns > 1 ? (
+      ) : enableVirtualLayout ? (
         <StoreVirtualizedSections
           activeCategory={activeCategory}
           virtualItems={virtualItems}
@@ -644,19 +643,6 @@ export function Store() {
           onOrderNow={handleOrderNow}
           onAddToCart={handleAddToCart}
         />
-      ) : enableVirtualLayout && columns === 1 ? (
-        <div className="flex flex-col gap-6 pb-8 w-full -mx-6 px-6 md:-mx-12 md:px-12">
-          {categories.map((cat) => (
-            <MobileCategorySlider
-              key={cat.id}
-              category={cat}
-              products={groupedProducts[cat.id] || []}
-              onOrderNow={handleOrderNow}
-              onAddToCart={handleAddToCart}
-              metrics={viewportMetrics}
-            />
-          ))}
-        </div>
       ) : (
         <StoreStaticSections
           groupedProducts={groupedProducts}
