@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 
 export function useCoarsePointer() {
-  const [isCoarsePointer, setIsCoarsePointer] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia("(pointer: coarse)").matches;
-  });
+  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

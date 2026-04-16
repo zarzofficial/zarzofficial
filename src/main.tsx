@@ -1,5 +1,5 @@
 import {StrictMode} from 'react';
-import {createRoot} from 'react-dom/client';
+import {createRoot, hydrateRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import { AppProviders } from './app/AppProviders';
@@ -75,10 +75,9 @@ async function preloadStartupRoute() {
 }
 
 function shouldHydratePrerenderedApp() {
-  // These prerendered pages are generated from static routes only, while the
-  // client render depends on query params, viewport state, motion state, and
-  // other runtime-only inputs. Mounting fresh is more stable than hydrating.
-  return false;
+  // Keep the prerendered shell visible and attach React to it instead of
+  // clearing the page and remounting from scratch on first load.
+  return true;
 }
 
 const rootElement = document.getElementById('root');
@@ -99,8 +98,9 @@ const isPrerendered = rootElement.dataset.prerendered === "true";
 const shouldHydratePrerendered = isPrerendered && shouldHydratePrerenderedApp();
 
 function mountApp() {
-  if (isPrerendered) {
-    rootElement.textContent = "";
+  if (shouldHydratePrerendered) {
+    hydrateRoot(rootElement, appTree);
+    return;
   }
 
   createRoot(rootElement).render(appTree);
