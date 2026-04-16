@@ -2,58 +2,215 @@ import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { useCoarsePointer } from "../lib/useCoarsePointer";
 import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
+const mobileRevealTransition = {
+  duration: 0.28,
+  ease: [0.22, 1, 0.36, 1] as const,
+};
 
+const whyChooseItems = [
+  {
+    id: "fast",
+    number: "01",
+    iconName: "bolt" as const,
+    title: "تنفيذ فوري",
+    description: "طلبك يبدأ خلال دقائق من التأكيد بدون أي تأخير",
+    borderClass: "md:hover:border-primary/30",
+    shadowClass: "md:hover:shadow-[0_16px_40px_rgba(208,188,255,0.08)]",
+    overlayClass: "from-primary/[0.04]",
+    iconClass: "bg-primary/10 border-primary/20 text-primary",
+    iconGlowClass: "md:group-hover:shadow-[0_0_20px_rgba(208,188,255,0.2)]",
+  },
+  {
+    id: "safe",
+    number: "02",
+    iconName: "shield" as const,
+    title: "أمان كامل",
+    description: "حساباتك محمية ولا نطلب أي بيانات سرية مطلقاً",
+    borderClass: "md:hover:border-[#3b82f6]/30",
+    shadowClass: "md:hover:shadow-[0_16px_40px_rgba(59,130,246,0.08)]",
+    overlayClass: "from-[#3b82f6]/[0.04]",
+    iconClass: "bg-[#3b82f6]/10 border-[#3b82f6]/20 text-[#3b82f6]",
+    iconGlowClass: "md:group-hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]",
+  },
+  {
+    id: "support",
+    number: "03",
+    iconName: "headset_mic" as const,
+    title: "دعم ٢٤/٧",
+    description: "فريق متخصص جاهز لمساعدتك في أي وقت تحتاجه",
+    borderClass: "md:hover:border-[#10b981]/30",
+    shadowClass: "md:hover:shadow-[0_16px_40px_rgba(16,185,129,0.08)]",
+    overlayClass: "from-[#10b981]/[0.04]",
+    iconClass: "bg-[#10b981]/10 border-[#10b981]/20 text-[#10b981]",
+    iconGlowClass: "md:group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]",
+  },
+  {
+    id: "payments",
+    number: "04",
+    iconName: "payments" as const,
+    title: "دفع مرن",
+    description: "ندعم التحويل البنكي والكاش حسب ما يناسبك",
+    borderClass: "md:hover:border-[#f59e0b]/30",
+    shadowClass: "md:hover:shadow-[0_16px_40px_rgba(245,158,11,0.08)]",
+    overlayClass: "from-[#f59e0b]/[0.04]",
+    iconClass: "bg-[#f59e0b]/10 border-[#f59e0b]/20 text-[#f59e0b]",
+    iconGlowClass: "md:group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)]",
+  },
+  {
+    id: "quality",
+    number: "05",
+    iconName: "workspace_premium" as const,
+    title: "جودة مضمونة",
+    description: "ضمان زارز الملكي على كل خدمة نقدّمها لك",
+    borderClass: "md:hover:border-[#e11d48]/30",
+    shadowClass: "md:hover:shadow-[0_16px_40px_rgba(225,29,72,0.08)]",
+    overlayClass: "from-[#e11d48]/[0.04]",
+    iconClass: "bg-[#e11d48]/10 border-[#e11d48]/20 text-[#e11d48]",
+    iconGlowClass: "md:group-hover:shadow-[0_0_20px_rgba(225,29,72,0.2)]",
+  },
+  {
+    id: "results",
+    number: "06",
+    iconName: "trending_up" as const,
+    title: "نتائج حقيقية",
+    description: "خدمات فعلية بنتائج ملموسة وقابلة للقياس",
+    borderClass: "md:hover:border-[#8b5cf6]/30",
+    shadowClass: "md:hover:shadow-[0_16px_40px_rgba(139,92,246,0.08)]",
+    overlayClass: "from-[#8b5cf6]/[0.04]",
+    iconClass: "bg-[#8b5cf6]/10 border-[#8b5cf6]/20 text-[#8b5cf6]",
+    iconGlowClass: "md:group-hover:shadow-[0_0_20px_rgba(139,92,246,0.2)]",
+  },
+] as const;
 
-function FaqItem({ faq, isOpen, onClick }: { key?: React.Key, faq: { question: string, answer: string }, isOpen: boolean, onClick: () => void }) {
+type FaqEntry = {
+  question: string;
+  answer: string;
+};
+
+type WhyChooseItem = (typeof whyChooseItems)[number];
+
+type WhyChooseCardProps = {
+  index: number;
+  item: WhyChooseItem;
+  isCoarsePointer: boolean;
+};
+
+function FaqItem({
+  faq,
+  isOpen,
+  onClick,
+  isCoarsePointer,
+}: {
+  faq: FaqEntry;
+  isOpen: boolean;
+  onClick: () => void;
+  isCoarsePointer: boolean;
+}) {
   return (
-    <motion.div
-      className={`perf-card cyber-glass-card rounded-2xl overflow-hidden cursor-pointer transition-colors duration-500 border ${isOpen ? 'border-[#e11d48]/30 bg-[#e11d48]/5 shadow-[0_4px_30px_rgba(225,29,72,0.1)]' : 'border-outline-variant/10 hover:border-outline-variant/30 bg-surface-container-low/30'}`}
-      onClick={onClick}
-      layout="position"
+    <div
+      className={`perf-card faq-mobile-card cyber-glass-card rounded-2xl overflow-hidden border transition-[transform,border-color,background-color] duration-300 ${
+        isOpen
+          ? "border-[#e11d48]/30 bg-[#e11d48]/5 shadow-[0_4px_30px_rgba(225,29,72,0.1)]"
+          : "border-outline-variant/10 bg-surface-container-low/30 md:hover:border-outline-variant/30"
+      } ${isCoarsePointer ? "transform-gpu will-change-transform" : ""}`}
     >
-      <motion.div className="p-6 flex items-center justify-between" layout="position">
+      <button
+        type="button"
+        onClick={onClick}
+        aria-expanded={isOpen}
+        className="flex w-full items-center justify-between gap-4 p-6 text-start"
+      >
         <h3 className="text-lg font-bold text-on-surface">{faq.question}</h3>
         <SiteIcon
           name={isOpen ? "remove" : "add"}
-          className={`transition-transform duration-500 origin-center ${isOpen ? "text-[#e11d48] rotate-180" : "text-[#0ea5e9] rotate-0"}`}
+          className={`origin-center transition-transform duration-300 ${isOpen ? "rotate-180 text-[#e11d48]" : "rotate-0 text-[#0ea5e9]"}`}
         />
-      </motion.div>
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0, filter: "blur(4px)", y: -10 }}
-            animate={{ height: "auto", opacity: 1, filter: "blur(0px)", y: 0 }}
-            exit={{ height: 0, opacity: 0, filter: "blur(4px)", y: -10 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden"
+      </button>
+      <div
+        className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ${
+          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        } ${isCoarsePointer ? "ease-out" : "[transition-timing-function:cubic-bezier(0.22,1,0.36,1)]"}`}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <div
+            className={`px-6 pb-6 text-[#cbc3d9] leading-relaxed transition-transform duration-300 ${
+              isOpen ? "translate-y-0" : "-translate-y-1"
+            }`}
           >
-            <div className="px-6 pb-6 text-[#cbc3d9] leading-relaxed">
-              {faq.answer}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+            {faq.answer}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
-function FaqAccordion({ faqs }: { faqs: { question: string, answer: string }[] }) {
+function FaqAccordion({
+  faqs,
+  isCoarsePointer,
+}: {
+  faqs: FaqEntry[];
+  isCoarsePointer: boolean;
+}) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
     <div className="space-y-4 text-start">
       {faqs.map((faq, idx) => (
-        <FaqItem
-          key={idx}
-          faq={faq}
-          isOpen={openIndex === idx}
-          onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
-        />
+        <React.Fragment key={idx}>
+          <FaqItem
+            faq={faq}
+            isOpen={openIndex === idx}
+            onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+            isCoarsePointer={isCoarsePointer}
+          />
+        </React.Fragment>
       ))}
     </div>
+  );
+}
+
+function WhyChooseCard({
+  index,
+  item,
+  isCoarsePointer,
+}: WhyChooseCardProps) {
+  const cardContent = (
+    <div
+      className={`perf-card why-choose-mobile-card group relative overflow-hidden rounded-[1.25rem] border border-outline-variant/10 bg-surface-container-low/60 p-5 transition-[transform,opacity,border-color,background-color] duration-300 md:p-7 md:duration-500 ${item.borderClass} ${item.shadowClass} md:hover:-translate-y-1.5`}
+    >
+      <div className={`absolute inset-0 bg-gradient-to-br ${item.overlayClass} to-transparent opacity-0 transition-opacity duration-300 md:group-hover:opacity-100`} />
+      <div className="pointer-events-none absolute top-4 left-4 select-none text-[3.5rem] leading-none font-black text-white/[0.03]">
+        {item.number}
+      </div>
+      <div className="relative z-10">
+        <div
+          className={`mb-5 flex h-11 w-11 items-center justify-center rounded-xl border transition-transform duration-300 md:group-hover:scale-110 ${item.iconClass} ${item.iconGlowClass}`}
+        >
+          <SiteIcon name={item.iconName} className="text-[22px]" />
+        </div>
+        <h4 className="mb-2 text-sm font-black text-on-surface md:text-[15px]">{item.title}</h4>
+        <p className="text-xs leading-relaxed text-outline md:text-[13px]">{item.description}</p>
+      </div>
+    </div>
+  );
+
+  if (!isCoarsePointer) {
+    return cardContent;
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ ...mobileRevealTransition, delay: index * 0.04 }}
+    >
+      {cardContent}
+    </motion.div>
   );
 }
 const categoryCardVariants = {
@@ -465,8 +622,8 @@ export function Home() {
 
       {/* Why ZARZ Section */}
       <section className="py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
-        <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[60px] md:blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-tertiary/5 rounded-full blur-[50px] md:blur-[100px] pointer-events-none"></div>
+        <div className="why-choose-mobile-glow absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] pointer-events-none"></div>
+        <div className="why-choose-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-primary text-sm font-bold mb-6 backdrop-blur-md">لماذا نحن مختلفون؟</span>
@@ -474,86 +631,12 @@ export function Home() {
             <p className="text-outline text-base md:text-lg max-w-xl mx-auto leading-relaxed">نقدّم تجربة متكاملة تجمع بين السرعة والأمان والدعم المستمر</p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-
-            {/* Card 1 */}
-            <div className="perf-card group relative rounded-[1.25rem] p-5 md:p-7 bg-surface-container-low/60 backdrop-blur-sm border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_16px_40px_rgba(208,188,255,0.08)] overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="absolute top-4 left-4 text-[3.5rem] font-black text-white/[0.03] leading-none select-none pointer-events-none">01</div>
-              <div className="relative z-10">
-                <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(208,188,255,0.2)] transition-all duration-500">
-                  <SiteIcon name="bolt" className="text-[22px] text-primary" />
-                </div>
-                <h4 className="text-sm md:text-[15px] font-black text-on-surface mb-2">تنفيذ فوري</h4>
-                <p className="text-xs md:text-[13px] text-outline leading-relaxed">طلبك يبدأ خلال دقائق من التأكيد بدون أي تأخير</p>
-              </div>
-            </div>
-
-            {/* Card 2 */}
-            <div className="perf-card group relative rounded-[1.25rem] p-5 md:p-7 bg-surface-container-low/60 backdrop-blur-sm border border-outline-variant/10 hover:border-[#3b82f6]/30 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_16px_40px_rgba(59,130,246,0.08)] overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#3b82f6]/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="absolute top-4 left-4 text-[3.5rem] font-black text-white/[0.03] leading-none select-none pointer-events-none">02</div>
-              <div className="relative z-10">
-                <div className="w-11 h-11 rounded-xl bg-[#3b82f6]/10 border border-[#3b82f6]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-500">
-                  <SiteIcon name="shield" className="text-[22px] text-[#3b82f6]" />
-                </div>
-                <h4 className="text-sm md:text-[15px] font-black text-on-surface mb-2">أمان كامل</h4>
-                <p className="text-xs md:text-[13px] text-outline leading-relaxed">حساباتك محمية ولا نطلب أي بيانات سرية مطلقاً</p>
-              </div>
-            </div>
-
-            {/* Card 3 */}
-            <div className="perf-card group relative rounded-[1.25rem] p-5 md:p-7 bg-surface-container-low/60 backdrop-blur-sm border border-outline-variant/10 hover:border-[#10b981]/30 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_16px_40px_rgba(16,185,129,0.08)] overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#10b981]/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="absolute top-4 left-4 text-[3.5rem] font-black text-white/[0.03] leading-none select-none pointer-events-none">03</div>
-              <div className="relative z-10">
-                <div className="w-11 h-11 rounded-xl bg-[#10b981]/10 border border-[#10b981]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all duration-500">
-                  <SiteIcon name="headset_mic" className="text-[22px] text-[#10b981]" />
-                </div>
-                <h4 className="text-sm md:text-[15px] font-black text-on-surface mb-2">دعم ٢٤/٧</h4>
-                <p className="text-xs md:text-[13px] text-outline leading-relaxed">فريق متخصص جاهز لمساعدتك في أي وقت تحتاجه</p>
-              </div>
-            </div>
-
-            {/* Card 4 */}
-            <div className="perf-card group relative rounded-[1.25rem] p-5 md:p-7 bg-surface-container-low/60 backdrop-blur-sm border border-outline-variant/10 hover:border-[#f59e0b]/30 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_16px_40px_rgba(245,158,11,0.08)] overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#f59e0b]/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="absolute top-4 left-4 text-[3.5rem] font-black text-white/[0.03] leading-none select-none pointer-events-none">04</div>
-              <div className="relative z-10">
-                <div className="w-11 h-11 rounded-xl bg-[#f59e0b]/10 border border-[#f59e0b]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] transition-all duration-500">
-                  <SiteIcon name="payments" className="text-[22px] text-[#f59e0b]" />
-                </div>
-                <h4 className="text-sm md:text-[15px] font-black text-on-surface mb-2">دفع مرن</h4>
-                <p className="text-xs md:text-[13px] text-outline leading-relaxed">ندعم التحويل البنكي والكاش حسب ما يناسبك</p>
-              </div>
-            </div>
-
-            {/* Card 5 */}
-            <div className="perf-card group relative rounded-[1.25rem] p-5 md:p-7 bg-surface-container-low/60 backdrop-blur-sm border border-outline-variant/10 hover:border-[#e11d48]/30 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_16px_40px_rgba(225,29,72,0.08)] overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#e11d48]/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="absolute top-4 left-4 text-[3.5rem] font-black text-white/[0.03] leading-none select-none pointer-events-none">05</div>
-              <div className="relative z-10">
-                <div className="w-11 h-11 rounded-xl bg-[#e11d48]/10 border border-[#e11d48]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(225,29,72,0.2)] transition-all duration-500">
-                  <SiteIcon name="workspace_premium" className="text-[22px] text-[#e11d48]" />
-                </div>
-                <h4 className="text-sm md:text-[15px] font-black text-on-surface mb-2">جودة مضمونة</h4>
-                <p className="text-xs md:text-[13px] text-outline leading-relaxed">ضمان زارز الملكي على كل خدمة نقدّمها لك</p>
-              </div>
-            </div>
-
-            {/* Card 6 */}
-            <div className="perf-card group relative rounded-[1.25rem] p-5 md:p-7 bg-surface-container-low/60 backdrop-blur-sm border border-outline-variant/10 hover:border-[#8b5cf6]/30 transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_16px_40px_rgba(139,92,246,0.08)] overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="absolute top-4 left-4 text-[3.5rem] font-black text-white/[0.03] leading-none select-none pointer-events-none">06</div>
-              <div className="relative z-10">
-                <div className="w-11 h-11 rounded-xl bg-[#8b5cf6]/10 border border-[#8b5cf6]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(139,92,246,0.2)] transition-all duration-500">
-                  <SiteIcon name="trending_up" className="text-[22px] text-[#8b5cf6]" />
-                </div>
-                <h4 className="text-sm md:text-[15px] font-black text-on-surface mb-2">نتائج حقيقية</h4>
-                <p className="text-xs md:text-[13px] text-outline leading-relaxed">خدمات فعلية بنتائج ملموسة وقابلة للقياس</p>
-              </div>
-            </div>
-
+          <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3">
+            {whyChooseItems.map((item, index) => (
+              <React.Fragment key={item.id}>
+                <WhyChooseCard index={index} item={item} isCoarsePointer={isCoarsePointer} />
+              </React.Fragment>
+            ))}
           </div>
         </div>
       </section>
@@ -655,7 +738,7 @@ export function Home() {
 
       {/* FAQ Section */}
       <section id="faq" className="perf-mobile-section relative overflow-hidden bg-background px-6 py-24 md:px-12" data-perf-size="medium">
-        <div className="absolute top-1/2 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none -translate-y-1/2"></div>
+        <div className="faq-mobile-glow absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px] pointer-events-none"></div>
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black font-headline text-on-background mb-4">أسئلة شائعة</h2>
@@ -663,6 +746,7 @@ export function Home() {
           </div>
 
           <FaqAccordion
+            isCoarsePointer={isCoarsePointer}
             faqs={[
               {
                 question: "كم يستغرق تنفيذ الطلب؟",
