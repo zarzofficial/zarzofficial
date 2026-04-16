@@ -32,10 +32,21 @@ export function FeaturedProducts() {
 
   const [isAtStart, setIsAtStart] = React.useState(true);
   const [isAtEnd, setIsAtEnd] = React.useState(false);
+  const edgeStateRef = React.useRef({ isAtStart: true, isAtEnd: false });
 
   useMotionValueEvent(scrollXProgress, "change", (latest) => {
-    setIsAtStart(latest <= 0.02);
-    setIsAtEnd(latest >= 0.98);
+    const nextIsAtStart = latest <= 0.02;
+    const nextIsAtEnd = latest >= 0.98;
+
+    if (edgeStateRef.current.isAtStart !== nextIsAtStart) {
+      edgeStateRef.current.isAtStart = nextIsAtStart;
+      setIsAtStart(nextIsAtStart);
+    }
+
+    if (edgeStateRef.current.isAtEnd !== nextIsAtEnd) {
+      edgeStateRef.current.isAtEnd = nextIsAtEnd;
+      setIsAtEnd(nextIsAtEnd);
+    }
   });
 
   const scrollLeft = () => {

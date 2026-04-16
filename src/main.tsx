@@ -1,5 +1,5 @@
 import {StrictMode} from 'react';
-import {createRoot, hydrateRoot} from 'react-dom/client';
+import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import { AppProviders } from './app/AppProviders';
@@ -74,6 +74,13 @@ async function preloadStartupRoute() {
   }
 }
 
+function shouldHydratePrerenderedApp() {
+  // These prerendered pages are generated from static routes only, while the
+  // client render depends on query params, viewport state, motion state, and
+  // other runtime-only inputs. Mounting fresh is more stable than hydrating.
+  return false;
+}
+
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
@@ -89,6 +96,15 @@ const appTree = (
 );
 
 const isPrerendered = rootElement.dataset.prerendered === "true";
+const shouldHydratePrerendered = isPrerendered && shouldHydratePrerenderedApp();
+
+function mountApp() {
+  if (isPrerendered) {
+    rootElement.textContent = "";
+  }
+
+  createRoot(rootElement).render(appTree);
+}
 
 void cleanupLegacyServiceWorkers();
 
@@ -98,12 +114,12 @@ if (isPrerendered) {
       console.error("Startup route preload failed", error);
     })
     .finally(() => {
-      hydrateRoot(rootElement, appTree);
+      mountApp();
     });
 } else {
   void preloadStartupRoute().catch((error) => {
     console.error("Startup route preload failed", error);
   });
 
-  createRoot(rootElement).render(appTree);
+  mountApp();
 }

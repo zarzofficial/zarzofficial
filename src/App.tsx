@@ -87,7 +87,27 @@ function CanonicalPath() {
 }
 
 function RouteFallback() {
-  return <div className="min-h-[52vh]" aria-hidden="true" />;
+  return (
+    <div className="min-h-[52vh] bg-background px-6 pb-16 pt-28 text-on-background md:px-12" aria-hidden="true">
+      <div className="mx-auto max-w-screen-2xl animate-pulse">
+        <div className="mb-4 h-3 w-24 rounded-full bg-primary/20" />
+        <div className="mb-4 h-10 w-full max-w-md rounded-full bg-surface-container" />
+        <div className="mb-12 h-4 w-full max-w-xl rounded-full bg-surface-container-high" />
+        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="overflow-hidden rounded-[1.75rem] border border-outline-variant/10 bg-surface-container-low">
+              <div className="aspect-[4/3] w-full bg-surface-container" />
+              <div className="space-y-3 p-5">
+                <div className="h-5 w-2/3 rounded-full bg-surface-container-high" />
+                <div className="h-4 w-full rounded-full bg-surface-container-highest/60" />
+                <div className="h-4 w-5/6 rounded-full bg-surface-container-highest/50" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function App() {

@@ -238,7 +238,7 @@
 .perf-scroll-strip {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
-    touch-action: pan-x;
+    touch-action: pan-x pan-y pinch-zoom;
 }
 
 /* Horizontal card rails must not keep paint/content containment or forced GPU layers,
@@ -246,13 +246,13 @@
 .perf-horizontal-cards {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
-    touch-action: pan-x;
+    touch-action: pan-x pan-y pinch-zoom;
 }
 
 .perf-mobile-horizontal-cards {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
-    touch-action: pan-x;
+    touch-action: pan-x pan-y pinch-zoom;
 }
 
 .perf-horizontal-cards .perf-panel,

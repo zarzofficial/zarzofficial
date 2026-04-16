@@ -82,12 +82,23 @@ export function Home() {
 
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
+  const edgeStateRef = useRef({ isAtStart: true, isAtEnd: false });
 
   const { scrollXProgress } = useScroll({ container: scrollContainerRef });
 
   useMotionValueEvent(scrollXProgress, "change", (latest) => {
-    setIsAtStart(latest <= 0.02);
-    setIsAtEnd(latest >= 0.98);
+    const nextIsAtStart = latest <= 0.02;
+    const nextIsAtEnd = latest >= 0.98;
+
+    if (edgeStateRef.current.isAtStart !== nextIsAtStart) {
+      edgeStateRef.current.isAtStart = nextIsAtStart;
+      setIsAtStart(nextIsAtStart);
+    }
+
+    if (edgeStateRef.current.isAtEnd !== nextIsAtEnd) {
+      edgeStateRef.current.isAtEnd = nextIsAtEnd;
+      setIsAtEnd(nextIsAtEnd);
+    }
   });
 
   // Map progress (0 to 1) to a pixel translation. 

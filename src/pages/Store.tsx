@@ -112,6 +112,15 @@ function getCategoryName(categoryId: string) {
   return categories.find((category) => category.id === categoryId)?.name ?? categoryId;
 }
 
+function isVisibleCategory(value: string | null): value is VisibleCategory {
+  return value === "all" || categories.some((category) => category.id === value);
+}
+
+function getRequestedCategory(searchParams: URLSearchParams) {
+  const requestedCategory = searchParams.get("category");
+  return isVisibleCategory(requestedCategory) ? requestedCategory : "all";
+}
+
 function buildVirtualItems(groupedProducts: Record<string, Product[]>, columns: number) {
   const items: VirtualStoreItem[] = [];
 
@@ -505,7 +514,7 @@ export function Store() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
-  const initialCategory = (searchParams.get("category") as VisibleCategory) || "all";
+  const initialCategory = getRequestedCategory(searchParams);
   const [activeCategory, setActiveCategory] = useState<VisibleCategory>(initialCategory);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [columns, setColumns] = useState(1);
@@ -513,36 +522,29 @@ export function Store() {
   const toastTimeoutRef = useRef<number | undefined>(undefined);
 
   const viewportMetrics = getViewportMetrics(columns);
-  const staticMetrics = viewportMetricsByColumns[1];
+  const staticMetrics = getViewportMetrics(columns);
+  const effectiveCategory = enableVirtualLayout && columns === 1 && activeCategory === "all" ? "social" : activeCategory;
+  const shouldUseVirtualLayout = enableVirtualLayout && columns > 1;
 
   useEffect(() => {
-    setEnableVirtualLayout(true);
-
     const handleResize = () => {
       const nextColumns = getColumnCount(window.innerWidth);
       setColumns((currentColumns) => (currentColumns === nextColumns ? currentColumns : nextColumns));
     };
 
     handleResize();
+    setEnableVirtualLayout(true);
     window.addEventListener("resize", handleResize, { passive: true });
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
-    const categoryQuery = (searchParams.get("category") as VisibleCategory) || "all";
+    const categoryQuery = getRequestedCategory(searchParams);
     if (categoryQuery !== activeCategory) {
       setActiveCategory(categoryQuery);
     }
   }, [activeCategory, searchParams]);
-
-  // On mobile, redirect 'all' to 'social'
-  useEffect(() => {
-    if (columns === 1 && activeCategory === "all") {
-      setActiveCategory("social");
-      setSearchParams({ category: "social" }, { replace: true, preventScrollReset: true });
-    }
-  }, [columns, activeCategory, setSearchParams]);
 
   useEffect(() => {
     return () => {
@@ -553,9 +555,9 @@ export function Store() {
   }, []);
 
   const filteredProducts = useMemo(() => {
-    if (activeCategory === "all") return products;
-    return products.filter((product) => product.category === activeCategory);
-  }, [activeCategory]);
+    if (effectiveCategory === "all") return products;
+    return products.filter((product) => product.category === effectiveCategory);
+  }, [effectiveCategory]);
 
   const groupedProducts = useMemo(
     () =>
@@ -640,7 +642,7 @@ export function Store() {
               key={category.id}
               onClick={() => handleCategoryChange(category.id)}
               className={`whitespace-nowrap rounded-full px-8 py-3 font-bold transition-colors ${
-                activeCategory === category.id
+                effectiveCategory === category.id
                   ? "primary-gradient text-on-primary shadow-lg shadow-primary/20"
                   : "bg-surface-container text-outline hover:text-primary"
               }`}
@@ -655,10 +657,10 @@ export function Store() {
         <main className="mx-auto max-w-screen-2xl px-6 md:px-12">
           <div className="py-20 text-center text-outline">لا توجد منتجات متاحة في هذا القسم حالياً.</div>
         </main>
-      ) : enableVirtualLayout ? (
+      ) : shouldUseVirtualLayout ? (
         <StoreVirtualizedSections
-          key={activeCategory}
-          activeCategory={activeCategory}
+          key={effectiveCategory}
+          activeCategory={effectiveCategory}
           virtualItems={virtualItems}
           viewportMetrics={viewportMetrics}
           onOrderNow={handleOrderNow}
