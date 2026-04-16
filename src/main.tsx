@@ -74,6 +74,28 @@ async function preloadStartupRoute() {
   }
 }
 
+function warmCommonRoutes() {
+  if (typeof window === "undefined") return;
+
+  const path = normalizeStartupPath(window.location.pathname);
+  if (path !== "/") return;
+
+  const warmStoreRoute = () => {
+    void import("./pages/Store").catch((error) => {
+      console.error("Store route warmup failed", error);
+    });
+  };
+
+  if ("requestIdleCallback" in window) {
+    (window as Window & {
+      requestIdleCallback: (callback: () => void, options?: { timeout?: number }) => number;
+    }).requestIdleCallback(warmStoreRoute, { timeout: 1800 });
+    return;
+  }
+
+  window.setTimeout(warmStoreRoute, 900);
+}
+
 function shouldHydratePrerenderedApp() {
   // Keep the prerendered shell visible and attach React to it instead of
   // clearing the page and remounting from scratch on first load.
@@ -107,6 +129,7 @@ function mountApp() {
 }
 
 void cleanupLegacyServiceWorkers();
+warmCommonRoutes();
 
 if (isPrerendered) {
   void preloadStartupRoute()

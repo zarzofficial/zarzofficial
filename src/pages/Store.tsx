@@ -1,12 +1,10 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type Attributes } from "react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
-import { LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { products, type Product } from "../data/products";
 import { SiteIcon } from "../components/SiteIcon";
 import { useCart } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
-import { useCoarsePointer } from "../lib/useCoarsePointer";
 import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
 import {
   getCatalogPath,
@@ -18,7 +16,6 @@ import {
 
 const categories = storeCategories;
 const mobileOverviewBatchSize = 2;
-const mobileSectionTransition = { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const };
 
 
 type VirtualStoreItem =
@@ -155,6 +152,7 @@ function StoreProductCard({
   metrics,
   staticLayout = false,
   deferContent = false,
+  prioritizeImage = false,
 }: {
   product: Product;
   onOrderNow: (product: Product) => void;
@@ -162,6 +160,7 @@ function StoreProductCard({
   metrics: StoreViewportMetrics;
   staticLayout?: boolean;
   deferContent?: boolean;
+  prioritizeImage?: boolean;
 } & Attributes) {
   const discountPercent = getDiscountPercent();
   const originalPrice = getLegacyOriginalPrice(product.basePrice);
@@ -196,9 +195,9 @@ function StoreProductCard({
           alt={product.title}
           className={`w-full h-full object-cover transition-transform duration-300 md:group-hover:scale-[1.03] ${product.outOfStock ? "opacity-50" : ""}`}
           src={product.image || "/assets/store-fallback.svg"}
-          loading="lazy"
+          loading={prioritizeImage ? "eager" : "lazy"}
           decoding="async"
-          fetchPriority="low"
+          fetchPriority={prioritizeImage ? "high" : "low"}
           referrerPolicy="no-referrer"
           draggable={false}
           width={634}
@@ -304,7 +303,7 @@ function StoreStaticSections({
             </div>
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8 xl:grid-cols-4">
-            {categoryProducts.map((product) => (
+            {categoryProducts.map((product, index) => (
               <StoreProductCard
                 key={product.id}
                 product={product}
@@ -312,6 +311,7 @@ function StoreStaticSections({
                 onAddToCart={onAddToCart}
                 metrics={metrics}
                 staticLayout
+                prioritizeImage={index < 4}
               />
             ))}
           </div>
@@ -521,9 +521,15 @@ function MobileCategorySlider({
         dir="rtl"
         style={{ scrollBehavior: "smooth", WebkitOverflowScrolling: "touch" }}
       >
-        {products.map((product) => (
+        {products.map((product, index) => (
           <div key={product.id} className="h-full w-[290px] shrink-0 snap-center">
-            <StoreProductCard product={product} onOrderNow={onOrderNow} onAddToCart={onAddToCart} metrics={metrics} />
+            <StoreProductCard
+              product={product}
+              onOrderNow={onOrderNow}
+              onAddToCart={onAddToCart}
+              metrics={metrics}
+              prioritizeImage={index < 2}
+            />
           </div>
         ))}
       </div>
@@ -555,7 +561,6 @@ function StoreMobileOverviewSections({
   onAddToCart: (product: Product) => void;
   metrics: StoreViewportMetrics;
 }) {
-  const prefersReducedMotion = useReducedMotion();
   const orderedCategorySections = categories
     .filter((category) => category.id !== "all")
     .map((category) => ({
@@ -566,47 +571,34 @@ function StoreMobileOverviewSections({
 
   const visibleSections = orderedCategorySections.slice(0, visibleSectionCount);
   const hasMoreSections = visibleSectionCount < orderedCategorySections.length;
-  const sectionRevealProps = prefersReducedMotion
-    ? {}
-    : {
-        initial: { opacity: 0, y: 18 },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, amount: 0.18 },
-        transition: mobileSectionTransition,
-      };
 
   return (
-    <LazyMotion features={domAnimation}>
-      <main className="mx-auto max-w-screen-2xl">
-        {visibleSections.map(({ category, products }) => (
-          <m.section key={category.id} {...sectionRevealProps}>
-            <MobileCategorySlider
-              category={category}
-              products={products}
-              categoryPath={getCatalogPath(category.id)}
-              onOrderNow={onOrderNow}
-              onAddToCart={onAddToCart}
-              metrics={metrics}
-            />
-          </m.section>
-        ))}
+    <main className="mx-auto max-w-screen-2xl">
+      {visibleSections.map(({ category, products }) => (
+        <section key={category.id}>
+          <MobileCategorySlider
+            category={category}
+            products={products}
+            categoryPath={getCatalogPath(category.id)}
+            onOrderNow={onOrderNow}
+            onAddToCart={onAddToCart}
+            metrics={metrics}
+          />
+        </section>
+      ))}
 
-        {hasMoreSections && (
-          <m.div
-            {...sectionRevealProps}
-            className="mx-auto flex max-w-screen-2xl justify-center px-6 pb-6 md:px-12"
+      {hasMoreSections && (
+        <div className="mx-auto flex max-w-screen-2xl justify-center px-6 pb-6 md:px-12">
+          <button
+            onClick={onLoadMore}
+            className="inline-flex items-center gap-2 rounded-full primary-gradient px-6 py-3 text-sm font-bold text-on-primary shadow-[0_10px_24px_rgba(86,0,202,0.18)] transition-transform active:scale-95"
           >
-            <button
-              onClick={onLoadMore}
-              className="inline-flex items-center gap-2 rounded-full primary-gradient px-6 py-3 text-sm font-bold text-on-primary shadow-[0_10px_24px_rgba(86,0,202,0.18)] transition-transform active:scale-95"
-            >
-              عرض المزيد
-              <SiteIcon name="keyboard_double_arrow_down" className="text-base" />
-            </button>
-          </m.div>
-        )}
-      </main>
-    </LazyMotion>
+            عرض المزيد
+            <SiteIcon name="keyboard_double_arrow_down" className="text-base" />
+          </button>
+        </div>
+      )}
+    </main>
   );
 }
 
@@ -614,7 +606,6 @@ export function Store() {
   const { category: categoryParam } = useParams<{ category?: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const isCoarsePointer = useCoarsePointer();
   const categoryStripRef = useRef<HTMLElement | null>(null);
   useHorizontalTouchScroll(categoryStripRef);
   const routeCategory = getCatalogRouteCategory(categoryParam);
@@ -627,7 +618,7 @@ export function Store() {
   const viewportMetrics = getViewportMetrics(columns);
   const staticMetrics = getViewportMetrics(columns);
   const effectiveCategory: VisibleCategory = routeCategory ?? "all";
-  const isMobileAllOverview = isCoarsePointer && columns === 1 && effectiveCategory === "all";
+  const isMobileAllOverview = columns === 1 && effectiveCategory === "all";
   const shouldUseVirtualLayout = enableVirtualLayout && columns > 1;
 
   useEffect(() => {
