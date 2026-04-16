@@ -2,13 +2,9 @@ import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
-import { motion } from "motion/react";
+import { LazyMotion, domAnimation, m, motion, useReducedMotion } from "motion/react";
 import { useCoarsePointer } from "../lib/useCoarsePointer";
 import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
-const mobileRevealTransition = {
-  duration: 0.28,
-  ease: [0.22, 1, 0.36, 1] as const,
-};
 
 const whyChooseItems = [
   {
@@ -93,9 +89,36 @@ type FaqEntry = {
 type WhyChooseItem = (typeof whyChooseItems)[number];
 
 type WhyChooseCardProps = {
-  index: number;
   item: WhyChooseItem;
   isCoarsePointer: boolean;
+  reduceMotion: boolean;
+};
+
+const whyChooseGridVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.07,
+      delayChildren: 0.03,
+    },
+  },
+};
+
+const whyChooseCardVariants = {
+  hidden: {
+    opacity: 0,
+    y: 22,
+    scale: 0.975,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      ease: [0.16, 1, 0.3, 1] as const,
+    },
+  },
 };
 
 function FaqItem({
@@ -174,13 +197,13 @@ function FaqAccordion({
 }
 
 function WhyChooseCard({
-  index,
   item,
   isCoarsePointer,
+  reduceMotion,
 }: WhyChooseCardProps) {
   const cardContent = (
     <div
-      className={`perf-card why-choose-mobile-card group relative overflow-hidden rounded-[1.25rem] border border-outline-variant/10 bg-surface-container-low/60 p-5 transition-[transform,opacity,border-color,background-color] duration-300 md:p-7 md:duration-500 ${item.borderClass} ${item.shadowClass} md:hover:-translate-y-1.5`}
+      className={`perf-card why-choose-mobile-card group relative overflow-hidden rounded-[1.25rem] border border-outline-variant/10 bg-surface-container-low/60 p-5 transition-[transform,opacity,border-color,background-color,box-shadow] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] md:p-7 md:duration-500 ${item.borderClass} ${item.shadowClass} md:hover:-translate-y-1.5`}
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${item.overlayClass} to-transparent opacity-0 transition-opacity duration-300 md:group-hover:opacity-100`} />
       <div className="pointer-events-none absolute top-4 left-4 select-none text-[3.5rem] leading-none font-black text-white/[0.03]">
@@ -198,19 +221,14 @@ function WhyChooseCard({
     </div>
   );
 
-  if (!isCoarsePointer) {
+  if (!isCoarsePointer || reduceMotion) {
     return cardContent;
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ ...mobileRevealTransition, delay: index * 0.04 }}
-    >
+    <m.div variants={whyChooseCardVariants}>
       {cardContent}
-    </motion.div>
+    </m.div>
   );
 }
 const categoryCardVariants = {
@@ -225,18 +243,47 @@ const categoryCardVariants = {
   }
 };
 
-const techLogos = Array.from({ length: 8 }).map((_, i) => (
-  <div key={`wraith-${i}`} className="group flex items-center gap-4 md:gap-8">
+const techLogoNames = [
+  { id: "nova", label: "NOVA", iconName: "rocket_launch" },
+  { id: "luma", label: "LUMA", iconName: "bolt" },
+  { id: "vera", label: "VERA", iconName: "verified" },
+  { id: "nexa", label: "NEXA", iconName: "trending_up" },
+  { id: "orbit", label: "ORBIT", iconName: "groups" },
+  { id: "arc", label: "ARC", iconName: "code" },
+  { id: "vanta", label: "VANTA", iconName: "shield" },
+  { id: "mono", label: "MONO", iconName: "storefront" },
+] as const satisfies ReadonlyArray<{
+  id: string;
+  label: string;
+  iconName: SiteIconName;
+}>;
+
+const desktopTechLogos = techLogoNames.map((logo) => (
+  <div key={logo.id} className="group flex items-center gap-4 md:gap-8">
     <span className="font-black text-xl md:text-3xl tracking-[0.25em] text-white opacity-80 font-headline drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
-      WRAITH
+      {logo.label}
     </span>
     <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary/40"></span>
+  </div>
+));
+
+const mobileTechLogos = techLogoNames.map((logo) => (
+  <div key={`${logo.id}-mobile`} className="flex items-center justify-center gap-1.5 whitespace-nowrap text-white/[0.24]">
+    <SiteIcon
+      name={logo.iconName}
+      className="text-[0.95rem] opacity-90 [filter:drop-shadow(0_1px_0_rgba(255,255,255,0.05))_drop-shadow(0_-1px_0_rgba(0,0,0,0.55))]"
+      strokeWidth={2}
+    />
+    <span className="font-black text-[0.6rem] tracking-[0.14em] font-headline [text-shadow:0_1px_0_rgba(255,255,255,0.05),0_-1px_0_rgba(0,0,0,0.55)]">
+      {logo.label}
+    </span>
   </div>
 ));
 
 export function Home() {
   const location = useLocation();
   const isCoarsePointer = useCoarsePointer();
+  const reduceMotion = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   useHorizontalTouchScroll(scrollContainerRef);
@@ -631,13 +678,38 @@ export function Home() {
             <p className="text-outline text-base md:text-lg max-w-xl mx-auto leading-relaxed">نقدّم تجربة متكاملة تجمع بين السرعة والأمان والدعم المستمر</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3">
-            {whyChooseItems.map((item, index) => (
-              <React.Fragment key={item.id}>
-                <WhyChooseCard index={index} item={item} isCoarsePointer={isCoarsePointer} />
-              </React.Fragment>
-            ))}
-          </div>
+          {isCoarsePointer && !reduceMotion ? (
+            <LazyMotion features={domAnimation}>
+              <m.div
+                className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.12, margin: "0px 0px -10% 0px" }}
+                variants={whyChooseGridVariants}
+              >
+                {whyChooseItems.map((item) => (
+                  <WhyChooseCard
+                    key={item.id}
+                    item={item}
+                    isCoarsePointer={isCoarsePointer}
+                    reduceMotion={reduceMotion}
+                  />
+                ))}
+              </m.div>
+            </LazyMotion>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3">
+              {whyChooseItems.map((item) => (
+                <React.Fragment key={item.id}>
+                  <WhyChooseCard
+                    item={item}
+                    isCoarsePointer={isCoarsePointer}
+                    reduceMotion={reduceMotion}
+                  />
+                </React.Fragment>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -656,8 +728,16 @@ export function Home() {
             <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#8b5cf6] drop-shadow-[0_0_20px_rgba(208,188,255,0.4)]">وثقت بنا</span>
           </h2>
         </div>
-        <div 
-          className="group w-full inline-flex flex-nowrap overflow-x-auto md:overflow-hidden no-scrollbar [mask-image:_linear-gradient(to_right,transparent_0,_black_40px,_black_calc(100%-40px),transparent_100%)] md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] opacity-70 grayscale hover:grayscale-0 transition-all duration-700 bg-surface/0"
+        <div
+          className="md:hidden pointer-events-none select-none px-1 py-2"
+          dir="ltr"
+        >
+          <div className="grid grid-cols-4 gap-x-3 gap-y-5 opacity-80 grayscale [mask-image:linear-gradient(to_right,transparent_0,black_8%,black_92%,transparent_100%)]">
+            {mobileTechLogos}
+          </div>
+        </div>
+        <div
+          className="group hidden w-full md:inline-flex md:flex-nowrap md:overflow-hidden no-scrollbar md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] opacity-70 grayscale hover:grayscale-0 transition-all duration-700 bg-surface/0"
           dir="ltr"
         >
           <style>{`
@@ -675,8 +755,8 @@ export function Home() {
             }
           `}</style>
           <div className="flex items-center justify-start [&>div]:mx-6 md:[&>div]:mx-10 w-max animate-infinite-scroll">
-            {techLogos}
-            {techLogos}
+            {desktopTechLogos}
+            {desktopTechLogos}
           </div>
         </div>
       </div>
