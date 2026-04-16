@@ -1,9 +1,10 @@
 import { Suspense, lazy, useEffect } from "react";
-import { BrowserRouter as Router, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { getProductBySlugOrId } from "./data/products";
 import { AppFrame } from "./app/AppFrame";
+import { getCatalogPath, getCatalogRouteCategory, getCategoryName } from "./lib/storeCatalog";
 
 const Store = lazy(() => import("./pages/Store").then((module) => ({ default: module.Store })));
 const Cart = lazy(() => import("./pages/Cart").then((module) => ({ default: module.Cart })));
@@ -25,6 +26,10 @@ function DynamicTitle() {
       pageName = "سلة المشتريات";
     } else if (path === "/checkout" || path === "/products/checkout") {
       pageName = "إتمام الطلب";
+    } else if (path === "/products/catalog" || path.startsWith("/products/catalog/")) {
+      const categoryId = path === "/products/catalog" ? null : path.split("/products/catalog/")[1];
+      const category = getCatalogRouteCategory(categoryId);
+      pageName = category && category !== "all" ? `المنتجات | ${getCategoryName(category)}` : "المنتجات";
     } else if (path.startsWith("/products/")) {
       const id = path.split("/products/")[1];
       const product = getProductBySlugOrId(id ? decodeURIComponent(id) : "");
@@ -86,6 +91,18 @@ function CanonicalPath() {
   return null;
 }
 
+function StoreRoute() {
+  const [searchParams] = useSearchParams();
+  const legacyCategory = searchParams.get("category");
+
+  if (legacyCategory) {
+    const requestedCategory = getCatalogRouteCategory(legacyCategory);
+    return <Navigate to={getCatalogPath(requestedCategory ?? "all")} replace />;
+  }
+
+  return <Store />;
+}
+
 function RouteFallback() {
   return (
     <div className="min-h-[52vh] bg-background px-6 pb-16 pt-28 text-on-background md:px-12" aria-hidden="true">
@@ -120,7 +137,9 @@ export default function App() {
           <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/products" element={<Store />} />
+              <Route path="/products" element={<StoreRoute />} />
+              <Route path="/products/catalog" element={<Navigate to="/products" replace />} />
+              <Route path="/products/catalog/:category" element={<Store />} />
               <Route path="/products/:id" element={<ProductDetails />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/products/cart" element={<Navigate to="/cart" replace />} />

@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { products } from "../data/products";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 import { SiteIcon } from "./SiteIcon";
+import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
 
 const categoryMap: Record<string, { label: string; color: string }> = {
   ai: { label: "الذكاء الاصطناعي", color: "#8b5cf6" },
@@ -26,6 +27,7 @@ export function FeaturedProducts() {
     .filter(Boolean) as typeof products;
 
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  useHorizontalTouchScroll(scrollContainerRef);
   const [isAtStart, setIsAtStart] = React.useState(true);
   const [isAtEnd, setIsAtEnd] = React.useState(false);
   const edgeStateRef = React.useRef({ isAtStart: true, isAtEnd: false, frameId: 0 });

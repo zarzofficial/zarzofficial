@@ -1,20 +1,21 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type Attributes } from "react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { products, type Category, type Product } from "../data/products";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { products, type Product } from "../data/products";
 import { SiteIcon } from "../components/SiteIcon";
 import { useCart } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
+import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
+import {
+  getCatalogPath,
+  getCatalogRouteCategory,
+  getCategoryName,
+  storeCategories,
+  type VisibleCategory,
+} from "../lib/storeCatalog";
 
-const categories = [
-  { id: "all", name: "الكل", desktopOnly: true },
-  { id: "social", name: "التواصل الاجتماعي" },
-  { id: "ai", name: "الذكاء الاصطناعي" },
-  { id: "web", name: "المواقع والمتاجر" },
-  { id: "gaming", name: "الألعاب" },
-] as const;
+const categories = storeCategories;
 
-type VisibleCategory = Category | "all";
 
 type VirtualStoreItem =
   | {
@@ -106,19 +107,6 @@ function chunkProducts(items: Product[], chunkSize: number) {
   }
 
   return chunks;
-}
-
-function getCategoryName(categoryId: string) {
-  return categories.find((category) => category.id === categoryId)?.name ?? categoryId;
-}
-
-function isVisibleCategory(value: string | null): value is VisibleCategory {
-  return value === "all" || categories.some((category) => category.id === value);
-}
-
-function getRequestedCategory(searchParams: URLSearchParams) {
-  const requestedCategory = searchParams.get("category");
-  return isVisibleCategory(requestedCategory) ? requestedCategory : "all";
 }
 
 function buildVirtualItems(groupedProducts: Record<string, Product[]>, columns: number) {
@@ -510,11 +498,14 @@ function MobileCategorySlider({
 }
 
 export function Store() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { category: categoryParam } = useParams<{ category?: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const categoryStripRef = useRef<HTMLElement | null>(null);
+  useHorizontalTouchScroll(categoryStripRef);
+  const routeCategory = getCatalogRouteCategory(categoryParam);
 
-  const initialCategory = getRequestedCategory(searchParams);
+  const initialCategory = routeCategory ?? "all";
   const [activeCategory, setActiveCategory] = useState<VisibleCategory>(initialCategory);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [columns, setColumns] = useState(1);
@@ -523,7 +514,7 @@ export function Store() {
 
   const viewportMetrics = getViewportMetrics(columns);
   const staticMetrics = getViewportMetrics(columns);
-  const effectiveCategory = enableVirtualLayout && columns === 1 && activeCategory === "all" ? "social" : activeCategory;
+  const effectiveCategory = activeCategory;
   const shouldUseVirtualLayout = enableVirtualLayout && columns > 1;
 
   useEffect(() => {
@@ -540,11 +531,15 @@ export function Store() {
   }, []);
 
   useEffect(() => {
-    const categoryQuery = getRequestedCategory(searchParams);
-    if (categoryQuery !== activeCategory) {
-      setActiveCategory(categoryQuery);
+    if (routeCategory === null) {
+      navigate("/products", { replace: true });
+      return;
     }
-  }, [activeCategory, searchParams]);
+
+    if (routeCategory !== activeCategory) {
+      setActiveCategory(routeCategory);
+    }
+  }, [activeCategory, navigate, routeCategory]);
 
   useEffect(() => {
     return () => {
@@ -574,11 +569,9 @@ export function Store() {
   const virtualItems = useMemo(() => buildVirtualItems(groupedProducts, columns), [columns, groupedProducts]);
 
   const handleCategoryChange = (categoryId: string) => {
-    setActiveCategory(categoryId as VisibleCategory);
-    setSearchParams(
-      { category: categoryId }, 
-      { replace: true, preventScrollReset: true }
-    );
+    const nextCategory = categoryId as VisibleCategory;
+    setActiveCategory(nextCategory);
+    navigate(getCatalogPath(nextCategory), { preventScrollReset: true });
   };
 
   const handleOrderNow = (product: Product) => {
@@ -633,11 +626,9 @@ export function Store() {
         </div>
       </header>
 
-      <section className="perf-scroll-strip mx-auto mb-16 max-w-screen-2xl overflow-x-auto px-6 no-scrollbar md:px-12">
+      <section ref={categoryStripRef} className="perf-scroll-strip mx-auto mb-16 max-w-screen-2xl overflow-x-auto px-6 no-scrollbar md:px-12">
         <div className="flex gap-4 pb-4">
-          {categories
-            .filter((cat) => columns > 1 || !("desktopOnly" in cat && cat.desktopOnly))
-            .map((category) => (
+          {categories.map((category) => (
             <button
               key={category.id}
               onClick={() => handleCategoryChange(category.id)}

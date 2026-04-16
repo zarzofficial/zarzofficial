@@ -4,6 +4,7 @@ import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
 import { motion, AnimatePresence } from "motion/react";
 import { useCoarsePointer } from "../lib/useCoarsePointer";
+import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
 
 
 function FaqItem({ faq, isOpen, onClick }: { key?: React.Key, faq: { question: string, answer: string }, isOpen: boolean, onClick: () => void }) {
@@ -81,6 +82,7 @@ export function Home() {
   const isCoarsePointer = useCoarsePointer();
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  useHorizontalTouchScroll(scrollContainerRef);
 
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
@@ -325,7 +327,7 @@ export function Home() {
                 title: "الذكاء الاصطناعي",
                 description: "أتمتة ذكية وحلول تحليلية مبنية على أحدث تقنيات، لتطوير أعمالك بشكل غير مسبوق وتحقيق قفزات نوعية في الإنتاجية.",
                 iconName: "neurology",
-                link: "/products?category=ai",
+                link: "/products/catalog/ai",
                 linkText: "تفاصيل الخدمة",
                 badge: "حصري",
                 subBadge: "Neural Core v2.0"
@@ -335,7 +337,7 @@ export function Home() {
                 title: "إدارة المنصات",
                 description: "نصنع محتوى يتفاعل معه العالم بأسلوب احترافي وجذاب يضمن وصول رسالتك للجمهور المستهدف.",
                 iconName: "campaign",
-                link: "/products?category=social",
+                link: "/products/catalog/social",
                 linkText: "تصفح الباقات"
               },
               {
@@ -343,7 +345,7 @@ export function Home() {
                 title: "خدمات الألعاب",
                 description: "شحن، اشتراكات، وأدوات احترافية لأفضل تجربة لعب. كل ما يحتاجه المحترفون في مكان واحد.",
                 iconName: "sports_esports",
-                link: "/products?category=gaming",
+                link: "/products/catalog/gaming",
                 linkText: "تصفح العروض"
               },
               {
@@ -351,7 +353,7 @@ export function Home() {
                 title: "خدمات الويب",
                 description: "برمجة وتصميم واجهات عصرية تضمن أفضل تجربة مستخدم وأداء فائق السرعة مع بنية تحتية رقمية متينة.",
                 iconName: "terminal",
-                link: "/products?category=web",
+                link: "/products/catalog/web",
                 linkText: "اكتشف المزيد",
                 bgIcon: "code"
               }

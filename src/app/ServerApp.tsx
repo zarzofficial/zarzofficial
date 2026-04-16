@@ -1,4 +1,4 @@
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AppFrame } from "./AppFrame";
 import { Home } from "../pages/Home";
 import { Store } from "../pages/Store";
@@ -24,6 +24,8 @@ export function ServerApp({ location }: { location: string }) {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Store />} />
+          <Route path="/products/catalog" element={<Navigate to="/products" replace />} />
+          <Route path="/products/catalog/:category" element={<Store />} />
           <Route path="/products/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Cart />} />

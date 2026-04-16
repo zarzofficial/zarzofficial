@@ -32,6 +32,13 @@ const legacyProductSlugs = [
   "جواهر-فري-فاير",
 ];
 
+const catalogRouteDirectories = [
+  "products/catalog/social",
+  "products/catalog/ai",
+  "products/catalog/web",
+  "products/catalog/gaming",
+];
+
 const routeDirectories = [
   "account",
   "cart",
@@ -39,6 +46,8 @@ const routeDirectories = [
   "contact",
   "terms",
   "products",
+  "products/catalog",
+  ...catalogRouteDirectories,
   "products/cart",
   "products/checkout",
   ...productSlugs.map((slug) => `products/${slug}`),
@@ -66,6 +75,11 @@ const routeTitles = new Map([
 
 routeTitles.set("cart", routeTitles.get("products/cart"));
 routeTitles.set("checkout", routeTitles.get("products/checkout"));
+routeTitles.set("products/catalog", routeTitles.get("products"));
+routeTitles.set("products/catalog/social", `${titlePrefix}المنتجات | التواصل الاجتماعي`);
+routeTitles.set("products/catalog/ai", `${titlePrefix}المنتجات | الذكاء الاصطناعي`);
+routeTitles.set("products/catalog/web", `${titlePrefix}المنتجات | المواقع والمتاجر`);
+routeTitles.set("products/catalog/gaming", `${titlePrefix}المنتجات | الألعاب`);
 
 const productTitles = [
   [productSlugs[0], "شات جي بي تي بلس (ChatGPT Plus) - شهر واحد"],
