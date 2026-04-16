@@ -98,8 +98,8 @@ const whyChooseGridVariants = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.07,
-      delayChildren: 0.03,
+      staggerChildren: 0.085,
+      delayChildren: 0.05,
     },
   },
 };
@@ -107,16 +107,43 @@ const whyChooseGridVariants = {
 const whyChooseCardVariants = {
   hidden: {
     opacity: 0,
-    y: 22,
-    scale: 0.975,
+    y: 16,
+    scale: 0.988,
   },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      duration: 0.5,
-      ease: [0.16, 1, 0.3, 1] as const,
+      duration: 0.58,
+      ease: [0.22, 1, 0.36, 1] as const,
+    },
+  },
+};
+
+const faqListVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.065,
+      delayChildren: 0.04,
+    },
+  },
+};
+
+const faqItemRevealVariants = {
+  hidden: {
+    opacity: 0,
+    y: 14,
+    scale: 0.992,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.54,
+      ease: [0.22, 1, 0.36, 1] as const,
     },
   },
 };
@@ -126,15 +153,17 @@ function FaqItem({
   isOpen,
   onClick,
   isCoarsePointer,
+  reduceMotion,
 }: {
   faq: FaqEntry;
   isOpen: boolean;
   onClick: () => void;
   isCoarsePointer: boolean;
+  reduceMotion: boolean;
 }) {
-  return (
+  const faqContent = (
     <div
-      className={`perf-card faq-mobile-card cyber-glass-card rounded-2xl overflow-hidden border transition-[transform,border-color,background-color] duration-300 ${
+      className={`perf-card faq-mobile-card cyber-glass-card rounded-2xl overflow-hidden border transition-[transform,border-color,background-color,box-shadow] duration-[420ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] ${
         isOpen
           ? "border-[#e11d48]/30 bg-[#e11d48]/5 shadow-[0_4px_30px_rgba(225,29,72,0.1)]"
           : "border-outline-variant/10 bg-surface-container-low/30 md:hover:border-outline-variant/30"
@@ -149,18 +178,18 @@ function FaqItem({
         <h3 className="text-lg font-bold text-on-surface">{faq.question}</h3>
         <SiteIcon
           name={isOpen ? "remove" : "add"}
-          className={`origin-center transition-transform duration-300 ${isOpen ? "rotate-180 text-[#e11d48]" : "rotate-0 text-[#0ea5e9]"}`}
+          className={`origin-center transition-[transform,color] duration-[380ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] ${isOpen ? "rotate-180 text-[#e11d48]" : "rotate-0 text-[#0ea5e9]"}`}
         />
       </button>
       <div
-        className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ${
+        className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-[460ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
           isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-        } ${isCoarsePointer ? "ease-out" : "[transition-timing-function:cubic-bezier(0.22,1,0.36,1)]"}`}
+        }`}
       >
         <div className="min-h-0 overflow-hidden">
           <div
-            className={`px-6 pb-6 text-[#cbc3d9] leading-relaxed transition-transform duration-300 ${
-              isOpen ? "translate-y-0" : "-translate-y-1"
+            className={`px-6 pb-6 text-[#cbc3d9] leading-relaxed transition-[transform,opacity] duration-[420ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] ${
+              isOpen ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
             }`}
           >
             {faq.answer}
@@ -169,30 +198,60 @@ function FaqItem({
       </div>
     </div>
   );
+
+  if (!isCoarsePointer || reduceMotion) {
+    return faqContent;
+  }
+
+  return (
+    <m.div
+      layout
+      variants={faqItemRevealVariants}
+      transition={{ layout: { duration: 0.42, ease: [0.22, 1, 0.36, 1] } }}
+    >
+      {faqContent}
+    </m.div>
+  );
 }
 
 function FaqAccordion({
   faqs,
   isCoarsePointer,
+  reduceMotion,
 }: {
   faqs: FaqEntry[];
   isCoarsePointer: boolean;
+  reduceMotion: boolean;
 }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const faqItems = faqs.map((faq, idx) => (
+    <React.Fragment key={idx}>
+      <FaqItem
+        faq={faq}
+        isOpen={openIndex === idx}
+        onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+        isCoarsePointer={isCoarsePointer}
+        reduceMotion={reduceMotion}
+      />
+    </React.Fragment>
+  ));
+
+  if (!isCoarsePointer || reduceMotion) {
+    return <div className="space-y-4 text-start">{faqItems}</div>;
+  }
 
   return (
-    <div className="space-y-4 text-start">
-      {faqs.map((faq, idx) => (
-        <React.Fragment key={idx}>
-          <FaqItem
-            faq={faq}
-            isOpen={openIndex === idx}
-            onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
-            isCoarsePointer={isCoarsePointer}
-          />
-        </React.Fragment>
-      ))}
-    </div>
+    <LazyMotion features={domAnimation}>
+      <m.div
+        className="space-y-4 text-start"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.14, margin: "0px 0px -10% 0px" }}
+        variants={faqListVariants}
+      >
+        {faqItems}
+      </m.div>
+    </LazyMotion>
   );
 }
 
@@ -679,7 +738,7 @@ export function Home() {
                 className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3"
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.12, margin: "0px 0px -10% 0px" }}
+                viewport={{ once: true, amount: 0.16, margin: "0px 0px -8% 0px" }}
                 variants={whyChooseGridVariants}
               >
                 {whyChooseItems.map((item) => (
@@ -822,6 +881,7 @@ export function Home() {
 
           <FaqAccordion
             isCoarsePointer={isCoarsePointer}
+            reduceMotion={reduceMotion}
             faqs={[
               {
                 question: "كم يستغرق تنفيذ الطلب؟",
