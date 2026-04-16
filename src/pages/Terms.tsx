@@ -1,3 +1,5 @@
+import { SiteIcon } from "../components/SiteIcon";
+
 export function Terms() {
   return (
     <div className="relative pt-40 pb-24 px-6 md:px-12 max-w-5xl mx-auto min-h-screen">
@@ -41,7 +43,7 @@ export function Terms() {
               </a>
             </nav>
             <div className="perf-card mt-12 p-6 bg-surface-container rounded-2xl border border-primary/10">
-              <span className="material-symbols-outlined text-primary mb-4 text-xl">verified_user</span>
+              <SiteIcon name="verified_user" className="text-primary mb-4 text-xl" />
               <p className="text-xs text-on-surface-variant leading-relaxed">
                 آخر تحديث: ٢٤ أكتوبر ٢٠٢٤. تحتفظ زارز بالحق في تعديل هذه الشروط في أي وقت.
               </p>
@@ -77,7 +79,7 @@ export function Terms() {
             <ul className="space-y-8">
               <li className="flex gap-6">
                 <div className="shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl bg-surface-container-highest text-primary">
-                  <span className="material-symbols-outlined">person_check</span>
+                  <SiteIcon name="person_check" />
                 </div>
                 <div>
                   <h4 className="text-on-background font-bold text-xl mb-2">الأهلية القانونية</h4>
@@ -86,7 +88,7 @@ export function Terms() {
               </li>
               <li className="flex gap-6">
                 <div className="shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl bg-surface-container-highest text-secondary">
-                  <span className="material-symbols-outlined">block</span>
+                  <SiteIcon name="block" />
                 </div>
                 <div>
                   <h4 className="text-on-background font-bold text-xl mb-2">الاستخدام المحظور</h4>

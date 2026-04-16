@@ -16,6 +16,7 @@ import {
   writeGuestOrders,
   type PaymentMethod,
 } from "../lib/order-utils";
+import { SiteIcon } from "../components/SiteIcon";
 
 function closeReservedWindow(target: Window | null | undefined) {
   if (!target || target.closed) return;
@@ -232,7 +233,7 @@ export function Cart() {
       <div className="flex items-center justify-center mb-16 gap-2 sm:gap-4 rtl">
         <div className="flex flex-col items-center gap-2 transition-all duration-500">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${currentStep >= 1 ? "primary-gradient shadow-[0_0_20px_rgba(208,188,255,0.3)]" : "bg-surface-container border border-outline-variant/30"}`}>
-            <span className={`material-symbols-outlined ${currentStep >= 1 ? "text-on-primary" : "text-outline"}`} data-icon="shopping_basket">shopping_basket</span>
+            <SiteIcon name="shopping_basket" className={currentStep >= 1 ? "text-on-primary" : "text-outline"} />
           </div>
           <span className={`text-xs font-bold transition-colors ${currentStep >= 1 ? "text-primary" : "text-outline"}`}>السلة</span>
         </div>
@@ -241,7 +242,7 @@ export function Cart() {
 
         <div className="flex flex-col items-center gap-2 transition-all duration-500">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${currentStep >= 2 ? "primary-gradient shadow-[0_0_20px_rgba(208,188,255,0.3)]" : "bg-surface-container border border-outline-variant/30"}`}>
-            <span className={`material-symbols-outlined ${currentStep >= 2 ? "text-on-primary" : "text-outline"}`} data-icon="person">person</span>
+            <SiteIcon name="person" className={currentStep >= 2 ? "text-on-primary" : "text-outline"} />
           </div>
           <span className={`text-xs font-bold transition-colors ${currentStep >= 2 ? "text-primary" : "text-outline"}`}>التفاصيل</span>
         </div>
@@ -250,7 +251,7 @@ export function Cart() {
 
         <div className="flex flex-col items-center gap-2 transition-all duration-500">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${currentStep >= 3 ? "primary-gradient shadow-[0_0_20px_rgba(208,188,255,0.3)]" : "bg-surface-container border border-outline-variant/30"}`}>
-            <span className={`material-symbols-outlined ${currentStep >= 3 ? "text-on-primary" : "text-outline"}`} data-icon="payments">payments</span>
+            <SiteIcon name="payments" className={currentStep >= 3 ? "text-on-primary" : "text-outline"} />
           </div>
           <span className={`text-xs font-bold transition-colors ${currentStep >= 3 ? "text-primary" : "text-outline"}`}>الدفع</span>
         </div>
@@ -263,7 +264,7 @@ export function Cart() {
 
             {items.length === 0 ? (
               <div className="text-center py-10 text-outline">
-                <span className="material-symbols-outlined text-5xl mb-4 block">remove_shopping_cart</span>
+                <SiteIcon name="remove_shopping_cart" className="mb-4 block text-5xl" />
                 <p>سلة المشتريات فارغة</p>
                 <Link to="/products" className="text-primary mt-4 inline-block hover:underline">تصفح المنتجات</Link>
               </div>
@@ -283,7 +284,7 @@ export function Cart() {
                         <div className="flex justify-between items-start mb-2 gap-3 sm:gap-4">
                           <h3 className="text-base sm:text-lg font-bold text-on-surface line-clamp-2">{item.title}</h3>
                           <button onClick={() => removeItem(item.cartId)} className="text-outline hover:text-error transition-colors shrink-0 pt-1" type="button">
-                            <span className="material-symbols-outlined" data-icon="delete">delete</span>
+                            <SiteIcon name="delete" />
                           </button>
                         </div>
 
@@ -301,11 +302,11 @@ export function Cart() {
                           <span className="text-base sm:text-lg font-bold text-tertiary">{item.totalPrice.toFixed(2)} ج.س</span>
                           <div className="flex items-center bg-surface-container rounded-full px-4 py-1 gap-4 shrink-0 shadow-sm border border-white/5">
                             <button onClick={() => updateQty(item.cartId, item.qty - 1)} className="text-primary hover:text-white" type="button">
-                              <span className="material-symbols-outlined text-sm" data-icon="remove">remove</span>
+                              <SiteIcon name="remove" className="text-sm" />
                             </button>
                             <span className="text-sm font-bold w-4 text-center text-on-surface">{item.qty}</span>
                             <button onClick={() => updateQty(item.cartId, item.qty + 1)} className="text-primary hover:text-white" type="button">
-                              <span className="material-symbols-outlined text-sm" data-icon="add">add</span>
+                              <SiteIcon name="add" className="text-sm" />
                             </button>
                           </div>
                         </div>
@@ -342,14 +343,14 @@ export function Cart() {
               <label className="relative cursor-pointer group" onClick={() => setPaymentMethod("bankak")}>
                 <input type="radio" name="payment" className="peer sr-only" checked={paymentMethod === "bankak"} readOnly />
                 <div className="flex flex-col items-center justify-center p-6 bg-surface-container rounded-3xl border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
-                  <span className="material-symbols-outlined text-4xl mb-2 text-outline peer-checked:text-primary transition-colors" data-icon="account_balance">account_balance</span>
+                  <SiteIcon name="account_balance" className="mb-2 text-4xl text-outline transition-colors peer-checked:text-primary" />
                   <span className="text-sm font-bold text-on-surface">بنكك</span>
                 </div>
               </label>
               <label className="relative cursor-pointer group" onClick={() => setPaymentMethod("cash")}>
                 <input type="radio" name="payment" className="peer sr-only" checked={paymentMethod === "cash"} readOnly />
                 <div className="flex flex-col items-center justify-center p-6 bg-surface-container rounded-3xl border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
-                  <span className="material-symbols-outlined text-4xl mb-2 text-outline peer-checked:text-primary transition-colors" data-icon="payments">payments</span>
+                  <SiteIcon name="payments" className="mb-2 text-4xl text-outline transition-colors peer-checked:text-primary" />
                   <span className="text-sm font-bold text-on-surface">كاش</span>
                 </div>
               </label>
@@ -358,7 +359,7 @@ export function Cart() {
             {paymentMethod === "bankak" && (
               <div className="p-6 bg-primary/5 rounded-2xl border border-primary/20 space-y-4">
                 <div className="flex items-center gap-3 text-primary mb-2">
-                  <span className="material-symbols-outlined">info</span>
+                  <SiteIcon name="info" />
                   <h3 className="font-bold">بيانات حساب التحويل (بنكك)</h3>
                 </div>
                 <div className="bg-background rounded-xl p-4 text-sm space-y-2 border border-outline-variant/10">
@@ -378,12 +379,12 @@ export function Cart() {
             {paymentMethod === "cash" && (
               <div className="p-6 bg-[#3b82f6]/5 rounded-2xl border border-[#3b82f6]/20 space-y-4">
                 <div className="flex items-center gap-3 text-[#3b82f6] mb-2">
-                  <span className="material-symbols-outlined">support_agent</span>
+                  <SiteIcon name="support_agent" />
                   <h3 className="font-bold">الدفع كاش (مباشر)</h3>
                 </div>
                 <p className="text-sm text-outline leading-relaxed">إتمام الطلب بالكاش يتطلب التواصل معنا مباشرة عبر واتساب لترتيب عملية التسليم وتأكيد الخدمة.</p>
                 <div className="bg-[#3b82f6]/10 p-3 rounded-xl border border-[#3b82f6]/20 mt-4 flex items-start gap-2">
-                  <span className="material-symbols-outlined text-[#3b82f6] text-sm mt-0.5" data-icon="location_on">location_on</span>
+                  <SiteIcon name="location_on" className="mt-0.5 text-sm text-[#3b82f6]" />
                   <p className="text-xs text-on-surface font-medium leading-relaxed">تنويه: الدفع كاش يتوفر حالياً فقط في الولايات التالية: <strong className="text-[#3b82f6] font-bold">نهر النيل، بورسودان، الخرطوم</strong>.</p>
                 </div>
               </div>
@@ -400,9 +401,9 @@ export function Cart() {
         <div className="lg:col-span-4">
           <div className="flex justify-center -mt-2 mb-8 lg:hidden relative z-10 w-full">
             <div className="perf-card bg-primary/10 border border-primary/30 backdrop-blur-md rounded-full px-5 py-2.5 shadow-[0_10px_20px_rgba(208,188,255,0.15)] flex items-center gap-3 text-primary">
-              <span className="material-symbols-outlined text-lg">check_circle</span>
+              <SiteIcon name="check_circle" className="text-lg" />
               <span className="text-sm font-bold tracking-wide">الخطوة الأخيرة: ملخص الطلب</span>
-              <span className="material-symbols-outlined text-lg">keyboard_double_arrow_down</span>
+              <SiteIcon name="keyboard_double_arrow_down" className="text-lg" />
             </div>
           </div>
 
@@ -431,20 +432,18 @@ export function Cart() {
 
               <button data-testid="checkout-submit" onClick={handleCheckoutClick} disabled={items.length === 0 || !isFormValid || loading || authLoading} className={`w-full mt-8 py-5 rounded-full text-on-primary font-bold text-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed ${paymentMethod === "bankak" ? "primary-gradient shadow-[0_10px_30px_rgba(125,60,255,0.4)]" : "bg-[#25D366] shadow-[0_10px_30px_rgba(37,211,102,0.4)]"}`}>
                 <span>{loading ? "جاري إرسال الطلب..." : paymentMethod === "bankak" ? "تأكيد وشراء" : "التأكيد عبر واتساب"}</span>
-                <span className="material-symbols-outlined" data-icon={paymentMethod === "bankak" ? "arrow_back" : "forum"}>
-                  {paymentMethod === "bankak" ? "arrow_back" : "forum"}
-                </span>
+                <SiteIcon name={paymentMethod === "bankak" ? "arrow_back" : "forum"} />
               </button>
 
               <div className="mt-6 flex items-center justify-center gap-2 text-xs text-outline opacity-60">
-                <span className="material-symbols-outlined text-sm" data-icon="lock">lock</span>
+                <SiteIcon name="lock" className="text-sm" />
                 <span>عملية دفع آمنة ومشفرة بالكامل</span>
               </div>
             </div>
 
             <div className="perf-card bg-primary/5 rounded-3xl p-6 border border-primary/10 flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center text-primary">
-                <span className="material-symbols-outlined">workspace_premium</span>
+                <SiteIcon name="workspace_premium" />
               </div>
               <div>
                 <p className="text-sm font-bold text-primary">ضمان زارز الملكي</p>
@@ -459,17 +458,17 @@ export function Cart() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm px-4">
           <div className="perf-modal-card bg-surface-container rounded-[40px] p-8 md:p-12 max-w-lg w-full text-center border border-outline-variant/10 shadow-[0_32px_80px_rgba(86,0,202,0.4)] relative">
             <button onClick={() => setShowGuestPrompt(false)} className="absolute top-6 left-6 text-outline hover:text-white transition-colors" type="button">
-              <span className="material-symbols-outlined">close</span>
+              <SiteIcon name="close" />
             </button>
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-              <span className="material-symbols-outlined text-4xl text-primary">person_search</span>
+              <SiteIcon name="person_search" className="text-4xl text-primary" />
             </div>
             <h2 className="text-2xl md:text-3xl font-black font-headline text-on-surface mb-3">هل أنت مسجل؟</h2>
             <p className="text-outline mb-10 text-sm md:text-base leading-relaxed">يمكنك تسجيل الدخول لحفظ طلبك في حسابك، أو المتابعة فوراً كزائر ليُحفظ على هذا الجهاز فقط.</p>
 
             <div className="flex flex-col gap-4">
               <button data-testid="checkout-login-and-continue" onClick={handleLoginRedirect} className="w-full py-4 primary-gradient rounded-full text-on-primary font-bold hover:shadow-[0_10px_30px_rgba(125,60,255,0.4)] transition-all flex items-center justify-center gap-2" type="button">
-                <span className="material-symbols-outlined text-[20px]">login</span>
+                <SiteIcon name="login" className="text-[20px]" />
                 تسجيل الدخول / إنشاء حساب
               </button>
               <button
@@ -492,7 +491,7 @@ export function Cart() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm">
           <div className="perf-modal-card bg-surface-container rounded-[40px] p-12 max-w-md w-full text-center border border-primary/20 shadow-[0_32px_80px_rgba(86,0,202,0.4)]">
             <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-8">
-              <span className="material-symbols-outlined text-5xl text-primary">check_circle</span>
+              <SiteIcon name="check_circle" className="text-5xl text-primary" />
             </div>
             <h2 className="text-3xl font-black font-headline text-on-surface mb-4" data-testid="checkout-success">تم الطلب بنجاح!</h2>
             <p className="text-outline mb-10 leading-relaxed">{success}</p>

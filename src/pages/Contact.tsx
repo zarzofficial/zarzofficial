@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { SiteIcon } from "../components/SiteIcon";
 
 export function Contact() {
   const [success, setSuccess] = useState(false);
@@ -33,7 +34,7 @@ export function Contact() {
           {/* Email */}
           <div className="perf-panel bg-surface-container-low p-6 rounded-3xl transition-transform hover:scale-[1.02] duration-500 flex items-center gap-6">
             <div className="w-14 h-14 shrink-0 bg-[#E91E63]/20 rounded-[1rem] flex items-center justify-center shadow-inner">
-              <span className="material-symbols-outlined text-[#E91E63] text-2xl">mail</span>
+              <SiteIcon name="mail" className="text-[#E91E63] text-2xl" />
             </div>
             <div className="overflow-hidden">
               <h3 className="font-headline text-lg font-bold mb-1">البريد الإلكتروني</h3>
@@ -44,7 +45,7 @@ export function Contact() {
           {/* Saudi Phone */}
           <div className="perf-panel bg-surface-container-low p-6 rounded-3xl transition-transform hover:scale-[1.02] duration-500 flex items-center gap-6">
             <div className="w-14 h-14 shrink-0 bg-[#E91E63]/20 rounded-[1rem] flex items-center justify-center shadow-inner">
-              <span className="material-symbols-outlined text-[#E91E63] text-2xl">call</span>
+              <SiteIcon name="call" className="text-[#E91E63] text-2xl" />
             </div>
             <div className="overflow-hidden">
               <h3 className="font-headline text-lg font-bold mb-1">هاتف السعودية</h3>
@@ -55,7 +56,7 @@ export function Contact() {
           {/* WhatsApp */}
           <div className="perf-panel bg-surface-container-low p-6 rounded-3xl transition-transform hover:scale-[1.02] duration-500 flex items-center gap-6">
             <div className="w-14 h-14 shrink-0 bg-[#E91E63]/20 rounded-[1rem] flex items-center justify-center shadow-inner">
-              <span className="material-symbols-outlined text-[#E91E63] text-2xl">support_agent</span>
+              <SiteIcon name="support_agent" className="text-[#E91E63] text-2xl" />
             </div>
             <div className="overflow-hidden">
               <h3 className="font-headline text-lg font-bold mb-1">واتساب ودعم مباشر</h3>
@@ -66,7 +67,7 @@ export function Contact() {
           {/* Local Phone */}
           <div className="perf-panel bg-surface-container-low p-6 rounded-3xl transition-transform hover:scale-[1.02] duration-500 flex items-center gap-6">
             <div className="w-14 h-14 shrink-0 bg-[#E91E63]/20 rounded-[1rem] flex items-center justify-center shadow-inner">
-              <span className="material-symbols-outlined text-[#E91E63] text-2xl">phone_iphone</span>
+              <SiteIcon name="phone_iphone" className="text-[#E91E63] text-2xl" />
             </div>
             <div className="overflow-hidden">
               <h3 className="font-headline text-lg font-bold mb-1">رقم محلي</h3>
@@ -86,7 +87,7 @@ export function Contact() {
             {success ? (
             <div className="h-full flex flex-col items-center justify-center relative z-10 space-y-6">
                 <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-5xl text-primary">check_circle</span>
+                  <SiteIcon name="check_circle" className="text-5xl text-primary" />
                 </div>
                 <h2 className="text-3xl font-black font-headline text-on-surface">تم استلام طلبك</h2>
                 <p className="text-outline text-center">سيتواصل فريق زارز معك في أقرب وقت شكراً لثقتك بنا.</p>
@@ -143,7 +144,7 @@ export function Contact() {
                 <div className="flex justify-end">
                   <button type="submit" className="primary-gradient text-on-primary font-bold px-12 py-4 rounded-full text-lg shadow-[0_12px_32px_rgba(125,60,255,0.4)] hover:scale-105 hover:shadow-[0_16px_40px_rgba(125,60,255,0.5)] active:scale-95 transition-all duration-300 flex items-center gap-3">
                     إرسال الرسالة
-                    <span className="material-symbols-outlined text-xl">send</span>
+                    <SiteIcon name="send" className="text-xl" />
                   </button>
                 </div>
               </form>
@@ -165,7 +166,7 @@ export function Contact() {
             <div className="absolute inset-0 primary-gradient opacity-10"></div>
             <div className="perf-card absolute bg-surface-container p-4 rounded-2xl shadow-2xl flex items-center gap-4">
               <div className="w-10 h-10 primary-gradient rounded-full flex items-center justify-center">
-                <span className="material-symbols-outlined text-white text-sm">location_on</span>
+                <SiteIcon name="location_on" className="text-white text-sm" />
               </div>
               <div>
                 <p className="font-bold text-sm">مقر زارز الرئيسي</p>
@@ -181,11 +182,11 @@ export function Contact() {
           </p>
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <span className="material-symbols-outlined text-primary">schedule</span>
+              <SiteIcon name="schedule" className="text-primary" />
               <span className="text-on-surface">من الأحد إلى الخميس: ٩:٠٠ ص - ٦:٠٠ م</span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="material-symbols-outlined text-primary">distance</span>
+              <SiteIcon name="distance" className="text-primary" />
               <span className="text-on-surface">طريق الملك فهد، برج الفيصلية، الرياض</span>
             </div>
           </div>

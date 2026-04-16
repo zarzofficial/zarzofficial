@@ -153,12 +153,14 @@ function StoreProductCard({
   onAddToCart,
   metrics,
   staticLayout = false,
+  deferContent = false,
 }: {
   product: Product;
   onOrderNow: (product: Product) => void;
   onAddToCart: (product: Product) => void;
   metrics: StoreViewportMetrics;
   staticLayout?: boolean;
+  deferContent?: boolean;
 } & Attributes) {
   const discountPercent = getDiscountPercent();
   const originalPrice = getLegacyOriginalPrice(product.basePrice);
@@ -170,7 +172,11 @@ function StoreProductCard({
           ? "shadow-sm"
           : "shadow-md transition-transform duration-300 md:hover:-translate-y-1 md:hover:shadow-[0_18px_38px_rgba(86,0,202,0.14)]"
       } ${product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : ""}`}
-      style={{ contentVisibility: "auto", containIntrinsicSize: `1px ${metrics.cardHeight}px` }}
+      style={
+        deferContent
+          ? { contentVisibility: "auto", containIntrinsicSize: `1px ${metrics.cardHeight}px` }
+          : undefined
+      }
     >
       <Link
         to={`/products/${product.id}`}
@@ -386,6 +392,7 @@ function StoreVirtualizedSections({
                         onOrderNow={onOrderNow}
                         onAddToCart={onAddToCart}
                         metrics={viewportMetrics}
+                        deferContent
                       />
                     ))}
                   </div>
@@ -456,7 +463,7 @@ function MobileCategorySlider({
                 : "border border-primary/20 bg-surface-container/50 opacity-40 cursor-not-allowed"
             }`}
           >
-            <span className="material-symbols-outlined text-2xl">chevron_left</span>
+            <SiteIcon name="chevron_left" className="text-2xl" />
           </button>
           <button
             onClick={scrollRightBtn}
@@ -467,7 +474,7 @@ function MobileCategorySlider({
                 : "border border-primary/20 bg-surface-container/50 opacity-40 cursor-not-allowed"
             }`}
           >
-            <span className="material-symbols-outlined text-2xl">chevron_right</span>
+            <SiteIcon name="chevron_right" className="text-2xl" />
           </button>
         </div>
       </div>

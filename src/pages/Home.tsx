@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
-import { SiteIcon } from "../components/SiteIcon";
+import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
 import { motion, AnimatePresence, useScroll, useSpring, useMotionValueEvent, useTransform } from "motion/react";
 
 
@@ -256,7 +256,7 @@ export function Home() {
                     : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
                 }`}
               >
-                <span className="material-symbols-outlined text-2xl">chevron_left</span>
+                <SiteIcon name="chevron_left" className="text-2xl" />
               </button>
               <button 
                 onClick={scrollRight}
@@ -267,7 +267,7 @@ export function Home() {
                     : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
                 }`}
               >
-                <span className="material-symbols-outlined text-2xl">chevron_right</span>
+                <SiteIcon name="chevron_right" className="text-2xl" />
               </button>
             </div>
           </div>
@@ -340,16 +340,19 @@ export function Home() {
                     <div className={`absolute top-6 left-6 p-2 rounded-xl border transition-colors z-20 ${
                       isActive ? "border-primary/50 text-white bg-primary/20" : "border-outline-variant/20 text-outline-variant group-hover:border-primary/30"
                     }`}>
-                      <span className="material-symbols-outlined text-lg">arrow_outward</span>
+                      <SiteIcon name="arrow_outward" className="text-lg" />
                     </div>
 
                     <div className="relative z-20">
                       <div className={`main-service-card__icon-shell icon-glow-container mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border transition-all duration-500 ${
                         isActive ? "border-primary/40 bg-primary/20 scale-110 shadow-inner" : "border-white/10 bg-white/5"
                       }`}>
-                        <span className={`material-symbols-outlined text-3xl transition-colors ${
-                          isActive ? "text-primary drop-shadow-[0_0_15px_rgba(208,188,255,0.8)]" : "icon-gradient"
-                        }`} data-icon={srv.iconName}>{srv.iconName}</span>
+                        <SiteIcon
+                          name={srv.iconName as SiteIconName}
+                          className={`text-3xl transition-colors ${
+                            isActive ? "text-primary drop-shadow-[0_0_15px_rgba(208,188,255,0.8)]" : "icon-gradient"
+                          }`}
+                        />
                       </div>
                       
                       {srv.badge && (
@@ -379,15 +382,19 @@ export function Home() {
                         isActive ? "text-primary gap-4 text-glow" : "text-on-surface hover:text-primary"
                       }`}>
                         <span className="text-sm md:text-base">{srv.linkText}</span>
-                        <span className="material-symbols-outlined text-sm transition-transform duration-300 md:group-hover/link:-translate-x-1">arrow_back</span>
+                        <SiteIcon name="arrow_back" className="text-sm transition-transform duration-300 md:group-hover/link:-translate-x-1" />
                       </Link>
                     </div>
                     
                     {srv.bgIcon && (
                       <div className="hidden lg:block">
-                        <span className={`material-symbols-outlined absolute -left-8 -bottom-8 select-none pointer-events-none rotate-12 transition-all duration-1000 ${
-                          isActive ? "text-primary/10 text-[180px]" : "text-on-surface/5 text-[140px]"
-                        }`} data-icon={srv.bgIcon}>{srv.bgIcon}</span>
+                        <SiteIcon
+                          name={srv.bgIcon as SiteIconName}
+                          className={`absolute -left-8 -bottom-8 select-none pointer-events-none rotate-12 transition-all duration-1000 ${
+                            isActive ? "text-primary/10 text-[180px]" : "text-on-surface/5 text-[140px]"
+                          }`}
+                          strokeWidth={1.4}
+                        />
                       </div>
                     )}
                   </div>
@@ -424,7 +431,7 @@ export function Home() {
               <div className="absolute top-4 left-4 text-[3.5rem] font-black text-white/[0.03] leading-none select-none pointer-events-none">01</div>
               <div className="relative z-10">
                 <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(208,188,255,0.2)] transition-all duration-500">
-                  <span className="material-symbols-outlined text-[22px] text-primary">bolt</span>
+                  <SiteIcon name="bolt" className="text-[22px] text-primary" />
                 </div>
                 <h4 className="text-sm md:text-[15px] font-black text-on-surface mb-2">تنفيذ فوري</h4>
                 <p className="text-xs md:text-[13px] text-outline leading-relaxed">طلبك يبدأ خلال دقائق من التأكيد بدون أي تأخير</p>
@@ -437,7 +444,7 @@ export function Home() {
               <div className="absolute top-4 left-4 text-[3.5rem] font-black text-white/[0.03] leading-none select-none pointer-events-none">02</div>
               <div className="relative z-10">
                 <div className="w-11 h-11 rounded-xl bg-[#3b82f6]/10 border border-[#3b82f6]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-500">
-                  <span className="material-symbols-outlined text-[22px] text-[#3b82f6]">shield</span>
+                  <SiteIcon name="shield" className="text-[22px] text-[#3b82f6]" />
                 </div>
                 <h4 className="text-sm md:text-[15px] font-black text-on-surface mb-2">أمان كامل</h4>
                 <p className="text-xs md:text-[13px] text-outline leading-relaxed">حساباتك محمية ولا نطلب أي بيانات سرية مطلقاً</p>
@@ -450,7 +457,7 @@ export function Home() {
               <div className="absolute top-4 left-4 text-[3.5rem] font-black text-white/[0.03] leading-none select-none pointer-events-none">03</div>
               <div className="relative z-10">
                 <div className="w-11 h-11 rounded-xl bg-[#10b981]/10 border border-[#10b981]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all duration-500">
-                  <span className="material-symbols-outlined text-[22px] text-[#10b981]">headset_mic</span>
+                  <SiteIcon name="headset_mic" className="text-[22px] text-[#10b981]" />
                 </div>
                 <h4 className="text-sm md:text-[15px] font-black text-on-surface mb-2">دعم ٢٤/٧</h4>
                 <p className="text-xs md:text-[13px] text-outline leading-relaxed">فريق متخصص جاهز لمساعدتك في أي وقت تحتاجه</p>
@@ -463,7 +470,7 @@ export function Home() {
               <div className="absolute top-4 left-4 text-[3.5rem] font-black text-white/[0.03] leading-none select-none pointer-events-none">04</div>
               <div className="relative z-10">
                 <div className="w-11 h-11 rounded-xl bg-[#f59e0b]/10 border border-[#f59e0b]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] transition-all duration-500">
-                  <span className="material-symbols-outlined text-[22px] text-[#f59e0b]">payments</span>
+                  <SiteIcon name="payments" className="text-[22px] text-[#f59e0b]" />
                 </div>
                 <h4 className="text-sm md:text-[15px] font-black text-on-surface mb-2">دفع مرن</h4>
                 <p className="text-xs md:text-[13px] text-outline leading-relaxed">ندعم التحويل البنكي والكاش حسب ما يناسبك</p>
@@ -476,7 +483,7 @@ export function Home() {
               <div className="absolute top-4 left-4 text-[3.5rem] font-black text-white/[0.03] leading-none select-none pointer-events-none">05</div>
               <div className="relative z-10">
                 <div className="w-11 h-11 rounded-xl bg-[#e11d48]/10 border border-[#e11d48]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(225,29,72,0.2)] transition-all duration-500">
-                  <span className="material-symbols-outlined text-[22px] text-[#e11d48]">workspace_premium</span>
+                  <SiteIcon name="workspace_premium" className="text-[22px] text-[#e11d48]" />
                 </div>
                 <h4 className="text-sm md:text-[15px] font-black text-on-surface mb-2">جودة مضمونة</h4>
                 <p className="text-xs md:text-[13px] text-outline leading-relaxed">ضمان زارز الملكي على كل خدمة نقدّمها لك</p>
@@ -489,7 +496,7 @@ export function Home() {
               <div className="absolute top-4 left-4 text-[3.5rem] font-black text-white/[0.03] leading-none select-none pointer-events-none">06</div>
               <div className="relative z-10">
                 <div className="w-11 h-11 rounded-xl bg-[#8b5cf6]/10 border border-[#8b5cf6]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(139,92,246,0.2)] transition-all duration-500">
-                  <span className="material-symbols-outlined text-[22px] text-[#8b5cf6]">trending_up</span>
+                  <SiteIcon name="trending_up" className="text-[22px] text-[#8b5cf6]" />
                 </div>
                 <h4 className="text-sm md:text-[15px] font-black text-on-surface mb-2">نتائج حقيقية</h4>
                 <p className="text-xs md:text-[13px] text-outline leading-relaxed">خدمات فعلية بنتائج ملموسة وقابلة للقياس</p>
@@ -552,7 +559,7 @@ export function Home() {
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-500"></div>
             <div className="relative z-10 flex flex-col items-center">
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                <span className="material-symbols-outlined text-3xl text-primary drop-shadow-[0_0_10px_rgba(208,188,255,0.5)]">groups</span>
+                <SiteIcon name="groups" className="text-3xl text-primary drop-shadow-[0_0_10px_rgba(208,188,255,0.5)]" />
               </div>
               <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight group-hover:text-primary transition-colors">+10k</div>
               <div className="text-outline text-sm md:text-base font-bold">عميل سعيد</div>
@@ -563,7 +570,7 @@ export function Home() {
             <div className="absolute top-0 left-0 w-32 h-32 bg-[#3b82f6]/10 rounded-full blur-3xl group-hover:bg-[#3b82f6]/20 transition-all duration-500"></div>
             <div className="relative z-10 flex flex-col items-center">
               <div className="w-16 h-16 rounded-full bg-[#3b82f6]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                <span className="material-symbols-outlined text-3xl text-[#3b82f6] drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">verified</span>
+                <SiteIcon name="verified" className="text-3xl text-[#3b82f6] drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
               </div>
               <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight group-hover:text-[#3b82f6] transition-colors">99%</div>
               <div className="text-outline text-sm md:text-base font-bold">رضا المستخدمين</div>
@@ -574,7 +581,7 @@ export function Home() {
             <div className="absolute bottom-0 right-0 w-32 h-32 bg-[#f59e0b]/10 rounded-full blur-3xl group-hover:bg-[#f59e0b]/20 transition-all duration-500"></div>
             <div className="relative z-10 flex flex-col items-center">
               <div className="w-16 h-16 rounded-full bg-[#f59e0b]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                <span className="material-symbols-outlined text-3xl text-[#f59e0b] drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">rocket_launch</span>
+                <SiteIcon name="rocket_launch" className="text-3xl text-[#f59e0b] drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
               </div>
               <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight group-hover:text-[#f59e0b] transition-colors">+250</div>
               <div className="text-outline text-sm md:text-base font-bold">مشروع منجز</div>
@@ -585,7 +592,7 @@ export function Home() {
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#10b981]/10 rounded-full blur-3xl group-hover:bg-[#10b981]/20 transition-all duration-500"></div>
             <div className="relative z-10 flex flex-col items-center">
               <div className="w-16 h-16 rounded-full bg-[#10b981]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                <span className="material-symbols-outlined text-3xl text-[#10b981] drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">support_agent</span>
+                <SiteIcon name="support_agent" className="text-3xl text-[#10b981] drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
               </div>
               <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight group-hover:text-[#10b981] transition-colors">24/7</div>
               <div className="text-outline text-sm md:text-base font-bold">دعم فني متواصل</div>

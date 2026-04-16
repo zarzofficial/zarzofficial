@@ -211,7 +211,7 @@ export function FeaturedProducts() {
                 : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
             }`}
           >
-            <span className="material-symbols-outlined text-2xl">chevron_left</span>
+            <SiteIcon name="chevron_left" className="text-2xl" />
           </button>
           <button 
             onClick={scrollRight}
@@ -222,7 +222,7 @@ export function FeaturedProducts() {
                 : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
             }`}
           >
-            <span className="material-symbols-outlined text-2xl">chevron_right</span>
+            <SiteIcon name="chevron_right" className="text-2xl" />
           </button>
         </div>
     </section>
