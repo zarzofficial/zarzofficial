@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { products } from "../data/products";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 import { SiteIcon } from "./SiteIcon";
-import { motion, useScroll, useTransform, useMotionValueEvent } from "motion/react";
 
 const categoryMap: Record<string, { label: string; color: string }> = {
   ai: { label: "الذكاء الاصطناعي", color: "#8b5cf6" },
@@ -27,27 +26,52 @@ export function FeaturedProducts() {
     .filter(Boolean) as typeof products;
 
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
-  const { scrollXProgress } = useScroll({ container: scrollContainerRef });
-  const indicatorX = useTransform(scrollXProgress, [0, 1], [0, -192]);
-
   const [isAtStart, setIsAtStart] = React.useState(true);
   const [isAtEnd, setIsAtEnd] = React.useState(false);
-  const edgeStateRef = React.useRef({ isAtStart: true, isAtEnd: false });
+  const edgeStateRef = React.useRef({ isAtStart: true, isAtEnd: false, frameId: 0 });
 
-  useMotionValueEvent(scrollXProgress, "change", (latest) => {
-    const nextIsAtStart = latest <= 0.02;
-    const nextIsAtEnd = latest >= 0.98;
+  useEffect(() => {
+    const railElement = scrollContainerRef.current;
+    if (!railElement) return;
 
-    if (edgeStateRef.current.isAtStart !== nextIsAtStart) {
-      edgeStateRef.current.isAtStart = nextIsAtStart;
-      setIsAtStart(nextIsAtStart);
-    }
+    const updateEdgeState = () => {
+      const maxScroll = Math.max(0, railElement.scrollWidth - railElement.clientWidth);
+      const currentScroll = Math.min(maxScroll, Math.abs(railElement.scrollLeft));
+      const nextIsAtStart = currentScroll <= 10;
+      const nextIsAtEnd = currentScroll >= maxScroll - 10;
 
-    if (edgeStateRef.current.isAtEnd !== nextIsAtEnd) {
-      edgeStateRef.current.isAtEnd = nextIsAtEnd;
-      setIsAtEnd(nextIsAtEnd);
-    }
-  });
+      if (edgeStateRef.current.isAtStart !== nextIsAtStart) {
+        edgeStateRef.current.isAtStart = nextIsAtStart;
+        setIsAtStart(nextIsAtStart);
+      }
+
+      if (edgeStateRef.current.isAtEnd !== nextIsAtEnd) {
+        edgeStateRef.current.isAtEnd = nextIsAtEnd;
+        setIsAtEnd(nextIsAtEnd);
+      }
+    };
+
+    const queueUpdate = () => {
+      if (edgeStateRef.current.frameId) return;
+      edgeStateRef.current.frameId = window.requestAnimationFrame(() => {
+        edgeStateRef.current.frameId = 0;
+        updateEdgeState();
+      });
+    };
+
+    updateEdgeState();
+    railElement.addEventListener("scroll", queueUpdate, { passive: true });
+    window.addEventListener("resize", queueUpdate, { passive: true });
+
+    return () => {
+      if (edgeStateRef.current.frameId) {
+        window.cancelAnimationFrame(edgeStateRef.current.frameId);
+        edgeStateRef.current.frameId = 0;
+      }
+      railElement.removeEventListener("scroll", queueUpdate);
+      window.removeEventListener("resize", queueUpdate);
+    };
+  }, []);
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -79,7 +103,7 @@ export function FeaturedProducts() {
 
         <div 
           ref={scrollContainerRef}
-          className="perf-mobile-horizontal-cards flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 lg:gap-8 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none no-scrollbar pb-8 pt-4 px-4 -mx-4 md:px-0 md:-mx-0"
+          className="perf-mobile-horizontal-cards flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 lg:gap-8 overflow-x-auto md:overflow-visible snap-x snap-proximity md:snap-none no-scrollbar pb-8 pt-4 px-4 -mx-4 md:px-0 md:-mx-0"
           dir="rtl"
         >
           {featured.map((product) => {

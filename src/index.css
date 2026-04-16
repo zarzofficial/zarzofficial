@@ -292,6 +292,10 @@
         backface-visibility: visible;
     }
 
+    .perf-mobile-horizontal-cards {
+        scroll-snap-type: x proximity;
+    }
+
     .perf-mobile-section {
         contain: layout style;
     }
@@ -384,6 +388,12 @@
     .main-service-card__icon-shell {
         backdrop-filter: none;
         background: rgba(255, 255, 255, 0.04);
+    }
+
+    .perf-navbar {
+        backdrop-filter: none !important;
+        background: rgba(29, 12, 38, 0.94) !important;
+        box-shadow: 0 6px 18px rgba(8, 6, 18, 0.22) !important;
     }
 }
 

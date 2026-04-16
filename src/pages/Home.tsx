@@ -2,7 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
-import { motion, AnimatePresence, useScroll, useSpring, useMotionValueEvent, useTransform } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import { useCoarsePointer } from "../lib/useCoarsePointer";
 
 
 function FaqItem({ faq, isOpen, onClick }: { key?: React.Key, faq: { question: string, answer: string }, isOpen: boolean, onClick: () => void }) {
@@ -77,33 +78,64 @@ const techLogos = Array.from({ length: 8 }).map((_, i) => (
 
 export function Home() {
   const location = useLocation();
+  const isCoarsePointer = useCoarsePointer();
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
-  const edgeStateRef = useRef({ isAtStart: true, isAtEnd: false });
+  const [indicatorOffset, setIndicatorOffset] = useState(0);
+  const edgeStateRef = useRef({ isAtStart: true, isAtEnd: false, indicatorOffset: 0, frameId: 0 });
 
-  const { scrollXProgress } = useScroll({ container: scrollContainerRef });
+  useEffect(() => {
+    const railElement = scrollContainerRef.current;
+    if (!railElement) return;
 
-  useMotionValueEvent(scrollXProgress, "change", (latest) => {
-    const nextIsAtStart = latest <= 0.02;
-    const nextIsAtEnd = latest >= 0.98;
+    const updateRailState = () => {
+      const maxScroll = Math.max(0, railElement.scrollWidth - railElement.clientWidth);
+      const currentScroll = Math.min(maxScroll, Math.abs(railElement.scrollLeft));
+      const nextProgress = maxScroll === 0 ? 0 : currentScroll / maxScroll;
+      const nextIsAtStart = currentScroll <= 10;
+      const nextIsAtEnd = currentScroll >= maxScroll - 10;
+      const nextIndicatorOffset = -192 * nextProgress;
 
-    if (edgeStateRef.current.isAtStart !== nextIsAtStart) {
-      edgeStateRef.current.isAtStart = nextIsAtStart;
-      setIsAtStart(nextIsAtStart);
-    }
+      if (edgeStateRef.current.isAtStart !== nextIsAtStart) {
+        edgeStateRef.current.isAtStart = nextIsAtStart;
+        setIsAtStart(nextIsAtStart);
+      }
 
-    if (edgeStateRef.current.isAtEnd !== nextIsAtEnd) {
-      edgeStateRef.current.isAtEnd = nextIsAtEnd;
-      setIsAtEnd(nextIsAtEnd);
-    }
-  });
+      if (edgeStateRef.current.isAtEnd !== nextIsAtEnd) {
+        edgeStateRef.current.isAtEnd = nextIsAtEnd;
+        setIsAtEnd(nextIsAtEnd);
+      }
 
-  // Map progress (0 to 1) to a pixel translation. 
-  // Container is 256px (w-64), thumb is 64px (w-16). Max travel is -192px.
-  const indicatorX = useTransform(scrollXProgress, [0, 1], [0, -192]);
+      if (Math.abs(edgeStateRef.current.indicatorOffset - nextIndicatorOffset) > 1) {
+        edgeStateRef.current.indicatorOffset = nextIndicatorOffset;
+        setIndicatorOffset(nextIndicatorOffset);
+      }
+    };
+
+    const queueUpdate = () => {
+      if (edgeStateRef.current.frameId) return;
+      edgeStateRef.current.frameId = window.requestAnimationFrame(() => {
+        edgeStateRef.current.frameId = 0;
+        updateRailState();
+      });
+    };
+
+    updateRailState();
+    railElement.addEventListener("scroll", queueUpdate, { passive: true });
+    window.addEventListener("resize", queueUpdate, { passive: true });
+
+    return () => {
+      if (edgeStateRef.current.frameId) {
+        window.cancelAnimationFrame(edgeStateRef.current.frameId);
+        edgeStateRef.current.frameId = 0;
+      }
+      railElement.removeEventListener("scroll", queueUpdate);
+      window.removeEventListener("resize", queueUpdate);
+    };
+  }, []);
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -285,7 +317,7 @@ export function Home() {
 
           <div 
             ref={scrollContainerRef}
-            className="perf-mobile-horizontal-cards flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-6 lg:gap-8 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none no-scrollbar pb-12 pt-4 px-4 -mx-4 md:px-0 md:-mx-0"
+            className="perf-mobile-horizontal-cards flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-6 lg:gap-8 overflow-x-auto md:overflow-visible snap-x snap-proximity md:snap-none no-scrollbar pb-12 pt-4 px-4 -mx-4 md:px-0 md:-mx-0"
           >
             {[
               {
@@ -325,13 +357,19 @@ export function Home() {
               }
             ].map((srv, idx) => {
               const isActive = activeIndex === idx;
+              const ServiceCardWrapper = isCoarsePointer ? "div" : motion.div;
+              const serviceCardMotionProps = isCoarsePointer
+                ? {}
+                : {
+                    initial: "hidden" as const,
+                    whileInView: "visible" as const,
+                    viewport: { once: true, margin: "200px" },
+                    variants: categoryCardVariants,
+                  };
               return (
-                <motion.div 
+                <ServiceCardWrapper 
                   key={srv.id}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "200px" }}
-                  variants={categoryCardVariants}
+                  {...serviceCardMotionProps}
                   className="block snap-start snap-always shrink-0 w-[280px] md:w-auto"
                   onClick={() => setActiveIndex(idx)}
                 >
@@ -409,15 +447,15 @@ export function Home() {
                       </div>
                     )}
                   </div>
-                </motion.div>
+                </ServiceCardWrapper>
               );
             })}
           </div>
 
           <div className="block md:hidden w-64 h-1.5 bg-outline-variant/10 rounded-full mx-auto mt-8 relative shadow-inner overflow-hidden" dir="rtl">
-            <motion.div
+            <div
               className="absolute top-0 right-0 bottom-0 w-16 bg-primary rounded-full shadow-[0_0_8px_rgba(208,188,255,0.6)]"
-              style={{ x: indicatorX }}
+              style={{ transform: `translate3d(${indicatorOffset}px, 0, 0)` }}
             />
           </div>
         </div>
