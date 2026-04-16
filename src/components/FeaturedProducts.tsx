@@ -103,7 +103,7 @@ export function FeaturedProducts() {
           </div>
         </div>
 
-        <div 
+        <div
           ref={scrollContainerRef}
           className="perf-mobile-horizontal-cards flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 lg:gap-8 overflow-x-auto md:overflow-visible snap-x snap-proximity md:snap-none no-scrollbar pb-8 pt-4 px-4 -mx-4 md:px-0 md:-mx-0"
           dir="rtl"
@@ -112,7 +112,6 @@ export function FeaturedProducts() {
             const category = categoryMap[product.category] || { label: product.category, color: "#d0bcff" };
             const discountPercent = getDiscountPercent();
             const originalPrice = getLegacyOriginalPrice(product.basePrice);
-            const shouldPrioritizeImage = index < 3;
 
             return (
               <Link
@@ -140,17 +139,20 @@ export function FeaturedProducts() {
                     </div>
                   )}
 
+                  {/* All images in horizontal carousel use eager loading since lazy loading
+                      only scans ahead vertically and can't predict horizontal scroll,
+                      which causes blank placeholders when the user swipes. */}
                   <img
                     src={product.image}
                     alt={product.title}
                     className={`h-full w-full object-cover transition-transform duration-300 md:group-hover:scale-[1.03] ${
                       product.outOfStock ? "opacity-50" : ""
                     }`}
-                    loading={shouldPrioritizeImage ? "eager" : "lazy"}
+                    loading="eager"
                     decoding="async"
-                    fetchPriority={index === 0 ? "high" : shouldPrioritizeImage ? "auto" : "low"}
+                    fetchPriority={index === 0 ? "high" : index < 3 ? "auto" : "low"}
                     referrerPolicy="no-referrer"
-                    sizes="(max-width: 639px) 88vw, (max-width: 1023px) 44vw, 30vw"
+                    sizes="(max-width: 639px) 290px, (max-width: 1023px) 44vw, 30vw"
                     draggable={false}
                     width={634}
                     height={634}
@@ -240,23 +242,23 @@ export function FeaturedProducts() {
         </div>
       </div>
         <div className="flex gap-3 justify-center mt-6 md:hidden" dir="ltr">
-          <button 
+          <button
             onClick={scrollLeft}
             disabled={isAtEnd}
             className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${
-              !isAtEnd 
-                ? "bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]" 
+              !isAtEnd
+                ? "bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]"
                 : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
             }`}
           >
             <SiteIcon name="chevron_left" className="text-2xl" />
           </button>
-          <button 
+          <button
             onClick={scrollRight}
             disabled={isAtStart}
             className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${
-              !isAtStart 
-                ? "bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]" 
+              !isAtStart
+                ? "bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]"
                 : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
             }`}
           >

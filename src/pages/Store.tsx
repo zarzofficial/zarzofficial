@@ -197,9 +197,10 @@ function StoreProductCard({
           src={product.image || "/assets/store-fallback.svg"}
           loading={prioritizeImage ? "eager" : "lazy"}
           decoding="async"
-          fetchPriority={prioritizeImage ? "high" : "low"}
+          fetchPriority={prioritizeImage ? "high" : "auto"}
           referrerPolicy="no-referrer"
           draggable={false}
+          sizes="(max-width: 639px) 290px, (max-width: 1023px) 45vw, (max-width: 1279px) 30vw, 23vw"
           width={634}
           height={634}
         />
@@ -528,7 +529,7 @@ function MobileCategorySlider({
               onOrderNow={onOrderNow}
               onAddToCart={onAddToCart}
               metrics={metrics}
-              prioritizeImage={index < 2}
+              prioritizeImage={true}
             />
           </div>
         ))}
