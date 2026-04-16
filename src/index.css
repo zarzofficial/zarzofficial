@@ -269,25 +269,11 @@
 
 @media (max-width: 767px) {
     .perf-mobile-section {
-        content-visibility: auto;
-        contain-intrinsic-size: 1px 900px;
-    }
-
-    .perf-mobile-section[data-perf-size="compact"] {
-        contain-intrinsic-size: 1px 560px;
-    }
-
-    .perf-mobile-section[data-perf-size="medium"] {
-        contain-intrinsic-size: 1px 820px;
-    }
-
-    .perf-mobile-section[data-perf-size="tall"] {
-        contain-intrinsic-size: 1px 1200px;
+        contain: layout style;
     }
 
     .perf-mobile-card {
-        content-visibility: auto;
-        contain-intrinsic-size: 1px 440px;
+        contain: layout style;
     }
 
     .perf-panel,
