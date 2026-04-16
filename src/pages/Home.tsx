@@ -307,7 +307,7 @@ export function Home() {
   }, [location.pathname, location.search, location.state]);
 
   return (
-    <div className="pt-12 md:pt-14">
+    <div className="home-mobile-page pt-12 md:pt-14">
       {/* Hero Section */}
       <section className="relative min-h-0 overflow-hidden px-4 pb-2 pt-16 sm:px-6 sm:py-10 md:px-12 md:py-12 lg:py-20">
         <div className="absolute inset-0 z-0">
@@ -415,7 +415,7 @@ export function Home() {
         <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-background to-transparent pointer-events-none z-0 border-t border-background"></div>
         <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-background to-transparent pointer-events-none z-0 border-b border-background"></div>
         
-        <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none"></div>
+        <div className="home-mobile-glow absolute top-1/2 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none"></div>
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-row justify-between items-end mb-12 gap-4">
             <div className="text-start">
@@ -429,7 +429,7 @@ export function Home() {
                 disabled={isAtEnd}
                 className={`flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full transition-all ${
                   !isAtEnd 
-                    ? "bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]" 
+                    ? "bg-primary text-white md:hover:bg-primary/90 md:hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]" 
                     : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
                 }`}
               >
@@ -440,7 +440,7 @@ export function Home() {
                 disabled={isAtStart}
                 className={`flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full transition-all ${
                   !isAtStart 
-                    ? "bg-primary text-white hover:bg-primary/90 hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]" 
+                    ? "bg-primary text-white md:hover:bg-primary/90 md:hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]" 
                     : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
                 }`}
               >
@@ -500,18 +500,18 @@ export function Home() {
                   <div
                     className={`perf-panel cyber-glass-card rounded-[2.5rem] p-6 md:p-8 group relative flex h-[360px] md:h-[400px] w-full flex-col justify-between overflow-hidden transition-all duration-500 cursor-pointer ${
                       isActive 
-                        ? "border-primary scale-[1.02] shadow-[0_20px_50px_rgba(208,188,255,0.15)] z-10" 
-                        : "border-outline-variant/10 hover:border-primary/30 hover:-translate-y-1"
+                        ? "border-primary md:scale-[1.02] shadow-[0_20px_50px_rgba(208,188,255,0.15)] z-10" 
+                        : "border-outline-variant/10 md:hover:border-primary/30 md:hover:-translate-y-1"
                     }`}
                     style={{ contain: "layout style" }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.08] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.08] to-transparent opacity-0 transition-opacity duration-500 md:group-hover:opacity-100"></div>
                     
                     <div className={`main-service-card__bg mesh-gradient-bg transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-40'}`}></div>
                     
                     {/* Top Right Arrow */}
                     <div className={`absolute top-6 left-6 p-2 rounded-xl border transition-colors z-20 ${
-                      isActive ? "border-primary/50 text-white bg-primary/20" : "border-outline-variant/20 text-outline-variant group-hover:border-primary/30"
+                      isActive ? "border-primary/50 text-white bg-primary/20" : "border-outline-variant/20 text-outline-variant md:group-hover:border-primary/30"
                     }`}>
                       <SiteIcon name="arrow_outward" className="text-lg" />
                     </div>
@@ -552,7 +552,7 @@ export function Home() {
                     
                     <div className="relative z-20 mt-auto pt-6 border-t border-outline-variant/10">
                       <Link to={srv.link} className={`main-service-card__link group/link inline-flex items-center gap-2 font-black transition-all duration-300 ${
-                        isActive ? "text-primary gap-4 text-glow" : "text-on-surface hover:text-primary"
+                        isActive ? "text-primary gap-4 text-glow" : "text-on-surface md:hover:text-primary"
                       }`}>
                         <span className="text-sm md:text-base">{srv.linkText}</span>
                         <SiteIcon name="arrow_back" className="text-sm transition-transform duration-300 md:group-hover/link:-translate-x-1" />
@@ -578,8 +578,8 @@ export function Home() {
 
           <div className="block md:hidden w-64 h-1.5 bg-outline-variant/10 rounded-full mx-auto mt-8 relative shadow-inner overflow-hidden" dir="rtl">
             <div
-              className="absolute top-0 right-0 bottom-0 w-16 bg-primary rounded-full shadow-[0_0_8px_rgba(208,188,255,0.6)]"
-              style={{ transform: `translate3d(${indicatorOffset}px, 0, 0)` }}
+              className="home-mobile-rail-indicator absolute top-0 right-0 bottom-0 w-16 bg-primary rounded-full shadow-[0_0_8px_rgba(208,188,255,0.6)]"
+              style={{ transform: `translateX(${indicatorOffset}px)` }}
             />
           </div>
         </div>
@@ -587,8 +587,8 @@ export function Home() {
 
       {/* Why ZARZ Section */}
       <section className="py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
-        <div className="why-choose-mobile-glow absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] pointer-events-none"></div>
-        <div className="why-choose-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
+        <div className="why-choose-mobile-glow home-mobile-glow absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] pointer-events-none"></div>
+        <div className="why-choose-mobile-glow home-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-primary text-sm font-bold mb-6 backdrop-blur-md">لماذا نحن مختلفون؟</span>
@@ -611,7 +611,7 @@ export function Home() {
         <div className="flex flex-col items-center justify-center text-center mb-10 md:mb-16 relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs md:text-sm font-bold mb-4 backdrop-blur-md shadow-[0_0_15px_rgba(208,188,255,0.1)]">
             <span className="relative flex h-2 w-2 mb-0.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="home-mobile-ping animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
             </span>
             شركاء النجاح
@@ -657,51 +657,51 @@ export function Home() {
       {/* Stats Section */}
       <section className="perf-mobile-section relative overflow-hidden px-6 py-24 md:px-12" data-perf-size="compact">
         <div className="absolute inset-0 z-0">
-          <div className="absolute top-1/2 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]"></div>
-          <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-tertiary/10 rounded-full blur-[120px]"></div>
+          <div className="home-mobile-glow absolute top-1/2 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]"></div>
+          <div className="home-mobile-glow absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-tertiary/10 rounded-full blur-[120px]"></div>
         </div>
         <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 text-center">
 
-          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_60px_rgba(86,0,202,0.15)] overflow-hidden flex flex-col justify-center">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-500"></div>
+          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-primary/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(86,0,202,0.15)] overflow-hidden flex flex-col justify-center">
+            <div className="home-mobile-glow absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-primary/20"></div>
             <div className="relative z-10 flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 transition-transform duration-500 md:group-hover:scale-110">
                 <SiteIcon name="groups" className="text-3xl text-primary drop-shadow-[0_0_10px_rgba(208,188,255,0.5)]" />
               </div>
-              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight group-hover:text-primary transition-colors">+10k</div>
+              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight transition-colors md:group-hover:text-primary">+10k</div>
               <div className="text-outline text-sm md:text-base font-bold">عميل سعيد</div>
             </div>
           </div>
 
-          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 hover:border-[#3b82f6]/30 transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_60px_rgba(59,130,246,0.15)] overflow-hidden flex flex-col justify-center">
-            <div className="absolute top-0 left-0 w-32 h-32 bg-[#3b82f6]/10 rounded-full blur-3xl group-hover:bg-[#3b82f6]/20 transition-all duration-500"></div>
+          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#3b82f6]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(59,130,246,0.15)] overflow-hidden flex flex-col justify-center">
+            <div className="home-mobile-glow absolute top-0 left-0 w-32 h-32 bg-[#3b82f6]/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-[#3b82f6]/20"></div>
             <div className="relative z-10 flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-[#3b82f6]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+              <div className="w-16 h-16 rounded-full bg-[#3b82f6]/10 flex items-center justify-center mb-6 transition-transform duration-500 md:group-hover:scale-110">
                 <SiteIcon name="verified" className="text-3xl text-[#3b82f6] drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
               </div>
-              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight group-hover:text-[#3b82f6] transition-colors">99%</div>
+              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight transition-colors md:group-hover:text-[#3b82f6]">99%</div>
               <div className="text-outline text-sm md:text-base font-bold">رضا المستخدمين</div>
             </div>
           </div>
 
-          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 hover:border-[#f59e0b]/30 transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_60px_rgba(245,158,11,0.15)] overflow-hidden flex flex-col justify-center">
-            <div className="absolute bottom-0 right-0 w-32 h-32 bg-[#f59e0b]/10 rounded-full blur-3xl group-hover:bg-[#f59e0b]/20 transition-all duration-500"></div>
+          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#f59e0b]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(245,158,11,0.15)] overflow-hidden flex flex-col justify-center">
+            <div className="home-mobile-glow absolute bottom-0 right-0 w-32 h-32 bg-[#f59e0b]/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-[#f59e0b]/20"></div>
             <div className="relative z-10 flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-[#f59e0b]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+              <div className="w-16 h-16 rounded-full bg-[#f59e0b]/10 flex items-center justify-center mb-6 transition-transform duration-500 md:group-hover:scale-110">
                 <SiteIcon name="rocket_launch" className="text-3xl text-[#f59e0b] drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
               </div>
-              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight group-hover:text-[#f59e0b] transition-colors">+250</div>
+              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight transition-colors md:group-hover:text-[#f59e0b]">+250</div>
               <div className="text-outline text-sm md:text-base font-bold">مشروع منجز</div>
             </div>
           </div>
 
-          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 hover:border-[#10b981]/30 transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_20px_60px_rgba(16,185,129,0.15)] overflow-hidden flex flex-col justify-center">
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#10b981]/10 rounded-full blur-3xl group-hover:bg-[#10b981]/20 transition-all duration-500"></div>
+          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#10b981]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(16,185,129,0.15)] overflow-hidden flex flex-col justify-center">
+            <div className="home-mobile-glow absolute bottom-0 left-0 w-32 h-32 bg-[#10b981]/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-[#10b981]/20"></div>
             <div className="relative z-10 flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-[#10b981]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+              <div className="w-16 h-16 rounded-full bg-[#10b981]/10 flex items-center justify-center mb-6 transition-transform duration-500 md:group-hover:scale-110">
                 <SiteIcon name="support_agent" className="text-3xl text-[#10b981] drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
               </div>
-              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight group-hover:text-[#10b981] transition-colors">24/7</div>
+              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight transition-colors md:group-hover:text-[#10b981]">24/7</div>
               <div className="text-outline text-sm md:text-base font-bold">دعم فني متواصل</div>
             </div>
           </div>
@@ -711,7 +711,7 @@ export function Home() {
 
       {/* FAQ Section */}
       <section id="faq" className="perf-mobile-section relative overflow-hidden bg-background px-6 py-24 md:px-12" data-perf-size="medium">
-        <div className="faq-mobile-glow absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px] pointer-events-none"></div>
+        <div className="faq-mobile-glow home-mobile-glow absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px] pointer-events-none"></div>
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black font-headline text-on-background mb-4">أسئلة شائعة</h2>
@@ -745,8 +745,8 @@ export function Home() {
       <section className="perf-mobile-section px-6 py-24 md:px-12 md:py-32" data-perf-size="compact">
         <div className="perf-panel max-w-7xl mx-auto cyber-glass-card rounded-[2.5rem] p-8 md:p-14 relative overflow-hidden group border border-outline-variant/20 shadow-2xl">
           <div className="mesh-gradient-bg opacity-30"></div>
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-tertiary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+          <div className="home-mobile-glow absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+          <div className="home-mobile-glow absolute bottom-0 left-0 w-64 h-64 bg-tertiary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
 
           <div className="relative z-10 flex flex-col xl:flex-row items-center xl:items-end justify-between gap-12 xl:gap-20">
             {/* Text Content */}
@@ -764,11 +764,11 @@ export function Home() {
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 w-full xl:w-auto shrink-0 pb-0 xl:pb-2">
-              <a href="https://wa.me/201500007300" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 bg-surface/50 backdrop-blur-md text-on-background border border-outline-variant/30 px-8 py-5 rounded-xl font-bold text-lg hover:bg-white/10 transition-all w-full sm:w-auto">
+              <a href="https://wa.me/201500007300" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 bg-surface/50 backdrop-blur-md text-on-background border border-outline-variant/30 px-8 py-5 rounded-xl font-bold text-lg md:hover:bg-white/10 transition-all w-full sm:w-auto">
                 <SiteIcon name="forum" className="text-xl" />
                 تواصل عبر واتساب
               </a>
-              <Link to="/products" className="primary-gradient text-on-primary font-bold px-8 py-5 rounded-xl text-lg hover:shadow-[0_0_30px_rgba(208,188,255,0.4)] transition-all scale-100 active:scale-95 text-center flex items-center justify-center gap-3 w-full sm:w-auto">
+              <Link to="/products" className="primary-gradient text-on-primary font-bold px-8 py-5 rounded-xl text-lg md:hover:shadow-[0_0_30px_rgba(208,188,255,0.4)] transition-all scale-100 active:scale-95 text-center flex items-center justify-center gap-3 w-full sm:w-auto">
                 استعرض المنتجات
                 <SiteIcon name="arrow_back" className="text-xl" />
               </Link>

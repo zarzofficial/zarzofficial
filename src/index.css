@@ -282,6 +282,34 @@
 }
 
 @media (max-width: 767px) {
+    .home-mobile-page [class*="backdrop-blur"] {
+        backdrop-filter: none !important;
+    }
+
+    .home-mobile-page .text-glow {
+        text-shadow: none !important;
+    }
+
+    .home-mobile-page .lucide,
+    .home-mobile-page [class*="drop-shadow"] {
+        filter: none !important;
+        text-shadow: none !important;
+    }
+
+    .home-mobile-page .home-mobile-glow {
+        filter: blur(34px) !important;
+        opacity: 0.24 !important;
+        transform: none !important;
+    }
+
+    .home-mobile-page .home-mobile-ping {
+        display: none !important;
+    }
+
+    .home-mobile-page .home-mobile-rail-indicator {
+        box-shadow: 0 0 6px rgba(208, 188, 255, 0.4) !important;
+    }
+
     .perf-mobile-horizontal-cards .perf-panel,
     .perf-mobile-horizontal-cards .perf-card,
     .perf-mobile-horizontal-cards .perf-modal-card,
