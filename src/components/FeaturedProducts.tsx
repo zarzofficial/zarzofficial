@@ -112,6 +112,7 @@ export function FeaturedProducts() {
             const category = categoryMap[product.category] || { label: product.category, color: "#d0bcff" };
             const discountPercent = getDiscountPercent();
             const originalPrice = getLegacyOriginalPrice(product.basePrice);
+            const shouldPrioritizeImage = index < 3;
 
             return (
               <Link
@@ -145,9 +146,9 @@ export function FeaturedProducts() {
                     className={`h-full w-full object-cover transition-transform duration-300 md:group-hover:scale-[1.03] ${
                       product.outOfStock ? "opacity-50" : ""
                     }`}
-                    loading={index === 0 ? "eager" : "lazy"}
+                    loading={shouldPrioritizeImage ? "eager" : "lazy"}
                     decoding="async"
-                    fetchPriority={index === 0 ? "high" : "low"}
+                    fetchPriority={index === 0 ? "high" : shouldPrioritizeImage ? "auto" : "low"}
                     referrerPolicy="no-referrer"
                     sizes="(max-width: 639px) 88vw, (max-width: 1023px) 44vw, 30vw"
                     draggable={false}

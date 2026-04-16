@@ -2,8 +2,6 @@ import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
-import { LazyMotion, domAnimation, m, motion, useReducedMotion } from "motion/react";
-import { useCoarsePointer } from "../lib/useCoarsePointer";
 import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
 
 const whyChooseItems = [
@@ -88,86 +86,22 @@ type FaqEntry = {
 
 type WhyChooseItem = (typeof whyChooseItems)[number];
 
-type WhyChooseCardProps = {
-  item: WhyChooseItem;
-  isCoarsePointer: boolean;
-  reduceMotion: boolean;
-};
-
-const whyChooseGridVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.085,
-      delayChildren: 0.05,
-    },
-  },
-};
-
-const whyChooseCardVariants = {
-  hidden: {
-    opacity: 0,
-    y: 16,
-    scale: 0.988,
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.58,
-      ease: [0.22, 1, 0.36, 1] as const,
-    },
-  },
-};
-
-const faqListVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.065,
-      delayChildren: 0.04,
-    },
-  },
-};
-
-const faqItemRevealVariants = {
-  hidden: {
-    opacity: 0,
-    y: 14,
-    scale: 0.992,
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.54,
-      ease: [0.22, 1, 0.36, 1] as const,
-    },
-  },
-};
-
 function FaqItem({
   faq,
   isOpen,
   onClick,
-  isCoarsePointer,
-  reduceMotion,
 }: {
   faq: FaqEntry;
   isOpen: boolean;
   onClick: () => void;
-  isCoarsePointer: boolean;
-  reduceMotion: boolean;
 }) {
-  const faqContent = (
+  return (
     <div
-      className={`perf-card faq-mobile-card cyber-glass-card rounded-2xl overflow-hidden border transition-[transform,border-color,background-color,box-shadow] duration-[420ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] ${
+      className={`perf-card faq-mobile-card cyber-glass-card rounded-2xl overflow-hidden border transition-[border-color,background-color,box-shadow] duration-[420ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] ${
         isOpen
           ? "border-[#e11d48]/30 bg-[#e11d48]/5 shadow-[0_4px_30px_rgba(225,29,72,0.1)]"
           : "border-outline-variant/10 bg-surface-container-low/30 md:hover:border-outline-variant/30"
-      } ${isCoarsePointer ? "transform-gpu will-change-transform" : ""}`}
+      }`}
     >
       <button
         type="button"
@@ -198,69 +132,32 @@ function FaqItem({
       </div>
     </div>
   );
-
-  if (!isCoarsePointer || reduceMotion) {
-    return faqContent;
-  }
-
-  return (
-    <m.div
-      layout
-      variants={faqItemRevealVariants}
-      transition={{ layout: { duration: 0.42, ease: [0.22, 1, 0.36, 1] } }}
-    >
-      {faqContent}
-    </m.div>
-  );
 }
 
 function FaqAccordion({
   faqs,
-  isCoarsePointer,
-  reduceMotion,
 }: {
   faqs: FaqEntry[];
-  isCoarsePointer: boolean;
-  reduceMotion: boolean;
 }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const faqItems = faqs.map((faq, idx) => (
-    <React.Fragment key={idx}>
-      <FaqItem
-        faq={faq}
-        isOpen={openIndex === idx}
-        onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
-        isCoarsePointer={isCoarsePointer}
-        reduceMotion={reduceMotion}
-      />
-    </React.Fragment>
-  ));
-
-  if (!isCoarsePointer || reduceMotion) {
-    return <div className="space-y-4 text-start">{faqItems}</div>;
-  }
 
   return (
-    <LazyMotion features={domAnimation}>
-      <m.div
-        className="space-y-4 text-start"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.14, margin: "0px 0px -10% 0px" }}
-        variants={faqListVariants}
-      >
-        {faqItems}
-      </m.div>
-    </LazyMotion>
+    <div className="space-y-4 text-start">
+      {faqs.map((faq, idx) => (
+        <React.Fragment key={idx}>
+          <FaqItem
+            faq={faq}
+            isOpen={openIndex === idx}
+            onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+          />
+        </React.Fragment>
+      ))}
+    </div>
   );
 }
 
-function WhyChooseCard({
-  item,
-  isCoarsePointer,
-  reduceMotion,
-}: WhyChooseCardProps) {
-  const cardContent = (
+function WhyChooseCard({ item }: { item: WhyChooseItem }) {
+  return (
     <div
       className={`perf-card why-choose-mobile-card group relative overflow-hidden rounded-[1.25rem] border border-outline-variant/10 bg-surface-container-low/60 p-5 transition-[transform,opacity,border-color,background-color,box-shadow] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] md:p-7 md:duration-500 ${item.borderClass} ${item.shadowClass} md:hover:-translate-y-1.5`}
     >
@@ -279,28 +176,7 @@ function WhyChooseCard({
       </div>
     </div>
   );
-
-  if (!isCoarsePointer || reduceMotion) {
-    return cardContent;
-  }
-
-  return (
-    <m.div variants={whyChooseCardVariants}>
-      {cardContent}
-    </m.div>
-  );
 }
-const categoryCardVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.22, 1, 0.36, 1]
-    }
-  }
-};
 
 const techLogoNames = [
   { id: "nova", label: "NOVA", iconName: "rocket_launch" },
@@ -336,8 +212,6 @@ const mobileTechLogos = (
 
 export function Home() {
   const location = useLocation();
-  const isCoarsePointer = useCoarsePointer();
-  const reduceMotion = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   useHorizontalTouchScroll(scrollContainerRef);
@@ -617,19 +491,9 @@ export function Home() {
               }
             ].map((srv, idx) => {
               const isActive = activeIndex === idx;
-              const ServiceCardWrapper = isCoarsePointer ? "div" : motion.div;
-              const serviceCardMotionProps = isCoarsePointer
-                ? {}
-                : {
-                    initial: "hidden" as const,
-                    whileInView: "visible" as const,
-                    viewport: { once: true, margin: "200px" },
-                    variants: categoryCardVariants,
-                  };
               return (
-                <ServiceCardWrapper 
+                <div
                   key={srv.id}
-                  {...serviceCardMotionProps}
                   className="block snap-start snap-always shrink-0 w-[280px] md:w-auto"
                   onClick={() => setActiveIndex(idx)}
                 >
@@ -707,7 +571,7 @@ export function Home() {
                       </div>
                     )}
                   </div>
-                </ServiceCardWrapper>
+                </div>
               );
             })}
           </div>
@@ -732,38 +596,13 @@ export function Home() {
             <p className="text-outline text-base md:text-lg max-w-xl mx-auto leading-relaxed">نقدّم تجربة متكاملة تجمع بين السرعة والأمان والدعم المستمر</p>
           </div>
 
-          {isCoarsePointer && !reduceMotion ? (
-            <LazyMotion features={domAnimation}>
-              <m.div
-                className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.16, margin: "0px 0px -8% 0px" }}
-                variants={whyChooseGridVariants}
-              >
-                {whyChooseItems.map((item) => (
-                  <WhyChooseCard
-                    key={item.id}
-                    item={item}
-                    isCoarsePointer={isCoarsePointer}
-                    reduceMotion={reduceMotion}
-                  />
-                ))}
-              </m.div>
-            </LazyMotion>
-          ) : (
-            <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3">
-              {whyChooseItems.map((item) => (
-                <React.Fragment key={item.id}>
-                  <WhyChooseCard
-                    item={item}
-                    isCoarsePointer={isCoarsePointer}
-                    reduceMotion={reduceMotion}
-                  />
-                </React.Fragment>
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3">
+            {whyChooseItems.map((item) => (
+              <React.Fragment key={item.id}>
+                <WhyChooseCard item={item} />
+              </React.Fragment>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -880,8 +719,6 @@ export function Home() {
           </div>
 
           <FaqAccordion
-            isCoarsePointer={isCoarsePointer}
-            reduceMotion={reduceMotion}
             faqs={[
               {
                 question: "كم يستغرق تنفيذ الطلب؟",
