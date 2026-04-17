@@ -508,6 +508,10 @@
     will-change: transform;
     transform: translateY(0);
   }
+
+  .perf-mobile-horizontal-cards {
+    touch-action: pan-x !important;
+  }
 }
 
 html {

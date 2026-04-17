@@ -68,6 +68,7 @@ export function useHorizontalTouchScroll(containerRef: RefObject<HTMLElement | n
 
       if (touchState.axisLock === "x") {
         touchState.suppressClick = true;
+        event.preventDefault();
       }
     };
 
@@ -92,7 +93,7 @@ export function useHorizontalTouchScroll(containerRef: RefObject<HTMLElement | n
     };
 
     railElement.addEventListener("touchstart", handleTouchStart, { passive: true });
-    railElement.addEventListener("touchmove", handleTouchMove, { passive: true });
+    railElement.addEventListener("touchmove", handleTouchMove, { passive: false });
     railElement.addEventListener("touchend", handleTouchEnd, { passive: true });
     railElement.addEventListener("touchcancel", handleTouchEnd, { passive: true });
     railElement.addEventListener("click", handleClickCapture, true);
