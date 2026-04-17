@@ -114,6 +114,29 @@ export function FeaturedProducts() {
   useHorizontalTouchScroll(scrollContainerRef);
   const { isAtStart, isAtEnd } = useHorizontalRailState(scrollContainerRef);
 
+  const [visibleCount, setVisibleCount] = useState(4);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const scrollLeft = Math.abs(container.scrollLeft); // Use absolute for RTL
+      const cardWidth = 300;
+
+      const newCount = Math.ceil(scrollLeft / cardWidth) + 6;
+
+      if (newCount > visibleCount) {
+        setVisibleCount(newCount);
+      }
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+    };
+  }, [visibleCount]);
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: -360, behavior: "smooth" });
@@ -154,7 +177,7 @@ export function FeaturedProducts() {
           className="perf-mobile-horizontal-cards flex snap-x snap-proximity gap-5 overflow-x-auto px-4 pb-8 pt-4 no-scrollbar -mx-4 md:grid md:snap-none md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 md:-mx-0 lg:grid-cols-3 lg:gap-8"
           dir="rtl"
         >
-          {featured.map((product) => {
+          {featured.slice(0, visibleCount).map((product) => {
             const category = categoryMap[product.category] || {
               label: product.category,
               color: "#d0bcff",
