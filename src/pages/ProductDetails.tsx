@@ -5,7 +5,7 @@ import { Button } from "../components/ui/button";
 import { getCategoryLabel, getProductBySlugOrId, type ProductVariationGroup } from "../data/products";
 import { useCart, type CartVariationSelection } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
-import { getResponsiveProductImage } from "../lib/responsiveImage";
+import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
 
 function buildVariationDefaults(groups: ProductVariationGroup[]) {
   return Object.fromEntries(
@@ -176,6 +176,7 @@ export function ProductDetails() {
             loading="eager"
             decoding="async"
             fetchPriority="high"
+            onError={(event) => handleResponsiveImageError(event, responsiveImage.src)}
             referrerPolicy="no-referrer"
             sizes="(max-width: 1023px) calc(100vw - 2rem), 46vw"
             draggable={false}

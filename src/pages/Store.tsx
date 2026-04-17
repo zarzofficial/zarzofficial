@@ -5,7 +5,7 @@ import { products, type Product } from "../data/products";
 import { SiteIcon } from "../components/SiteIcon";
 import { useCart } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
-import { getResponsiveProductImage } from "../lib/responsiveImage";
+import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
 import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
 import { useHorizontalRailState } from "../lib/useHorizontalRailState";
 import {
@@ -202,6 +202,7 @@ function StoreProductCard({
           loading={prioritizeImage ? "eager" : "lazy"}
           decoding="async"
           fetchPriority={prioritizeImage ? "high" : "auto"}
+          onError={(event) => handleResponsiveImageError(event, responsiveImage.src)}
           referrerPolicy="no-referrer"
           draggable={false}
           sizes="(max-width: 639px) 290px, (max-width: 1023px) 45vw, (max-width: 1279px) 30vw, 23vw"

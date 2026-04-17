@@ -1,8 +1,9 @@
-import { readdir, stat } from "node:fs/promises";
+import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 
 const assetDir = path.resolve("public/assets");
+const generatedManifestPath = path.resolve("src/generated/responsiveImages.ts");
 const widths = [160, 320, 480, 640, 960, 1280];
 const variantPattern = /-\d+\.webp$/i;
 
@@ -13,6 +14,7 @@ async function generateResponsiveVariants() {
     .map((entry) => entry.name);
 
   let generatedCount = 0;
+  const responsiveImageWidths = {};
 
   for (const fileName of sourceFiles) {
     const inputPath = path.join(assetDir, fileName);
@@ -21,6 +23,11 @@ async function generateResponsiveVariants() {
     const metadata = await image.metadata();
 
     if (!metadata.width) continue;
+
+    responsiveImageWidths[`/assets/${fileName}`] = [
+      ...widths.filter((width) => width < metadata.width),
+      metadata.width,
+    ];
 
     for (const width of widths) {
       if (width >= metadata.width) continue;
@@ -48,6 +55,18 @@ async function generateResponsiveVariants() {
       generatedCount += 1;
     }
   }
+
+  const manifestEntries = Object.entries(responsiveImageWidths)
+    .sort(([leftPath], [rightPath]) => leftPath.localeCompare(rightPath))
+    .map(([imagePath, availableWidths]) => `  ${JSON.stringify(imagePath)}: [${availableWidths.join(", ")}],`)
+    .join("\n");
+
+  await mkdir(path.dirname(generatedManifestPath), { recursive: true });
+  await writeFile(
+    generatedManifestPath,
+    `export const responsiveImageWidths: Record<string, readonly number[]> = {\n${manifestEntries}\n};\n`,
+    "utf8",
+  );
 
   console.log(`Generated ${generatedCount} responsive image variants.`);
 }

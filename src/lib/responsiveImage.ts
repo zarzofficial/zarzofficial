@@ -1,4 +1,6 @@
-const PRODUCT_IMAGE_WIDTHS = [160, 320, 480, 640, 960, 1280] as const;
+import type { SyntheticEvent } from "react";
+import { responsiveImageWidths } from "../generated/responsiveImages";
+
 const PRODUCT_IMAGE_PATTERN = /^\/assets\/.+\.webp$/i;
 
 function withResponsiveSuffix(src: string, width: number) {
@@ -12,8 +14,29 @@ export function getResponsiveProductImage(src?: string | null) {
     return { src: resolvedSrc };
   }
 
+  const widths = responsiveImageWidths[resolvedSrc];
+  if (!widths?.length) {
+    return { src: resolvedSrc };
+  }
+
+  const maxWidth = widths[widths.length - 1];
+
   return {
     src: resolvedSrc,
-    srcSet: PRODUCT_IMAGE_WIDTHS.map((width) => `${withResponsiveSuffix(resolvedSrc, width)} ${width}w`).join(", "),
+    srcSet: widths
+      .map((width) => `${width === maxWidth ? resolvedSrc : withResponsiveSuffix(resolvedSrc, width)} ${width}w`)
+      .join(", "),
   };
+}
+
+export function handleResponsiveImageError(
+  event: SyntheticEvent<HTMLImageElement>,
+  fallbackSrc?: string | null,
+) {
+  const image = event.currentTarget;
+  if (image.dataset.fallbackApplied === "true") return;
+
+  image.dataset.fallbackApplied = "true";
+  image.src = fallbackSrc || image.src;
+  image.srcset = "";
 }

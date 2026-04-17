@@ -16,7 +16,7 @@ import {
   writeGuestOrders,
   type PaymentMethod,
 } from "../lib/order-utils";
-import { getResponsiveProductImage } from "../lib/responsiveImage";
+import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
 import { SiteIcon } from "../components/SiteIcon";
 
 function closeReservedWindow(target: Window | null | undefined) {
@@ -286,6 +286,7 @@ export function Cart() {
                           sizes="96px"
                           loading="lazy"
                           decoding="async"
+                          onError={(event) => handleResponsiveImageError(event, responsiveImage.src)}
                         />
                       </div>
                       <div className="flex-grow flex flex-col min-w-0">

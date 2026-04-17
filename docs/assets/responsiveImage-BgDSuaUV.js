@@ -1,1 +1,0 @@
-const r=[160,320,480,640,960,1280],n=/^\/assets\/.+\.webp$/i;function c(s,e){return s.replace(/\.webp$/i,`-${e}.webp`)}function o(s){const e=s||"/assets/store-fallback.svg";return n.test(e)?{src:e,srcSet:r.map(t=>`${c(e,t)} ${t}w`).join(", ")}:{src:e}}export{o as g};

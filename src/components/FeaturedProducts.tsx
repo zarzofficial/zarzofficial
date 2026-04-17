@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import React, { useEffect, useRef } from "react";
 import { products } from "../data/products";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
-import { getResponsiveProductImage } from "../lib/responsiveImage";
+import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
 import { useHorizontalRailState } from "../lib/useHorizontalRailState";
 import { SiteIcon } from "./SiteIcon";
 import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
@@ -110,6 +110,7 @@ export function FeaturedProducts() {
                     loading="eager"
                     decoding="async"
                     fetchPriority={index === 0 ? "high" : index < 3 ? "auto" : "low"}
+                    onError={(event) => handleResponsiveImageError(event, responsiveImage.src)}
                     referrerPolicy="no-referrer"
                     sizes="(max-width: 639px) 290px, (max-width: 1023px) 44vw, 30vw"
                     draggable={false}
