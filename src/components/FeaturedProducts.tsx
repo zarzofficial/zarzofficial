@@ -18,10 +18,12 @@ function FeaturedProductImage({
   alt,
   image,
   outOfStock,
+  loadingStrategy,
 }: {
   alt: string;
   image: ReturnType<typeof getResponsiveProductImage>;
   outOfStock: boolean;
+  loadingStrategy: "eager" | "lazy";
 }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -41,12 +43,11 @@ function FeaturedProductImage({
         src={image.src}
         srcSet={image.srcSet}
         alt={alt}
-        className={`h-full w-full object-cover ${
+        className={`h-full w-full object-cover transition-opacity duration-300 ${
           isLoaded ? (outOfStock ? "opacity-50" : "opacity-100") : "opacity-0"
         }`}
-        loading="eager"
+        loading={loadingStrategy}
         decoding="async"
-        fetchPriority="high"
         onLoad={() => setIsLoaded(true)}
         onError={(event) => {
           handleResponsiveImageError(event, image.src);
@@ -161,12 +162,13 @@ export function FeaturedProducts() {
             slidesPerView="auto"
             spaceBetween={12}
             freeMode={true}
+            touchRatio={1}
             speed={300}
             resistanceRatio={0.85}
             dir="rtl"
             className="w-full !px-6 !pb-6 !pt-2"
           >
-            {featured.map((product) => {
+            {featured.map((product, index) => {
               const category = categoryMap[product.category] || {
                 label: product.category,
                 color: "#d0bcff",
@@ -190,6 +192,7 @@ export function FeaturedProducts() {
                         alt={product.title}
                         image={responsiveImage}
                         outOfStock={product.outOfStock}
+                        loadingStrategy={index < 3 ? "eager" : "lazy"}
                       />
 
                       {product.outOfStock && (
@@ -289,7 +292,7 @@ export function FeaturedProducts() {
           ref={scrollContainerRef}
           className="hidden md:grid md:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-8"
         >
-          {featured.map((product) => {
+          {featured.map((product, index) => {
             const category = categoryMap[product.category] || {
               label: product.category,
               color: "#d0bcff",
@@ -319,6 +322,7 @@ export function FeaturedProducts() {
                     alt={product.title}
                     image={responsiveImage}
                     outOfStock={product.outOfStock}
+                    loadingStrategy={index < 3 ? "eager" : "lazy"}
                   />
 
                   {product.outOfStock && (
