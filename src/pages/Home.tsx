@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
 import { useHorizontalRailState } from "../lib/useHorizontalRailState";
-import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
 
 const whyChooseItems = [
   {
@@ -236,7 +235,6 @@ export function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const railIndicatorRef = useRef<HTMLDivElement>(null);
-  useHorizontalTouchScroll(scrollContainerRef);
   const { isAtStart, isAtEnd } = useHorizontalRailState(scrollContainerRef, {
     onProgress: (progress) => {
       if (!railIndicatorRef.current) return;

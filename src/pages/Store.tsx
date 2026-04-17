@@ -6,7 +6,6 @@ import { SiteIcon } from "../components/SiteIcon";
 import { useCart } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
-import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
 import { useHorizontalRailState } from "../lib/useHorizontalRailState";
 import {
   getCatalogPath,
@@ -430,7 +429,6 @@ function MobileCategorySlider({
   metrics: StoreViewportMetrics;
 }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  useHorizontalTouchScroll(scrollContainerRef);
   const { isAtStart, isAtEnd } = useHorizontalRailState(scrollContainerRef, {
     dependencyKey: `${category.id}-${products.length}`,
   });
@@ -570,7 +568,6 @@ export function Store() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const categoryStripRef = useRef<HTMLElement | null>(null);
-  useHorizontalTouchScroll(categoryStripRef);
   const routeCategory = getCatalogRouteCategory(categoryParam);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [columns, setColumns] = useState(1);

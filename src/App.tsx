@@ -91,61 +91,6 @@ function CanonicalPath() {
   return null;
 }
 
-function ScrollController() {
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      const maxDelta = 60; // حد أقصى للسرعة
-
-      if (Math.abs(e.deltaY) > maxDelta) {
-        e.preventDefault();
-        window.scrollBy({
-          top: e.deltaY > 0 ? maxDelta : -maxDelta,
-        });
-      }
-    };
-
-    window.addEventListener("wheel", handleWheel, { passive: false });
-
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-    };
-  }, []);
-
-  useEffect(() => {
-    let lastY = 0;
-
-    const handleTouchMove = (e: TouchEvent) => {
-      const currentY = e.touches[0].clientY;
-      const delta = lastY - currentY;
-
-      const maxSpeed = 25;
-
-      if (Math.abs(delta) > maxSpeed) {
-        e.preventDefault();
-        window.scrollBy({
-          top: delta > 0 ? maxSpeed : -maxSpeed,
-        });
-      }
-
-      lastY = currentY;
-    };
-
-    const handleTouchStart = (e: TouchEvent) => {
-      lastY = e.touches[0].clientY;
-    };
-
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
-
-    return () => {
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchmove", handleTouchMove);
-    };
-  }, []);
-
-  return null;
-}
-
 function StoreRoute() {
   const [searchParams] = useSearchParams();
   const legacyCategory = searchParams.get("category");
@@ -188,7 +133,6 @@ export default function App() {
       <CanonicalPath />
       <DynamicTitle />
       <ScrollToTop />
-      <ScrollController />
       <AppFrame>
           <Suspense fallback={<RouteFallback />}>
             <Routes>
