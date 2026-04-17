@@ -1,77 +1,163 @@
+import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useCart } from "../lib/CartContext";
 import { SiteIcon } from "./SiteIcon";
 
+const CATEGORIES = [
+  { name: "الذكاء الاصطناعي", path: "/products/catalog/ai", icon: "neurology" as const },
+  { name: "سوشيال ميديا",     path: "/products/catalog/social", icon: "campaign" as const },
+  { name: "الألعاب",          path: "/products/catalog/gaming", icon: "sports_esports" as const },
+  { name: "مواقع ومتاجر",     path: "/products/catalog/web", icon: "code" as const },
+];
+
 export function Navbar() {
   const { items } = useCart();
   const location = useLocation();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const totalItems = items.reduce((sum, item) => sum + item.qty, 0);
 
   const navLinks = [
-    { name: "الرئيسية", path: "/", hasDropdown: false },
-    { name: "المنتجات", path: "/products", hasDropdown: true },
-    { name: "تتبع طلبك", path: "/account", hasDropdown: false },
-    { name: "اتصل بنا", path: "/contact", hasDropdown: true },
+    { name: "الرئيسية",  path: "/",        hasDropdown: false },
+    { name: "المنتجات",  path: "/products", hasDropdown: true  },
+    { name: "تتبع طلبك", path: "/account",  hasDropdown: false },
+    { name: "اتصل بنا", path: "/contact",  hasDropdown: false },
   ];
 
   const handleLogoClick = () => {
-    if (location.pathname === "/") {
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    }
+    if (location.pathname === "/") window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
   };
 
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // Close dropdown on route change
+  useEffect(() => { setDropdownOpen(false); }, [location.pathname]);
+
   return (
-    <nav className="perf-navbar fixed top-0 w-full z-50 bg-[#000000]/80 backdrop-blur-xl border-b border-white/5 font-headline antialiased">
-      <div className="flex justify-between items-center px-6 md:px-12 py-4 w-full max-w-screen-2xl mx-auto flex-row relative">
-        {/* Left: Logo */}
-        <Link to="/" onClick={handleLogoClick} className="flex items-center gap-2 relative z-10 group mt-1">
-          <div className="text-2xl font-black text-white tracking-tight flex items-center gap-2 group-active:scale-95 transition-transform">
-            <div className="w-8 h-8 rounded-lg outline outline-2 outline-offset-2 outline-[#a855f7]/50 bg-gradient-to-tr from-[#a855f7] to-[#d8b4fe] flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.4)]">
-              <span className="text-black font-extrabold text-lg leading-none -mt-1 -ml-0.5">Z</span>
-            </div>
-            <span className="text-xl tracking-wide">ZARZ</span>
-          </div>
+    <nav className="perf-navbar fixed top-0 w-full z-50 bg-transparent backdrop-blur-xl border-b border-white/5 font-headline antialiased">
+      <div className="flex justify-between items-center px-6 md:px-12 py-4 w-full max-w-screen-2xl mx-auto relative">
+
+        {/* Right: Logo (original "زارز" text) */}
+        <Link
+          to="/"
+          onClick={handleLogoClick}
+          className="text-3xl font-black text-[#d0bcff] tracking-tight relative z-10 hover:text-white transition-colors"
+        >
+          زارز
         </Link>
 
         {/* Center: Desktop Links */}
-        <div className="hidden md:flex flex-row items-center justify-center gap-10 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full" dir="ltr">
+        <div
+          className="hidden md:flex flex-row items-center justify-center gap-10 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          dir="ltr"
+        >
           {navLinks.slice().reverse().map((link) => {
-            const isActive = location.pathname === link.path;
+            const isActive =
+              link.path === "/"
+                ? location.pathname === "/"
+                : location.pathname.startsWith(link.path);
+
+            if (link.hasDropdown) {
+              return (
+                <div key={link.name} className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setDropdownOpen((v) => !v)}
+                    className={`flex items-center gap-1 font-medium text-[0.9rem] transition-all duration-200 ${
+                      isActive ? "text-white" : "text-[#a1a1aa] hover:text-white"
+                    }`}
+                  >
+                    {link.name}
+                    <SiteIcon
+                      name="keyboard_arrow_down"
+                      className={`text-[18px] transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+
+                  {/* Dropdown */}
+                  {dropdownOpen && (
+                    <div className="absolute top-full mt-3 left-1/2 -translate-x-1/2 w-52 bg-[#0a0a0a]/95 border border-white/10 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] backdrop-blur-xl overflow-hidden animate-fade-in">
+                      {CATEGORIES.map((cat) => (
+                        <Link
+                          key={cat.path}
+                          to={cat.path}
+                          className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors border-b border-white/5 last:border-0 ${
+                            location.pathname === cat.path
+                              ? "bg-white/10 text-white"
+                              : "text-[#a1a1aa] hover:bg-white/5 hover:text-white"
+                          }`}
+                        >
+                          <SiteIcon name={cat.icon} className="text-[16px] text-primary shrink-0" />
+                          {cat.name}
+                        </Link>
+                      ))}
+                      <Link
+                        to="/products"
+                        className="flex items-center justify-center gap-2 px-4 py-3 text-xs text-primary hover:text-white transition-colors bg-white/3 hover:bg-white/10"
+                      >
+                        عرض جميع المنتجات
+                        <SiteIcon name="arrow_forward" className="text-[14px]" />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={link.name}
                 to={link.path}
-                className={`flex items-center gap-1.5 font-medium text-[0.9rem] transition-all duration-300 ${
-                  isActive 
-                    ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]" 
-                    : "text-[#a1a1aa] hover:text-white"
+                className={`font-medium text-[0.9rem] transition-all duration-200 ${
+                  isActive ? "text-white" : "text-[#a1a1aa] hover:text-white"
                 }`}
               >
                 {link.name}
-                {link.hasDropdown && (
-                  <SiteIcon name="keyboard_arrow_down" className="text-[18px] opacity-70" />
-                )}
               </Link>
             );
           })}
         </div>
-        
-        {/* Right side: Cart & Action button */}
-        <div className="flex items-center justify-end gap-3 md:gap-5 relative z-10 h-full">
-          <Link to="/cart" className="relative text-[#a1a1aa] hover:text-white transition-colors group flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/5">
+
+        {/* Left: Cart & Account */}
+        <div className="flex items-center justify-end gap-3 md:gap-5 relative z-10">
+          {/* Mobile: store icon */}
+          <Link to="/products" className="md:hidden text-[#d0bcff] hover:text-white transition-colors">
+            <SiteIcon name="storefront" className="text-[24px]" />
+          </Link>
+
+          <Link
+            to="/cart"
+            className="relative text-[#a1a1aa] hover:text-white transition-colors group flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/5"
+          >
             <SiteIcon name="shopping_cart" className="text-[22px]" />
             {totalItems > 0 && (
-              <span className="absolute top-0 right-0 bg-[#e11d48] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full group-hover:scale-110 shadow-[0_0_10px_rgba(225,29,72,0.6)] transition-transform">
+              <span className="absolute top-0 right-0 bg-[#e11d48] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-[0_0_10px_rgba(225,29,72,0.6)] group-hover:scale-110 transition-transform">
                 {totalItems}
               </span>
             )}
           </Link>
-          <Link to="/account" className="hidden md:flex items-center justify-center px-6 py-2 rounded-full border border-white/20 text-white text-sm font-medium hover:bg-white/10 transition-colors">
+
+          {/* Mobile: account icon */}
+          <Link to="/account" className="md:hidden text-[#d0bcff] hover:text-white transition-colors">
+            <SiteIcon name="person" className="text-[24px]" />
+          </Link>
+
+          <Link
+            to="/account"
+            className="hidden md:flex items-center justify-center px-5 py-2 rounded-full border border-white/20 text-white text-sm font-medium hover:bg-white/10 transition-colors"
+          >
             حسابي
           </Link>
         </div>
-
       </div>
     </nav>
   );
