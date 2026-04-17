@@ -546,9 +546,18 @@
     animation: none !important;
   }
 
-  /* منع اختفاء العناصر */
+  /* منع اختفاء العناصر أثناء السكروول */
+  .perf-mobile-horizontal-cards,
+  .perf-mobile-horizontal-cards * {
+    content-visibility: visible !important;
+    contain: none !important;
+  }
+
+  /* إجبار الرسم المستمر */
   .perf-mobile-horizontal-cards {
-    transform: none !important;
+    transform: translate3d(0,0,0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     will-change: auto !important;
     scroll-behavior: auto !important;
   }
@@ -562,10 +571,14 @@
     min-width: 290px;
   }
 
-
   /* تحسين اللمس */
   * {
     -webkit-tap-highlight-color: transparent;
   }
 
+}
+
+img {
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }

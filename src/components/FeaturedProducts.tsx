@@ -139,13 +139,13 @@ export function FeaturedProducts() {
   }, [visibleCount]);
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -360, behavior: "smooth" });
+      scrollContainerRef.current.scrollBy({ left: -360, behavior: "auto" });
     }
   };
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 360, behavior: "smooth" });
+      scrollContainerRef.current.scrollBy({ left: 360, behavior: "auto" });
     }
   };
 

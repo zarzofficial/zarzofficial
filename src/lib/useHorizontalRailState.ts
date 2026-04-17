@@ -46,9 +46,9 @@ export function useHorizontalRailState(
         metrics.isAtStart = nextIsAtStart;
         metrics.isAtEnd = nextIsAtEnd;
 
-        setTimeout(() => {
-          setEdgeState({ isAtStart: nextIsAtStart, isAtEnd: nextIsAtEnd });
-        }, 0);
+        // setTimeout(() => {
+        //   setEdgeState({ isAtStart: nextIsAtStart, isAtEnd: nextIsAtEnd });
+        // }, 0);
       }
     };
 
