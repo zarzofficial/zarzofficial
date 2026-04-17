@@ -6,7 +6,6 @@ import { SiteIcon } from "../components/SiteIcon";
 import { useCart } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
-import { useHorizontalRailState } from "../lib/useHorizontalRailState";
 import {
   getCatalogPath,
   getCatalogRouteCategory,
@@ -429,9 +428,6 @@ function MobileCategorySlider({
   metrics: StoreViewportMetrics;
 }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const { isAtStart, isAtEnd } = useHorizontalRailState(scrollContainerRef, {
-    dependencyKey: `${category.id}-${products.length}`,
-  });
 
   const scrollLeftBtn = () => {
     if (scrollContainerRef.current) {
@@ -454,23 +450,13 @@ function MobileCategorySlider({
         <div className="flex gap-2" dir="ltr">
           <button
             onClick={scrollLeftBtn}
-            disabled={isAtEnd}
-            className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${
-              !isAtEnd
-                ? "bg-primary text-white shadow-[0_0_15px_rgba(208,188,255,0.3)] hover:scale-105 active:scale-95"
-                : "border border-primary/20 bg-surface-container/50 opacity-40 cursor-not-allowed"
-            }`}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white shadow-[0_0_15px_rgba(208,188,255,0.3)] transition-all hover:scale-105 active:scale-95 touch-manipulation"
           >
             <SiteIcon name="chevron_left" className="text-2xl" />
           </button>
           <button
             onClick={scrollRightBtn}
-            disabled={isAtStart}
-            className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${
-              !isAtStart
-                ? "bg-primary text-white shadow-[0_0_15px_rgba(208,188,255,0.3)] hover:scale-105 active:scale-95"
-                : "border border-primary/20 bg-surface-container/50 opacity-40 cursor-not-allowed"
-            }`}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white shadow-[0_0_15px_rgba(208,188,255,0.3)] transition-all hover:scale-105 active:scale-95 touch-manipulation"
           >
             <SiteIcon name="chevron_right" className="text-2xl" />
           </button>

@@ -80,23 +80,10 @@ export function FeaturedProducts() {
   // Desktop scroll refs kept for arrow buttons (desktop only)
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [swiperInstance, setSwiperInstance] = useState<any>(null);
-  const [isAtStart, setIsAtStart] = useState(true);
-  const [isAtEnd, setIsAtEnd] = useState(false);
-
-  const syncSwiperState = (swiper: any) => {
-    if (!swiper) return;
-
-    setIsAtStart((currentValue: boolean) =>
-      currentValue === swiper.isBeginning ? currentValue : swiper.isBeginning,
-    );
-    setIsAtEnd((currentValue: boolean) =>
-      currentValue === swiper.isEnd ? currentValue : swiper.isEnd,
-    );
-  };
 
   const goToPreviousSlide = () => {
     if (swiperInstance) {
-      if (!isAtStart) swiperInstance.slidePrev();
+      swiperInstance.slidePrev();
     } else if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: -360, behavior: "auto" });
     }
@@ -104,7 +91,7 @@ export function FeaturedProducts() {
 
   const goToNextSlide = () => {
     if (swiperInstance) {
-      if (!isAtEnd) swiperInstance.slideNext();
+      swiperInstance.slideNext();
     } else if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: 360, behavior: "auto" });
     }
@@ -139,13 +126,7 @@ export function FeaturedProducts() {
         {/* Mobile: Swiper */}
         <div className="md:hidden -mx-6">
           <Swiper
-            onSwiper={(swiper) => {
-              setSwiperInstance(swiper);
-              requestAnimationFrame(() => syncSwiperState(swiper));
-            }}
-            onProgress={syncSwiperState}
-            onSlideChange={syncSwiperState}
-            onResize={syncSwiperState}
+            onSwiper={setSwiperInstance}
             modules={[FreeMode]}
             slidesPerView="auto"
             spaceBetween={12}
@@ -282,11 +263,10 @@ export function FeaturedProducts() {
               type="button"
               aria-label="المنتج السابق"
               onClick={goToPreviousSlide}
-              disabled={isAtStart}
               className={`flex h-11 w-11 items-center justify-center rounded-full transition-all touch-manipulation ${
-                !isAtStart
+                swiperInstance
                   ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.35)] active:scale-95"
-                  : "cursor-not-allowed border border-primary/20 bg-surface-container/50 text-primary opacity-40"
+                  : "border border-primary/20 bg-surface-container/50 text-primary opacity-60"
               }`}
             >
               <SiteIcon name="chevron_right" className="text-2xl" />
@@ -296,11 +276,10 @@ export function FeaturedProducts() {
               type="button"
               aria-label="المنتج التالي"
               onClick={goToNextSlide}
-              disabled={isAtEnd}
               className={`flex h-11 w-11 items-center justify-center rounded-full transition-all touch-manipulation ${
-                !isAtEnd
+                swiperInstance
                   ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.35)] active:scale-95"
-                  : "cursor-not-allowed border border-primary/20 bg-surface-container/50 text-primary opacity-40"
+                  : "border border-primary/20 bg-surface-container/50 text-primary opacity-60"
               }`}
             >
               <SiteIcon name="chevron_left" className="text-2xl" />

@@ -135,6 +135,12 @@
   * {
     @apply border-border outline-ring/50;
   }
+  a,
+  button,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
   body {
     @apply bg-background text-foreground font-sans overflow-x-hidden;
   }
@@ -469,7 +475,8 @@
   .cyber-glass-card,
   .perf-card,
   .perf-panel,
-  [data-slot="card"] {
+  [data-slot="card"],
+  .product-card {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     box-shadow: 0 6px 18px rgba(0,0,0,0.22) !important;
@@ -496,6 +503,12 @@
     transition: none !important;
   }
 
+  .product-card,
+  .product-card * {
+    transition-property: none !important;
+    animation: none !important;
+  }
+
   html,
   body {
     overflow-x: hidden !important;
@@ -509,7 +522,7 @@
 html,
 body {
   scroll-behavior: auto !important;
-  overscroll-behavior: none;
+  overscroll-behavior: auto;
 }
 
 /* عزل الرسم لكل قسم (Isolation for Partial Painting Optimization) */

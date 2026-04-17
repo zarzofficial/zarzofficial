@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
-import { useHorizontalRailState } from "../lib/useHorizontalRailState";
+import { useCoarsePointer } from "../lib/useCoarsePointer";
 
 const whyChooseItems = [
   {
@@ -233,14 +233,8 @@ const Section = React.memo(
 export function Home() {
   const location = useLocation();
   const [activeIndex, setActiveIndex] = useState(0);
+  const isCoarsePointer = useCoarsePointer();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const railIndicatorRef = useRef<HTMLDivElement>(null);
-  const { isAtStart, isAtEnd } = useHorizontalRailState(scrollContainerRef, {
-    onProgress: (progress) => {
-      if (!railIndicatorRef.current) return;
-      railIndicatorRef.current.style.transform = `translateX(${(-192 * progress).toFixed(2)}px)`;
-    },
-  });
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -402,23 +396,13 @@ export function Home() {
             <div className="flex gap-2 md:gap-3 mb-1 md:hidden" dir="ltr">
               <button 
                 onClick={scrollLeft}
-                disabled={isAtEnd}
-                className={`flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full transition-all ${
-                  !isAtEnd 
-                    ? "bg-primary text-white md:hover:bg-primary/90 md:hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]" 
-                    : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
-                }`}
+                className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-primary text-white transition-all md:hover:bg-primary/90 md:hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)] touch-manipulation"
               >
                 <SiteIcon name="chevron_left" className="text-2xl" />
               </button>
               <button 
                 onClick={scrollRight}
-                disabled={isAtStart}
-                className={`flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full transition-all ${
-                  !isAtStart 
-                    ? "bg-primary text-white md:hover:bg-primary/90 md:hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)]" 
-                    : "border border-primary/20 bg-surface-container/50 backdrop-blur-md text-primary opacity-40 cursor-not-allowed"
-                }`}
+                className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full bg-primary text-white transition-all md:hover:bg-primary/90 md:hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(208,188,255,0.4)] touch-manipulation"
               >
                 <SiteIcon name="chevron_right" className="text-2xl" />
               </button>
@@ -471,7 +455,11 @@ export function Home() {
                 <div
                   key={srv.id}
                   className="block snap-start snap-always shrink-0 w-[280px] md:w-auto"
-                  onClick={() => setActiveIndex(idx)}
+                  onClick={() => {
+                    if (!isCoarsePointer) {
+                      setActiveIndex(idx);
+                    }
+                  }}
                 >
                   <div
                     className={`perf-panel cyber-glass-card rounded-[2.5rem] p-6 md:p-8 group relative flex h-[360px] md:h-[400px] w-full flex-col justify-between overflow-hidden transition-all duration-500 cursor-pointer ${
@@ -479,7 +467,6 @@ export function Home() {
                         ? "border-primary md:scale-[1.02] shadow-[0_20px_50px_rgba(208,188,255,0.15)] z-10" 
                         : "border-outline-variant/10 md:hover:border-primary/30 md:hover:-translate-y-1"
                     }`}
-                    style={{ contain: "layout style" }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.08] to-transparent opacity-0 transition-opacity duration-500 md:group-hover:opacity-100"></div>
                     
@@ -552,13 +539,6 @@ export function Home() {
             })}
           </div>
 
-          <div className="block md:hidden w-64 h-1.5 bg-outline-variant/10 rounded-full mx-auto mt-8 relative shadow-inner overflow-hidden" dir="rtl">
-            <div
-              ref={railIndicatorRef}
-              className="home-mobile-rail-indicator absolute top-0 right-0 bottom-0 w-16 bg-primary rounded-full shadow-[0_0_8px_rgba(208,188,255,0.6)]"
-              style={{ transform: "translateX(0px)" }}
-            />
-          </div>
         </div>
       </Section>
 
