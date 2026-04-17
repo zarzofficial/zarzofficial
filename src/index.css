@@ -503,4 +503,13 @@
   body {
     overflow-x: hidden !important;
   }
+
+  section {
+    will-change: transform;
+    transform: translateY(0);
+  }
+}
+
+html {
+  scroll-behavior: auto !important;
 }
