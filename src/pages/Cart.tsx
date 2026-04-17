@@ -16,6 +16,7 @@ import {
   writeGuestOrders,
   type PaymentMethod,
 } from "../lib/order-utils";
+import { getResponsiveProductImage } from "../lib/responsiveImage";
 import { SiteIcon } from "../components/SiteIcon";
 
 function closeReservedWindow(target: Window | null | undefined) {
@@ -270,14 +271,21 @@ export function Cart() {
               </div>
             ) : (
               <div className="space-y-6">
-                {items.map((item, index) => (
+                {items.map((item, index) => {
+                  const responsiveImage = getResponsiveProductImage(item.image);
+
+                  return (
                   <div key={item.cartId}>
                     <div className="flex items-start sm:items-center gap-4 sm:gap-6 group">
                       <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-[#13071A] p-1 flex items-center justify-center">
                         <img
                           alt={item.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                          src={item.image || "/favicon.svg"}
+                          src={responsiveImage.src}
+                          srcSet={responsiveImage.srcSet}
+                          sizes="96px"
+                          loading="lazy"
+                          decoding="async"
                         />
                       </div>
                       <div className="flex-grow flex flex-col min-w-0">
@@ -314,7 +322,8 @@ export function Cart() {
                     </div>
                     {index < items.length - 1 && <div className="h-[1px] bg-outline-variant/10 mt-6"></div>}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

@@ -5,7 +5,9 @@ import { products, type Product } from "../data/products";
 import { SiteIcon } from "../components/SiteIcon";
 import { useCart } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
+import { getResponsiveProductImage } from "../lib/responsiveImage";
 import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
+import { useHorizontalRailState } from "../lib/useHorizontalRailState";
 import {
   getCatalogPath,
   getCatalogRouteCategory,
@@ -165,6 +167,7 @@ function StoreProductCard({
   const discountPercent = getDiscountPercent();
   const originalPrice = getLegacyOriginalPrice(product.basePrice);
   const imageFrameClassName = staticLayout ? "h-[284px] sm:h-[224px] lg:h-[200px] xl:h-[184px]" : "";
+  const responsiveImage = getResponsiveProductImage(product.image);
 
   return (
     <div
@@ -194,7 +197,8 @@ function StoreProductCard({
         <img
           alt={product.title}
           className={`w-full h-full object-cover transition-transform duration-300 md:group-hover:scale-[1.03] ${product.outOfStock ? "opacity-50" : ""}`}
-          src={product.image || "/assets/store-fallback.svg"}
+          src={responsiveImage.src}
+          srcSet={responsiveImage.srcSet}
           loading={prioritizeImage ? "eager" : "lazy"}
           decoding="async"
           fetchPriority={prioritizeImage ? "high" : "auto"}
@@ -291,7 +295,7 @@ function StoreStaticSections({
   onOrderNow: (product: Product) => void;
   onAddToCart: (product: Product) => void;
   metrics: StoreViewportMetrics;
-}) {
+} & { key?: string | number }) {
   return (
     <main className="mx-auto max-w-screen-2xl px-6 md:px-12">
       {Object.entries(groupedProducts).map(([categoryId, categoryProducts]) => (
@@ -426,52 +430,9 @@ function MobileCategorySlider({
 }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   useHorizontalTouchScroll(scrollContainerRef);
-  const [isAtStart, setIsAtStart] = useState(true);
-  const [isAtEnd, setIsAtEnd] = useState(false);
-  const edgeStateRef = useRef({ isAtStart: true, isAtEnd: false, frameId: 0 });
-
-  useEffect(() => {
-    const railElement = scrollContainerRef.current;
-    if (!railElement) return;
-
-    const updateEdgeState = () => {
-      const maxScroll = Math.max(0, railElement.scrollWidth - railElement.clientWidth);
-      const currentScroll = Math.min(maxScroll, Math.abs(railElement.scrollLeft));
-      const nextIsAtStart = currentScroll <= 10;
-      const nextIsAtEnd = currentScroll >= maxScroll - 10;
-
-      if (edgeStateRef.current.isAtStart !== nextIsAtStart) {
-        edgeStateRef.current.isAtStart = nextIsAtStart;
-        setIsAtStart(nextIsAtStart);
-      }
-
-      if (edgeStateRef.current.isAtEnd !== nextIsAtEnd) {
-        edgeStateRef.current.isAtEnd = nextIsAtEnd;
-        setIsAtEnd(nextIsAtEnd);
-      }
-    };
-
-    const queueUpdate = () => {
-      if (edgeStateRef.current.frameId) return;
-      edgeStateRef.current.frameId = window.requestAnimationFrame(() => {
-        edgeStateRef.current.frameId = 0;
-        updateEdgeState();
-      });
-    };
-
-    updateEdgeState();
-    railElement.addEventListener("scroll", queueUpdate, { passive: true });
-    window.addEventListener("resize", queueUpdate, { passive: true });
-
-    return () => {
-      if (edgeStateRef.current.frameId) {
-        window.cancelAnimationFrame(edgeStateRef.current.frameId);
-        edgeStateRef.current.frameId = 0;
-      }
-      railElement.removeEventListener("scroll", queueUpdate);
-      window.removeEventListener("resize", queueUpdate);
-    };
-  }, [products]);
+  const { isAtStart, isAtEnd } = useHorizontalRailState(scrollContainerRef, {
+    dependencyKey: `${category.id}-${products.length}`,
+  });
 
   const scrollLeftBtn = () => {
     if (scrollContainerRef.current) {
@@ -561,7 +522,7 @@ function StoreMobileOverviewSections({
   onOrderNow: (product: Product) => void;
   onAddToCart: (product: Product) => void;
   metrics: StoreViewportMetrics;
-}) {
+} & { key?: string | number }) {
   const orderedCategorySections = categories
     .filter((category) => category.id !== "all")
     .map((category) => ({

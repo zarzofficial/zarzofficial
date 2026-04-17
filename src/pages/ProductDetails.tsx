@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import { getCategoryLabel, getProductBySlugOrId, type ProductVariationGroup } from "../data/products";
 import { useCart, type CartVariationSelection } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
+import { getResponsiveProductImage } from "../lib/responsiveImage";
 
 function buildVariationDefaults(groups: ProductVariationGroup[]) {
   return Object.fromEntries(
@@ -64,6 +65,7 @@ export function ProductDetails() {
   const totalPrice = unitPrice * safeQuantity;
   const totalOriginalPrice = getLegacyOriginalPrice(totalPrice);
   const discountPercent = getDiscountPercent();
+  const responsiveImage = getResponsiveProductImage(product.image);
 
   function setVariation(groupId: string, value: string) {
     setSelectedVariations((currentValue) => ({ ...currentValue, [groupId]: value }));
@@ -165,7 +167,8 @@ export function ProductDetails() {
           style={{ contain: "content" }}
         >
           <img
-            src={product.image}
+            src={responsiveImage.src}
+            srcSet={responsiveImage.srcSet}
             alt={product.title}
             className="h-full w-full object-cover"
             width={634}

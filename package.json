@@ -6,9 +6,10 @@
   "homepage": "https://zarzofficial.github.io/zarzofficial-up/",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build && node scripts/sync-static-build.cjs && tsx scripts/prerender.tsx",
+    "build": "node scripts/generate-responsive-images.mjs && vite build && node scripts/sync-static-build.cjs && tsx scripts/prerender.tsx",
     "preview": "vite preview",
     "clean": "node -e \"const fs=require('fs');['dist','docs'].forEach((dir)=>fs.rmSync(dir,{recursive:true,force:true}));\"",
+    "images:responsive": "node scripts/generate-responsive-images.mjs",
     "lint": "tsc --noEmit",
     "predeploy": "npm run build",
     "deploy": "node -e \"console.log('GitHub Pages publishes from main/docs. Push main after build.')\""
@@ -42,6 +43,7 @@
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
     "gh-pages": "^6.3.0",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",

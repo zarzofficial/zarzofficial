@@ -94,27 +94,27 @@
 
 /__/auth/experiments.js
   Content-Type: application/javascript; charset=UTF-8
-  Cache-Control: no-cache, no-store, must-revalidate
-  CDN-Cache-Control: no-store
-  Cloudflare-CDN-Cache-Control: no-store
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  CDN-Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Cloudflare-CDN-Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
 /__/auth/handler.js
   Content-Type: application/javascript; charset=UTF-8
-  Cache-Control: no-cache, no-store, must-revalidate
-  CDN-Cache-Control: no-store
-  Cloudflare-CDN-Cache-Control: no-store
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  CDN-Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Cloudflare-CDN-Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
 /__/auth/iframe.js
   Content-Type: application/javascript; charset=UTF-8
-  Cache-Control: no-cache, no-store, must-revalidate
-  CDN-Cache-Control: no-store
-  Cloudflare-CDN-Cache-Control: no-store
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  CDN-Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Cloudflare-CDN-Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
 /__/auth/links.js
   Content-Type: application/javascript; charset=UTF-8
-  Cache-Control: no-cache, no-store, must-revalidate
-  CDN-Cache-Control: no-store
-  Cloudflare-CDN-Cache-Control: no-store
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  CDN-Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Cloudflare-CDN-Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
 /__/firebase/init.json
   Content-Type: application/json; charset=UTF-8

@@ -53,12 +53,12 @@ async function preloadStartupRoute() {
   }
 
   if (path === "/cart" || path === "/checkout" || path === "/products/cart" || path === "/products/checkout") {
-    await import("./pages/Cart");
+    await import("./routes/CartRoute");
     return;
   }
 
   if (path === "/account" || path === "/account.html") {
-    await import("./pages/Account");
+    await import("./routes/AccountRoute");
     return;
   }
 
@@ -77,11 +77,30 @@ async function preloadStartupRoute() {
   }
 }
 
+function shouldWarmStoreRoute() {
+  if (typeof window === "undefined") return false;
+
+  const isCoarsePointer =
+    typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches;
+  const connection = navigator as Navigator & {
+    connection?: {
+      effectiveType?: string;
+      saveData?: boolean;
+    };
+  };
+  const connectionInfo = connection.connection;
+  const slowConnection =
+    Boolean(connectionInfo?.saveData) ||
+    ["slow-2g", "2g", "3g"].includes(String(connectionInfo?.effectiveType || "").toLowerCase());
+
+  return !isCoarsePointer && !slowConnection;
+}
+
 function warmCommonRoutes() {
   if (typeof window === "undefined") return;
 
   const path = normalizeStartupPath(window.location.pathname);
-  if (path !== "/") return;
+  if (path !== "/" || !shouldWarmStoreRoute()) return;
 
   const warmStoreRoute = () => {
     void import("./pages/Store").catch((error) => {
@@ -89,14 +108,7 @@ function warmCommonRoutes() {
     });
   };
 
-  if ("requestIdleCallback" in window) {
-    (window as Window & {
-      requestIdleCallback: (callback: () => void, options?: { timeout?: number }) => number;
-    }).requestIdleCallback(warmStoreRoute, { timeout: 1800 });
-    return;
-  }
-
-  window.setTimeout(warmStoreRoute, 900);
+  globalThis.setTimeout(warmStoreRoute, 4000);
 }
 
 function shouldHydratePrerenderedApp() {

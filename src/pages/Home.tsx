@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
+import { useHorizontalRailState } from "../lib/useHorizontalRailState";
 import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
 
 const whyChooseItems = [
@@ -214,62 +215,14 @@ export function Home() {
   const location = useLocation();
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const railIndicatorRef = useRef<HTMLDivElement>(null);
   useHorizontalTouchScroll(scrollContainerRef);
-
-  const [isAtStart, setIsAtStart] = useState(true);
-  const [isAtEnd, setIsAtEnd] = useState(false);
-  const [indicatorOffset, setIndicatorOffset] = useState(0);
-  const edgeStateRef = useRef({ isAtStart: true, isAtEnd: false, indicatorOffset: 0, frameId: 0 });
-
-  useEffect(() => {
-    const railElement = scrollContainerRef.current;
-    if (!railElement) return;
-
-    const updateRailState = () => {
-      const maxScroll = Math.max(0, railElement.scrollWidth - railElement.clientWidth);
-      const currentScroll = Math.min(maxScroll, Math.abs(railElement.scrollLeft));
-      const nextProgress = maxScroll === 0 ? 0 : currentScroll / maxScroll;
-      const nextIsAtStart = currentScroll <= 10;
-      const nextIsAtEnd = currentScroll >= maxScroll - 10;
-      const nextIndicatorOffset = -192 * nextProgress;
-
-      if (edgeStateRef.current.isAtStart !== nextIsAtStart) {
-        edgeStateRef.current.isAtStart = nextIsAtStart;
-        setIsAtStart(nextIsAtStart);
-      }
-
-      if (edgeStateRef.current.isAtEnd !== nextIsAtEnd) {
-        edgeStateRef.current.isAtEnd = nextIsAtEnd;
-        setIsAtEnd(nextIsAtEnd);
-      }
-
-      if (Math.abs(edgeStateRef.current.indicatorOffset - nextIndicatorOffset) > 1) {
-        edgeStateRef.current.indicatorOffset = nextIndicatorOffset;
-        setIndicatorOffset(nextIndicatorOffset);
-      }
-    };
-
-    const queueUpdate = () => {
-      if (edgeStateRef.current.frameId) return;
-      edgeStateRef.current.frameId = window.requestAnimationFrame(() => {
-        edgeStateRef.current.frameId = 0;
-        updateRailState();
-      });
-    };
-
-    updateRailState();
-    railElement.addEventListener("scroll", queueUpdate, { passive: true });
-    window.addEventListener("resize", queueUpdate, { passive: true });
-
-    return () => {
-      if (edgeStateRef.current.frameId) {
-        window.cancelAnimationFrame(edgeStateRef.current.frameId);
-        edgeStateRef.current.frameId = 0;
-      }
-      railElement.removeEventListener("scroll", queueUpdate);
-      window.removeEventListener("resize", queueUpdate);
-    };
-  }, []);
+  const { isAtStart, isAtEnd } = useHorizontalRailState(scrollContainerRef, {
+    onProgress: (progress) => {
+      if (!railIndicatorRef.current) return;
+      railIndicatorRef.current.style.transform = `translateX(${(-192 * progress).toFixed(2)}px)`;
+    },
+  });
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -315,6 +268,9 @@ export function Home() {
             alt="Hero Background"
             className="w-full h-full object-cover opacity-20"
             src="/assets/hero-ambient.svg"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-l from-background via-transparent to-background/50"></div>
           <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-background/70 to-background sm:h-28"></div>
@@ -578,8 +534,9 @@ export function Home() {
 
           <div className="block md:hidden w-64 h-1.5 bg-outline-variant/10 rounded-full mx-auto mt-8 relative shadow-inner overflow-hidden" dir="rtl">
             <div
+              ref={railIndicatorRef}
               className="home-mobile-rail-indicator absolute top-0 right-0 bottom-0 w-16 bg-primary rounded-full shadow-[0_0_8px_rgba(208,188,255,0.6)]"
-              style={{ transform: `translateX(${indicatorOffset}px)` }}
+              style={{ transform: "translateX(0px)" }}
             />
           </div>
         </div>

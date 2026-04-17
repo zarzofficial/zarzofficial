@@ -7,8 +7,8 @@ import { getCatalogPath, getCatalogRouteCategory, getCategoryName } from "./lib/
 
 const Home = lazy(() => import("./pages/Home").then((module) => ({ default: module.Home })));
 const Store = lazy(() => import("./pages/Store").then((module) => ({ default: module.Store })));
-const Cart = lazy(() => import("./pages/Cart").then((module) => ({ default: module.Cart })));
-const Account = lazy(() => import("./pages/Account").then((module) => ({ default: module.Account })));
+const CartRoute = lazy(() => import("./routes/CartRoute"));
+const AccountRoute = lazy(() => import("./routes/AccountRoute"));
 const Contact = lazy(() => import("./pages/Contact").then((module) => ({ default: module.Contact })));
 const Terms = lazy(() => import("./pages/Terms").then((module) => ({ default: module.Terms })));
 const ProductDetails = lazy(() =>
@@ -141,11 +141,11 @@ export default function App() {
               <Route path="/products/catalog" element={<Navigate to="/products" replace />} />
               <Route path="/products/catalog/:category" element={<Store />} />
               <Route path="/products/:id" element={<ProductDetails />} />
-              <Route path="/cart" element={<Cart />} />
+              <Route path="/cart" element={<CartRoute />} />
               <Route path="/products/cart" element={<Navigate to="/cart" replace />} />
               <Route path="/checkout" element={<Navigate to="/cart" replace />} />
               <Route path="/products/checkout" element={<Navigate to="/cart" replace />} />
-              <Route path="/account" element={<Account />} />
+              <Route path="/account" element={<AccountRoute />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/store.html" element={<Navigate to="/products" replace />} />

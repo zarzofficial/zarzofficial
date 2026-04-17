@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import React, { useEffect, useRef } from "react";
 import { products } from "../data/products";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
+import { getResponsiveProductImage } from "../lib/responsiveImage";
+import { useHorizontalRailState } from "../lib/useHorizontalRailState";
 import { SiteIcon } from "./SiteIcon";
 import { useHorizontalTouchScroll } from "../lib/useHorizontalTouchScroll";
 
@@ -28,52 +30,7 @@ export function FeaturedProducts() {
 
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
   useHorizontalTouchScroll(scrollContainerRef);
-  const [isAtStart, setIsAtStart] = React.useState(true);
-  const [isAtEnd, setIsAtEnd] = React.useState(false);
-  const edgeStateRef = React.useRef({ isAtStart: true, isAtEnd: false, frameId: 0 });
-
-  useEffect(() => {
-    const railElement = scrollContainerRef.current;
-    if (!railElement) return;
-
-    const updateEdgeState = () => {
-      const maxScroll = Math.max(0, railElement.scrollWidth - railElement.clientWidth);
-      const currentScroll = Math.min(maxScroll, Math.abs(railElement.scrollLeft));
-      const nextIsAtStart = currentScroll <= 10;
-      const nextIsAtEnd = currentScroll >= maxScroll - 10;
-
-      if (edgeStateRef.current.isAtStart !== nextIsAtStart) {
-        edgeStateRef.current.isAtStart = nextIsAtStart;
-        setIsAtStart(nextIsAtStart);
-      }
-
-      if (edgeStateRef.current.isAtEnd !== nextIsAtEnd) {
-        edgeStateRef.current.isAtEnd = nextIsAtEnd;
-        setIsAtEnd(nextIsAtEnd);
-      }
-    };
-
-    const queueUpdate = () => {
-      if (edgeStateRef.current.frameId) return;
-      edgeStateRef.current.frameId = window.requestAnimationFrame(() => {
-        edgeStateRef.current.frameId = 0;
-        updateEdgeState();
-      });
-    };
-
-    updateEdgeState();
-    railElement.addEventListener("scroll", queueUpdate, { passive: true });
-    window.addEventListener("resize", queueUpdate, { passive: true });
-
-    return () => {
-      if (edgeStateRef.current.frameId) {
-        window.cancelAnimationFrame(edgeStateRef.current.frameId);
-        edgeStateRef.current.frameId = 0;
-      }
-      railElement.removeEventListener("scroll", queueUpdate);
-      window.removeEventListener("resize", queueUpdate);
-    };
-  }, []);
+  const { isAtStart, isAtEnd } = useHorizontalRailState(scrollContainerRef);
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -112,6 +69,7 @@ export function FeaturedProducts() {
             const category = categoryMap[product.category] || { label: product.category, color: "#d0bcff" };
             const discountPercent = getDiscountPercent();
             const originalPrice = getLegacyOriginalPrice(product.basePrice);
+            const responsiveImage = getResponsiveProductImage(product.image);
 
             return (
               <Link
@@ -143,7 +101,8 @@ export function FeaturedProducts() {
                       only scans ahead vertically and can't predict horizontal scroll,
                       which causes blank placeholders when the user swipes. */}
                   <img
-                    src={product.image}
+                    src={responsiveImage.src}
+                    srcSet={responsiveImage.srcSet}
                     alt={product.title}
                     className={`h-full w-full object-cover transition-transform duration-300 md:group-hover:scale-[1.03] ${
                       product.outOfStock ? "opacity-50" : ""
