@@ -535,18 +535,32 @@
   }
 
 }
+/* =========================
+   FINAL PERFORMANCE FIX
+   ========================= */
 
 @media (max-width: 768px) {
-  /* 10. تعطيل animation الثقيلة */
+
+  /* تعطيل الأنيميشن الثقيلة */
   .animate-pulse {
     animation: none !important;
   }
-}
 
-/* =========================
-   GLOBAL IMAGE OPTIMIZATION
-   ========================= */
-img {
-  content-visibility: auto;
-  contain-intrinsic-size: 300px;
+  /* منع اختفاء العناصر */
+  .perf-mobile-horizontal-cards {
+    transform: none !important;
+    will-change: auto !important;
+  }
+
+  /* تقليل الضغط */
+  img {
+    content-visibility: auto;
+    contain-intrinsic-size: 300px;
+  }
+
+  /* تحسين اللمس */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
 }
