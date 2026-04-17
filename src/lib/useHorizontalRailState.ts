@@ -42,16 +42,14 @@ export function useHorizontalRailState(
 
       onProgressRef.current?.(progress);
 
-      if (metrics.isAtStart === nextIsAtStart && metrics.isAtEnd === nextIsAtEnd) {
-        return;
+      if (metrics.isAtStart !== nextIsAtStart || metrics.isAtEnd !== nextIsAtEnd) {
+        metrics.isAtStart = nextIsAtStart;
+        metrics.isAtEnd = nextIsAtEnd;
+
+        setTimeout(() => {
+          setEdgeState({ isAtStart: nextIsAtStart, isAtEnd: nextIsAtEnd });
+        }, 0);
       }
-
-      metrics.isAtStart = nextIsAtStart;
-      metrics.isAtEnd = nextIsAtEnd;
-
-      startTransition(() => {
-        setEdgeState({ isAtStart: nextIsAtStart, isAtEnd: nextIsAtEnd });
-      });
     };
 
     const measureRail = () => {
@@ -80,9 +78,21 @@ export function useHorizontalRailState(
     const resizeObserver =
       typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => queueMeasure());
 
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          queueScrollSync();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
     resizeObserver?.observe(railElement);
     queueMeasure();
-    railElement.addEventListener("scroll", queueScrollSync, { passive: true });
+    railElement.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("resize", queueMeasure, { passive: true });
 
     return () => {
@@ -97,7 +107,7 @@ export function useHorizontalRailState(
       }
 
       resizeObserver?.disconnect();
-      railElement.removeEventListener("scroll", queueScrollSync);
+      railElement.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", queueMeasure);
     };
   }, [dependencyKey, railRef, threshold]);

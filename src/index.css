@@ -535,3 +535,18 @@
   }
 
 }
+
+@media (max-width: 768px) {
+  /* 10. تعطيل animation الثقيلة */
+  .animate-pulse {
+    animation: none !important;
+  }
+}
+
+/* =========================
+   GLOBAL IMAGE OPTIMIZATION
+   ========================= */
+img {
+  content-visibility: auto;
+  contain-intrinsic-size: 300px;
+}

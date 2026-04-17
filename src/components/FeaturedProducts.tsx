@@ -33,10 +33,9 @@ function FeaturedProductImage({
     const targetElement = imageSlotRef.current;
     if (!targetElement || typeof window === "undefined") return;
 
-    if (!("IntersectionObserver" in window)) {
-      setShouldLoad(true);
-      return;
-    }
+    // تعطيل lazy loading مؤقتاً لمنع اختفاء الصور أثناء السكروول
+    setShouldLoad(true);
+    return;
 
     const observer = new IntersectionObserver(
       (entries) => {
