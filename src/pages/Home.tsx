@@ -198,200 +198,6 @@ const desktopTechLogos = techLogoNames.map((logo) => (
   <div key={logo.id} className="group flex items-center gap-4 md:gap-8">
     <span className="font-black text-xl md:text-3xl tracking-[0.25em] text-white opacity-80 font-headline drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
       {logo.label}
-
-const whyChooseItems = [
-  {
-    id: "fast",
-    number: "01",
-    iconName: "bolt" as const,
-    title: "تنفيذ فوري",
-    description: "طلبك يبدأ خلال دقائق من التأكيد بدون أي تأخير",
-    borderClass: "md:hover:border-primary/30",
-    shadowClass: "md:hover:shadow-[0_16px_40px_rgba(208,188,255,0.08)]",
-    overlayClass: "from-primary/[0.04]",
-    iconClass: "bg-primary/10 border-primary/20 text-primary",
-    iconGlowClass: "md:group-hover:shadow-[0_0_20px_rgba(208,188,255,0.2)]",
-  },
-  {
-    id: "safe",
-    number: "02",
-    iconName: "shield" as const,
-    title: "أمان كامل",
-    description: "حساباتك محمية ولا نطلب أي بيانات سرية مطلقاً",
-    borderClass: "md:hover:border-[#3b82f6]/30",
-    shadowClass: "md:hover:shadow-[0_16px_40px_rgba(59,130,246,0.08)]",
-    overlayClass: "from-[#3b82f6]/[0.04]",
-    iconClass: "bg-[#3b82f6]/10 border-[#3b82f6]/20 text-[#3b82f6]",
-    iconGlowClass: "md:group-hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]",
-  },
-  {
-    id: "support",
-    number: "03",
-    iconName: "headset_mic" as const,
-    title: "دعم ٢٤/٧",
-    description: "فريق متخصص جاهز لمساعدتك في أي وقت تحتاجه",
-    borderClass: "md:hover:border-[#10b981]/30",
-    shadowClass: "md:hover:shadow-[0_16px_40px_rgba(16,185,129,0.08)]",
-    overlayClass: "from-[#10b981]/[0.04]",
-    iconClass: "bg-[#10b981]/10 border-[#10b981]/20 text-[#10b981]",
-    iconGlowClass: "md:group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]",
-  },
-  {
-    id: "payments",
-    number: "04",
-    iconName: "payments" as const,
-    title: "دفع مرن",
-    description: "ندعم التحويل البنكي والكاش حسب ما يناسبك",
-    borderClass: "md:hover:border-[#f59e0b]/30",
-    shadowClass: "md:hover:shadow-[0_16px_40px_rgba(245,158,11,0.08)]",
-    overlayClass: "from-[#f59e0b]/[0.04]",
-    iconClass: "bg-[#f59e0b]/10 border-[#f59e0b]/20 text-[#f59e0b]",
-    iconGlowClass: "md:group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)]",
-  },
-  {
-    id: "quality",
-    number: "05",
-    iconName: "workspace_premium" as const,
-    title: "جودة مضمونة",
-    description: "ضمان زارز الملكي على كل خدمة نقدّمها لك",
-    borderClass: "md:hover:border-[#e11d48]/30",
-    shadowClass: "md:hover:shadow-[0_16px_40px_rgba(225,29,72,0.08)]",
-    overlayClass: "from-[#e11d48]/[0.04]",
-    iconClass: "bg-[#e11d48]/10 border-[#e11d48]/20 text-[#e11d48]",
-    iconGlowClass: "md:group-hover:shadow-[0_0_20px_rgba(225,29,72,0.2)]",
-  },
-  {
-    id: "results",
-    number: "06",
-    iconName: "trending_up" as const,
-    title: "نتائج حقيقية",
-    description: "خدمات فعلية بنتائج ملموسة وقابلة للقياس",
-    borderClass: "md:hover:border-[#8b5cf6]/30",
-    shadowClass: "md:hover:shadow-[0_16px_40px_rgba(139,92,246,0.08)]",
-    overlayClass: "from-[#8b5cf6]/[0.04]",
-    iconClass: "bg-[#8b5cf6]/10 border-[#8b5cf6]/20 text-[#8b5cf6]",
-    iconGlowClass: "md:group-hover:shadow-[0_0_20px_rgba(139,92,246,0.2)]",
-  },
-] as const;
-
-type FaqEntry = {
-  question: string;
-  answer: string;
-};
-
-type WhyChooseItem = (typeof whyChooseItems)[number];
-
-function FaqItem({
-  faq,
-  isOpen,
-  onClick,
-}: {
-  faq: FaqEntry;
-  isOpen: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <div
-      className={`perf-card faq-mobile-card cyber-glass-card rounded-2xl overflow-hidden border transition-[border-color,background-color,box-shadow] duration-[420ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] ${
-        isOpen
-          ? "border-[#e11d48]/30 bg-[#e11d48]/5 shadow-[0_4px_30px_rgba(225,29,72,0.1)]"
-          : "border-outline-variant/10 bg-surface-container-low/30 md:hover:border-outline-variant/30"
-      }`}
-    >
-      <button
-        type="button"
-        onClick={onClick}
-        aria-expanded={isOpen}
-        className="flex w-full items-center justify-between gap-4 p-6 text-start"
-      >
-        <h3 className="text-lg font-bold text-on-surface">{faq.question}</h3>
-        <SiteIcon
-          name={isOpen ? "remove" : "add"}
-          className={`origin-center transition-[transform,color] duration-[380ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] ${isOpen ? "rotate-180 text-[#e11d48]" : "rotate-0 text-[#0ea5e9]"}`}
-        />
-      </button>
-      <div
-        className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-[460ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
-          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-        }`}
-      >
-        <div className="min-h-0 overflow-hidden">
-          <div
-            className={`px-6 pb-6 text-[#cbc3d9] leading-relaxed transition-[transform,opacity] duration-[420ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] ${
-              isOpen ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
-            }`}
-          >
-            {faq.answer}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FaqAccordion({
-  faqs,
-}: {
-  faqs: FaqEntry[];
-}) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  return (
-    <div className="space-y-4 text-start">
-      {faqs.map((faq, idx) => (
-        <React.Fragment key={idx}>
-          <FaqItem
-            faq={faq}
-            isOpen={openIndex === idx}
-            onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
-          />
-        </React.Fragment>
-      ))}
-    </div>
-  );
-}
-
-function WhyChooseCard({ item }: { item: WhyChooseItem }) {
-  return (
-    <div
-      className={`perf-card why-choose-mobile-card group relative overflow-hidden rounded-[1.25rem] border border-outline-variant/10 bg-surface-container-low/60 p-5 transition-[transform,opacity,border-color,background-color,box-shadow] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] md:p-7 md:duration-500 ${item.borderClass} ${item.shadowClass} md:hover:-translate-y-1.5`}
-    >
-      <div className={`absolute inset-0 bg-gradient-to-br ${item.overlayClass} to-transparent opacity-0 transition-opacity duration-300 md:group-hover:opacity-100`} />
-      <div className="pointer-events-none absolute top-4 left-4 select-none text-[3.5rem] leading-none font-black text-white/[0.03]">
-        {item.number}
-      </div>
-      <div className="relative z-10">
-        <div
-          className={`mb-5 flex h-11 w-11 items-center justify-center rounded-xl border transition-transform duration-300 md:group-hover:scale-110 ${item.iconClass} ${item.iconGlowClass}`}
-        >
-          <SiteIcon name={item.iconName} className="text-[22px]" />
-        </div>
-        <h4 className="mb-2 text-sm font-black text-on-surface md:text-[15px]">{item.title}</h4>
-        <p className="text-xs leading-relaxed text-outline md:text-[13px]">{item.description}</p>
-      </div>
-    </div>
-  );
-}
-
-const techLogoNames = [
-  { id: "nova", label: "NOVA", iconName: "rocket_launch" },
-  { id: "luma", label: "LUMA", iconName: "bolt" },
-  { id: "vera", label: "VERA", iconName: "verified" },
-  { id: "nexa", label: "NEXA", iconName: "trending_up" },
-  { id: "orbit", label: "ORBIT", iconName: "groups" },
-  { id: "arc", label: "ARC", iconName: "code" },
-  { id: "vanta", label: "VANTA", iconName: "shield" },
-  { id: "mono", label: "MONO", iconName: "storefront" },
-] as const satisfies ReadonlyArray<{
-  id: string;
-  label: string;
-  iconName: SiteIconName;
-}>;
-
-const desktopTechLogos = techLogoNames.map((logo) => (
-  <div key={logo.id} className="group flex items-center gap-4 md:gap-8">
-    <span className="font-black text-xl md:text-3xl tracking-[0.25em] text-white opacity-80 font-headline drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
-      {logo.label}
     </span>
     <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary/40"></span>
   </div>
@@ -405,12 +211,22 @@ const mobileTechLogos = (
   </div>
 );
 
+const IsolatedSection = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="isolate-section">
+      {children}
+    </div>
+  );
+};
+
 const Section = React.memo(
   ({ children, className, id, ...props }: React.ComponentProps<"section">) => {
     return (
-      <section id={id} className={className} {...props}>
-        {children}
-      </section>
+      <IsolatedSection>
+        <section id={id} className={className} {...props}>
+          {children}
+        </Section>
+      </IsolatedSection>
     );
   }
 );
@@ -568,7 +384,9 @@ export function Home() {
         </div>
       </Section>
 
-      <FeaturedProducts />
+      <IsolatedSection>
+        <FeaturedProducts />
+      </IsolatedSection>
 
       {/* Services Grid (Horizontal Carousel) */}
       <Section className="perf-mobile-section px-6 py-32 bg-surface-container-low md:px-12 relative overflow-hidden" data-perf-size="tall">
@@ -744,6 +562,183 @@ export function Home() {
             />
           </div>
         </div>
+      </Section>
+
+      {/* Why ZARZ Section */}
+      <Section className="py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
+        <div className="why-choose-mobile-glow home-mobile-glow absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] pointer-events-none"></div>
+        <div className="why-choose-mobile-glow home-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="text-center mb-16">
+            <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-primary text-sm font-bold mb-6 backdrop-blur-md">لماذا نحن مختلفون؟</span>
+            <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background mb-4">لماذا تختار زارز؟</h2>
+            <p className="text-outline text-base md:text-lg max-w-xl mx-auto leading-relaxed">نقدّم تجربة متكاملة تجمع بين السرعة والأمان والدعم المستمر</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3">
+            {whyChooseItems.map((item) => (
+              <React.Fragment key={item.id}>
+                <WhyChooseCard item={item} />
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      </Section>
+
+      {/* Tech Marquee Section */}
+      <IsolatedSection>
+      <div className="z-20 w-full max-w-6xl mx-auto pt-4 pb-12 md:pt-10 md:pb-20 relative">
+        <div className="flex flex-col items-center justify-center text-center mb-10 md:mb-16 relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs md:text-sm font-bold mb-4 backdrop-blur-md shadow-[0_0_15px_rgba(208,188,255,0.1)]">
+            <span className="relative flex h-2 w-2 mb-0.5">
+              <span className="home-mobile-ping animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            </span>
+            شركاء النجاح
+          </div>
+          <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
+            <span className="text-on-background">شركات ملهمة </span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#8b5cf6] drop-shadow-[0_0_20px_rgba(208,188,255,0.4)]">وثقت بنا</span>
+          </h2>
+        </div>
+        <div
+          className="md:hidden pointer-events-none select-none px-1 py-2"
+          dir="ltr"
+        >
+          <div className="flex items-center justify-center opacity-80 grayscale [mask-image:linear-gradient(to_right,transparent_0,black_8%,black_92%,transparent_100%)]">
+            {mobileTechLogos}
+          </div>
+        </div>
+        <div
+          className="group hidden w-full md:inline-flex md:flex-nowrap md:overflow-hidden no-scrollbar md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] opacity-70 grayscale hover:grayscale-0 transition-all duration-700 bg-surface/0"
+          dir="ltr"
+        >
+          <style>{`
+            @keyframes infinite-scroll {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+            @media (min-width: 768px) {
+              .animate-infinite-scroll {
+                animation: infinite-scroll 30s linear infinite;
+              }
+              .group:hover .animate-infinite-scroll {
+                animation-play-state: paused;
+              }
+            }
+          `}</style>
+          <div className="flex items-center justify-start [&>div]:mx-6 md:[&>div]:mx-10 w-max animate-infinite-scroll">
+            {desktopTechLogos}
+            {desktopTechLogos}
+          </div>
+        </div>
+      </div>
+
+      </IsolatedSection>
+
+      {/* Stats Section */}
+      <Section className="perf-mobile-section relative overflow-hidden px-6 py-24 md:px-12" data-perf-size="compact">
+        <div className="absolute inset-0 z-0">
+          <div className="home-mobile-glow absolute top-1/2 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]"></div>
+          <div className="home-mobile-glow absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-tertiary/10 rounded-full blur-[120px]"></div>
+        </div>
+        <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 text-center">
+
+          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-primary/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(86,0,202,0.15)] overflow-hidden flex flex-col justify-center">
+            <div className="home-mobile-glow absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-primary/20"></div>
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 transition-transform duration-500 md:group-hover:scale-110">
+                <SiteIcon name="groups" className="text-3xl text-primary drop-shadow-[0_0_10px_rgba(208,188,255,0.5)]" />
+              </div>
+              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight transition-colors md:group-hover:text-primary">+10k</div>
+              <div className="text-outline text-sm md:text-base font-bold">عميل سعيد</div>
+            </div>
+          </div>
+
+          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#3b82f6]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(59,130,246,0.15)] overflow-hidden flex flex-col justify-center">
+            <div className="home-mobile-glow absolute top-0 left-0 w-32 h-32 bg-[#3b82f6]/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-[#3b82f6]/20"></div>
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-[#3b82f6]/10 flex items-center justify-center mb-6 transition-transform duration-500 md:group-hover:scale-110">
+                <SiteIcon name="verified" className="text-3xl text-[#3b82f6] drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
+              </div>
+              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight transition-colors md:group-hover:text-[#3b82f6]">99%</div>
+              <div className="text-outline text-sm md:text-base font-bold">رضا المستخدمين</div>
+            </div>
+          </div>
+
+          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#f59e0b]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(245,158,11,0.15)] overflow-hidden flex flex-col justify-center">
+            <div className="home-mobile-glow absolute bottom-0 right-0 w-32 h-32 bg-[#f59e0b]/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-[#f59e0b]/20"></div>
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-[#f59e0b]/10 flex items-center justify-center mb-6 transition-transform duration-500 md:group-hover:scale-110">
+                <SiteIcon name="rocket_launch" className="text-3xl text-[#f59e0b] drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
+              </div>
+              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight transition-colors md:group-hover:text-[#f59e0b]">+250</div>
+              <div className="text-outline text-sm md:text-base font-bold">مشروع منجز</div>
+            </div>
+          </div>
+
+          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#10b981]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(16,185,129,0.15)] overflow-hidden flex flex-col justify-center">
+            <div className="home-mobile-glow absolute bottom-0 left-0 w-32 h-32 bg-[#10b981]/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-[#10b981]/20"></div>
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-[#10b981]/10 flex items-center justify-center mb-6 transition-transform duration-500 md:group-hover:scale-110">
+                <SiteIcon name="support_agent" className="text-3xl text-[#10b981] drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+              </div>
+              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight transition-colors md:group-hover:text-[#10b981]">24/7</div>
+              <div className="text-outline text-sm md:text-base font-bold">دعم فني متواصل</div>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+
+      {/* FAQ Section */}
+      <Section id="faq" className="perf-mobile-section relative overflow-hidden bg-background px-6 py-24 md:px-12" data-perf-size="medium">
+        <div className="faq-mobile-glow home-mobile-glow absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px] pointer-events-none"></div>
+        <div className="max-w-4xl mx-auto relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-black font-headline text-on-background mb-4">أسئلة شائعة</h2>
+            <p className="text-lg text-outline">إجابات سريعة قبل بدء الطلب.</p>
+          </div>
+
+          <FaqAccordion
+            faqs={[
+              {
+                question: "كم يستغرق تنفيذ الطلب؟",
+                answer: "يعتمد الوقت على نوع الخدمة، لكن أغلب الطلبات يبدأ تنفيذها خلال دقائق إلى ساعات قليلة بعد التأكيد."
+              },
+              {
+                question: "كيف يتم التواصل بعد الطلب؟",
+                answer: "عبر الواتساب بشكل مباشر على الرقم الخاص بالمتجر، وسيتم تزويدك بكل التحديثات الخاصة بطلبك."
+              },
+              {
+                question: "هل الخدمات آمنة على الحسابات؟",
+                answer: "نعم، جميع خدماتنا نعتمد فيها على أفضل معايير الأمان ولا نطلب أي أرقام سرية قد تضر بحسابك إطلاقاً."
+              },
+              {
+                question: "هل يمكن طلب خدمة مخصصة؟",
+                answer: "بالتأكيد، يمكنك التواصل معنا عبر الواتساب لشرح متطلباتك وسيقوم فريقنا بتقديم حل يناسب احتياجاتك الخاصة بأسعار منافسة."
+              }
+            ]}
+          />
+        </div>
+      </Section>
+
+      {/* CTA Section */}
+      <Section className="perf-mobile-section px-6 py-24 md:px-12 md:py-32" data-perf-size="compact">
+        <div className="perf-panel max-w-7xl mx-auto cyber-glass-card rounded-[2.5rem] p-8 md:p-14 relative overflow-hidden group border border-outline-variant/20 shadow-2xl">
+          <div className="mesh-gradient-bg opacity-30"></div>
+          <div className="home-mobile-glow absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+          <div className="home-mobile-glow absolute bottom-0 left-0 w-64 h-64 bg-tertiary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+
+          <div className="relative z-10 flex flex-col xl:flex-row items-center xl:items-end justify-between gap-12 xl:gap-20">
+            {/* Text Content */}
+            <div className="text-start flex-1 max-w-3xl w-full">
+              <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-outline text-sm font-bold mb-8 backdrop-blur-md">
+                جاهز تبدأ الآن؟
+              </span>
+              <h2 className="text-4xl md:text-5xl lg:text-5xl font-black font-headline mb-6 text-on-background leading-tight text-glow">
+                خلنا نحول طلبك إلى تنفيذ سريع ومرتب
+              </h2>
               <p className="text-lg md:text-xl text-[#cbc3d9] leading-relaxed max-w-2xl">
                 سواء كنت تحتاج شحن ألعاب، نمو لحساباتك، أو متجر احترافي، البداية من هنا.
               </p>
@@ -762,7 +757,7 @@ export function Home() {
             </div>
           </div>
         </div>
-      </section>
+      </Section>
     </div>
   );
 }

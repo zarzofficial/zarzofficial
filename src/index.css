@@ -517,3 +517,21 @@
 html {
   scroll-behavior: auto !important;
 }
+
+/* عزل الرسم لكل قسم (Isolation for Partial Painting Optimization) */
+.isolate-section {
+  isolation: isolate;
+  contain: layout paint;
+  transform: translateZ(0);
+}
+
+.swiper {
+  isolation: isolate;
+}
+
+@media (max-width: 768px) {
+  .isolate-section {
+    contain: layout;
+    transform: none;
+  }
+}
