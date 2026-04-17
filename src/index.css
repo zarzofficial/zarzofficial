@@ -589,18 +589,33 @@ img {
    SWIPER PERFORMANCE
    ========================= */
 
-.swiper {
-  transform: translateZ(0);
+/* منع الاختفاء أثناء السكروول */
+.swiper,
+.swiper-wrapper,
+.swiper-slide {
+  transform: none !important;
+  will-change: auto !important;
 }
 
 .swiper-slide {
   flex-shrink: 0 !important;
-  will-change: transform;
   height: auto;
 }
 
-/* تعطيل hover في الموبايل */
+/* تثبيت الصور */
+.swiper-slide img {
+  backface-visibility: visible !important;
+  transform: none !important;
+}
+
+/* تعطيل أي تأثير أثناء السكروول */
 @media (max-width: 768px) {
+  .swiper-slide * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* تعطيل hover في الموبايل */
   .group:hover {
     transform: none !important;
   }

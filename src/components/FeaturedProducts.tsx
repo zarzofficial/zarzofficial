@@ -41,7 +41,7 @@ function FeaturedProductImage({
         src={image.src}
         srcSet={image.srcSet}
         alt={alt}
-        className={`h-full w-full object-cover transition-opacity duration-300 md:group-hover:scale-[1.03] ${
+        className={`h-full w-full object-cover ${
           isLoaded ? (outOfStock ? "opacity-50" : "opacity-100") : "opacity-0"
         }`}
         loading="eager"
@@ -123,6 +123,7 @@ export function FeaturedProducts() {
             slidesPerView="auto"
             spaceBetween={12}
             freeMode={true}
+            speed={300}
             resistanceRatio={0.85}
             dir="rtl"
             className="w-full !px-6 !pb-6 !pt-2"
