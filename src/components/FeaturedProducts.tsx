@@ -78,15 +78,22 @@ export function FeaturedProducts() {
 
   // Desktop scroll refs kept for arrow buttons (desktop only)
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [swiperInstance, setSwiperInstance] = useState<any>(null);
+  const [isAtStart, setIsAtStart] = useState(true);
+  const [isAtEnd, setIsAtEnd] = useState(false);
 
   const scrollLeft = () => {
-    if (scrollContainerRef.current) {
+    if (swiperInstance) {
+      if (!isAtStart) swiperInstance.slidePrev();
+    } else if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: -360, behavior: "auto" });
     }
   };
 
   const scrollRight = () => {
-    if (scrollContainerRef.current) {
+    if (swiperInstance) {
+      if (!isAtEnd) swiperInstance.slideNext();
+    } else if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: 360, behavior: "auto" });
     }
   };
@@ -102,23 +109,54 @@ export function FeaturedProducts() {
       <div className="pointer-events-none absolute bottom-0 left-1/3 h-[220px] w-[220px] rounded-full bg-tertiary/5 blur-[32px] md:h-[400px] md:w-[400px] md:blur-[100px]" />
 
       <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="mb-12 flex flex-col items-center justify-between gap-6 md:flex-row md:items-end">
-          <div className="flex w-full flex-col items-center text-center md:w-auto md:items-start md:text-start">
-            <span className="mb-6 inline-block rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-bold text-primary sm:backdrop-blur-md">
+        <div className="mb-12 flex items-start justify-between gap-4">
+          <div className="flex flex-1 flex-col items-start text-start">
+            <span className="mb-4 inline-block rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-bold text-primary sm:backdrop-blur-md">
               الأكثر طلبًا
             </span>
-            <h2 className="mb-4 font-headline text-3xl font-black text-on-background md:text-5xl">
+            <h2 className="mb-3 font-headline text-3xl font-black text-on-background md:text-5xl">
               منتجات مميزة
             </h2>
             <p className="max-w-md text-base font-medium text-outline md:text-lg">
               اكتشف أكثر الخدمات طلبًا لدينا
             </p>
           </div>
+
+          <div className="flex shrink-0 gap-2" dir="ltr">
+            <button
+              onClick={scrollLeft}
+              disabled={isAtStart}
+              className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${
+                !isAtStart
+                  ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.4)] active:scale-95"
+                  : "cursor-not-allowed border border-primary/20 bg-surface-container/50 text-primary opacity-40 backdrop-blur-md"
+              }`}
+            >
+              <SiteIcon name="chevron_left" className="text-2xl" />
+            </button>
+
+            <button
+              onClick={scrollRight}
+              disabled={isAtEnd}
+              className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${
+                !isAtEnd
+                  ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.4)] active:scale-95"
+                  : "cursor-not-allowed border border-primary/20 bg-surface-container/50 text-primary opacity-40 backdrop-blur-md"
+              }`}
+            >
+              <SiteIcon name="chevron_right" className="text-2xl" />
+            </button>
+          </div>
         </div>
 
         {/* Mobile: Swiper */}
         <div className="md:hidden -mx-6">
           <Swiper
+            onSwiper={setSwiperInstance}
+            onSlideChange={(swiper) => {
+              setIsAtStart(swiper.isBeginning);
+              setIsAtEnd(swiper.isEnd);
+            }}
             modules={[FreeMode]}
             slidesPerView="auto"
             spaceBetween={12}
@@ -374,20 +412,6 @@ export function FeaturedProducts() {
         </div>
       </div>
 
-      {/* Arrow buttons (desktop only, hidden on mobile since Swiper handles touch) */}
-      <div className="mt-6 hidden justify-center gap-3 md:flex" dir="ltr">
-        <button
-          onClick={scrollLeft}
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.4)] hover:scale-105 hover:bg-primary/90 active:scale-95 transition-all"
-        >
-          <SiteIcon name="chevron_left" className="text-2xl" />
-        </button>
-        <button
-          onClick={scrollRight}
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.4)] hover:scale-105 hover:bg-primary/90 active:scale-95 transition-all"
-        >
-          <SiteIcon name="chevron_right" className="text-2xl" />
-        </button>
       </div>
     </section>
   );
