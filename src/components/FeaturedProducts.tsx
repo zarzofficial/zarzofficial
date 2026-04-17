@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode } from "swiper/modules";
 import { products } from "../data/products";
@@ -83,7 +83,18 @@ export function FeaturedProducts() {
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
 
-  const scrollLeft = () => {
+  const syncSwiperState = (swiper: any) => {
+    if (!swiper) return;
+
+    setIsAtStart((currentValue: boolean) =>
+      currentValue === swiper.isBeginning ? currentValue : swiper.isBeginning,
+    );
+    setIsAtEnd((currentValue: boolean) =>
+      currentValue === swiper.isEnd ? currentValue : swiper.isEnd,
+    );
+  };
+
+  const goToPreviousSlide = () => {
     if (swiperInstance) {
       if (!isAtStart) swiperInstance.slidePrev();
     } else if (scrollContainerRef.current) {
@@ -91,7 +102,7 @@ export function FeaturedProducts() {
     }
   };
 
-  const scrollRight = () => {
+  const goToNextSlide = () => {
     if (swiperInstance) {
       if (!isAtEnd) swiperInstance.slideNext();
     } else if (scrollContainerRef.current) {
@@ -123,46 +134,26 @@ export function FeaturedProducts() {
             </p>
           </div>
 
-          <div className="flex shrink-0 gap-2" dir="ltr">
-            <button
-              onClick={scrollLeft}
-              disabled={isAtStart}
-              className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${
-                !isAtStart
-                  ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.4)] active:scale-95"
-                  : "cursor-not-allowed border border-primary/20 bg-surface-container/50 text-primary opacity-40 backdrop-blur-md"
-              }`}
-            >
-              <SiteIcon name="chevron_left" className="text-2xl" />
-            </button>
-
-            <button
-              onClick={scrollRight}
-              disabled={isAtEnd}
-              className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${
-                !isAtEnd
-                  ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.4)] active:scale-95"
-                  : "cursor-not-allowed border border-primary/20 bg-surface-container/50 text-primary opacity-40 backdrop-blur-md"
-              }`}
-            >
-              <SiteIcon name="chevron_right" className="text-2xl" />
-            </button>
-          </div>
         </div>
 
         {/* Mobile: Swiper */}
         <div className="md:hidden -mx-6">
           <Swiper
-            onSwiper={setSwiperInstance}
-            onSlideChange={(swiper) => {
-              setIsAtStart(swiper.isBeginning);
-              setIsAtEnd(swiper.isEnd);
+            onSwiper={(swiper) => {
+              setSwiperInstance(swiper);
+              requestAnimationFrame(() => syncSwiperState(swiper));
             }}
+            onProgress={syncSwiperState}
+            onSlideChange={syncSwiperState}
+            onResize={syncSwiperState}
             modules={[FreeMode]}
             slidesPerView="auto"
             spaceBetween={12}
             freeMode={true}
             touchRatio={1}
+            touchStartPreventDefault={false}
+            touchReleaseOnEdges={true}
+            watchOverflow={true}
             speed={300}
             resistanceRatio={0.85}
             dir="rtl"
@@ -285,6 +276,36 @@ export function FeaturedProducts() {
               );
             })}
           </Swiper>
+
+          <div className="mt-4 flex items-center justify-center gap-3 px-6" dir="rtl">
+            <button
+              type="button"
+              aria-label="المنتج السابق"
+              onClick={goToPreviousSlide}
+              disabled={isAtStart}
+              className={`flex h-11 w-11 items-center justify-center rounded-full transition-all touch-manipulation ${
+                !isAtStart
+                  ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.35)] active:scale-95"
+                  : "cursor-not-allowed border border-primary/20 bg-surface-container/50 text-primary opacity-40"
+              }`}
+            >
+              <SiteIcon name="chevron_right" className="text-2xl" />
+            </button>
+
+            <button
+              type="button"
+              aria-label="المنتج التالي"
+              onClick={goToNextSlide}
+              disabled={isAtEnd}
+              className={`flex h-11 w-11 items-center justify-center rounded-full transition-all touch-manipulation ${
+                !isAtEnd
+                  ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.35)] active:scale-95"
+                  : "cursor-not-allowed border border-primary/20 bg-surface-container/50 text-primary opacity-40"
+              }`}
+            >
+              <SiteIcon name="chevron_left" className="text-2xl" />
+            </button>
+          </div>
         </div>
 
         {/* Desktop: grid layout */}

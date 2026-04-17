@@ -9,6 +9,9 @@ export function useHorizontalTouchScroll(containerRef: RefObject<HTMLElement | n
   useEffect(() => {
     const railElement = containerRef.current;
     if (!isCoarsePointer || !railElement) return;
+    const axisIntentThreshold = 12;
+    const axisBias = 6;
+    const swipeSuppressThreshold = 24;
 
     const touchState = {
       startX: 0,
@@ -56,17 +59,26 @@ export function useHorizontalTouchScroll(containerRef: RefObject<HTMLElement | n
       const touch = event.touches[0];
       const deltaX = touch.clientX - touchState.startX;
       const deltaY = touch.clientY - touchState.startY;
+      const absDeltaX = Math.abs(deltaX);
+      const absDeltaY = Math.abs(deltaY);
 
       if (!touchState.axisLock) {
-        if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
+        if (absDeltaX < axisIntentThreshold && absDeltaY < axisIntentThreshold) {
           return;
         }
 
-        touchState.axisLock = Math.abs(deltaX) > Math.abs(deltaY) ? "x" : "y";
+        if (absDeltaX > absDeltaY + axisBias) {
+          touchState.axisLock = "x";
+        } else if (absDeltaY > absDeltaX + axisBias) {
+          touchState.axisLock = "y";
+        } else {
+          return;
+        }
+
         railElement.dataset.touchAxis = touchState.axisLock;
       }
 
-      if (touchState.axisLock === "x") {
+      if (touchState.axisLock === "x" && absDeltaX >= swipeSuppressThreshold) {
         touchState.suppressClick = true;
       }
     };
@@ -80,7 +92,7 @@ export function useHorizontalTouchScroll(containerRef: RefObject<HTMLElement | n
       touchState.resetClickTimeout = window.setTimeout(() => {
         touchState.suppressClick = false;
         touchState.resetClickTimeout = 0;
-      }, 250);
+      }, 120);
     };
 
     const handleClickCapture = (event: MouseEvent) => {
