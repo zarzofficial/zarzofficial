@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
 import { useCoarsePointer } from "../lib/useCoarsePointer";
+import { useScrollReveal } from "../lib/useScrollReveal";
 
 const whyChooseItems = [
   {
@@ -234,6 +235,7 @@ export function Home() {
   const location = useLocation();
   const [activeIndex, setActiveIndex] = useState(0);
   const isCoarsePointer = useCoarsePointer();
+  const revealRef = useScrollReveal();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollLeft = () => {
@@ -272,12 +274,13 @@ export function Home() {
   }, [location.pathname, location.search, location.state]);
 
   return (
-    <div className="home-mobile-page pt-12 md:pt-14">
+    <div ref={revealRef} className="home-mobile-page pt-12 md:pt-14">
       {/* Hero Section */}
-      <Section className="relative min-h-0 overflow-hidden px-4 pb-2 pt-16 sm:px-6 sm:py-10 md:px-12 md:py-12 lg:py-20">
+      <Section className="reveal-on-scroll relative min-h-0 overflow-hidden px-4 pb-2 pt-16 sm:px-6 sm:py-10 md:px-12 md:py-12 lg:py-20">
         <div className="absolute inset-0 z-0">
           {/* Mobile Image */}
           <img
+
             alt="Hero Background Mobile"
             className="w-full h-full object-cover opacity-20 md:hidden"
             src="/assets/hero-ambient.svg"
@@ -391,7 +394,7 @@ export function Home() {
       </IsolatedSection>
 
       {/* Services Grid (Horizontal Carousel) */}
-      <Section className="perf-mobile-section px-6 py-32 bg-surface-container-low md:px-12 relative overflow-hidden" data-perf-size="tall">
+      <Section className="reveal-on-scroll perf-mobile-section px-6 py-32 bg-surface-container-low md:px-12 relative overflow-hidden" data-perf-size="tall">
         <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-background to-transparent pointer-events-none z-0 border-t border-background"></div>
         <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-background to-transparent pointer-events-none z-0 border-b border-background"></div>
         
@@ -553,7 +556,7 @@ export function Home() {
       </Section>
 
       {/* Why ZARZ Section */}
-      <Section className="py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
+      <Section className="reveal-on-scroll py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
         <div className="why-choose-mobile-glow home-mobile-glow absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] pointer-events-none"></div>
         <div className="why-choose-mobile-glow home-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
         <div className="max-w-6xl mx-auto relative z-10">
@@ -575,7 +578,7 @@ export function Home() {
 
       {/* Tech Marquee Section */}
       <IsolatedSection>
-      <div className="z-20 w-full max-w-6xl mx-auto pt-4 pb-12 md:pt-10 md:pb-20 relative">
+      <div className="reveal-on-scroll z-20 w-full max-w-6xl mx-auto pt-4 pb-12 md:pt-10 md:pb-20 relative">
         <div className="flex flex-col items-center justify-center text-center mb-10 md:mb-16 relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs md:text-sm font-bold mb-4 backdrop-blur-md shadow-[0_0_15px_rgba(208,188,255,0.1)]">
             <span className="relative flex h-2 w-2 mb-0.5">
@@ -625,7 +628,7 @@ export function Home() {
       </IsolatedSection>
 
       {/* Stats Section */}
-      <Section className="perf-mobile-section relative overflow-hidden px-6 py-24 md:px-12" data-perf-size="compact">
+      <Section className="reveal-on-scroll perf-mobile-section relative overflow-hidden px-6 py-24 md:px-12" data-perf-size="compact">
         <div className="absolute inset-0 z-0">
           <div className="home-mobile-glow absolute top-1/2 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]"></div>
           <div className="home-mobile-glow absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-tertiary/10 rounded-full blur-[120px]"></div>
@@ -680,7 +683,7 @@ export function Home() {
 
 
       {/* FAQ Section */}
-      <Section id="faq" className="perf-mobile-section relative overflow-hidden bg-background px-6 py-24 md:px-12" data-perf-size="medium">
+      <Section id="faq" className="reveal-on-scroll perf-mobile-section relative overflow-hidden bg-background px-6 py-24 md:px-12" data-perf-size="medium">
         <div className="faq-mobile-glow home-mobile-glow absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px] pointer-events-none"></div>
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">
@@ -712,7 +715,7 @@ export function Home() {
       </Section>
 
       {/* CTA Section */}
-      <Section className="perf-mobile-section px-6 py-24 md:px-12 md:py-32" data-perf-size="compact">
+      <Section className="reveal-on-scroll perf-mobile-section px-6 py-24 md:px-12 md:py-32" data-perf-size="compact">
         <div className="perf-panel max-w-7xl mx-auto cyber-glass-card rounded-[2.5rem] p-8 md:p-14 relative overflow-hidden group border border-outline-variant/20 shadow-2xl">
           <div className="mesh-gradient-bg opacity-30"></div>
           <div className="home-mobile-glow absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>

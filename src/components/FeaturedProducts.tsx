@@ -80,20 +80,18 @@ export function FeaturedProducts() {
   // Desktop scroll refs kept for arrow buttons (desktop only)
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [swiperInstance, setSwiperInstance] = useState<any>(null);
+  const [isAtStart, setIsAtStart] = useState(true);
+  const [isAtEnd, setIsAtEnd] = useState(false);
 
   const goToPreviousSlide = () => {
-    if (swiperInstance) {
+    if (swiperInstance && !isAtStart) {
       swiperInstance.slidePrev();
-    } else if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -360, behavior: "auto" });
     }
   };
 
   const goToNextSlide = () => {
-    if (swiperInstance) {
+    if (swiperInstance && !isAtEnd) {
       swiperInstance.slideNext();
-    } else if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 360, behavior: "auto" });
     }
   };
 
@@ -126,7 +124,15 @@ export function FeaturedProducts() {
         {/* Swiper Slider */}
         <div className="-mx-6 md:mx-0">
           <Swiper
-            onSwiper={setSwiperInstance}
+            onSwiper={(swiper) => {
+              setSwiperInstance(swiper);
+              setIsAtStart(swiper.isBeginning);
+              setIsAtEnd(swiper.isEnd);
+            }}
+            onSlideChange={(swiper) => {
+              setIsAtStart(swiper.isBeginning);
+              setIsAtEnd(swiper.isEnd);
+            }}
             modules={[FreeMode]}
             slidesPerView="auto"
             spaceBetween={12}
@@ -149,7 +155,7 @@ export function FeaturedProducts() {
               const responsiveImage = getResponsiveProductImage(product.image);
 
               return (
-                <SwiperSlide key={product.id} className="!w-[290px] md:!w-[280px]">
+                <SwiperSlide key={product.id} className="featured-product-slide">
                   <Link
                     to={`/products/${product.id}`}
                     className={`product-card group relative flex flex-col h-full overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] ${
@@ -262,9 +268,12 @@ export function FeaturedProducts() {
               type="button"
               aria-label="المنتج السابق"
               onClick={goToPreviousSlide}
+              disabled={isAtStart}
               className={`flex h-11 w-11 items-center justify-center rounded-full transition-all touch-manipulation ${
-                swiperInstance
-                  ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.35)] active:scale-95"
+                isAtStart
+                  ? "cursor-not-allowed border border-primary/10 bg-surface-container/30 text-primary opacity-30"
+                  : swiperInstance
+                  ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.35)] active:scale-95 hover:bg-primary/90"
                   : "border border-primary/20 bg-surface-container/50 text-primary opacity-60"
               }`}
             >
@@ -275,9 +284,12 @@ export function FeaturedProducts() {
               type="button"
               aria-label="المنتج التالي"
               onClick={goToNextSlide}
+              disabled={isAtEnd}
               className={`flex h-11 w-11 items-center justify-center rounded-full transition-all touch-manipulation ${
-                swiperInstance
-                  ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.35)] active:scale-95"
+                isAtEnd
+                  ? "cursor-not-allowed border border-primary/10 bg-surface-container/30 text-primary opacity-30"
+                  : swiperInstance
+                  ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.35)] active:scale-95 hover:bg-primary/90"
                   : "border border-primary/20 bg-surface-container/50 text-primary opacity-60"
               }`}
             >
