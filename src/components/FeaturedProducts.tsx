@@ -178,12 +178,12 @@ export function FeaturedProducts() {
                 <SwiperSlide key={product.id} style={{ width: 290 }}>
                   <Link
                     to={`/products/${product.id}`}
-                    className={`product-card group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] ${
+                    className={`product-card group relative flex flex-col h-full overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] ${
                       product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : "bg-surface-container-low/80"
                     }`}
                     style={{ width: 290 }}
                   >
-                    <div className="relative min-h-0 aspect-[4/3] w-full overflow-hidden bg-[#0c0a10]">
+                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0c0a10]">
                       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-14 bg-gradient-to-t from-[#0c0a10] to-transparent" />
 
                       <FeaturedProductImage
@@ -216,7 +216,7 @@ export function FeaturedProducts() {
                       )}
                     </div>
 
-                    <div className="flex min-h-0 flex-1 flex-col p-3.5 text-right" dir="rtl">
+                    <div className="flex flex-1 flex-col justify-between p-3.5 text-right" dir="rtl">
                       <div className="mb-2 flex items-center justify-between gap-2">
                         <span
                           className="rounded-full border px-2.5 py-1 text-[10px] font-bold"
@@ -301,7 +301,7 @@ export function FeaturedProducts() {
               <Link
                 key={product.id}
                 to={`/products/${product.id}`}
-                className={`group relative flex flex-col overflow-hidden rounded-[1.5rem] border border-outline-variant/10 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_18px_40px_rgba(208,188,255,0.08)] ${
+                className={`product-card group relative flex flex-col h-full overflow-hidden rounded-[1.5rem] border border-outline-variant/10 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_18px_40px_rgba(208,188,255,0.08)] ${
                   product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : "bg-surface-container-low/80"
                 }`}
               >
@@ -312,7 +312,7 @@ export function FeaturedProducts() {
                   />
                 )}
 
-                <div className="relative min-h-0 aspect-square w-full overflow-hidden bg-[#0c0a10]">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0c0a10]">
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-16 bg-gradient-to-t from-[#0c0a10] to-transparent" />
 
                   <FeaturedProductImage
@@ -345,7 +345,7 @@ export function FeaturedProducts() {
                   )}
                 </div>
 
-                <div className="flex min-h-0 flex-1 flex-col p-5 text-right" dir="rtl">
+                <div className="flex flex-1 flex-col justify-between p-5 text-right" dir="rtl">
                   <div className="mb-3 flex items-center justify-between gap-2">
                     <span
                       className="rounded-full border px-3 py-1 text-xs font-bold"

@@ -529,6 +529,11 @@ html {
   isolation: isolate;
 }
 
+.swiper-slide {
+  height: auto !important;
+  display: flex;
+}
+
 @media (max-width: 768px) {
   .isolate-section {
     contain: layout;
