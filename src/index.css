@@ -467,25 +467,40 @@
    CLEAN MOBILE FIX
    ========================= */
 @media (max-width: 768px) {
-
-  /* تقليل الضغط فقط */
-  .cyber-glass-card {
+  .cyber-glass-card,
+  .perf-card,
+  .perf-panel,
+  [data-slot="card"] {
     backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.22) !important;
+    transform: none !important;
+    will-change: auto !important;
+    contain: unset !important;
+    content-visibility: visible !important;
   }
 
-  .home-mobile-glow {
-    filter: blur(40px) !important;
-    opacity: 0.2 !important;
+  .home-mobile-glow,
+  .mesh-gradient-bg,
+  .icon-glow-container::after,
+  .glowing-border-accent {
+    display: none !important;
   }
 
-  /* منع مشاكل السكروول */
+  .perf-mobile-horizontal-cards,
+  .perf-horizontal-cards {
+    transform: none !important;
+    will-change: auto !important;
+    contain: unset !important;
+  }
+
+  .perf-mobile-horizontal-cards * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  html,
   body {
-    overflow-x: hidden;
+    overflow-x: hidden !important;
   }
-
-  /* تحسين اللمس */
-  * {
-    -webkit-tap-highlight-color: transparent;
-  }
-
 }
