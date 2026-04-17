@@ -182,7 +182,6 @@
 .perf-panel,
 .perf-card,
 .perf-modal-card {
-    contain: layout style;
 }
 
 .mesh-gradient-bg {
@@ -220,7 +219,6 @@
 .cyber-glass-card:hover .glowing-border-accent { transform: translateX(100%); }
 
 .main-service-card {
-    contain: layout style;
 }
 
 .main-service-card__bg,
@@ -270,8 +268,6 @@
 .perf-horizontal-cards .perf-modal-card,
 .perf-horizontal-cards [data-slot="card"],
 .perf-horizontal-cards .cyber-glass-card {
-    contain: layout style !important;
-    content-visibility: visible !important;
     contain-intrinsic-size: none !important;
     transform: none !important;
     backface-visibility: visible !important;
@@ -317,8 +313,6 @@
     .perf-mobile-horizontal-cards .perf-modal-card,
     .perf-mobile-horizontal-cards [data-slot="card"],
     .perf-mobile-horizontal-cards .cyber-glass-card {
-        contain: layout style !important;
-        content-visibility: visible !important;
         contain-intrinsic-size: none !important;
         transform: none !important;
         backface-visibility: visible !important;
@@ -335,11 +329,9 @@
     }
 
     .perf-mobile-section {
-        contain: layout style;
     }
 
     .perf-mobile-card {
-        contain: layout style;
     }
 
     .perf-panel,
@@ -438,7 +430,6 @@
     .why-choose-mobile-card {
         backface-visibility: visible;
         will-change: auto;
-        contain: layout style;
     }
 
     .faq-mobile-card {
@@ -471,208 +462,30 @@
     box-shadow: 0 8px 40px rgba(86, 0, 202, 0.15);
 }
 
-/* =========================
-   FINAL MOBILE FIX (SCROLL + DISAPPEAR BUG)
-   ========================= */
 
+/* =========================
+   CLEAN MOBILE FIX
+   ========================= */
 @media (max-width: 768px) {
 
-  /* 1. حل مشكلة الاختفاء (أهم شيء) */
-  .cyber-glass-card,
-  .perf-card,
-  .perf-panel,
-  [data-slot="card"] {
-    contain: none !important;
-    transform: none !important;
-    will-change: auto !important;
-    backface-visibility: visible !important;
-  }
-
-  /* 2. إصلاح السكروول الأفقي */
-  .perf-mobile-horizontal-cards {
-    contain: none !important;
-    transform: none !important;
-    will-change: auto !important;
-  }
-
-  /* 3. تعطيل blur الثقيل */
+  /* تقليل الضغط فقط */
   .cyber-glass-card {
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 
-  /* 4. تقليل الضغط على GPU */
   .home-mobile-glow {
     filter: blur(40px) !important;
     opacity: 0.2 !important;
   }
 
-  /* 5. تقليل الظلال الثقيلة */
-  .cyber-glass-card,
-  .perf-card,
-  .perf-panel {
-    box-shadow: 0 6px 18px rgba(0,0,0,0.25) !important;
-  }
-
-  /* 6. تعطيل hover الثقيل */
-  .cyber-glass-card:hover,
-  .perf-card:hover {
-    transform: none !important;
-  }
-
-  /* 7. تحسين الأيقونات */
-  .icon-glow-container::after {
-    filter: blur(6px) !important;
-    opacity: 0.3 !important;
-  }
-
-  /* 8. تعطيل text glow */
-  .text-glow {
-    text-shadow: none !important;
-  }
-
-  /* 9. تحسين اللمس */
-  * {
-    -webkit-tap-highlight-color: transparent;
-  }
-
-}
-/* =========================
-   FINAL PERFORMANCE FIX
-   ========================= */
-
-@media (max-width: 768px) {
-
-  /* تعطيل الأنيميشن الثقيلة */
-  .animate-pulse {
-    animation: none !important;
-  }
-
-  /* منع اختفاء العناصر أثناء السكروول */
-  .perf-mobile-horizontal-cards,
-  .perf-mobile-horizontal-cards * {
-    content-visibility: visible !important;
-    contain: none !important;
-  }
-
-  /* إجبار الرسم المستمر */
-  .perf-mobile-horizontal-cards {
-    transform: translate3d(0,0,0) !important;
-    backface-visibility: hidden !important;
-    perspective: 1000px !important;
-    will-change: auto !important;
-    scroll-behavior: auto !important;
-  }
-
-  .perf-mobile-horizontal-cards > * {
-    flex-shrink: 0;
-  }
-
-  .product-card {
-    width: 290px;
-    min-width: 290px;
+  /* منع مشاكل السكروول */
+  body {
+    overflow-x: hidden;
   }
 
   /* تحسين اللمس */
   * {
     -webkit-tap-highlight-color: transparent;
-  }
-
-}
-
-img {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
-/* =========================
-   SWIPER PERFORMANCE
-   ========================= */
-
-/* منع الاختفاء أثناء السكروول */
-.swiper,
-.swiper-wrapper,
-.swiper-slide {
-  transform: none !important;
-  will-change: auto !important;
-}
-
-.swiper-slide {
-  flex-shrink: 0 !important;
-  height: auto;
-}
-
-/* تثبيت الصور */
-.swiper-slide img {
-  backface-visibility: visible !important;
-  transform: none !important;
-}
-
-/* تعطيل أي تأثير أثناء السكروول */
-@media (max-width: 768px) {
-  .swiper-slide * {
-    animation: none !important;
-    transition: none !important;
-  }
-
-  /* تعطيل hover في الموبايل */
-  .group:hover {
-    transform: none !important;
-  }
-}
-
-/* =========================
-   GLOBAL MOBILE FIX
-   ========================= */
-@media (max-width: 768px) {
-
-  /* 1) ايقاف كل الانيميشن والترانزيشن اثناء الموبايل */
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-  }
-
-  /* 2) الغاء كل blur/backdrop-filter */
-  [class*="blur"],
-  [class*="backdrop"],
-  .cyber-glass-card,
-  .glass-nav {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    filter: none !important;
-  }
-
-  /* 3) تقليل الظلال الثقيلة */
-  * {
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-
-  /* 4) منع مشاكل اعادة الرسم */
-  html, body {
-    transform: none !important;
-    will-change: auto !important;
-  }
-
-  /* 5) تثبيت الصور */
-  img {
-    transform: none !important;
-    backface-visibility: visible !important;
-    will-change: auto !important;
-  }
-
-  /* 6) ايقاف اي glow او تاثيرات خلفية */
-  .home-mobile-glow,
-  .mesh-gradient-bg,
-  [class*="glow"] {
-    display: none !important;
-  }
-
-  /* 7) منع مشاكل overflow */
-  body {
-    overflow-x: hidden !important;
   }
 
 }
