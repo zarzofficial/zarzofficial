@@ -276,10 +276,20 @@ export function Home() {
       {/* Hero Section */}
       <Section className="relative min-h-0 overflow-hidden px-4 pb-2 pt-16 sm:px-6 sm:py-10 md:px-12 md:py-12 lg:py-20">
         <div className="absolute inset-0 z-0">
+          {/* Mobile Image */}
           <img
-            alt="Hero Background"
-            className="w-full h-full object-cover opacity-20"
+            alt="Hero Background Mobile"
+            className="w-full h-full object-cover opacity-20 md:hidden"
             src="/assets/hero-ambient.svg"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+          />
+          {/* Desktop Image */}
+          <img
+            alt="Hero Background Desktop"
+            className="hidden md:block w-full h-full object-cover opacity-20"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_V8C1X5Y5GJtZ6TmyhE1V8o9zPZDTjiBfIHyLuwq8yStU5rjHntzzZmYKveVgO4NOCqe9qpcuwbPLDLb143PhrmcccmLHDPwjhqJ971uvr4MZDc4ZFuLT9DlECkBmu3u3NpaEI57fNO9PDe4Oa1EuwecaMWvNXnJbQkzezI7C2_oJtxRthxt1X_3d9JGecxAYEwlYHjH8_NO8XEISqGjJ_AcNw8mioPN4qoxuie9czflyupK_iRz6tKWVwFb8I0-JvW7wcF6T6qAI"
             loading="eager"
             decoding="async"
             fetchPriority="high"
