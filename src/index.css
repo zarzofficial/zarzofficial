@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "swiper/css";
+
 
 @font-face {
     font-family: "Cairo Local";
@@ -581,4 +583,25 @@
 img {
   transform: translateZ(0);
   backface-visibility: hidden;
+}
+
+/* =========================
+   SWIPER PERFORMANCE
+   ========================= */
+
+.swiper {
+  transform: translateZ(0);
+}
+
+.swiper-slide {
+  flex-shrink: 0 !important;
+  will-change: transform;
+  height: auto;
+}
+
+/* تعطيل hover في الموبايل */
+@media (max-width: 768px) {
+  .group:hover {
+    transform: none !important;
+  }
 }
