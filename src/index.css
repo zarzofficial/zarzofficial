@@ -429,7 +429,6 @@
     .faq-mobile-card,
     .why-choose-mobile-card {
         backface-visibility: visible;
-        will-change: auto;
     }
 
     .faq-mobile-card {
@@ -475,7 +474,6 @@
     -webkit-backdrop-filter: none !important;
     box-shadow: 0 6px 18px rgba(0,0,0,0.22) !important;
     transform: none !important;
-    will-change: auto !important;
     contain: unset !important;
     content-visibility: visible !important;
   }
@@ -490,7 +488,6 @@
   .perf-mobile-horizontal-cards,
   .perf-horizontal-cards {
     transform: none !important;
-    will-change: auto !important;
     contain: unset !important;
   }
 
@@ -504,39 +501,31 @@
     overflow-x: hidden !important;
   }
 
-  section {
-    will-change: transform;
-    transform: translateY(0);
-  }
-
   .perf-mobile-horizontal-cards {
     touch-action: pan-x !important;
   }
 }
 
-html {
+html,
+body {
   scroll-behavior: auto !important;
+  overscroll-behavior: none;
 }
 
 /* عزل الرسم لكل قسم (Isolation for Partial Painting Optimization) */
 .isolate-section {
   isolation: isolate;
-  contain: layout paint;
-  transform: translateZ(0);
 }
 
 .swiper {
   isolation: isolate;
 }
 
+.swiper-wrapper {
+  transition-timing-function: linear !important;
+}
+
 .swiper-slide {
   height: auto !important;
   display: flex;
-}
-
-@media (max-width: 768px) {
-  .isolate-section {
-    contain: layout;
-    transform: none;
-  }
 }
