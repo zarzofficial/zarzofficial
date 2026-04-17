@@ -550,6 +550,16 @@
   .perf-mobile-horizontal-cards {
     transform: none !important;
     will-change: auto !important;
+    scroll-behavior: auto !important;
+  }
+
+  .perf-mobile-horizontal-cards > * {
+    flex-shrink: 0;
+  }
+
+  .product-card {
+    width: 290px;
+    min-width: 290px;
   }
 
 

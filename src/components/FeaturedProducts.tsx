@@ -114,7 +114,7 @@ export function FeaturedProducts() {
   useHorizontalTouchScroll(scrollContainerRef);
   const { isAtStart, isAtEnd } = useHorizontalRailState(scrollContainerRef);
 
-  const [visibleCount, setVisibleCount] = useState(4);
+  const [visibleCount, setVisibleCount] = useState(8);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -124,7 +124,7 @@ export function FeaturedProducts() {
       const scrollLeft = Math.abs(container.scrollLeft); // Use absolute for RTL
       const cardWidth = 300;
 
-      const newCount = Math.ceil(scrollLeft / cardWidth) + 6;
+      const newCount = Math.ceil(scrollLeft / cardWidth) + 10;
 
       if (newCount > visibleCount) {
         setVisibleCount(newCount);
@@ -177,7 +177,18 @@ export function FeaturedProducts() {
           className="perf-mobile-horizontal-cards flex snap-x snap-proximity gap-5 overflow-x-auto px-4 pb-8 pt-4 no-scrollbar -mx-4 md:grid md:snap-none md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 md:-mx-0 lg:grid-cols-3 lg:gap-8"
           dir="rtl"
         >
-          {featured.slice(0, visibleCount).map((product) => {
+          {featured.map((product, index) => {
+            const BUFFER = 6;
+            if (index > visibleCount + BUFFER) {
+              return (
+                <div
+                  key={product.id}
+                  className="product-card"
+                  style={{ width: 290, height: 400 }}
+                />
+              );
+            }
+
             const category = categoryMap[product.category] || {
               label: product.category,
               color: "#d0bcff",
@@ -190,7 +201,7 @@ export function FeaturedProducts() {
               <Link
                 key={product.id}
                 to={`/products/${product.id}`}
-                className={`group relative flex w-[290px] shrink-0 snap-center flex-col overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] sm:min-h-[390px] sm:rounded-[1.5rem] sm:shadow-sm md:w-auto md:shadow-lg md:transition-all md:duration-300 md:hover:-translate-y-1 md:hover:border-primary/30 md:hover:shadow-[0_18px_40px_rgba(208,188,255,0.08)] ${
+                className={`product-card group relative flex w-[290px] shrink-0 snap-center flex-col overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] sm:min-h-[390px] sm:rounded-[1.5rem] sm:shadow-sm md:w-auto md:shadow-lg md:transition-all md:duration-300 md:hover:-translate-y-1 md:hover:border-primary/30 md:hover:shadow-[0_18px_40px_rgba(208,188,255,0.08)] ${
                   product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : "bg-surface-container-low/80"
                 }`}
               >
