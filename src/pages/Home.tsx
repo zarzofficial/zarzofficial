@@ -225,7 +225,7 @@ const Section = React.memo(
       <IsolatedSection>
         <section id={id} className={className} {...props}>
           {children}
-        </Section>
+        </section>
       </IsolatedSection>
     );
   }
