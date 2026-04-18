@@ -17,6 +17,9 @@ export function AppFrame({ children }: { children: ReactNode }) {
       touchMultiplier: 2, // Keep touch fast
     });
 
+    // Expose for keyboard snap navigation to use lenis.scrollTo directly
+    (window as any).__lenis = lenis;
+
     function raf(time: number) {
       lenis.raf(time);
       requestAnimationFrame(raf);
@@ -26,6 +29,7 @@ export function AppFrame({ children }: { children: ReactNode }) {
 
     return () => {
       lenis.destroy();
+      delete (window as any).__lenis;
     };
   }, []);
 

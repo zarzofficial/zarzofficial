@@ -8,19 +8,19 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 const ScrollReveal = ({ children, type = "fadeUp", delay = 0, className = "" }: { children: React.ReactNode, type?: "fadeUp" | "fadeRight" | "fadeLeft" | "scaleUp" | "blurIn", delay?: number, className?: string }) => {
   const variants = {
-    fadeUp: { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } },
-    fadeRight: { hidden: { opacity: 0, x: -24 }, visible: { opacity: 1, x: 0 } },
-    fadeLeft: { hidden: { opacity: 0, x: 24 }, visible: { opacity: 1, x: 0 } },
-    scaleUp: { hidden: { opacity: 0, scale: 0.96 }, visible: { opacity: 1, scale: 1 } },
-    blurIn: { hidden: { opacity: 0, scale: 0.98 }, visible: { opacity: 1, scale: 1 } },
+    fadeUp:    { hidden: { opacity: 0, y: 24,  transition: { duration: 0.3 } }, visible: { opacity: 1, y: 0 } },
+    fadeRight: { hidden: { opacity: 0, x: -24, transition: { duration: 0.3 } }, visible: { opacity: 1, x: 0 } },
+    fadeLeft:  { hidden: { opacity: 0, x: 24,  transition: { duration: 0.3 } }, visible: { opacity: 1, x: 0 } },
+    scaleUp:   { hidden: { opacity: 0, scale: 0.96, transition: { duration: 0.3 } }, visible: { opacity: 1, scale: 1 } },
+    blurIn:    { hidden: { opacity: 0, scale: 0.98, transition: { duration: 0.3 } }, visible: { opacity: 1, scale: 1 } },
   };
 
   return (
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: false, margin: "-60px" }}
-      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
       variants={variants[type]}
       className={className}
     >
@@ -85,8 +85,16 @@ const useKeyboardSectionSnap = () => {
       if (idx < 0 || idx >= sections.length) return;
       currentIndex = idx;
       isScrolling = true;
-      window.scrollTo({ top: getAbsoluteTop(sections[idx]), behavior: "smooth" });
-      setTimeout(() => { isScrolling = false; }, 900);
+      // Index 0 = Hero: always scroll to very top so sticky navbar is visible
+      const target = idx === 0 ? 0 : getAbsoluteTop(sections[idx]);
+      const lenis = (window as any).__lenis;
+      if (lenis) {
+        // Use Lenis for perfectly smooth, conflict-free snap scroll
+        lenis.scrollTo(target, { duration: 1.2, easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+      } else {
+        window.scrollTo({ top: target, behavior: "smooth" });
+      }
+      setTimeout(() => { isScrolling = false; }, 1300);
     };
 
     // Sync currentIndex when user scrolls manually
