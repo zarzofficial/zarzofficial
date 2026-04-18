@@ -21,9 +21,9 @@ function MobileHero() {
       className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right"
       dir="rtl"
     >
-      <h1 className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.3] tracking-[-0.02em] sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.3]">
-        تسوق كل ما تحتاجه في 
-        <span className="text-[#a78bfa] not-italic">مكان واحد</span>
+      <h1 className="mb-4 max-w-[20rem] px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.36] tracking-[-0.02em] sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.32]">
+        تسوق كل ما تحتاجه في
+        <span className="mt-1 block text-[#a78bfa] not-italic">مكان واحد</span>
       </h1>
       <p className="mb-6 px-1 text-[0.95rem] leading-7 text-[#c4bcda] sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem]">
         مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
