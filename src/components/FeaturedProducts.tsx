@@ -88,7 +88,7 @@ export function FeaturedProducts() {
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="mb-12 flex items-start justify-between gap-4">
           <div className="flex flex-1 flex-col items-start text-start">
-            <span className="mb-4 inline-block rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-bold text-primary sm:backdrop-blur-md">
+            <span className="mb-4 inline-block rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-bold text-primary lg:backdrop-blur-md">
               الأكثر طلبًا
             </span>
             <h2 className="mb-3 font-headline text-3xl font-black text-on-background md:text-5xl">
@@ -133,7 +133,7 @@ export function FeaturedProducts() {
                     width: "72vw",
                     maxWidth: 280,
                     scrollSnapAlign: "start",
-                    willChange: "transform",
+                    // No will-change: 6 simultaneous layers on mobile = GPU memory pressure & more jank
                   }}
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0c0a10]">
@@ -147,8 +147,8 @@ export function FeaturedProducts() {
                     />
 
                     {product.outOfStock && (
-                      <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-sm">
-                        <span className="rounded-full border border-destructive/50 bg-destructive/10 px-5 py-2 font-headline text-lg font-black text-destructive shadow-[0_0_14px_rgba(255,0,0,0.16)]">
+                      <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/70">
+                        <span className="rounded-full border border-destructive/50 bg-destructive/10 px-5 py-2 font-headline text-lg font-black text-destructive">
                           نفدت الكمية
                         </span>
                       </div>

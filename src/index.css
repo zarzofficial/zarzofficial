@@ -134,8 +134,15 @@
 
 @layer base {
     html {
-        scroll-behavior: smooth;
         overflow-x: hidden;
+        /* scroll-behavior on mobile uses the OS scrolling system directly — no JS needed */
+    }
+
+    /* Desktop only: smooth-scroll for anchor links and programmatic scrollTo */
+    @media (min-width: 1024px) {
+        html {
+            scroll-behavior: smooth;
+        }
     }
 
     body {
@@ -143,10 +150,10 @@
         max-width: 100vw;
     }
 
-    /* Mobile: Enable GPU scroll compositing */
+    /* Mobile: GPU scroll compositing + prevent elastic bounce paint */
     @media (max-width: 1023px) {
-        body {
-            -webkit-overflow-scrolling: touch;
+        html {
+            overscroll-behavior: none;
         }
     }
 
@@ -574,9 +581,9 @@
         border-color: rgba(208, 188, 255, 0.1) !important;
     }
 
-    /* 5. Section layout containment — safe version (paint overflow causes clip issues) */
+    /* 5. Reduce contain cost on mobile: layout is expensive, style alone is sufficient */
     section {
-        contain: layout style;
+        contain: style;
     }
 
     /* 6. Disable text-glow (text-shadow triggers repaint) */
@@ -612,14 +619,14 @@
     }
 }
 
-html,
-body {
-    overscroll-behavior: auto;
-}
+/* overscroll behavior is set per-breakpoint above */
 
-/* عزل الرسم لكل قسم (Isolation for Partial Painting Optimization) */
-.isolate-section {
-    isolation: isolate;
+
+/* Section isolation — desktop only: creates stacking context per section (compositor layers) */
+@media (min-width: 1024px) {
+    .isolate-section {
+        isolation: isolate;
+    }
 }
 
 
