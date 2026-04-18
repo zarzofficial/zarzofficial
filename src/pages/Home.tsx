@@ -6,6 +6,94 @@ import { useCoarsePointer } from "../lib/useCoarsePointer";
 import { useScrollReveal } from "../lib/useScrollReveal";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
+// ─── Hero text: static on mobile, animated on desktop ────────────────────────
+// Checked once at render time — same pattern as ScrollReveal above.
+const IS_DESKTOP = typeof window !== "undefined" && window.innerWidth >= 1024;
+
+function HeroContent() {
+  if (!IS_DESKTOP) {
+    // Mobile: plain HTML, zero framer-motion, no glow spans that trigger GPU layers
+    return (
+      <div
+        className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right"
+        dir="rtl"
+      >
+        <h1 className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.3] tracking-[-0.02em] sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.3]">
+          {"\u062a\u0633\u0648\u0642 \u0643\u0644 \u0645\u0627 \u062a\u062d\u062a\u0627\u062c\u0647 \u0641\u064a "}
+          <span className="text-[#a78bfa] not-italic">\u0645\u0643\u0627\u0646 \u0648\u0627\u062d\u062f</span>
+        </h1>
+        <p className="mb-6 px-1 text-[0.95rem] leading-7 text-[#c4bcda] sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem]">
+          {"\u0645\u0631\u062d\u0628\u0627\u064b \u0628\u0643 \u0641\u064a \u0632\u0627\u0631\u0632\u060c \u0648\u062c\u0647\u062a\u0643 \u0627\u0644\u0623\u0648\u0644\u0649 \u0644\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0631\u0642\u0645\u064a\u0629. \u0646\u0648\u0641\u0631 \u0644\u0643 \u0634\u062d\u0646 \u0623\u0644\u0639\u0627\u0628 \u0641\u0648\u0631\u064a\u060c \u0627\u0634\u062a\u0631\u0627\u0643\u0627\u062a \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a\u060c \u062e\u062f\u0645\u0627\u062a \u0632\u064a\u0627\u062f\u0629 \u0627\u0644\u0645\u062a\u0627\u0628\u0639\u064a\u0646\u060c \u0648\u062a\u0637\u0648\u064a\u0631 \u0627\u0644\u0645\u062a\u0627\u062c\u0631 \u0628\u0623\u0641\u0636\u0644 \u0627\u0644\u0623\u0633\u0639\u0627\u0631 \u0648\u0623\u0633\u0631\u0639 \u062a\u0646\u0641\u064a\u0630."}
+        </p>
+        <div className="flex w-full flex-col gap-3 sm:flex-row sm:gap-3">
+          <Link
+            to="/products"
+            className="primary-gradient w-full rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary active:scale-95 sm:min-w-[12rem] sm:w-auto"
+          >
+            {"\u0639\u0631\u0648\u0636\u0646\u0627 \u0627\u0644\u062d\u0635\u0631\u064a\u0629"}
+          </Link>
+          <Link
+            to="/contact"
+            className="w-full rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-center text-base font-bold text-white sm:min-w-[12rem] sm:w-auto"
+          >
+            {"\u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627"}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop: full framer-motion entrance animation
+  return (
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.1 } }
+      }}
+      className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right lg:mx-0 lg:max-w-none lg:text-start"
+      dir="rtl"
+    >
+      <motion.h1
+        variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }}
+        className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.3] tracking-[-0.02em] sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.3] md:mb-6 md:max-w-none md:text-5xl xl:text-6xl md:leading-[1.3] md:tracking-tight"
+      >
+        {"\u062a\u0633\u0648\u0642 \u0643\u0644 \u0645\u0627 \u062a\u062d\u062a\u0627\u062c\u0647 \u0641\u064a "}<br className="hidden sm:block" />
+        <span className="relative inline-block mt-1 py-1 md:py-2 md:mt-3">
+          <span className="absolute inset-0 bg-[#a78bfa]/20 blur-[30px] rounded-full hidden lg:block animate-[pulse_4s_ease-in-out_infinite]"></span>
+          <span className="relative text-[#a78bfa] not-italic md:italic md:drop-shadow-[0_0_15px_rgba(167,139,250,0.6)] lg:animate-[pulse_3s_ease-in-out_infinite]">{"\u0645\u0643\u0627\u0646 \u0648\u0627\u062d\u062f"}</span>
+        </span>
+      </motion.h1>
+      <motion.p
+        variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
+        className="mb-6 px-1 text-[0.95rem] leading-7 text-outline sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem] md:mb-8 md:max-w-2xl md:text-xl md:leading-relaxed text-[#c4bcda]"
+      >
+        {"\u0645\u0631\u062d\u0628\u0627\u064b \u0628\u0643 \u0641\u064a \u0632\u0627\u0631\u0632\u060c \u0648\u062c\u0647\u062a\u0643 \u0627\u0644\u0623\u0648\u0644\u0649 \u0644\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0631\u0642\u0645\u064a\u0629. \u0646\u0648\u0641\u0631 \u0644\u0643 \u0634\u062d\u0646 \u0623\u0644\u0639\u0627\u0645 \u0641\u0648\u0631\u064a\u060c \u0627\u0634\u062a\u0631\u0627\u0643\u0627\u062a \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a\u060c \u062e\u062f\u0645\u0627\u062a \u0632\u064a\u0627\u062f\u0629 \u0627\u0644\u0645\u062a\u0627\u0628\u0639\u064a\u0646\u060c \u0648\u062a\u0637\u0648\u064a\u0631 \u0627\u0644\u0645\u062a\u0627\u062c\u0631 \u0628\u0623\u0641\u0636\u0644 \u0627\u0644\u0623\u0633\u0639\u0627\u0631 \u0648\u0623\u0633\u0631\u0639 \u062a\u0646\u0641\u064a\u0630."}
+      </motion.p>
+      <motion.div
+        variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } }}
+        className="flex w-full flex-col gap-3 sm:flex-row sm:gap-3 md:justify-start md:gap-5"
+      >
+        <Link
+          to="/products"
+          className="primary-gradient w-full rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary active:scale-95 md:hover:shadow-[0_0_40px_rgba(208,188,255,0.5)] md:hover:-translate-y-1 md:transition-all sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
+        >
+          {"\u0639\u0631\u0648\u0636\u0646\u0627 \u0627\u0644\u062d\u0635\u0631\u064a\u0629"}
+        </Link>
+        <Link
+          to="/contact"
+          className="w-full rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-center text-base font-bold text-white md:backdrop-blur-md md:hover:bg-white/10 md:hover:border-white/40 md:hover:-translate-y-1 md:transition-all sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
+        >
+          {"\u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627"}
+        </Link>
+      </motion.div>
+    </motion.div>
+  );
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+
 const ScrollReveal = ({ children, type = "fadeUp", delay = 0, className = "" }: { children: React.ReactNode, type?: "fadeUp" | "fadeRight" | "fadeLeft" | "scaleUp" | "blurIn", delay?: number, className?: string }) => {
   // Read once at component definition time — avoids re-reading on every render
   const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
@@ -445,49 +533,8 @@ export function Home() {
         </div>
         <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch justify-between gap-8 lg:flex-row lg:items-center xl:gap-12">
 
-          {/* Main Hero Text */}
-          <motion.div 
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: { staggerChildren: 0.15, delayChildren: 0.1 }
-              }
-            }}
-            className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right lg:mx-0 lg:max-w-none lg:text-start" dir="rtl">
-            <motion.h1 
-              variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }}
-              className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.3] tracking-[-0.02em] text-glow sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.3] md:mb-6 md:max-w-none md:text-5xl xl:text-6xl md:leading-[1.3] md:tracking-tight">
-              تسوق كل ما تحتاجه في <br className="hidden sm:block" />
-              <span className="relative inline-block mt-1 py-1 md:py-2 md:mt-3">
-                <span className="absolute inset-0 bg-[#a78bfa]/20 blur-[30px] rounded-full hidden md:block animate-[pulse_4s_ease-in-out_infinite]"></span>
-                <span className="relative text-[#a78bfa] not-italic md:italic drop-shadow-[0_0_15px_rgba(167,139,250,0.6)] md:animate-[pulse_3s_ease-in-out_infinite]">مكان واحد</span>
-              </span>
-            </motion.h1>
-            <motion.p 
-              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
-              className="mb-6 px-1 text-[0.95rem] leading-7 text-outline sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem] md:mb-8 md:max-w-2xl md:text-xl md:leading-relaxed text-[#c4bcda]">
-              مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
-            </motion.p>
-            <motion.div 
-              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } }}
-              className="flex w-full flex-col gap-3 sm:flex-row sm:gap-3 md:justify-start md:gap-5">
-              <Link
-                to="/products"
-                className="primary-gradient w-full rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary active:scale-95 md:hover:shadow-[0_0_40px_rgba(208,188,255,0.5)] md:hover:-translate-y-1 md:transition-all sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
-              >
-                عروضنا الحصرية
-              </Link>
-              <Link
-                to="/contact"
-                className="w-full rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-center text-base font-bold text-white md:backdrop-blur-md md:hover:bg-white/10 md:hover:border-white/40 md:hover:-translate-y-1 md:transition-all sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
-              >
-                تواصل معنا
-              </Link>
-            </motion.div>
-          </motion.div>
+          {/* Main Hero Text — HeroContent switches mobile↔desktop internally */}
+          <HeroContent />
 
           {/* Features Vertical Card */}
           <TiltCard className="perf-panel w-full lg:w-[340px] xl:w-[380px] shrink-0 cyber-glass-card rounded-[2rem] p-5 xl:p-6 border border-white/5 bg-surface/60 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] relative hidden lg:block lg:animate-in lg:fade-in lg:slide-in-from-left-12 lg:duration-1000 lg:delay-300 lg:fill-mode-both">
