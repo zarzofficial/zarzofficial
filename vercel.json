@@ -1,0 +1,8 @@
+{
+  "buildCommand": "node scripts/generate-responsive-images.mjs && vite build && node scripts/sync-static-build.cjs",
+  "outputDirectory": "docs",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/((?!assets|_next|favicon|robots|sitemap|.*\\..*).*)", "destination": "/index.html" }
+  ]
+}
