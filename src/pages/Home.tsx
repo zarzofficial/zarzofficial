@@ -8,19 +8,19 @@ import { motion } from "framer-motion";
 
 const ScrollReveal = ({ children, type = "fadeUp", delay = 0, className = "" }: { children: React.ReactNode, type?: "fadeUp" | "fadeRight" | "fadeLeft" | "scaleUp" | "blurIn", delay?: number, className?: string }) => {
   const variants = {
-    fadeUp: { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0 } },
-    fadeRight: { hidden: { opacity: 0, x: -50 }, visible: { opacity: 1, x: 0 } },
-    fadeLeft: { hidden: { opacity: 0, x: 50 }, visible: { opacity: 1, x: 0 } },
+    fadeUp: { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } },
+    fadeRight: { hidden: { opacity: 0, x: -30 }, visible: { opacity: 1, x: 0 } },
+    fadeLeft: { hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0 } },
     scaleUp: { hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1 } },
-    blurIn: { hidden: { opacity: 0, filter: "blur(10px)" }, visible: { opacity: 1, filter: "blur(0px)" } },
+    blurIn: { hidden: { opacity: 0, scale: 0.97 }, visible: { opacity: 1, scale: 1 } }, // Replaced expensive blur with subtle scale
   };
 
   return (
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+      viewport={{ once: true, margin: "-20px" }}
+      transition={{ duration: 0.5, delay, ease: "easeOut" }}
       variants={variants[type]}
       className={className}
     >
