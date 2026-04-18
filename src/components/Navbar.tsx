@@ -85,7 +85,7 @@ export function Navbar() {
 
                   {/* Dropdown */}
                   {dropdownOpen && (
-                    <div className="absolute top-full mt-4 left-1/2 -translate-x-1/2 w-56 bg-surface/40 border border-white/10 rounded-3xl shadow-[0_30px_80px_rgba(0,0,0,0.8)] backdrop-blur-2xl overflow-hidden animate-fade-in ring-1 ring-white/5">
+                    <div dir="rtl" className="absolute top-full mt-4 left-1/2 -translate-x-1/2 w-[240px] bg-black/20 border border-white/10 rounded-3xl shadow-[0_30px_80px_rgba(0,0,0,0.8)] backdrop-blur-2xl overflow-hidden animate-fade-in ring-1 ring-white/5">
                       <div className="p-2 space-y-1">
                         {CATEGORIES.map((cat) => (
                           <Link
@@ -94,11 +94,11 @@ export function Navbar() {
                             className={`flex items-center gap-3 px-4 py-3 text-sm transition-all duration-300 rounded-2xl ${
                               location.pathname === cat.path
                                 ? "bg-primary/20 text-white shadow-[inset_0_0_20px_rgba(125,60,255,0.2)]"
-                                : "text-[#a1a1aa] hover:bg-white/10 hover:text-white hover:translate-x-1"
+                                : "text-[#a1a1aa] hover:bg-white/10 hover:text-white hover:-translate-x-1"
                             }`}
                           >
                             <SiteIcon name={cat.icon} className={`text-[18px] shrink-0 ${location.pathname === cat.path ? 'text-primary' : 'text-primary/70'}`} />
-                            <span className="font-semibold">{cat.name}</span>
+                            <span className="font-semibold pt-1">{cat.name}</span>
                           </Link>
                         ))}
                       </div>
@@ -108,7 +108,7 @@ export function Navbar() {
                           className="flex items-center justify-center gap-2 px-4 py-3 mt-1 text-xs font-bold text-white transition-all bg-primary/20 hover:bg-primary/40 rounded-2xl"
                         >
                           عرض جميع المنتجات
-                          <SiteIcon name="arrow_forward" className="text-[14px]" />
+                          <SiteIcon name="arrow_back" className="text-[14px]" />
                         </Link>
                       </div>
                     </div>
