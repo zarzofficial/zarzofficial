@@ -17,13 +17,30 @@ function FeaturedProductImage({
   image,
   outOfStock,
   loadingStrategy,
+  priority,
 }: {
   alt: string;
   image: ReturnType<typeof getResponsiveProductImage>;
   outOfStock: boolean;
   loadingStrategy: "eager" | "lazy";
+  priority?: boolean;
 }) {
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Avoid opacity-0 → transition pop-in for eager/priority images.
+  // Show skeleton for layout stability, but reveal image immediately at load.
+  // No CSS transition on priority images — they must paint with zero delay.
+  const opacityClass = priority
+    ? isLoaded
+      ? outOfStock
+        ? "opacity-50"
+        : "opacity-100"
+      : "opacity-0"
+    : isLoaded
+    ? outOfStock
+      ? "opacity-50"
+      : "opacity-100"
+    : "opacity-0";
 
   return (
     <div className="absolute inset-0">
@@ -41,11 +58,10 @@ function FeaturedProductImage({
         src={image.src}
         srcSet={image.srcSet}
         alt={alt}
-        className={`h-full w-full object-cover transition-opacity duration-300 ${
-          isLoaded ? (outOfStock ? "opacity-50" : "opacity-100") : "opacity-0"
-        }`}
+        className={`h-full w-full object-cover ${priority ? "" : "transition-opacity duration-200"} ${opacityClass}`}
         loading={loadingStrategy}
-        decoding="async"
+        decoding={priority ? "sync" : "async"}
+        fetchPriority={priority ? "high" : loadingStrategy === "eager" ? "auto" : "low"}
         onLoad={() => setIsLoaded(true)}
         onError={(event) => {
           handleResponsiveImageError(event, image.src);
@@ -80,7 +96,6 @@ export function FeaturedProducts() {
   return (
     <section
       className="perf-mobile-section relative overflow-hidden bg-background px-6 pb-4 pt-4 md:px-12 md:py-14"
-      data-perf-size="medium"
     >
       <div className="pointer-events-none absolute top-0 right-1/4 h-[260px] w-[260px] rounded-full bg-primary/5 blur-[36px] md:h-[500px] md:w-[500px] md:blur-[120px]" />
       <div className="pointer-events-none absolute bottom-0 left-1/3 h-[220px] w-[220px] rounded-full bg-tertiary/5 blur-[32px] md:h-[400px] md:w-[400px] md:blur-[100px]" />
@@ -143,7 +158,8 @@ export function FeaturedProducts() {
                       alt={product.title}
                       image={responsiveImage}
                       outOfStock={product.outOfStock}
-                      loadingStrategy={index < 2 ? "eager" : "lazy"}
+                      loadingStrategy={index < 3 ? "eager" : "lazy"}
+                      priority={index === 0}
                     />
 
                     {product.outOfStock && (
