@@ -5,15 +5,13 @@ import { getProductBySlugOrId } from "./data/products";
 import { AppFrame } from "./app/AppFrame";
 import { getCatalogPath, getCatalogRouteCategory, getCategoryName } from "./lib/storeCatalog";
 
-const Home = lazy(() => import("./pages/Home").then((module) => ({ default: module.Home })));
-const Store = lazy(() => import("./pages/Store").then((module) => ({ default: module.Store })));
-const CartRoute = lazy(() => import("./routes/CartRoute"));
-const AccountRoute = lazy(() => import("./routes/AccountRoute"));
-const Contact = lazy(() => import("./pages/Contact").then((module) => ({ default: module.Contact })));
-const Terms = lazy(() => import("./pages/Terms").then((module) => ({ default: module.Terms })));
-const ProductDetails = lazy(() =>
-  import("./pages/ProductDetails").then((module) => ({ default: module.ProductDetails })),
-);
+import { Home } from "./pages/Home";
+import { Store } from "./pages/Store";
+import CartRoute from "./routes/CartRoute";
+import AccountRoute from "./routes/AccountRoute";
+import { Contact } from "./pages/Contact";
+import { Terms } from "./pages/Terms";
+import { ProductDetails } from "./pages/ProductDetails";
 
 function DynamicTitle() {
   const location = useLocation();
