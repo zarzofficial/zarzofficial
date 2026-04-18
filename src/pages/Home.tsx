@@ -4,7 +4,7 @@ import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
 import { useCoarsePointer } from "../lib/useCoarsePointer";
 import { useScrollReveal } from "../lib/useScrollReveal";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 const ScrollReveal = ({ children, type = "fadeUp", delay = 0, className = "" }: { children: React.ReactNode, type?: "fadeUp" | "fadeRight" | "fadeLeft" | "scaleUp" | "blurIn", delay?: number, className?: string }) => {
   const variants = {
@@ -25,6 +25,46 @@ const ScrollReveal = ({ children, type = "fadeUp", delay = 0, className = "" }: 
       className={className}
     >
       {children}
+    </motion.div>
+  );
+};
+
+const TiltCard = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x, { stiffness: 400, damping: 30 });
+  const mouseYSpring = useSpring(y, { stiffness: 400, damping: 30 });
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], [8, -8]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], [-8, 8]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    x.set(mouseX / width - 0.5);
+    y.set(mouseY / height - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+      className={className}
+    >
+      <div style={{ transform: "translateZ(40px)" }} className="h-full w-full pointer-events-auto">
+        {children}
+      </div>
     </motion.div>
   );
 };
@@ -351,7 +391,7 @@ export function Home() {
           </div>
 
           {/* Features Vertical Card */}
-          <div className="perf-panel w-full lg:w-[340px] xl:w-[380px] shrink-0 cyber-glass-card rounded-[2rem] p-5 xl:p-6 border border-white/5 bg-surface/60 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] relative hidden lg:block lg:animate-in lg:fade-in lg:slide-in-from-left-12 lg:duration-1000 lg:delay-300 lg:fill-mode-both">
+          <TiltCard className="perf-panel w-full lg:w-[340px] xl:w-[380px] shrink-0 cyber-glass-card rounded-[2rem] p-5 xl:p-6 border border-white/5 bg-surface/60 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] relative hidden lg:block lg:animate-in lg:fade-in lg:slide-in-from-left-12 lg:duration-1000 lg:delay-300 lg:fill-mode-both">
             <div className="absolute -top-4 -right-4 w-32 h-32 bg-primary/20 rounded-full blur-[40px] pointer-events-none"></div>
 
             <div className="flex justify-start mb-4">
@@ -403,7 +443,7 @@ export function Home() {
               </div>
             </div>
 
-          </div>
+          </TiltCard>
         </div>
 
         {/* Decorative Watermark */}
