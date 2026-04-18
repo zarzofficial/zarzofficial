@@ -796,47 +796,47 @@ export function Home() {
 
         <ScrollReveal type="scaleUp" className="max-w-7xl mx-auto relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 text-center">
 
-          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-primary/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(86,0,202,0.15)] overflow-hidden flex flex-col justify-center">
+          <div className="perf-card group relative p-5 md:p-10 rounded-[2rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-primary/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(86,0,202,0.15)] overflow-hidden flex flex-col justify-center">
             <div className="home-mobile-glow absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-primary/20"></div>
             <div className="relative z-10 flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 transition-transform duration-500 md:group-hover:scale-110">
-                <SiteIcon name="groups" className="text-3xl text-primary drop-shadow-[0_0_10px_rgba(208,188,255,0.5)]" />
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 md:mb-6 transition-transform duration-500 md:group-hover:scale-110">
+                <SiteIcon name="groups" className="text-2xl md:text-3xl text-primary drop-shadow-[0_0_10px_rgba(208,188,255,0.5)]" />
               </div>
-              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight transition-colors md:group-hover:text-primary">+10k</div>
-              <div className="text-outline text-sm md:text-base font-bold">عميل سعيد</div>
+              <div className="text-3xl md:text-5xl font-black text-on-surface mb-1 md:mb-2 tracking-tight transition-colors md:group-hover:text-primary">+10k</div>
+              <div className="text-outline text-xs md:text-base font-bold">عميل سعيد</div>
             </div>
           </div>
 
-          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#3b82f6]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(59,130,246,0.15)] overflow-hidden flex flex-col justify-center">
+          <div className="perf-card group relative p-5 md:p-10 rounded-[2rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#3b82f6]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(59,130,246,0.15)] overflow-hidden flex flex-col justify-center">
             <div className="home-mobile-glow absolute top-0 left-0 w-32 h-32 bg-[#3b82f6]/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-[#3b82f6]/20"></div>
             <div className="relative z-10 flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-[#3b82f6]/10 flex items-center justify-center mb-6 transition-transform duration-500 md:group-hover:scale-110">
-                <SiteIcon name="verified" className="text-3xl text-[#3b82f6] drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#3b82f6]/10 flex items-center justify-center mb-4 md:mb-6 transition-transform duration-500 md:group-hover:scale-110">
+                <SiteIcon name="verified" className="text-2xl md:text-3xl text-[#3b82f6] drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
               </div>
-              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight transition-colors md:group-hover:text-[#3b82f6]">99%</div>
-              <div className="text-outline text-sm md:text-base font-bold">رضا المستخدمين</div>
+              <div className="text-3xl md:text-5xl font-black text-on-surface mb-1 md:mb-2 tracking-tight transition-colors md:group-hover:text-[#3b82f6]">99%</div>
+              <div className="text-outline text-xs md:text-base font-bold">رضا المستخدمين</div>
             </div>
           </div>
 
-          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#f59e0b]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(245,158,11,0.15)] overflow-hidden flex flex-col justify-center">
+          <div className="perf-card group relative p-5 md:p-10 rounded-[2rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#f59e0b]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(245,158,11,0.15)] overflow-hidden flex flex-col justify-center">
             <div className="home-mobile-glow absolute bottom-0 right-0 w-32 h-32 bg-[#f59e0b]/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-[#f59e0b]/20"></div>
             <div className="relative z-10 flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-[#f59e0b]/10 flex items-center justify-center mb-6 transition-transform duration-500 md:group-hover:scale-110">
-                <SiteIcon name="rocket_launch" className="text-3xl text-[#f59e0b] drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#f59e0b]/10 flex items-center justify-center mb-4 md:mb-6 transition-transform duration-500 md:group-hover:scale-110">
+                <SiteIcon name="rocket_launch" className="text-2xl md:text-3xl text-[#f59e0b] drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
               </div>
-              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight transition-colors md:group-hover:text-[#f59e0b]">+250</div>
-              <div className="text-outline text-sm md:text-base font-bold">مشروع منجز</div>
+              <div className="text-3xl md:text-5xl font-black text-on-surface mb-1 md:mb-2 tracking-tight transition-colors md:group-hover:text-[#f59e0b]">+250</div>
+              <div className="text-outline text-xs md:text-base font-bold">مشروع منجز</div>
             </div>
           </div>
 
-          <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#10b981]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(16,185,129,0.15)] overflow-hidden flex flex-col justify-center">
+          <div className="perf-card group relative p-5 md:p-10 rounded-[2rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#10b981]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(16,185,129,0.15)] overflow-hidden flex flex-col justify-center">
             <div className="home-mobile-glow absolute bottom-0 left-0 w-32 h-32 bg-[#10b981]/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-[#10b981]/20"></div>
             <div className="relative z-10 flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-[#10b981]/10 flex items-center justify-center mb-6 transition-transform duration-500 md:group-hover:scale-110">
-                <SiteIcon name="support_agent" className="text-3xl text-[#10b981] drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#10b981]/10 flex items-center justify-center mb-4 md:mb-6 transition-transform duration-500 md:group-hover:scale-110">
+                <SiteIcon name="support_agent" className="text-2xl md:text-3xl text-[#10b981] drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
               </div>
-              <div className="text-4xl md:text-5xl font-black text-on-surface mb-2 tracking-tight transition-colors md:group-hover:text-[#10b981]">24/7</div>
-              <div className="text-outline text-sm md:text-base font-bold">دعم فني متواصل</div>
+              <div className="text-3xl md:text-5xl font-black text-on-surface mb-1 md:mb-2 tracking-tight transition-colors md:group-hover:text-[#10b981]">24/7</div>
+              <div className="text-outline text-xs md:text-base font-bold">دعم فني متواصل</div>
             </div>
           </div>
         </ScrollReveal>
@@ -888,7 +888,7 @@ export function Home() {
               <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-outline text-sm font-bold mb-8 backdrop-blur-md">
                 جاهز تبدأ الآن؟
               </span>
-              <h2 className="text-4xl md:text-5xl lg:text-5xl font-black font-headline mb-6 text-on-background leading-tight text-glow">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black font-headline mb-6 text-on-background leading-tight text-glow">
                 خلنا نحول طلبك إلى تنفيذ سريع ومرتب
               </h2>
               <p className="text-lg md:text-xl text-[#cbc3d9] leading-relaxed max-w-2xl">
