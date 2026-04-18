@@ -302,7 +302,7 @@ export function Home() {
         <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch justify-between gap-8 lg:flex-row lg:items-center xl:gap-12">
 
           {/* Main Hero Text */}
-          <div className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right lg:mx-0 lg:max-w-none lg:text-start" dir="rtl">
+          <div className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right lg:mx-0 lg:max-w-none lg:text-start md:animate-in md:fade-in md:slide-in-from-bottom-12 md:duration-1000 md:ease-out" dir="rtl">
             <h1 className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.3] tracking-[-0.02em] text-glow sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.3] md:mb-6 md:max-w-none md:text-5xl xl:text-6xl md:leading-[1.3] md:tracking-tight">
               تسوق كل ما تحتاجه في <br className="hidden sm:block" />
               <span className="mt-1 block py-2 text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#d0bcff] not-italic md:mt-3 md:italic drop-shadow-sm">مكان واحد</span>
@@ -327,7 +327,7 @@ export function Home() {
           </div>
 
           {/* Features Vertical Card */}
-          <div className="perf-panel w-full lg:w-[340px] xl:w-[380px] shrink-0 cyber-glass-card rounded-[2rem] p-5 xl:p-6 border border-white/5 bg-surface/60 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] relative hidden lg:block">
+          <div className="perf-panel w-full lg:w-[340px] xl:w-[380px] shrink-0 cyber-glass-card rounded-[2rem] p-5 xl:p-6 border border-white/5 bg-surface/60 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] relative hidden lg:block lg:animate-in lg:fade-in lg:slide-in-from-left-12 lg:duration-1000 lg:delay-300 lg:fill-mode-both">
             <div className="absolute -top-4 -right-4 w-32 h-32 bg-primary/20 rounded-full blur-[40px] pointer-events-none"></div>
 
             <div className="flex justify-start mb-4">
