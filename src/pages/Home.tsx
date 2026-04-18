@@ -59,12 +59,10 @@ const TiltCard = ({ children, className = "" }: { children: React.ReactNode, cla
     <motion.div
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+      style={{ rotateX, rotateY, perspective: 1000 }}
       className={className}
     >
-      <div style={{ transform: "translateZ(40px)" }} className="h-full w-full pointer-events-auto">
-        {children}
-      </div>
+      {children}
     </motion.div>
   );
 };
