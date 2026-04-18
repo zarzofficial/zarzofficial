@@ -4,7 +4,7 @@ import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
 import { useCoarsePointer } from "../lib/useCoarsePointer";
 import { useScrollReveal } from "../lib/useScrollReveal";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { LazyMotion, domAnimation, m, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 // ─── Mobile/Desktop Hero split ────────────────────────────────────────────────
 // MobileHero: pure static HTML, zero framer-motion, no glow/blur elements.
@@ -47,7 +47,8 @@ function MobileHero() {
 
 function DesktopHero() {
   return (
-    <motion.div
+    <LazyMotion features={domAnimation}>
+    <m.div
       initial="hidden"
       animate="visible"
       variants={{
@@ -57,7 +58,7 @@ function DesktopHero() {
       className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right lg:mx-0 lg:max-w-none lg:text-start"
       dir="rtl"
     >
-      <motion.h1
+      <m.h1
         variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }}
         className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.3] tracking-[-0.02em] sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.3] md:mb-6 md:max-w-none md:text-5xl xl:text-6xl md:leading-[1.3] md:tracking-tight"
       >
@@ -68,14 +69,14 @@ function DesktopHero() {
             مكان واحد
           </span>
         </span>
-      </motion.h1>
-      <motion.p
+      </m.h1>
+      <m.p
         variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
         className="mb-6 px-1 text-[0.95rem] leading-7 text-outline sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem] md:mb-8 md:max-w-2xl md:text-xl md:leading-relaxed text-[#c4bcda]"
       >
         مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعام فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
-      </motion.p>
-      <motion.div
+      </m.p>
+      <m.div
         variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } }}
         className="flex w-full flex-col gap-3 sm:flex-row sm:gap-3 md:justify-start md:gap-5"
       >
@@ -91,8 +92,9 @@ function DesktopHero() {
         >
           تواصل معنا
         </Link>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
+    </LazyMotion>
   );
 }
 
@@ -139,6 +141,7 @@ const ScrollReveal = ({ children, type = "fadeUp", delay = 0, className = "" }: 
 };
 
 const TiltCard = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => {
+  const isTiltMobile = typeof window !== "undefined" && window.innerWidth < 1024;
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
@@ -164,15 +167,18 @@ const TiltCard = ({ children, className = "" }: { children: React.ReactNode, cla
     y.set(0);
   };
 
+  if (isTiltMobile) {
+    return <div className={className}>{children}</div>;
+  }
   return (
-    <motion.div
+    <m.div
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{ rotateX, rotateY, perspective: 1000 }}
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 };
 
@@ -615,7 +621,7 @@ export function Home() {
         <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-background to-transparent pointer-events-none z-0 border-t border-background"></div>
         <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-background to-transparent pointer-events-none z-0 border-b border-background"></div>
         
-        <div className="home-mobile-glow absolute top-1/2 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none"></div>
+        {!isMobile && <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none" />}
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-row justify-between items-end mb-12 gap-4">
             <div className="text-start">
@@ -774,8 +780,10 @@ export function Home() {
 
       {/* Why ZARZ Section */}
       <Section data-snap-section="true" data-cv-section className="py-12 md:py-20 px-6 md:px-12 relative overflow-hidden lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]">
-        <div className="why-choose-mobile-glow home-mobile-glow absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] pointer-events-none"></div>
-        <div className="why-choose-mobile-glow home-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
+        {!isMobile && <>
+          <div className="absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
+          <div className="absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[100px] pointer-events-none" />
+        </>}
         <ScrollReveal type="fadeUp" className="max-w-6xl mx-auto relative z-10 w-full">
           <div className="text-center mb-8 md:mb-10">
             <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-primary text-sm font-bold mb-4">لماذا نحن مختلفون؟</span>
@@ -805,10 +813,12 @@ export function Home() {
         <ScrollReveal type="blurIn" delay={0.1} className="z-20 w-full max-w-6xl mx-auto mb-16 md:mb-24 relative">
           <div className="flex flex-col items-center justify-center text-center mb-10 md:mb-16 relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs md:text-sm font-bold mb-4 backdrop-blur-md shadow-[0_0_15px_rgba(208,188,255,0.1)]">
-              <span className="relative flex h-2 w-2 mb-0.5">
-                <span className="home-mobile-ping animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-              </span>
+              {!isMobile && (
+                <span className="relative flex h-2 w-2 mb-0.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                </span>
+              )}
               شركاء النجاح
             </div>
             <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
@@ -824,8 +834,8 @@ export function Home() {
               {mobileTechLogos}
             </div>
           </div>
-          <div
-            className="group hidden w-full md:inline-flex md:flex-nowrap md:overflow-hidden no-scrollbar md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] opacity-70 grayscale hover:grayscale-0 transition-all duration-700 bg-surface/0"
+          {!isMobile && <div
+            className="group hidden w-full md:inline-flex md:flex-nowrap md:overflow-hidden no-scrollbar md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] opacity-70 grayscale hover:grayscale-0 md:transition-all md:duration-700 bg-surface/0"
             dir="ltr"
           >
             <style>{`
@@ -846,13 +856,13 @@ export function Home() {
               {desktopTechLogos}
               {desktopTechLogos}
             </div>
-          </div>
+          </div>}
         </ScrollReveal>
 
         <ScrollReveal type="scaleUp" className="max-w-7xl mx-auto relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 text-center">
 
-          <div className="perf-card group relative p-5 md:p-10 rounded-[2rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-primary/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(86,0,202,0.15)] overflow-hidden flex flex-col justify-center">
-            <div className="home-mobile-glow absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-primary/20"></div>
+          <div className="perf-card group relative p-5 md:p-10 rounded-[2rem] bg-surface-container-low border border-outline-variant/10 md:transition-all md:duration-500 md:hover:border-primary/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(86,0,202,0.15)] overflow-hidden flex flex-col justify-center">
+            {!isMobile && <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl md:transition-all md:duration-500 md:group-hover:bg-primary/20" />}
             <div className="relative z-10 flex flex-col items-center">
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 md:mb-6 transition-transform duration-500 md:group-hover:scale-110">
                 <SiteIcon name="groups" className="text-2xl md:text-3xl text-primary drop-shadow-[0_0_10px_rgba(208,188,255,0.5)]" />
@@ -862,8 +872,8 @@ export function Home() {
             </div>
           </div>
 
-          <div className="perf-card group relative p-5 md:p-10 rounded-[2rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#3b82f6]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(59,130,246,0.15)] overflow-hidden flex flex-col justify-center">
-            <div className="home-mobile-glow absolute top-0 left-0 w-32 h-32 bg-[#3b82f6]/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-[#3b82f6]/20"></div>
+          <div className="perf-card group relative p-5 md:p-10 rounded-[2rem] bg-surface-container-low border border-outline-variant/10 md:transition-all md:duration-500 md:hover:border-[#3b82f6]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(59,130,246,0.15)] overflow-hidden flex flex-col justify-center">
+            {!isMobile && <div className="absolute top-0 left-0 w-32 h-32 bg-[#3b82f6]/10 rounded-full blur-3xl md:transition-all md:duration-500 md:group-hover:bg-[#3b82f6]/20" />}
             <div className="relative z-10 flex flex-col items-center">
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#3b82f6]/10 flex items-center justify-center mb-4 md:mb-6 transition-transform duration-500 md:group-hover:scale-110">
                 <SiteIcon name="verified" className="text-2xl md:text-3xl text-[#3b82f6] drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
@@ -873,8 +883,8 @@ export function Home() {
             </div>
           </div>
 
-          <div className="perf-card group relative p-5 md:p-10 rounded-[2rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#f59e0b]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(245,158,11,0.15)] overflow-hidden flex flex-col justify-center">
-            <div className="home-mobile-glow absolute bottom-0 right-0 w-32 h-32 bg-[#f59e0b]/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-[#f59e0b]/20"></div>
+          <div className="perf-card group relative p-5 md:p-10 rounded-[2rem] bg-surface-container-low border border-outline-variant/10 md:transition-all md:duration-500 md:hover:border-[#f59e0b]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(245,158,11,0.15)] overflow-hidden flex flex-col justify-center">
+            {!isMobile && <div className="absolute bottom-0 right-0 w-32 h-32 bg-[#f59e0b]/10 rounded-full blur-3xl md:transition-all md:duration-500 md:group-hover:bg-[#f59e0b]/20" />}
             <div className="relative z-10 flex flex-col items-center">
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#f59e0b]/10 flex items-center justify-center mb-4 md:mb-6 transition-transform duration-500 md:group-hover:scale-110">
                 <SiteIcon name="rocket_launch" className="text-2xl md:text-3xl text-[#f59e0b] drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
@@ -884,8 +894,8 @@ export function Home() {
             </div>
           </div>
 
-          <div className="perf-card group relative p-5 md:p-10 rounded-[2rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-[#10b981]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(16,185,129,0.15)] overflow-hidden flex flex-col justify-center">
-            <div className="home-mobile-glow absolute bottom-0 left-0 w-32 h-32 bg-[#10b981]/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-[#10b981]/20"></div>
+          <div className="perf-card group relative p-5 md:p-10 rounded-[2rem] bg-surface-container-low border border-outline-variant/10 md:transition-all md:duration-500 md:hover:border-[#10b981]/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(16,185,129,0.15)] overflow-hidden flex flex-col justify-center">
+            {!isMobile && <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#10b981]/10 rounded-full blur-3xl md:transition-all md:duration-500 md:group-hover:bg-[#10b981]/20" />}
             <div className="relative z-10 flex flex-col items-center">
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-[#10b981]/10 flex items-center justify-center mb-4 md:mb-6 transition-transform duration-500 md:group-hover:scale-110">
                 <SiteIcon name="support_agent" className="text-2xl md:text-3xl text-[#10b981] drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
@@ -900,7 +910,7 @@ export function Home() {
 
       {/* FAQ Section */}
       <Section data-snap-section="true" data-cv-section id="faq" className="perf-mobile-section relative overflow-hidden bg-background px-6 py-16 md:py-20 md:px-12 lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]" data-perf-size="medium">
-        <div className="faq-mobile-glow home-mobile-glow absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px] pointer-events-none"></div>
+        {!isMobile && <div className="absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px] pointer-events-none" />}
         <ScrollReveal type="fadeLeft" delay={0.1} className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black font-headline text-on-background mb-4">أسئلة شائعة</h2>
@@ -934,8 +944,10 @@ export function Home() {
       <Section data-snap-section="true" className="perf-mobile-section px-6 py-16 md:px-12 md:py-20 lg:flex lg:flex-col lg:justify-center lg:min-h-[70vh]" data-perf-size="compact">
         <ScrollReveal type="fadeUp" className="perf-panel max-w-7xl mx-auto cyber-glass-card rounded-[2.5rem] p-8 md:p-14 relative overflow-hidden group border border-outline-variant/20 shadow-2xl">
           <div className="mesh-gradient-bg opacity-30"></div>
-          <div className="home-mobile-glow absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-          <div className="home-mobile-glow absolute bottom-0 left-0 w-64 h-64 bg-tertiary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+          {!isMobile && <>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-tertiary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+          </>}
 
           <div className="relative z-10 flex flex-col xl:flex-row items-center xl:items-end justify-between gap-12 xl:gap-20">
             {/* Text Content */}
