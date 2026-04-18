@@ -7,6 +7,13 @@ import { useScrollReveal } from "../lib/useScrollReveal";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 const ScrollReveal = ({ children, type = "fadeUp", delay = 0, className = "" }: { children: React.ReactNode, type?: "fadeUp" | "fadeRight" | "fadeLeft" | "scaleUp" | "blurIn", delay?: number, className?: string }) => {
+  // On mobile (< 1024px), render all content instantly as one unit — no staggered animation
+  const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
+
+  if (!isDesktop) {
+    return <div className={className}>{children}</div>;
+  }
+
   const variants = {
     fadeUp:    { hidden: { opacity: 0, y: 24,  transition: { duration: 0.3 } }, visible: { opacity: 1, y: 0 } },
     fadeRight: { hidden: { opacity: 0, x: -24, transition: { duration: 0.3 } }, visible: { opacity: 1, x: 0 } },

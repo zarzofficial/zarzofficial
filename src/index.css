@@ -597,8 +597,8 @@ body {
     }
 }
 
-/* Animations for Desktop Sections */
-@media (min-width: 768px) {
+/* Animations for Desktop Sections only (lg: 1024px+) */
+@media (min-width: 1024px) {
   .reveal-on-scroll {
     opacity: 0;
     transform: translateY(30px);

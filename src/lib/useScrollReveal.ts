@@ -6,8 +6,8 @@ export function useScrollReveal() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Only apply animations on desktop screens (min-width: 768px)
-    if (window.innerWidth < 768 || !containerRef.current) return;
+    // Only apply animations on desktop screens (min-width: 1024px = lg)
+    if (window.innerWidth < 1024 || !containerRef.current) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
