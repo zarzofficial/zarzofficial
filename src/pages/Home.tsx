@@ -71,31 +71,43 @@ const useKeyboardSectionSnap = () => {
   useEffect(() => {
     if (window.innerWidth < 1024) return;
 
+    let isScrolling = false;
+
+    const getAbsoluteTop = (el: HTMLElement): number =>
+      el.getBoundingClientRect().top + window.scrollY;
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Allow default behavior for inputs/textareas
       if (document.activeElement?.tagName === "INPUT" || document.activeElement?.tagName === "TEXTAREA") return;
+      if (isScrolling) return;
 
-      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-        const sections = Array.from(document.querySelectorAll('[data-snap-section]')) as HTMLElement[];
-        if (sections.length === 0) return;
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      e.preventDefault();
 
-        const currentScroll = window.scrollY;
+      const sections = Array.from(
+        document.querySelectorAll('[data-snap-section="true"]')
+      ) as HTMLElement[];
+      if (sections.length === 0) return;
 
-        if (e.key === "ArrowDown") {
-          const nextSection = sections.find(s => s.offsetTop > currentScroll + 50);
-          if (nextSection) {
-            e.preventDefault();
-            window.scrollTo({ top: nextSection.offsetTop - 20, behavior: 'smooth' });
-          }
-        } else if (e.key === "ArrowUp") {
-          const prevSection = [...sections].reverse().find(s => s.offsetTop < currentScroll - 50);
-          if (prevSection) {
-            e.preventDefault();
-            window.scrollTo({ top: prevSection.offsetTop - 20, behavior: 'smooth' });
-          } else if (currentScroll > 50) {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
+      const currentScroll = window.scrollY;
+      const threshold = 80;
+
+      if (e.key === "ArrowDown") {
+        const next = sections.find(s => getAbsoluteTop(s) > currentScroll + threshold);
+        if (next) {
+          isScrolling = true;
+          window.scrollTo({ top: getAbsoluteTop(next), behavior: "smooth" });
+          setTimeout(() => { isScrolling = false; }, 900);
+        }
+      } else {
+        const prev = [...sections].reverse().find(s => getAbsoluteTop(s) < currentScroll - threshold);
+        if (prev) {
+          isScrolling = true;
+          window.scrollTo({ top: getAbsoluteTop(prev), behavior: "smooth" });
+          setTimeout(() => { isScrolling = false; }, 900);
+        } else if (currentScroll > threshold) {
+          isScrolling = true;
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          setTimeout(() => { isScrolling = false; }, 900);
         }
       }
     };
@@ -260,7 +272,7 @@ function FaqAccordion({
 function WhyChooseCard({ item }: { item: WhyChooseItem }) {
   return (
     <div
-      className={`perf-card why-choose-mobile-card group relative overflow-hidden rounded-[1.25rem] border border-outline-variant/10 bg-surface-container-low/60 p-5 transition-[transform,opacity,border-color,background-color,box-shadow] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] md:p-7 md:duration-500 ${item.borderClass} ${item.shadowClass} md:hover:-translate-y-1.5`}
+      className={`perf-card why-choose-mobile-card group relative overflow-hidden rounded-[1.25rem] border border-outline-variant/10 bg-surface-container-low/60 p-4 md:p-6 transition-[transform,opacity,border-color,background-color,box-shadow] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] md:duration-500 ${item.borderClass} ${item.shadowClass} md:hover:-translate-y-1.5`}
     >
       <div className={`absolute inset-0 bg-gradient-to-br ${item.overlayClass} to-transparent opacity-0 transition-opacity duration-300 md:group-hover:opacity-100`} />
       <div className="pointer-events-none absolute top-4 left-4 select-none text-[3.5rem] leading-none font-black text-white/[0.03]">
@@ -268,11 +280,11 @@ function WhyChooseCard({ item }: { item: WhyChooseItem }) {
       </div>
       <div className="relative z-10">
         <div
-          className={`mb-5 flex h-11 w-11 items-center justify-center rounded-xl border transition-transform duration-300 md:group-hover:scale-110 ${item.iconClass} ${item.iconGlowClass}`}
+          className={`mb-3 md:mb-4 flex h-11 w-11 items-center justify-center rounded-xl border transition-transform duration-300 md:group-hover:scale-110 ${item.iconClass} ${item.iconGlowClass}`}
         >
           <SiteIcon name={item.iconName} className="text-[22px]" />
         </div>
-        <h4 className="mb-2 text-sm font-black text-on-surface md:text-[15px]">{item.title}</h4>
+        <h4 className="mb-1.5 text-sm font-black text-on-surface md:text-[15px]">{item.title}</h4>
         <p className="text-xs leading-relaxed text-outline md:text-[13px]">{item.description}</p>
       </div>
     </div>
@@ -677,17 +689,17 @@ export function Home() {
       </Section>
 
       {/* Why ZARZ Section */}
-      <Section data-snap-section="true" className="py-20 md:py-20 px-6 md:px-12 relative overflow-hidden flex flex-col justify-center min-h-[100vh]">
+      <Section data-snap-section="true" className="py-12 md:py-14 px-6 md:px-12 relative overflow-hidden flex flex-col justify-center min-h-[100vh]">
         <div className="why-choose-mobile-glow home-mobile-glow absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] pointer-events-none"></div>
         <div className="why-choose-mobile-glow home-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
-        <ScrollReveal type="fadeUp" className="max-w-6xl mx-auto relative z-10">
-          <div className="text-center mb-16">
-            <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-primary text-sm font-bold mb-6 backdrop-blur-md">لماذا نحن مختلفون؟</span>
-            <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background mb-4">لماذا تختار زارز؟</h2>
+        <ScrollReveal type="fadeUp" className="max-w-6xl mx-auto relative z-10 w-full">
+          <div className="text-center mb-8 md:mb-10">
+            <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-primary text-sm font-bold mb-4 backdrop-blur-md">لماذا نحن مختلفون؟</span>
+            <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background mb-3">لماذا تختار زارز؟</h2>
             <p className="text-outline text-base md:text-lg max-w-xl mx-auto leading-relaxed">نقدّم تجربة متكاملة تجمع بين السرعة والأمان والدعم المستمر</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-3">
             {whyChooseItems.map((item) => (
               <React.Fragment key={item.id}>
                 <WhyChooseCard item={item} />
