@@ -574,18 +574,14 @@
         border-color: rgba(208, 188, 255, 0.1) !important;
     }
 
-    /* 5. Section paint containment — browser only paints visible sections */
-    section,
-    [data-snap-section] {
-        contain: paint;
-        overflow: hidden;
+    /* 5. Section layout containment — safe version (paint overflow causes clip issues) */
+    section {
+        contain: layout style;
     }
 
     /* 6. Disable text-glow (text-shadow triggers repaint) */
-    .text-glow,
-    [class*="drop-shadow"] {
+    .text-glow {
         text-shadow: none !important;
-        filter: none !important;
     }
 
     /* 7. Navbar: solid background, no blur */
@@ -605,6 +601,14 @@
 
     html, body {
         overflow-x: hidden !important;
+    }
+
+    /* 9. content-visibility: auto for below-fold sections — skip render when off-screen.
+       The browser skips layout+paint for these entirely until they scroll near the viewport.
+       contain-intrinsic-size approximates the section height to keep scrollbar accurate. */
+    [data-cv-section] {
+        content-visibility: auto;
+        contain-intrinsic-size: 0 600px;
     }
 }
 

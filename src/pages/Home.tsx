@@ -7,19 +7,20 @@ import { useScrollReveal } from "../lib/useScrollReveal";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 const ScrollReveal = ({ children, type = "fadeUp", delay = 0, className = "" }: { children: React.ReactNode, type?: "fadeUp" | "fadeRight" | "fadeLeft" | "scaleUp" | "blurIn", delay?: number, className?: string }) => {
-  // On mobile (< 1024px), render all content instantly as one unit — no staggered animation
+  // Read once at component definition time — avoids re-reading on every render
   const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
 
+  // On mobile: plain div, zero JS cost, no IntersectionObserver, no framer-motion
   if (!isDesktop) {
     return <div className={className}>{children}</div>;
   }
 
   const variants = {
-    fadeUp:    { hidden: { opacity: 0, y: 24,  transition: { duration: 0.3 } }, visible: { opacity: 1, y: 0 } },
-    fadeRight: { hidden: { opacity: 0, x: -24, transition: { duration: 0.3 } }, visible: { opacity: 1, x: 0 } },
-    fadeLeft:  { hidden: { opacity: 0, x: 24,  transition: { duration: 0.3 } }, visible: { opacity: 1, x: 0 } },
-    scaleUp:   { hidden: { opacity: 0, scale: 0.96, transition: { duration: 0.3 } }, visible: { opacity: 1, scale: 1 } },
-    blurIn:    { hidden: { opacity: 0, scale: 0.98, transition: { duration: 0.3 } }, visible: { opacity: 1, scale: 1 } },
+    fadeUp:    { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } },
+    fadeRight: { hidden: { opacity: 0, x: -24 }, visible: { opacity: 1, x: 0 } },
+    fadeLeft:  { hidden: { opacity: 0, x: 24 }, visible: { opacity: 1, x: 0 } },
+    scaleUp:   { hidden: { opacity: 0, scale: 0.96 }, visible: { opacity: 1, scale: 1 } },
+    blurIn:    { hidden: { opacity: 0, scale: 0.98 }, visible: { opacity: 1, scale: 1 } },
   };
 
   return (
@@ -239,10 +240,10 @@ function FaqItem({
 }) {
   return (
     <div
-      className={`perf-card faq-mobile-card cyber-glass-card rounded-2xl overflow-hidden border transition-[border-color,background-color,box-shadow] duration-[420ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] ${
+      className={`perf-card faq-mobile-card cyber-glass-card rounded-2xl overflow-hidden border md:transition-[border-color] md:duration-300 ${
         isOpen
-          ? "border-[#e11d48]/30 bg-[#e11d48]/5 shadow-[0_4px_30px_rgba(225,29,72,0.1)]"
-          : "border-outline-variant/10 bg-surface-container-low/30 md:hover:border-outline-variant/30"
+          ? "border-[#e11d48]/30"
+          : "border-outline-variant/10"
       }`}
     >
       <button
@@ -258,13 +259,13 @@ function FaqItem({
         />
       </button>
       <div
-        className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-[460ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
+        className={`grid overflow-hidden md:transition-[grid-template-rows,opacity] md:duration-[460ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] ${
           isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         }`}
       >
         <div className="min-h-0 overflow-hidden">
           <div
-            className={`px-6 pb-6 text-[#cbc3d9] leading-relaxed transition-[transform,opacity] duration-[420ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] ${
+            className={`px-6 pb-6 text-[#cbc3d9] leading-relaxed md:transition-[transform,opacity] md:duration-[420ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] ${
               isOpen ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
             }`}
           >
@@ -301,15 +302,16 @@ function FaqAccordion({
 function WhyChooseCard({ item }: { item: WhyChooseItem }) {
   return (
     <div
-      className={`perf-card why-choose-mobile-card group relative overflow-hidden rounded-[1.25rem] border border-outline-variant/10 bg-surface-container-low/60 p-4 md:p-6 transition-[transform,opacity,border-color,background-color,box-shadow] duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] md:duration-500 ${item.borderClass} ${item.shadowClass} md:hover:-translate-y-1.5`}
+      className={`perf-card why-choose-mobile-card group relative overflow-hidden rounded-[1.25rem] border border-outline-variant/10 bg-surface-container-low/60 p-4 md:p-6 md:transition-[transform,border-color] md:duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] md:duration-500 ${item.borderClass} md:hover:-translate-y-1.5`}
     >
-      <div className={`absolute inset-0 bg-gradient-to-br ${item.overlayClass} to-transparent opacity-0 transition-opacity duration-300 md:group-hover:opacity-100`} />
+      {/* gradient overlay — opacity only, compositor-safe */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${item.overlayClass} to-transparent opacity-0 md:transition-opacity md:duration-300 md:group-hover:opacity-100`} />
       <div className="pointer-events-none absolute top-4 left-4 select-none text-[3.5rem] leading-none font-black text-white/[0.03]">
         {item.number}
       </div>
       <div className="relative z-10">
         <div
-          className={`mb-3 md:mb-4 flex h-11 w-11 items-center justify-center rounded-xl border transition-transform duration-300 md:group-hover:scale-110 ${item.iconClass} ${item.iconGlowClass}`}
+          className={`mb-3 md:mb-4 flex h-11 w-11 items-center justify-center rounded-xl border md:transition-transform md:duration-300 md:group-hover:scale-110 ${item.iconClass}`}
         >
           <SiteIcon name={item.iconName} className="text-[22px]" />
         </div>
@@ -474,13 +476,13 @@ export function Home() {
               className="flex w-full flex-col gap-3 sm:flex-row sm:gap-3 md:justify-start md:gap-5">
               <Link
                 to="/products"
-                className="primary-gradient w-full rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary transition-all scale-100 active:scale-95 hover:shadow-[0_0_40px_rgba(208,188,255,0.5)] hover:-translate-y-1 sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
+                className="primary-gradient w-full rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary active:scale-95 md:hover:shadow-[0_0_40px_rgba(208,188,255,0.5)] md:hover:-translate-y-1 md:transition-all sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
               >
                 عروضنا الحصرية
               </Link>
               <Link
                 to="/contact"
-                className="w-full rounded-full border border-white/20 bg-white/5 backdrop-blur-md px-8 py-3.5 text-center text-base font-bold text-white transition-all hover:bg-white/10 hover:border-white/40 hover:-translate-y-1 sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
+                className="w-full rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-center text-base font-bold text-white md:backdrop-blur-md md:hover:bg-white/10 md:hover:border-white/40 md:hover:-translate-y-1 md:transition-all sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
               >
                 تواصل معنا
               </Link>
@@ -557,8 +559,8 @@ export function Home() {
         <FeaturedProducts />
       </section>
 
-      {/* Services Grid (Horizontal Carousel) */}
-      <Section data-snap-section="true" className="perf-mobile-section px-6 py-16 md:py-20 bg-surface-container-low md:px-12 relative overflow-hidden lg:flex lg:flex-col lg:justify-center lg:min-h-screen" data-perf-size="tall">
+      {/* Services Grid — data-cv-section enables content-visibility:auto on mobile */}
+      <Section data-snap-section="true" data-cv-section className="perf-mobile-section px-6 py-16 md:py-20 bg-surface-container-low md:px-12 relative overflow-hidden lg:flex lg:flex-col lg:justify-center lg:min-h-screen" data-perf-size="tall">
         <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-background to-transparent pointer-events-none z-0 border-t border-background"></div>
         <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-background to-transparent pointer-events-none z-0 border-b border-background"></div>
         
@@ -720,12 +722,12 @@ export function Home() {
       </Section>
 
       {/* Why ZARZ Section */}
-      <Section data-snap-section="true" className="py-12 md:py-20 px-6 md:px-12 relative overflow-hidden lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]">
+      <Section data-snap-section="true" data-cv-section className="py-12 md:py-20 px-6 md:px-12 relative overflow-hidden lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]">
         <div className="why-choose-mobile-glow home-mobile-glow absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] pointer-events-none"></div>
         <div className="why-choose-mobile-glow home-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
         <ScrollReveal type="fadeUp" className="max-w-6xl mx-auto relative z-10 w-full">
           <div className="text-center mb-8 md:mb-10">
-            <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-primary text-sm font-bold mb-4 backdrop-blur-md">لماذا نحن مختلفون؟</span>
+            <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-primary text-sm font-bold mb-4">لماذا نحن مختلفون؟</span>
             <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background mb-3">لماذا تختار زارز؟</h2>
             <p className="text-outline text-base md:text-lg max-w-xl mx-auto leading-relaxed">نقدّم تجربة متكاملة تجمع بين السرعة والأمان والدعم المستمر</p>
           </div>
@@ -741,7 +743,7 @@ export function Home() {
       </Section>
 
       {/* Unified Marquee & Stats Section */}
-      <Section data-snap-section="true" className="perf-mobile-section relative overflow-hidden px-6 py-16 md:py-20 md:px-12 lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]" data-perf-size="compact">
+      <Section data-snap-section="true" data-cv-section className="perf-mobile-section relative overflow-hidden px-6 py-16 md:py-20 md:px-12 lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]" data-perf-size="compact">
         <div className="absolute inset-0 z-0 pointer-events-none">
           <div className="home-mobile-glow absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[150px]"></div>
           <div className="home-mobile-glow absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-tertiary/10 rounded-full blur-[120px]"></div>
@@ -844,7 +846,7 @@ export function Home() {
 
 
       {/* FAQ Section */}
-      <Section data-snap-section="true" id="faq" className="perf-mobile-section relative overflow-hidden bg-background px-6 py-16 md:py-20 md:px-12 lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]" data-perf-size="medium">
+      <Section data-snap-section="true" data-cv-section id="faq" className="perf-mobile-section relative overflow-hidden bg-background px-6 py-16 md:py-20 md:px-12 lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]" data-perf-size="medium">
         <div className="faq-mobile-glow home-mobile-glow absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px] pointer-events-none"></div>
         <ScrollReveal type="fadeLeft" delay={0.1} className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">
