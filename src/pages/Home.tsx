@@ -67,6 +67,44 @@ const TiltCard = ({ children, className = "" }: { children: React.ReactNode, cla
   );
 };
 
+const useKeyboardSectionSnap = () => {
+  useEffect(() => {
+    if (window.innerWidth < 1024) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Allow default behavior for inputs/textareas
+      if (document.activeElement?.tagName === "INPUT" || document.activeElement?.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        const sections = Array.from(document.querySelectorAll('[data-snap-section]')) as HTMLElement[];
+        if (sections.length === 0) return;
+
+        const currentScroll = window.scrollY;
+
+        if (e.key === "ArrowDown") {
+          const nextSection = sections.find(s => s.offsetTop > currentScroll + 50);
+          if (nextSection) {
+            e.preventDefault();
+            window.scrollTo({ top: nextSection.offsetTop - 20, behavior: 'smooth' });
+          }
+        } else if (e.key === "ArrowUp") {
+          const prevSection = [...sections].reverse().find(s => s.offsetTop < currentScroll - 50);
+          if (prevSection) {
+            e.preventDefault();
+            window.scrollTo({ top: prevSection.offsetTop - 20, behavior: 'smooth' });
+          } else if (currentScroll > 50) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+};
+
 const whyChooseItems = [
   {
     id: "fast",
@@ -294,6 +332,7 @@ const Section = React.memo(
 );
 
 export function Home() {
+  useKeyboardSectionSnap();
   const location = useLocation();
   const [activeIndex, setActiveIndex] = useState(0);
   const isCoarsePointer = useCoarsePointer();
@@ -338,7 +377,7 @@ export function Home() {
   return (
     <div ref={revealRef} className="home-mobile-page pt-12 md:pt-14">
       {/* Hero Section */}
-      <Section className="relative min-h-0 md:min-h-screen overflow-hidden px-4 pb-2 pt-14 sm:px-6 sm:py-8 md:px-12 md:py-8 lg:py-10">
+      <Section data-snap-section="true" className="relative min-h-0 md:min-h-screen overflow-hidden px-4 pb-2 pt-14 sm:px-6 sm:py-8 md:px-12 md:py-8 lg:py-10">
         <div className="absolute inset-0 z-0">
           {/* Mobile Image */}
           <img
@@ -470,11 +509,13 @@ export function Home() {
       </Section>
 
       <IsolatedSection>
-        <FeaturedProducts />
+        <div data-snap-section="true">
+          <FeaturedProducts />
+        </div>
       </IsolatedSection>
 
       {/* Services Grid (Horizontal Carousel) */}
-      <Section className="perf-mobile-section px-6 py-32 bg-surface-container-low md:px-12 relative overflow-hidden" data-perf-size="tall">
+      <Section data-snap-section="true" className="perf-mobile-section px-6 py-32 bg-surface-container-low md:px-12 relative overflow-hidden" data-perf-size="tall">
         <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-background to-transparent pointer-events-none z-0 border-t border-background"></div>
         <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-background to-transparent pointer-events-none z-0 border-b border-background"></div>
         
@@ -636,7 +677,7 @@ export function Home() {
       </Section>
 
       {/* Why ZARZ Section */}
-      <Section className="py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
+      <Section data-snap-section="true" className="py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
         <div className="why-choose-mobile-glow home-mobile-glow absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] pointer-events-none"></div>
         <div className="why-choose-mobile-glow home-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
         <ScrollReveal type="fadeUp" className="max-w-6xl mx-auto relative z-10">
@@ -708,7 +749,7 @@ export function Home() {
       </IsolatedSection>
 
       {/* Stats Section */}
-      <Section className="perf-mobile-section relative overflow-hidden px-6 py-24 md:px-12" data-perf-size="compact">
+      <Section data-snap-section="true" className="perf-mobile-section relative overflow-hidden px-6 py-24 md:px-12" data-perf-size="compact">
         <div className="absolute inset-0 z-0">
           <div className="home-mobile-glow absolute top-1/2 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]"></div>
           <div className="home-mobile-glow absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-tertiary/10 rounded-full blur-[120px]"></div>
