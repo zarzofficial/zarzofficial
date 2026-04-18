@@ -334,7 +334,6 @@
 .perf-horizontal-cards .perf-modal-card,
 .perf-horizontal-cards [data-slot="card"],
 .perf-horizontal-cards .cyber-glass-card {
-    contain-intrinsic-size: none !important;
     transform: none !important;
     backface-visibility: visible !important;
 }
@@ -419,10 +418,8 @@
         border-color: rgba(208, 188, 255, 0.1) !important;
     }
 
-    /* 5. Reduce contain cost on mobile: layout is expensive, style alone is sufficient */
-    section {
-        contain: style;
-    }
+    /* 5. No contain on mobile — containment strategies can interfere with paint order
+       and cause sections to render late during fast scrolling. Removed entirely. */
 
     /* 6. Disable text-glow (text-shadow triggers repaint) */
     .text-glow {
