@@ -85,28 +85,32 @@ export function Navbar() {
 
                   {/* Dropdown */}
                   {dropdownOpen && (
-                    <div className="absolute top-full mt-3 left-1/2 -translate-x-1/2 w-52 bg-[#0a0a0a]/95 border border-white/10 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)] backdrop-blur-xl overflow-hidden animate-fade-in">
-                      {CATEGORIES.map((cat) => (
+                    <div className="absolute top-full mt-4 left-1/2 -translate-x-1/2 w-56 bg-surface/40 border border-white/10 rounded-3xl shadow-[0_30px_80px_rgba(0,0,0,0.8)] backdrop-blur-2xl overflow-hidden animate-fade-in ring-1 ring-white/5">
+                      <div className="p-2 space-y-1">
+                        {CATEGORIES.map((cat) => (
+                          <Link
+                            key={cat.path}
+                            to={cat.path}
+                            className={`flex items-center gap-3 px-4 py-3 text-sm transition-all duration-300 rounded-2xl ${
+                              location.pathname === cat.path
+                                ? "bg-primary/20 text-white shadow-[inset_0_0_20px_rgba(125,60,255,0.2)]"
+                                : "text-[#a1a1aa] hover:bg-white/10 hover:text-white hover:translate-x-1"
+                            }`}
+                          >
+                            <SiteIcon name={cat.icon} className={`text-[18px] shrink-0 ${location.pathname === cat.path ? 'text-primary' : 'text-primary/70'}`} />
+                            <span className="font-semibold">{cat.name}</span>
+                          </Link>
+                        ))}
+                      </div>
+                      <div className="p-2 pt-0">
                         <Link
-                          key={cat.path}
-                          to={cat.path}
-                          className={`flex items-center gap-3 px-4 py-3 text-sm transition-colors border-b border-white/5 last:border-0 ${
-                            location.pathname === cat.path
-                              ? "bg-white/10 text-white"
-                              : "text-[#a1a1aa] hover:bg-white/5 hover:text-white"
-                          }`}
+                          to="/products"
+                          className="flex items-center justify-center gap-2 px-4 py-3 mt-1 text-xs font-bold text-white transition-all bg-primary/20 hover:bg-primary/40 rounded-2xl"
                         >
-                          <SiteIcon name={cat.icon} className="text-[16px] text-primary shrink-0" />
-                          {cat.name}
+                          عرض جميع المنتجات
+                          <SiteIcon name="arrow_forward" className="text-[14px]" />
                         </Link>
-                      ))}
-                      <Link
-                        to="/products"
-                        className="flex items-center justify-center gap-2 px-4 py-3 text-xs text-primary hover:text-white transition-colors bg-white/3 hover:bg-white/10"
-                      >
-                        عرض جميع المنتجات
-                        <SiteIcon name="arrow_forward" className="text-[14px]" />
-                      </Link>
+                      </div>
                     </div>
                   )}
                 </div>
