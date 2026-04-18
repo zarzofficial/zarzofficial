@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react";
+import { useEffect } from "react";
 import { BrowserRouter as Router, Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { getProductBySlugOrId } from "./data/products";
@@ -101,30 +101,6 @@ function StoreRoute() {
   return <Store />;
 }
 
-function RouteFallback() {
-  return (
-    <div className="min-h-[52vh] bg-background px-6 pb-16 pt-28 text-on-background md:px-12" aria-hidden="true">
-      <div className="mx-auto max-w-screen-2xl animate-pulse">
-        <div className="mb-4 h-3 w-24 rounded-full bg-primary/20" />
-        <div className="mb-4 h-10 w-full max-w-md rounded-full bg-surface-container" />
-        <div className="mb-12 h-4 w-full max-w-xl rounded-full bg-surface-container-high" />
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="overflow-hidden rounded-[1.75rem] border border-outline-variant/10 bg-surface-container-low">
-              <div className="aspect-[4/3] w-full bg-surface-container" />
-              <div className="space-y-3 p-5">
-                <div className="h-5 w-2/3 rounded-full bg-surface-container-high" />
-                <div className="h-4 w-full rounded-full bg-surface-container-highest/60" />
-                <div className="h-4 w-5/6 rounded-full bg-surface-container-highest/50" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function App() {
   return (
     <Router>
@@ -132,27 +108,25 @@ export default function App() {
       <DynamicTitle />
       <ScrollToTop />
       <AppFrame>
-          <Suspense fallback={<RouteFallback />}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/products" element={<StoreRoute />} />
-              <Route path="/products/catalog" element={<Navigate to="/products" replace />} />
-              <Route path="/products/catalog/:category" element={<Store />} />
-              <Route path="/products/:id" element={<ProductDetails />} />
-              <Route path="/cart" element={<CartRoute />} />
-              <Route path="/products/cart" element={<Navigate to="/cart" replace />} />
-              <Route path="/checkout" element={<Navigate to="/cart" replace />} />
-              <Route path="/products/checkout" element={<Navigate to="/cart" replace />} />
-              <Route path="/account" element={<AccountRoute />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/store.html" element={<Navigate to="/products" replace />} />
-              <Route path="/account.html" element={<Navigate to="/account" replace />} />
-              <Route path="/contact.html" element={<Navigate to="/contact" replace />} />
-              <Route path="/terms.html" element={<Navigate to="/terms" replace />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<StoreRoute />} />
+          <Route path="/products/catalog" element={<Navigate to="/products" replace />} />
+          <Route path="/products/catalog/:category" element={<Store />} />
+          <Route path="/products/:id" element={<ProductDetails />} />
+          <Route path="/cart" element={<CartRoute />} />
+          <Route path="/products/cart" element={<Navigate to="/cart" replace />} />
+          <Route path="/checkout" element={<Navigate to="/cart" replace />} />
+          <Route path="/products/checkout" element={<Navigate to="/cart" replace />} />
+          <Route path="/account" element={<AccountRoute />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/store.html" element={<Navigate to="/products" replace />} />
+          <Route path="/account.html" element={<Navigate to="/account" replace />} />
+          <Route path="/contact.html" element={<Navigate to="/contact" replace />} />
+          <Route path="/terms.html" element={<Navigate to="/terms" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </AppFrame>
     </Router>
   );

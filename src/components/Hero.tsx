@@ -36,7 +36,7 @@ export function Hero() {
                transition={{ duration: 0.6, delay: 0.3 }}
                className="text-4xl font-black tracking-tight sm:text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight lg:leading-[1.1] font-heading w-full"
             >
-              تسوق كل ما تحتاجه في{" "}
+          تسوق كل ما تحتاجه في 
               <span className="bg-clip-text text-transparent bg-gradient-to-l from-primary to-secondary inline-block mt-2 sm:mt-0">مكان واحد</span>
             </motion.h1>
 
