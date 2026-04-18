@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom";
-import React, { useRef, useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode } from "swiper/modules";
+import React, { useState } from "react";
 import { products } from "../data/products";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
@@ -77,24 +75,6 @@ export function FeaturedProducts() {
     .map((id) => products.find((product) => product.id === id))
     .filter(Boolean) as typeof products;
 
-  // Desktop scroll refs kept for arrow buttons (desktop only)
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [swiperInstance, setSwiperInstance] = useState<any>(null);
-  const [isAtStart, setIsAtStart] = useState(true);
-  const [isAtEnd, setIsAtEnd] = useState(false);
-
-  const goToPreviousSlide = () => {
-    if (swiperInstance && !isAtStart) {
-      swiperInstance.slidePrev();
-    }
-  };
-
-  const goToNextSlide = () => {
-    if (swiperInstance && !isAtEnd) {
-      swiperInstance.slideNext();
-    }
-  };
-
   const discountPercent = getDiscountPercent();
 
   return (
@@ -121,30 +101,18 @@ export function FeaturedProducts() {
 
         </div>
 
-        {/* Mobile Swiper (hidden on desktop) */}
-        <div className="-mx-6 md:mx-0 lg:hidden">
-          <Swiper
-            onSwiper={(swiper) => {
-              setSwiperInstance(swiper);
-              setIsAtStart(swiper.isBeginning);
-              setIsAtEnd(swiper.isEnd);
-            }}
-            onSlideChange={(swiper) => {
-              setIsAtStart(swiper.isBeginning);
-              setIsAtEnd(swiper.isEnd);
-            }}
-            modules={[FreeMode]}
-            slidesPerView="auto"
-            spaceBetween={12}
-            freeMode={true}
-            touchRatio={1}
-            touchStartPreventDefault={false}
-            touchReleaseOnEdges={true}
-            watchOverflow={true}
-            speed={300}
-            resistanceRatio={0.85}
+        {/* Mobile: Native horizontal scroll (hidden on desktop) — GPU-smooth on Android */}
+        <div className="lg:hidden -mx-6">
+          <div
             dir="rtl"
-            className="w-full !px-6 !pb-6 !pt-2"
+            className="flex gap-3 overflow-x-auto px-6 pb-6 pt-2"
+            style={{
+              scrollSnapType: "x mandatory",
+              WebkitOverflowScrolling: "touch",
+              overscrollBehaviorX: "contain",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
           >
             {featured.map((product, index) => {
               const category = categoryMap[product.category] || {
@@ -155,146 +123,101 @@ export function FeaturedProducts() {
               const responsiveImage = getResponsiveProductImage(product.image);
 
               return (
-                <SwiperSlide key={product.id} className="featured-product-slide">
-                  <Link
-                    to={`/products/${product.id}`}
-                    className={`product-card group relative flex flex-col h-full overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] ${
-                      product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : "bg-surface-container-low/80"
-                    }`}
-                  >
-                    <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0c0a10]">
-                      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-14 bg-gradient-to-t from-[#0c0a10] to-transparent" />
+                <Link
+                  key={product.id}
+                  to={`/products/${product.id}`}
+                  className={`product-card group relative flex flex-col overflow-hidden rounded-[1.4rem] border border-outline-variant/10 shadow-[0_10px_24px_rgba(8,6,18,0.16)] shrink-0 ${
+                    product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : "bg-surface-container-low/80"
+                  }`}
+                  style={{
+                    width: "72vw",
+                    maxWidth: 280,
+                    scrollSnapAlign: "start",
+                    willChange: "transform",
+                  }}
+                >
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0c0a10]">
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-14 bg-gradient-to-t from-[#0c0a10] to-transparent" />
 
-                      <FeaturedProductImage
-                        alt={product.title}
-                        image={responsiveImage}
-                        outOfStock={product.outOfStock}
-                        loadingStrategy={index < 3 ? "eager" : "lazy"}
-                      />
+                    <FeaturedProductImage
+                      alt={product.title}
+                      image={responsiveImage}
+                      outOfStock={product.outOfStock}
+                      loadingStrategy={index < 2 ? "eager" : "lazy"}
+                    />
 
-                      {product.outOfStock && (
-                        <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-sm">
-                          <span className="rounded-full border border-destructive/50 bg-destructive/10 px-5 py-2 font-headline text-lg font-black text-destructive shadow-[0_0_14px_rgba(255,0,0,0.16)]">
-                            نفدت الكمية
-                          </span>
-                        </div>
-                      )}
-
-                      <div className="absolute top-3 left-3 z-20">
-                        <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/60 px-2.5 py-1">
-                          <span className="text-xs text-[#fbbf24]">★</span>
-                          <span className="text-xs font-bold text-white">{product.rating}</span>
-                        </div>
+                    {product.outOfStock && (
+                      <div className="absolute inset-0 z-20 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+                        <span className="rounded-full border border-destructive/50 bg-destructive/10 px-5 py-2 font-headline text-lg font-black text-destructive shadow-[0_0_14px_rgba(255,0,0,0.16)]">
+                          نفدت الكمية
+                        </span>
                       </div>
+                    )}
 
-                      {discountPercent && !product.outOfStock && (
-                        <div className="absolute top-3 right-3 z-20">
-                          <span className="rounded-full bg-[#ff3b30] px-3 py-1 text-xs font-bold tracking-wider text-white shadow-[0_6px_16px_rgba(255,59,48,0.18)]">
-                            {`خصم ${discountPercent}%`}
-                          </span>
-                        </div>
-                      )}
+                    <div className="absolute top-3 left-3 z-20">
+                      <div className="flex items-center gap-1 rounded-full border border-white/10 bg-black/60 px-2.5 py-1">
+                        <span className="text-xs text-[#fbbf24]">★</span>
+                        <span className="text-xs font-bold text-white">{product.rating}</span>
+                      </div>
                     </div>
 
-                    <div className="flex flex-1 flex-col justify-between p-3.5 text-right" dir="rtl">
-                      <div className="mb-2 flex items-center justify-between gap-2">
-                        <span
-                          className="rounded-full border px-2.5 py-1 text-[10px] font-bold"
-                          style={{
-                            color: category.color,
-                            borderColor: `${category.color}30`,
-                            backgroundColor: `${category.color}10`,
-                          }}
-                        >
-                          {category.label}
-                        </span>
-                        <span className="text-[11px] font-medium text-outline/60">
-                          {product.reviewCount || 100} تقييم
+                    {discountPercent && !product.outOfStock && (
+                      <div className="absolute top-3 right-3 z-20">
+                        <span className="rounded-full bg-[#ff3b30] px-3 py-1 text-xs font-bold tracking-wider text-white shadow-[0_6px_16px_rgba(255,59,48,0.18)]">
+                          {`خصم ${discountPercent}%`}
                         </span>
                       </div>
+                    )}
+                  </div>
 
-                      <h3
-                        className={`mb-1.5 line-clamp-2 text-[14px] font-black leading-snug ${
-                          product.outOfStock ? "text-outline" : "text-on-surface"
-                        }`}
+                  <div className="flex flex-1 flex-col justify-between p-3.5 text-right" dir="rtl">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span
+                        className="rounded-full border px-2.5 py-1 text-[10px] font-bold"
+                        style={{ color: category.color, borderColor: `${category.color}30`, backgroundColor: `${category.color}10` }}
                       >
-                        {product.title}
-                      </h3>
-
-                      <p className="mb-3 line-clamp-2 text-[11px] leading-relaxed text-outline">
-                        {product.desc}
-                      </p>
-
-                      <div className="mt-auto flex min-h-[56px] items-end justify-between border-t border-outline-variant/10 pt-2.5">
-                        {!product.outOfStock ? (
-                          <div className="flex flex-col items-start gap-1.5" dir="rtl">
-                            <div className="flex items-baseline gap-1.5">
-                              <span className="text-[1.6rem] font-black leading-none text-white">
-                                {formatSudanesePrice(product.basePrice)}
-                              </span>
-                              <span className="text-[10px] font-bold text-primary/75">ج.س</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="flex items-baseline gap-1 text-[10px] text-outline/60 line-through">
-                                <span>{formatSudanesePrice(originalPrice)}</span>
-                                <span>ج.س</span>
-                              </span>
-                              <span className="flex items-center gap-1 rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2 py-0.5 text-[9px] font-bold text-[#ff857d]">
-                                <span>وفر</span>
-                                <span dir="ltr">{discountPercent}%</span>
-                              </span>
-                            </div>
-                          </div>
-                        ) : (
-                          <span className="text-xs font-bold text-outline/50">غير متوفر</span>
-                        )}
-
-                        <span className={`flex items-center gap-1 text-[10px] font-bold ${
-                          product.outOfStock ? "text-outline/40" : "text-primary/70"
-                        }`}>
-                          تفاصيل
-                          <SiteIcon name="arrow_back" className="text-sm" />
-                        </span>
-                      </div>
+                        {category.label}
+                      </span>
+                      <span className="text-[11px] font-medium text-outline/60">{product.reviewCount || 100} تقييم</span>
                     </div>
-                  </Link>
-                </SwiperSlide>
+
+                    <h3 className={`mb-1.5 line-clamp-2 text-[14px] font-black leading-snug ${product.outOfStock ? "text-outline" : "text-on-surface"}`}>
+                      {product.title}
+                    </h3>
+
+                    <p className="mb-3 line-clamp-2 text-[11px] leading-relaxed text-outline">{product.desc}</p>
+
+                    <div className="mt-auto flex min-h-[56px] items-end justify-between border-t border-outline-variant/10 pt-2.5">
+                      {!product.outOfStock ? (
+                        <div className="flex flex-col items-start gap-1.5" dir="rtl">
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-[1.6rem] font-black leading-none text-white">{formatSudanesePrice(product.basePrice)}</span>
+                            <span className="text-[10px] font-bold text-primary/75">ج.س</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="flex items-baseline gap-1 text-[10px] text-outline/60 line-through">
+                              <span>{formatSudanesePrice(originalPrice)}</span>
+                              <span>ج.س</span>
+                            </span>
+                            <span className="flex items-center gap-1 rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2 py-0.5 text-[9px] font-bold text-[#ff857d]">
+                              <span>وفر</span>
+                              <span dir="ltr">{discountPercent}%</span>
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-xs font-bold text-outline/50">غير متوفر</span>
+                      )}
+
+                      <span className={`flex items-center gap-1 text-[10px] font-bold ${product.outOfStock ? "text-outline/40" : "text-primary/70"}`}>
+                        تفاصيل
+                        <SiteIcon name="arrow_back" className="text-sm" />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
               );
             })}
-          </Swiper>
-
-          <div className="mt-4 flex items-center justify-center gap-3 px-6" dir="rtl">
-            <button
-              type="button"
-              aria-label="المنتج السابق"
-              onClick={goToPreviousSlide}
-              disabled={isAtStart}
-              className={`flex h-11 w-11 items-center justify-center rounded-full transition-all touch-manipulation ${
-                isAtStart
-                  ? "cursor-not-allowed border border-primary/10 bg-surface-container/30 text-primary opacity-30"
-                  : swiperInstance
-                  ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.35)] active:scale-95 hover:bg-primary/90"
-                  : "border border-primary/20 bg-surface-container/50 text-primary opacity-60"
-              }`}
-            >
-              <SiteIcon name="chevron_right" className="text-2xl" />
-            </button>
-
-            <button
-              type="button"
-              aria-label="المنتج التالي"
-              onClick={goToNextSlide}
-              disabled={isAtEnd}
-              className={`flex h-11 w-11 items-center justify-center rounded-full transition-all touch-manipulation ${
-                isAtEnd
-                  ? "cursor-not-allowed border border-primary/10 bg-surface-container/30 text-primary opacity-30"
-                  : swiperInstance
-                  ? "bg-primary text-white shadow-[0_0_20px_rgba(208,188,255,0.35)] active:scale-95 hover:bg-primary/90"
-                  : "border border-primary/20 bg-surface-container/50 text-primary opacity-60"
-              }`}
-            >
-              <SiteIcon name="chevron_left" className="text-2xl" />
-            </button>
           </div>
         </div>
 
