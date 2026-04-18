@@ -12,16 +12,23 @@ import {
 export function Categories() {
   const [activeIndex, setActiveIndex] = useState(1);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const getScrollStep = () => {
+    if (!scrollContainerRef.current) return 0;
+    const firstCard = scrollContainerRef.current.firstElementChild as HTMLElement | null;
+    const gap = Number.parseFloat(window.getComputedStyle(scrollContainerRef.current).columnGap || window.getComputedStyle(scrollContainerRef.current).gap || "0") || 0;
+
+    return (firstCard?.getBoundingClientRect().width ?? scrollContainerRef.current.clientWidth) + gap;
+  };
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -320, behavior: 'smooth' });
+      scrollContainerRef.current.scrollBy({ left: -getScrollStep(), behavior: 'smooth' });
     }
   };
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 320, behavior: 'smooth' });
+      scrollContainerRef.current.scrollBy({ left: getScrollStep(), behavior: 'smooth' });
     }
   };
 
@@ -101,7 +108,7 @@ export function Categories() {
                 onClick={() => setActiveIndex(idx)}
               >
                 <Card
-                  className={`relative group h-[340px] w-[calc(100vw-3rem)] max-w-[20rem] md:w-[280px] flex flex-col justify-end transition-all duration-300 ${
+                  className={`relative group h-[340px] w-[calc(100vw-2.5rem)] md:w-[280px] flex flex-col justify-end transition-all duration-300 ${
                     isActive 
                       ? "bg-primary border-primary text-white scale-[1.02] shadow-[0_10px_40px_rgba(255,0,122,0.3)] z-10" 
                       : "bg-card/40 backdrop-blur-xl border-white/10 hover:border-primary/30"

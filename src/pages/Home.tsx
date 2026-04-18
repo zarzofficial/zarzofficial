@@ -477,16 +477,23 @@ export function Home() {
   const revealRef = useScrollReveal();
   const isDesktopViewport = useDesktopViewport();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const getServiceRailStep = () => {
+    if (!scrollContainerRef.current) return 0;
+    const firstCard = scrollContainerRef.current.firstElementChild as HTMLElement | null;
+    const gap = Number.parseFloat(window.getComputedStyle(scrollContainerRef.current).columnGap || window.getComputedStyle(scrollContainerRef.current).gap || "0") || 0;
+
+    return (firstCard?.getBoundingClientRect().width ?? scrollContainerRef.current.clientWidth) + gap;
+  };
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -360, behavior: 'smooth' });
+      scrollContainerRef.current.scrollBy({ left: -getServiceRailStep(), behavior: 'smooth' });
     }
   };
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 360, behavior: 'smooth' });
+      scrollContainerRef.current.scrollBy({ left: getServiceRailStep(), behavior: 'smooth' });
     }
   };
 
@@ -685,7 +692,7 @@ export function Home() {
               return (
                 <div
                   key={srv.id}
-                  className="block snap-start snap-always shrink-0 w-[calc(100vw-3rem)] max-w-[22rem] md:w-auto"
+                  className="block snap-start snap-always shrink-0 w-[calc(100vw-2.5rem)] md:w-auto"
                   onClick={() => {
                     if (!isCoarsePointer) {
                       setActiveIndex(idx);

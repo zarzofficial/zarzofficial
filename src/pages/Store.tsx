@@ -422,16 +422,23 @@ function MobileCategorySlider({
   metrics: StoreViewportMetrics;
 }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const getScrollStep = () => {
+    if (!scrollContainerRef.current) return 0;
+    const firstCard = scrollContainerRef.current.firstElementChild as HTMLElement | null;
+    const gap = Number.parseFloat(window.getComputedStyle(scrollContainerRef.current).columnGap || window.getComputedStyle(scrollContainerRef.current).gap || "0") || 0;
+
+    return (firstCard?.getBoundingClientRect().width ?? scrollContainerRef.current.clientWidth) + gap;
+  };
 
   const scrollLeftBtn = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -260, behavior: "smooth" });
+      scrollContainerRef.current.scrollBy({ left: -getScrollStep(), behavior: "smooth" });
     }
   };
 
   const scrollRightBtn = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 260, behavior: "smooth" });
+      scrollContainerRef.current.scrollBy({ left: getScrollStep(), behavior: "smooth" });
     }
   };
 
@@ -469,7 +476,7 @@ function MobileCategorySlider({
         {products.map((product, index) => (
           <div
             key={product.id}
-            className="h-full w-[calc(100vw-3rem)] max-w-[22rem] shrink-0 snap-start"
+            className="h-full w-[calc(100vw-2.5rem)] shrink-0 snap-start snap-always"
           >
             <StoreProductCard
               product={product}
