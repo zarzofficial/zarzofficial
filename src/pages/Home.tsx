@@ -1,49 +1,52 @@
-import { Link, useLocation } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
+﻿import { Link, useLocation } from "react-router-dom";
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
 import { useCoarsePointer } from "../lib/useCoarsePointer";
 import { useScrollReveal } from "../lib/useScrollReveal";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
-// ─── Hero text: static on mobile, animated on desktop ────────────────────────
-// Checked once at render time — same pattern as ScrollReveal above.
-const IS_DESKTOP = typeof window !== "undefined" && window.innerWidth >= 1024;
+// ─── Mobile/Desktop Hero split ────────────────────────────────────────────────
+// Two separate components. Selection via useLayoutEffect (fires after mount,
+// before paint) so there is:
+//   · No window check during the render phase → no hydration mismatch
+//   · No resize / matchMedia listener
+//   · framer-motion is never instantiated on mobile devices
+// isMobile state starts as false (matches SSR output), then useLayoutEffect
+// corrects it synchronously before the browser paints the first frame.
 
-function HeroContent() {
-  if (!IS_DESKTOP) {
-    // Mobile: plain HTML, zero framer-motion, no glow spans that trigger GPU layers
-    return (
-      <div
-        className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right"
-        dir="rtl"
-      >
-        <h1 className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.3] tracking-[-0.02em] sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.3]">
-          {"\u062a\u0633\u0648\u0642 \u0643\u0644 \u0645\u0627 \u062a\u062d\u062a\u0627\u062c\u0647 \u0641\u064a "}
-          <span className="text-[#a78bfa] not-italic">\u0645\u0643\u0627\u0646 \u0648\u0627\u062d\u062f</span>
-        </h1>
-        <p className="mb-6 px-1 text-[0.95rem] leading-7 text-[#c4bcda] sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem]">
-          {"\u0645\u0631\u062d\u0628\u0627\u064b \u0628\u0643 \u0641\u064a \u0632\u0627\u0631\u0632\u060c \u0648\u062c\u0647\u062a\u0643 \u0627\u0644\u0623\u0648\u0644\u0649 \u0644\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0631\u0642\u0645\u064a\u0629. \u0646\u0648\u0641\u0631 \u0644\u0643 \u0634\u062d\u0646 \u0623\u0644\u0639\u0627\u0628 \u0641\u0648\u0631\u064a\u060c \u0627\u0634\u062a\u0631\u0627\u0643\u0627\u062a \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a\u060c \u062e\u062f\u0645\u0627\u062a \u0632\u064a\u0627\u062f\u0629 \u0627\u0644\u0645\u062a\u0627\u0628\u0639\u064a\u0646\u060c \u0648\u062a\u0637\u0648\u064a\u0631 \u0627\u0644\u0645\u062a\u0627\u062c\u0631 \u0628\u0623\u0641\u0636\u0644 \u0627\u0644\u0623\u0633\u0639\u0627\u0631 \u0648\u0623\u0633\u0631\u0639 \u062a\u0646\u0641\u064a\u0630."}
-        </p>
-        <div className="flex w-full flex-col gap-3 sm:flex-row sm:gap-3">
-          <Link
-            to="/products"
-            className="primary-gradient w-full rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary active:scale-95 sm:min-w-[12rem] sm:w-auto"
-          >
-            {"\u0639\u0631\u0648\u0636\u0646\u0627 \u0627\u0644\u062d\u0635\u0631\u064a\u0629"}
-          </Link>
-          <Link
-            to="/contact"
-            className="w-full rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-center text-base font-bold text-white sm:min-w-[12rem] sm:w-auto"
-          >
-            {"\u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627"}
-          </Link>
-        </div>
+function MobileHero() {
+  return (
+    <div
+      className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right"
+      dir="rtl"
+    >
+      <h1 className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.3] tracking-[-0.02em] sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.3]">
+        تسوق كل ما تحتاجه في{" "}
+        <span className="text-[#a78bfa] not-italic">مكان واحد</span>
+      </h1>
+      <p className="mb-6 px-1 text-[0.95rem] leading-7 text-[#c4bcda] sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem]">
+        مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
+      </p>
+      <div className="flex w-full flex-col gap-3 sm:flex-row sm:gap-3">
+        <Link
+          to="/products"
+          className="primary-gradient w-full rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary active:scale-95 sm:min-w-[12rem] sm:w-auto"
+        >
+          عروضنا الحصرية
+        </Link>
+        <Link
+          to="/contact"
+          className="w-full rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-center text-base font-bold text-white sm:min-w-[12rem] sm:w-auto"
+        >
+          تواصل معنا
+        </Link>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
-  // Desktop: full framer-motion entrance animation
+function DesktopHero() {
   return (
     <motion.div
       initial="hidden"
@@ -59,17 +62,19 @@ function HeroContent() {
         variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }}
         className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.3] tracking-[-0.02em] sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.3] md:mb-6 md:max-w-none md:text-5xl xl:text-6xl md:leading-[1.3] md:tracking-tight"
       >
-        {"\u062a\u0633\u0648\u0642 \u0643\u0644 \u0645\u0627 \u062a\u062d\u062a\u0627\u062c\u0647 \u0641\u064a "}<br className="hidden sm:block" />
+        تسوق كل ما تحتاجه في <br className="hidden sm:block" />
         <span className="relative inline-block mt-1 py-1 md:py-2 md:mt-3">
-          <span className="absolute inset-0 bg-[#a78bfa]/20 blur-[30px] rounded-full hidden lg:block animate-[pulse_4s_ease-in-out_infinite]"></span>
-          <span className="relative text-[#a78bfa] not-italic md:italic md:drop-shadow-[0_0_15px_rgba(167,139,250,0.6)] lg:animate-[pulse_3s_ease-in-out_infinite]">{"\u0645\u0643\u0627\u0646 \u0648\u0627\u062d\u062f"}</span>
+          <span className="absolute inset-0 bg-[#a78bfa]/20 blur-[30px] rounded-full hidden lg:block animate-[pulse_4s_ease-in-out_infinite]" />
+          <span className="relative text-[#a78bfa] not-italic md:italic md:drop-shadow-[0_0_15px_rgba(167,139,250,0.6)] lg:animate-[pulse_3s_ease-in-out_infinite]">
+            مكان واحد
+          </span>
         </span>
       </motion.h1>
       <motion.p
         variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
         className="mb-6 px-1 text-[0.95rem] leading-7 text-outline sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem] md:mb-8 md:max-w-2xl md:text-xl md:leading-relaxed text-[#c4bcda]"
       >
-        {"\u0645\u0631\u062d\u0628\u0627\u064b \u0628\u0643 \u0641\u064a \u0632\u0627\u0631\u0632\u060c \u0648\u062c\u0647\u062a\u0643 \u0627\u0644\u0623\u0648\u0644\u0649 \u0644\u0644\u062e\u062f\u0645\u0627\u062a \u0627\u0644\u0631\u0642\u0645\u064a\u0629. \u0646\u0648\u0641\u0631 \u0644\u0643 \u0634\u062d\u0646 \u0623\u0644\u0639\u0627\u0645 \u0641\u0648\u0631\u064a\u060c \u0627\u0634\u062a\u0631\u0627\u0643\u0627\u062a \u0627\u0644\u0630\u0643\u0627\u0621 \u0627\u0644\u0627\u0635\u0637\u0646\u0627\u0639\u064a\u060c \u062e\u062f\u0645\u0627\u062a \u0632\u064a\u0627\u062f\u0629 \u0627\u0644\u0645\u062a\u0627\u0628\u0639\u064a\u0646\u060c \u0648\u062a\u0637\u0648\u064a\u0631 \u0627\u0644\u0645\u062a\u0627\u062c\u0631 \u0628\u0623\u0641\u0636\u0644 \u0627\u0644\u0623\u0633\u0639\u0627\u0631 \u0648\u0623\u0633\u0631\u0639 \u062a\u0646\u0641\u064a\u0630."}
+        مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
       </motion.p>
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } }}
@@ -79,23 +84,31 @@ function HeroContent() {
           to="/products"
           className="primary-gradient w-full rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary active:scale-95 md:hover:shadow-[0_0_40px_rgba(208,188,255,0.5)] md:hover:-translate-y-1 md:transition-all sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
         >
-          {"\u0639\u0631\u0648\u0636\u0646\u0627 \u0627\u0644\u062d\u0635\u0631\u064a\u0629"}
+          عروضنا الحصرية
         </Link>
         <Link
           to="/contact"
           className="w-full rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-center text-base font-bold text-white md:backdrop-blur-md md:hover:bg-white/10 md:hover:border-white/40 md:hover:-translate-y-1 md:transition-all sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
         >
-          {"\u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627"}
+          تواصل معنا
         </Link>
       </motion.div>
     </motion.div>
   );
 }
+
+// Hook: detects mobile AFTER mount (no window during render, no hydration mismatch)
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useLayoutEffect(() => {
+    setIsMobile(window.innerWidth < 1024);
+  }, []);
+  return isMobile;
+}
 // ─────────────────────────────────────────────────────────────────────────────
 
-
 const ScrollReveal = ({ children, type = "fadeUp", delay = 0, className = "" }: { children: React.ReactNode, type?: "fadeUp" | "fadeRight" | "fadeLeft" | "scaleUp" | "blurIn", delay?: number, className?: string }) => {
-  // Read once at component definition time — avoids re-reading on every render
+  // Read once at component definition time â€” avoids re-reading on every render
   const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
 
   // On mobile: plain div, zero JS cost, no IntersectionObserver, no framer-motion
@@ -240,8 +253,8 @@ const whyChooseItems = [
     id: "fast",
     number: "01",
     iconName: "bolt" as const,
-    title: "تنفيذ فوري",
-    description: "طلبك يبدأ خلال دقائق من التأكيد بدون أي تأخير",
+    title: "ØªÙ†ÙÙŠØ° ÙÙˆØ±ÙŠ",
+    description: "Ø·Ù„Ø¨Ùƒ ÙŠØ¨Ø¯Ø£ Ø®Ù„Ø§Ù„ Ø¯Ù‚Ø§Ø¦Ù‚ Ù…Ù† Ø§Ù„ØªØ£ÙƒÙŠØ¯ Ø¨Ø¯ÙˆÙ† Ø£ÙŠ ØªØ£Ø®ÙŠØ±",
     borderClass: "md:hover:border-primary/30",
     shadowClass: "md:hover:shadow-[0_16px_40px_rgba(208,188,255,0.08)]",
     overlayClass: "from-primary/[0.04]",
@@ -252,8 +265,8 @@ const whyChooseItems = [
     id: "safe",
     number: "02",
     iconName: "shield" as const,
-    title: "أمان كامل",
-    description: "حساباتك محمية ولا نطلب أي بيانات سرية مطلقاً",
+    title: "Ø£Ù…Ø§Ù† ÙƒØ§Ù…Ù„",
+    description: "Ø­Ø³Ø§Ø¨Ø§ØªÙƒ Ù…Ø­Ù…ÙŠØ© ÙˆÙ„Ø§ Ù†Ø·Ù„Ø¨ Ø£ÙŠ Ø¨ÙŠØ§Ù†Ø§Øª Ø³Ø±ÙŠØ© Ù…Ø·Ù„Ù‚Ø§Ù‹",
     borderClass: "md:hover:border-[#3b82f6]/30",
     shadowClass: "md:hover:shadow-[0_16px_40px_rgba(59,130,246,0.08)]",
     overlayClass: "from-[#3b82f6]/[0.04]",
@@ -264,8 +277,8 @@ const whyChooseItems = [
     id: "support",
     number: "03",
     iconName: "headset_mic" as const,
-    title: "دعم ٢٤/٧",
-    description: "فريق متخصص جاهز لمساعدتك في أي وقت تحتاجه",
+    title: "Ø¯Ø¹Ù… Ù¢Ù¤/Ù§",
+    description: "ÙØ±ÙŠÙ‚ Ù…ØªØ®ØµØµ Ø¬Ø§Ù‡Ø² Ù„Ù…Ø³Ø§Ø¹Ø¯ØªÙƒ ÙÙŠ Ø£ÙŠ ÙˆÙ‚Øª ØªØ­ØªØ§Ø¬Ù‡",
     borderClass: "md:hover:border-[#10b981]/30",
     shadowClass: "md:hover:shadow-[0_16px_40px_rgba(16,185,129,0.08)]",
     overlayClass: "from-[#10b981]/[0.04]",
@@ -276,8 +289,8 @@ const whyChooseItems = [
     id: "payments",
     number: "04",
     iconName: "payments" as const,
-    title: "دفع مرن",
-    description: "ندعم التحويل البنكي والكاش حسب ما يناسبك",
+    title: "Ø¯ÙØ¹ Ù…Ø±Ù†",
+    description: "Ù†Ø¯Ø¹Ù… Ø§Ù„ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø¨Ù†ÙƒÙŠ ÙˆØ§Ù„ÙƒØ§Ø´ Ø­Ø³Ø¨ Ù…Ø§ ÙŠÙ†Ø§Ø³Ø¨Ùƒ",
     borderClass: "md:hover:border-[#f59e0b]/30",
     shadowClass: "md:hover:shadow-[0_16px_40px_rgba(245,158,11,0.08)]",
     overlayClass: "from-[#f59e0b]/[0.04]",
@@ -288,8 +301,8 @@ const whyChooseItems = [
     id: "quality",
     number: "05",
     iconName: "workspace_premium" as const,
-    title: "جودة مضمونة",
-    description: "ضمان زارز الملكي على كل خدمة نقدّمها لك",
+    title: "Ø¬ÙˆØ¯Ø© Ù…Ø¶Ù…ÙˆÙ†Ø©",
+    description: "Ø¶Ù…Ø§Ù† Ø²Ø§Ø±Ø² Ø§Ù„Ù…Ù„ÙƒÙŠ Ø¹Ù„Ù‰ ÙƒÙ„ Ø®Ø¯Ù…Ø© Ù†Ù‚Ø¯Ù‘Ù…Ù‡Ø§ Ù„Ùƒ",
     borderClass: "md:hover:border-[#e11d48]/30",
     shadowClass: "md:hover:shadow-[0_16px_40px_rgba(225,29,72,0.08)]",
     overlayClass: "from-[#e11d48]/[0.04]",
@@ -300,8 +313,8 @@ const whyChooseItems = [
     id: "results",
     number: "06",
     iconName: "trending_up" as const,
-    title: "نتائج حقيقية",
-    description: "خدمات فعلية بنتائج ملموسة وقابلة للقياس",
+    title: "Ù†ØªØ§Ø¦Ø¬ Ø­Ù‚ÙŠÙ‚ÙŠØ©",
+    description: "Ø®Ø¯Ù…Ø§Øª ÙØ¹Ù„ÙŠØ© Ø¨Ù†ØªØ§Ø¦Ø¬ Ù…Ù„Ù…ÙˆØ³Ø© ÙˆÙ‚Ø§Ø¨Ù„Ø© Ù„Ù„Ù‚ÙŠØ§Ø³",
     borderClass: "md:hover:border-[#8b5cf6]/30",
     shadowClass: "md:hover:shadow-[0_16px_40px_rgba(139,92,246,0.08)]",
     overlayClass: "from-[#8b5cf6]/[0.04]",
@@ -392,7 +405,7 @@ function WhyChooseCard({ item }: { item: WhyChooseItem }) {
     <div
       className={`perf-card why-choose-mobile-card group relative overflow-hidden rounded-[1.25rem] border border-outline-variant/10 bg-surface-container-low/60 p-4 md:p-6 md:transition-[transform,border-color] md:duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] md:duration-500 ${item.borderClass} md:hover:-translate-y-1.5`}
     >
-      {/* gradient overlay — opacity only, compositor-safe */}
+      {/* gradient overlay â€” opacity only, compositor-safe */}
       <div className={`absolute inset-0 bg-gradient-to-br ${item.overlayClass} to-transparent opacity-0 md:transition-opacity md:duration-300 md:group-hover:opacity-100`} />
       <div className="pointer-events-none absolute top-4 left-4 select-none text-[3.5rem] leading-none font-black text-white/[0.03]">
         {item.number}
@@ -468,6 +481,7 @@ export function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
   const isCoarsePointer = useCoarsePointer();
   const revealRef = useScrollReveal();
+  const isMobile = useIsMobile();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollLeft = () => {
@@ -510,19 +524,10 @@ export function Home() {
       {/* Hero Section */}
       <Section data-snap-section="true" className="relative overflow-hidden px-4 pb-2 pt-14 sm:px-6 sm:py-8 md:px-12 md:py-8 lg:min-h-screen lg:py-10 lg:flex lg:flex-col lg:justify-center">
         <div className="absolute inset-0 z-0">
-          {/* Mobile Image */}
           <img
-            alt="Hero Background Mobile"
-            className="w-full h-full object-cover opacity-20 md:hidden"
-            src="/assets/hero-ambient.svg"
-            loading="eager"
-            decoding="async"
-            fetchPriority="high"
-          />
-          {/* Desktop Image */}
-          <img
-            alt="Hero Background Desktop"
-            className="hidden md:block w-full h-full object-cover opacity-30"
+            alt="Hero Background"
+            className="w-full h-full object-cover"
+            style={{ opacity: isMobile ? 0.18 : 0.3 }}
             src="/assets/hero-ambient.svg"
             loading="eager"
             decoding="async"
@@ -533,8 +538,8 @@ export function Home() {
         </div>
         <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch justify-between gap-8 lg:flex-row lg:items-center xl:gap-12">
 
-          {/* Main Hero Text — HeroContent switches mobile↔desktop internally */}
-          <HeroContent />
+          {/* Hero: MobileHero (static, no framer-motion) or DesktopHero (animated) */}
+          {isMobile ? <MobileHero /> : <DesktopHero />}
 
           {/* Features Vertical Card */}
           <TiltCard className="perf-panel w-full lg:w-[340px] xl:w-[380px] shrink-0 cyber-glass-card rounded-[2rem] p-5 xl:p-6 border border-white/5 bg-surface/60 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] relative hidden lg:block lg:animate-in lg:fade-in lg:slide-in-from-left-12 lg:duration-1000 lg:delay-300 lg:fill-mode-both">
@@ -542,16 +547,16 @@ export function Home() {
 
             <div className="flex justify-start mb-4">
               <span className="bg-[#9f1239]/40 border border-[#e11d48]/30 text-[#fda4af] font-bold text-[10px] px-3 py-1.5 rounded-full backdrop-blur-md">
-                الأكثر طلباً هذا الأسبوع
+                Ø§Ù„Ø£ÙƒØ«Ø± Ø·Ù„Ø¨Ø§Ù‹ Ù‡Ø°Ø§ Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹
               </span>
             </div>
 
             <h3 className="text-xl md:text-2xl font-black text-on-background leading-tight mb-4 text-start tracking-tight">
-              تجربة أسرع وأوضح للطلبات الرقمية
+              ØªØ¬Ø±Ø¨Ø© Ø£Ø³Ø±Ø¹ ÙˆØ£ÙˆØ¶Ø­ Ù„Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø±Ù‚Ù…ÙŠØ©
             </h3>
 
             <p className="text-[#a1a1aa] text-xs leading-relaxed mb-6 text-start font-medium">
-              اختر الخدمة، أرسل بياناتك، وتابع التنفيذ من نفس المكان بدون خطوات معقدة.
+              Ø§Ø®ØªØ± Ø§Ù„Ø®Ø¯Ù…Ø©ØŒ Ø£Ø±Ø³Ù„ Ø¨ÙŠØ§Ù†Ø§ØªÙƒØŒ ÙˆØªØ§Ø¨Ø¹ Ø§Ù„ØªÙ†ÙÙŠØ° Ù…Ù† Ù†ÙØ³ Ø§Ù„Ù…ÙƒØ§Ù† Ø¨Ø¯ÙˆÙ† Ø®Ø·ÙˆØ§Øª Ù…Ø¹Ù‚Ø¯Ø©.
             </p>
 
             <div className="space-y-4">
@@ -561,8 +566,8 @@ export function Home() {
                   #
                 </div>
                 <div className="text-start">
-                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">نمو للحسابات والتفاعل</h4>
-                  <p className="text-xs text-outline line-clamp-1">باقات سوشيال ميديا مناسبة للبدء أو التوسع</p>
+                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">Ù†Ù…Ùˆ Ù„Ù„Ø­Ø³Ø§Ø¨Ø§Øª ÙˆØ§Ù„ØªÙØ§Ø¹Ù„</h4>
+                  <p className="text-xs text-outline line-clamp-1">Ø¨Ø§Ù‚Ø§Øª Ø³ÙˆØ´ÙŠØ§Ù„ Ù…ÙŠØ¯ÙŠØ§ Ù…Ù†Ø§Ø³Ø¨Ø© Ù„Ù„Ø¨Ø¯Ø¡ Ø£Ùˆ Ø§Ù„ØªÙˆØ³Ø¹</p>
                 </div>
               </div>
 
@@ -572,8 +577,8 @@ export function Home() {
                   <SiteIcon name="bolt" className="text-xl" />
                 </div>
                 <div className="text-start">
-                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">شحن واشتراكات مباشرة</h4>
-                  <p className="text-xs text-outline line-clamp-1">تأكيد سريع ومتابعة عبر واتساب أو الهاتف</p>
+                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">Ø´Ø­Ù† ÙˆØ§Ø´ØªØ±Ø§ÙƒØ§Øª Ù…Ø¨Ø§Ø´Ø±Ø©</h4>
+                  <p className="text-xs text-outline line-clamp-1">ØªØ£ÙƒÙŠØ¯ Ø³Ø±ÙŠØ¹ ÙˆÙ…ØªØ§Ø¨Ø¹Ø© Ø¹Ø¨Ø± ÙˆØ§ØªØ³Ø§Ø¨ Ø£Ùˆ Ø§Ù„Ù‡Ø§ØªÙ</p>
                 </div>
               </div>
 
@@ -583,8 +588,8 @@ export function Home() {
                   <SiteIcon name="laptop_mac" className="text-xl" />
                 </div>
                 <div className="text-start">
-                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">تنفيذ مواقع ومتاجر حسب الطلب</h4>
-                  <p className="text-xs text-outline line-clamp-1">من التعديل السريع إلى المشروع الكامل</p>
+                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">ØªÙ†ÙÙŠØ° Ù…ÙˆØ§Ù‚Ø¹ ÙˆÙ…ØªØ§Ø¬Ø± Ø­Ø³Ø¨ Ø§Ù„Ø·Ù„Ø¨</h4>
+                  <p className="text-xs text-outline line-clamp-1">Ù…Ù† Ø§Ù„ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø³Ø±ÙŠØ¹ Ø¥Ù„Ù‰ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ø§Ù„ÙƒØ§Ù…Ù„</p>
                 </div>
               </div>
             </div>
@@ -606,7 +611,7 @@ export function Home() {
         <FeaturedProducts />
       </section>
 
-      {/* Services Grid — data-cv-section enables content-visibility:auto on mobile */}
+      {/* Services Grid â€” data-cv-section enables content-visibility:auto on mobile */}
       <Section data-snap-section="true" data-cv-section className="perf-mobile-section px-6 py-16 md:py-20 bg-surface-container-low md:px-12 relative overflow-hidden lg:flex lg:flex-col lg:justify-center lg:min-h-screen" data-perf-size="tall">
         <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-background to-transparent pointer-events-none z-0 border-t border-background"></div>
         <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-background to-transparent pointer-events-none z-0 border-b border-background"></div>
@@ -615,8 +620,8 @@ export function Home() {
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-row justify-between items-end mb-12 gap-4">
             <div className="text-start">
-              <span className="text-primary font-bold tracking-widest text-sm md:text-base uppercase block mb-1">تخصصاتنا</span>
-              <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background">أقسامنا الرئيسية</h2>
+              <span className="text-primary font-bold tracking-widest text-sm md:text-base uppercase block mb-1">ØªØ®ØµØµØ§ØªÙ†Ø§</span>
+              <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background">Ø£Ù‚Ø³Ø§Ù…Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</h2>
             </div>
             
             <div className="flex gap-2 md:gap-3 mb-1 md:hidden" dir="ltr">
@@ -642,37 +647,37 @@ export function Home() {
             {[
               {
                 id: "ai",
-                title: "الذكاء الاصطناعي",
-                description: "أتمتة ذكية وحلول تحليلية مبنية على أحدث تقنيات، لتطوير أعمالك بشكل غير مسبوق وتحقيق قفزات نوعية في الإنتاجية.",
+                title: "Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ",
+                description: "Ø£ØªÙ…ØªØ© Ø°ÙƒÙŠØ© ÙˆØ­Ù„ÙˆÙ„ ØªØ­Ù„ÙŠÙ„ÙŠØ© Ù…Ø¨Ù†ÙŠØ© Ø¹Ù„Ù‰ Ø£Ø­Ø¯Ø« ØªÙ‚Ù†ÙŠØ§ØªØŒ Ù„ØªØ·ÙˆÙŠØ± Ø£Ø¹Ù…Ø§Ù„Ùƒ Ø¨Ø´ÙƒÙ„ ØºÙŠØ± Ù…Ø³Ø¨ÙˆÙ‚ ÙˆØªØ­Ù‚ÙŠÙ‚ Ù‚ÙØ²Ø§Øª Ù†ÙˆØ¹ÙŠØ© ÙÙŠ Ø§Ù„Ø¥Ù†ØªØ§Ø¬ÙŠØ©.",
                 iconName: "neurology",
                 link: "/products/catalog/ai",
-                linkText: "تفاصيل الخدمة",
-                badge: "حصري",
+                linkText: "ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø®Ø¯Ù…Ø©",
+                badge: "Ø­ØµØ±ÙŠ",
                 subBadge: "Neural Core v2.0"
               },
               {
                 id: "social",
-                title: "إدارة المنصات",
-                description: "نصنع محتوى يتفاعل معه العالم بأسلوب احترافي وجذاب يضمن وصول رسالتك للجمهور المستهدف.",
+                title: "Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ù†ØµØ§Øª",
+                description: "Ù†ØµÙ†Ø¹ Ù…Ø­ØªÙˆÙ‰ ÙŠØªÙØ§Ø¹Ù„ Ù…Ø¹Ù‡ Ø§Ù„Ø¹Ø§Ù„Ù… Ø¨Ø£Ø³Ù„ÙˆØ¨ Ø§Ø­ØªØ±Ø§ÙÙŠ ÙˆØ¬Ø°Ø§Ø¨ ÙŠØ¶Ù…Ù† ÙˆØµÙˆÙ„ Ø±Ø³Ø§Ù„ØªÙƒ Ù„Ù„Ø¬Ù…Ù‡ÙˆØ± Ø§Ù„Ù…Ø³ØªÙ‡Ø¯Ù.",
                 iconName: "campaign",
                 link: "/products/catalog/social",
-                linkText: "تصفح الباقات"
+                linkText: "ØªØµÙØ­ Ø§Ù„Ø¨Ø§Ù‚Ø§Øª"
               },
               {
                 id: "gaming",
-                title: "خدمات الألعاب",
-                description: "شحن، اشتراكات، وأدوات احترافية لأفضل تجربة لعب. كل ما يحتاجه المحترفون في مكان واحد.",
+                title: "Ø®Ø¯Ù…Ø§Øª Ø§Ù„Ø£Ù„Ø¹Ø§Ø¨",
+                description: "Ø´Ø­Ù†ØŒ Ø§Ø´ØªØ±Ø§ÙƒØ§ØªØŒ ÙˆØ£Ø¯ÙˆØ§Øª Ø§Ø­ØªØ±Ø§ÙÙŠØ© Ù„Ø£ÙØ¶Ù„ ØªØ¬Ø±Ø¨Ø© Ù„Ø¹Ø¨. ÙƒÙ„ Ù…Ø§ ÙŠØ­ØªØ§Ø¬Ù‡ Ø§Ù„Ù…Ø­ØªØ±ÙÙˆÙ† ÙÙŠ Ù…ÙƒØ§Ù† ÙˆØ§Ø­Ø¯.",
                 iconName: "sports_esports",
                 link: "/products/catalog/gaming",
-                linkText: "تصفح العروض"
+                linkText: "ØªØµÙØ­ Ø§Ù„Ø¹Ø±ÙˆØ¶"
               },
               {
                 id: "web",
-                title: "خدمات الويب",
-                description: "برمجة وتصميم واجهات عصرية تضمن أفضل تجربة مستخدم وأداء فائق السرعة مع بنية تحتية رقمية متينة.",
+                title: "Ø®Ø¯Ù…Ø§Øª Ø§Ù„ÙˆÙŠØ¨",
+                description: "Ø¨Ø±Ù…Ø¬Ø© ÙˆØªØµÙ…ÙŠÙ… ÙˆØ§Ø¬Ù‡Ø§Øª Ø¹ØµØ±ÙŠØ© ØªØ¶Ù…Ù† Ø£ÙØ¶Ù„ ØªØ¬Ø±Ø¨Ø© Ù…Ø³ØªØ®Ø¯Ù… ÙˆØ£Ø¯Ø§Ø¡ ÙØ§Ø¦Ù‚ Ø§Ù„Ø³Ø±Ø¹Ø© Ù…Ø¹ Ø¨Ù†ÙŠØ© ØªØ­ØªÙŠØ© Ø±Ù‚Ù…ÙŠØ© Ù…ØªÙŠÙ†Ø©.",
                 iconName: "terminal",
                 link: "/products/catalog/web",
-                linkText: "اكتشف المزيد",
+                linkText: "Ø§ÙƒØªØ´Ù Ø§Ù„Ù…Ø²ÙŠØ¯",
                 bgIcon: "code"
               }
             ].map((srv, idx) => {
@@ -774,9 +779,9 @@ export function Home() {
         <div className="why-choose-mobile-glow home-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
         <ScrollReveal type="fadeUp" className="max-w-6xl mx-auto relative z-10 w-full">
           <div className="text-center mb-8 md:mb-10">
-            <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-primary text-sm font-bold mb-4">لماذا نحن مختلفون؟</span>
-            <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background mb-3">لماذا تختار زارز؟</h2>
-            <p className="text-outline text-base md:text-lg max-w-xl mx-auto leading-relaxed">نقدّم تجربة متكاملة تجمع بين السرعة والأمان والدعم المستمر</p>
+            <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-primary text-sm font-bold mb-4">Ù„Ù…Ø§Ø°Ø§ Ù†Ø­Ù† Ù…Ø®ØªÙ„ÙÙˆÙ†ØŸ</span>
+            <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background mb-3">Ù„Ù…Ø§Ø°Ø§ ØªØ®ØªØ§Ø± Ø²Ø§Ø±Ø²ØŸ</h2>
+            <p className="text-outline text-base md:text-lg max-w-xl mx-auto leading-relaxed">Ù†Ù‚Ø¯Ù‘Ù… ØªØ¬Ø±Ø¨Ø© Ù…ØªÙƒØ§Ù…Ù„Ø© ØªØ¬Ù…Ø¹ Ø¨ÙŠÙ† Ø§Ù„Ø³Ø±Ø¹Ø© ÙˆØ§Ù„Ø£Ù…Ø§Ù† ÙˆØ§Ù„Ø¯Ø¹Ù… Ø§Ù„Ù…Ø³ØªÙ…Ø±</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-3">
@@ -803,11 +808,11 @@ export function Home() {
                 <span className="home-mobile-ping animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              شركاء النجاح
+              Ø´Ø±ÙƒØ§Ø¡ Ø§Ù„Ù†Ø¬Ø§Ø­
             </div>
             <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
-              <span className="text-on-background">شركات ملهمة </span>
-              <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#8b5cf6] drop-shadow-[0_0_20px_rgba(208,188,255,0.4)]">وثقت بنا</span>
+              <span className="text-on-background">Ø´Ø±ÙƒØ§Øª Ù…Ù„Ù‡Ù…Ø© </span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#8b5cf6] drop-shadow-[0_0_20px_rgba(208,188,255,0.4)]">ÙˆØ«Ù‚Øª Ø¨Ù†Ø§</span>
             </h2>
           </div>
           <div
@@ -852,7 +857,7 @@ export function Home() {
                 <SiteIcon name="groups" className="text-2xl md:text-3xl text-primary drop-shadow-[0_0_10px_rgba(208,188,255,0.5)]" />
               </div>
               <div className="text-3xl md:text-5xl font-black text-on-surface mb-1 md:mb-2 tracking-tight transition-colors md:group-hover:text-primary">+10k</div>
-              <div className="text-outline text-xs md:text-base font-bold">عميل سعيد</div>
+              <div className="text-outline text-xs md:text-base font-bold">Ø¹Ù…ÙŠÙ„ Ø³Ø¹ÙŠØ¯</div>
             </div>
           </div>
 
@@ -863,7 +868,7 @@ export function Home() {
                 <SiteIcon name="verified" className="text-2xl md:text-3xl text-[#3b82f6] drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
               </div>
               <div className="text-3xl md:text-5xl font-black text-on-surface mb-1 md:mb-2 tracking-tight transition-colors md:group-hover:text-[#3b82f6]">99%</div>
-              <div className="text-outline text-xs md:text-base font-bold">رضا المستخدمين</div>
+              <div className="text-outline text-xs md:text-base font-bold">Ø±Ø¶Ø§ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙŠÙ†</div>
             </div>
           </div>
 
@@ -874,7 +879,7 @@ export function Home() {
                 <SiteIcon name="rocket_launch" className="text-2xl md:text-3xl text-[#f59e0b] drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
               </div>
               <div className="text-3xl md:text-5xl font-black text-on-surface mb-1 md:mb-2 tracking-tight transition-colors md:group-hover:text-[#f59e0b]">+250</div>
-              <div className="text-outline text-xs md:text-base font-bold">مشروع منجز</div>
+              <div className="text-outline text-xs md:text-base font-bold">Ù…Ø´Ø±ÙˆØ¹ Ù…Ù†Ø¬Ø²</div>
             </div>
           </div>
 
@@ -885,7 +890,7 @@ export function Home() {
                 <SiteIcon name="support_agent" className="text-2xl md:text-3xl text-[#10b981] drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
               </div>
               <div className="text-3xl md:text-5xl font-black text-on-surface mb-1 md:mb-2 tracking-tight transition-colors md:group-hover:text-[#10b981]">24/7</div>
-              <div className="text-outline text-xs md:text-base font-bold">دعم فني متواصل</div>
+              <div className="text-outline text-xs md:text-base font-bold">Ø¯Ø¹Ù… ÙÙ†ÙŠ Ù…ØªÙˆØ§ØµÙ„</div>
             </div>
           </div>
         </ScrollReveal>
@@ -897,27 +902,27 @@ export function Home() {
         <div className="faq-mobile-glow home-mobile-glow absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px] pointer-events-none"></div>
         <ScrollReveal type="fadeLeft" delay={0.1} className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black font-headline text-on-background mb-4">أسئلة شائعة</h2>
-            <p className="text-lg text-outline">إجابات سريعة قبل بدء الطلب.</p>
+            <h2 className="text-4xl md:text-5xl font-black font-headline text-on-background mb-4">Ø£Ø³Ø¦Ù„Ø© Ø´Ø§Ø¦Ø¹Ø©</h2>
+            <p className="text-lg text-outline">Ø¥Ø¬Ø§Ø¨Ø§Øª Ø³Ø±ÙŠØ¹Ø© Ù‚Ø¨Ù„ Ø¨Ø¯Ø¡ Ø§Ù„Ø·Ù„Ø¨.</p>
           </div>
 
           <FaqAccordion
             faqs={[
               {
-                question: "كم يستغرق تنفيذ الطلب؟",
-                answer: "يعتمد الوقت على نوع الخدمة، لكن أغلب الطلبات يبدأ تنفيذها خلال دقائق إلى ساعات قليلة بعد التأكيد."
+                question: "ÙƒÙ… ÙŠØ³ØªØºØ±Ù‚ ØªÙ†ÙÙŠØ° Ø§Ù„Ø·Ù„Ø¨ØŸ",
+                answer: "ÙŠØ¹ØªÙ…Ø¯ Ø§Ù„ÙˆÙ‚Øª Ø¹Ù„Ù‰ Ù†ÙˆØ¹ Ø§Ù„Ø®Ø¯Ù…Ø©ØŒ Ù„ÙƒÙ† Ø£ØºÙ„Ø¨ Ø§Ù„Ø·Ù„Ø¨Ø§Øª ÙŠØ¨Ø¯Ø£ ØªÙ†ÙÙŠØ°Ù‡Ø§ Ø®Ù„Ø§Ù„ Ø¯Ù‚Ø§Ø¦Ù‚ Ø¥Ù„Ù‰ Ø³Ø§Ø¹Ø§Øª Ù‚Ù„ÙŠÙ„Ø© Ø¨Ø¹Ø¯ Ø§Ù„ØªØ£ÙƒÙŠØ¯."
               },
               {
-                question: "كيف يتم التواصل بعد الطلب؟",
-                answer: "عبر الواتساب بشكل مباشر على الرقم الخاص بالمتجر، وسيتم تزويدك بكل التحديثات الخاصة بطلبك."
+                question: "ÙƒÙŠÙ ÙŠØªÙ… Ø§Ù„ØªÙˆØ§ØµÙ„ Ø¨Ø¹Ø¯ Ø§Ù„Ø·Ù„Ø¨ØŸ",
+                answer: "Ø¹Ø¨Ø± Ø§Ù„ÙˆØ§ØªØ³Ø§Ø¨ Ø¨Ø´ÙƒÙ„ Ù…Ø¨Ø§Ø´Ø± Ø¹Ù„Ù‰ Ø§Ù„Ø±Ù‚Ù… Ø§Ù„Ø®Ø§Øµ Ø¨Ø§Ù„Ù…ØªØ¬Ø±ØŒ ÙˆØ³ÙŠØªÙ… ØªØ²ÙˆÙŠØ¯Ùƒ Ø¨ÙƒÙ„ Ø§Ù„ØªØ­Ø¯ÙŠØ«Ø§Øª Ø§Ù„Ø®Ø§ØµØ© Ø¨Ø·Ù„Ø¨Ùƒ."
               },
               {
-                question: "هل الخدمات آمنة على الحسابات؟",
-                answer: "نعم، جميع خدماتنا نعتمد فيها على أفضل معايير الأمان ولا نطلب أي أرقام سرية قد تضر بحسابك إطلاقاً."
+                question: "Ù‡Ù„ Ø§Ù„Ø®Ø¯Ù…Ø§Øª Ø¢Ù…Ù†Ø© Ø¹Ù„Ù‰ Ø§Ù„Ø­Ø³Ø§Ø¨Ø§ØªØŸ",
+                answer: "Ù†Ø¹Ù…ØŒ Ø¬Ù…ÙŠØ¹ Ø®Ø¯Ù…Ø§ØªÙ†Ø§ Ù†Ø¹ØªÙ…Ø¯ ÙÙŠÙ‡Ø§ Ø¹Ù„Ù‰ Ø£ÙØ¶Ù„ Ù…Ø¹Ø§ÙŠÙŠØ± Ø§Ù„Ø£Ù…Ø§Ù† ÙˆÙ„Ø§ Ù†Ø·Ù„Ø¨ Ø£ÙŠ Ø£Ø±Ù‚Ø§Ù… Ø³Ø±ÙŠØ© Ù‚Ø¯ ØªØ¶Ø± Ø¨Ø­Ø³Ø§Ø¨Ùƒ Ø¥Ø·Ù„Ø§Ù‚Ø§Ù‹."
               },
               {
-                question: "هل يمكن طلب خدمة مخصصة؟",
-                answer: "بالتأكيد، يمكنك التواصل معنا عبر الواتساب لشرح متطلباتك وسيقوم فريقنا بتقديم حل يناسب احتياجاتك الخاصة بأسعار منافسة."
+                question: "Ù‡Ù„ ÙŠÙ…ÙƒÙ† Ø·Ù„Ø¨ Ø®Ø¯Ù…Ø© Ù…Ø®ØµØµØ©ØŸ",
+                answer: "Ø¨Ø§Ù„ØªØ£ÙƒÙŠØ¯ØŒ ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹Ù†Ø§ Ø¹Ø¨Ø± Ø§Ù„ÙˆØ§ØªØ³Ø§Ø¨ Ù„Ø´Ø±Ø­ Ù…ØªØ·Ù„Ø¨Ø§ØªÙƒ ÙˆØ³ÙŠÙ‚ÙˆÙ… ÙØ±ÙŠÙ‚Ù†Ø§ Ø¨ØªÙ‚Ø¯ÙŠÙ… Ø­Ù„ ÙŠÙ†Ø§Ø³Ø¨ Ø§Ø­ØªÙŠØ§Ø¬Ø§ØªÙƒ Ø§Ù„Ø®Ø§ØµØ© Ø¨Ø£Ø³Ø¹Ø§Ø± Ù…Ù†Ø§ÙØ³Ø©."
               }
             ]}
           />
@@ -935,13 +940,13 @@ export function Home() {
             {/* Text Content */}
             <div className="text-start flex-1 max-w-3xl w-full">
               <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-outline text-sm font-bold mb-8 backdrop-blur-md">
-                جاهز تبدأ الآن؟
+                Ø¬Ø§Ù‡Ø² ØªØ¨Ø¯Ø£ Ø§Ù„Ø¢Ù†ØŸ
               </span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black font-headline mb-6 text-on-background leading-tight text-glow">
-                خلنا نحول طلبك إلى تنفيذ سريع ومرتب
+                Ø®Ù„Ù†Ø§ Ù†Ø­ÙˆÙ„ Ø·Ù„Ø¨Ùƒ Ø¥Ù„Ù‰ ØªÙ†ÙÙŠØ° Ø³Ø±ÙŠØ¹ ÙˆÙ…Ø±ØªØ¨
               </h2>
               <p className="text-lg md:text-xl text-[#cbc3d9] leading-relaxed max-w-2xl">
-                سواء كنت تحتاج شحن ألعاب، نمو لحساباتك، أو متجر احترافي، البداية من هنا.
+                Ø³ÙˆØ§Ø¡ ÙƒÙ†Øª ØªØ­ØªØ§Ø¬ Ø´Ø­Ù† Ø£Ù„Ø¹Ø§Ø¨ØŒ Ù†Ù…Ùˆ Ù„Ø­Ø³Ø§Ø¨Ø§ØªÙƒØŒ Ø£Ùˆ Ù…ØªØ¬Ø± Ø§Ø­ØªØ±Ø§ÙÙŠØŒ Ø§Ù„Ø¨Ø¯Ø§ÙŠØ© Ù…Ù† Ù‡Ù†Ø§.
               </p>
             </div>
 
@@ -949,10 +954,10 @@ export function Home() {
             <div className="flex flex-col sm:flex-row gap-4 w-full xl:w-auto shrink-0 pb-0 xl:pb-2">
               <a href="https://wa.me/201500007300" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 bg-surface/50 backdrop-blur-md text-on-background border border-outline-variant/30 px-8 py-5 rounded-xl font-bold text-lg md:hover:bg-white/10 transition-all w-full sm:w-auto">
                 <SiteIcon name="forum" className="text-xl" />
-                تواصل عبر واتساب
+                ØªÙˆØ§ØµÙ„ Ø¹Ø¨Ø± ÙˆØ§ØªØ³Ø§Ø¨
               </a>
               <Link to="/products" className="primary-gradient text-on-primary font-bold px-8 py-5 rounded-xl text-lg md:hover:shadow-[0_0_30px_rgba(208,188,255,0.4)] transition-all scale-100 active:scale-95 text-center flex items-center justify-center gap-3 w-full sm:w-auto">
-                استعرض المنتجات
+                Ø§Ø³ØªØ¹Ø±Ø¶ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª
                 <SiteIcon name="arrow_back" className="text-xl" />
               </Link>
             </div>
