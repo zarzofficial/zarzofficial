@@ -37,24 +37,47 @@ function fileToRoute(filePath: string) {
   return `/${relativePath}`;
 }
 
+function splitLeadingPreloads(markup: string) {
+  const match = markup.match(/^((?:<link\b[^>]*?>)+)([\s\S]*)$/);
+  if (!match) {
+    return {
+      preloads: "",
+      content: markup,
+    };
+  }
+
+  return {
+    preloads: match[1],
+    content: match[2],
+  };
+}
+
 function injectIntoRoot(html: string, markup: string) {
   const rootStart = html.indexOf('<div id="root"');
+  const headClose = html.indexOf("</head>");
   if (rootStart === -1) {
     throw new Error("Missing #root container in prerender target.");
+  }
+
+  if (headClose === -1) {
+    throw new Error("Missing </head> in prerender target.");
   }
 
   const rootOpenEnd = html.indexOf(">", rootStart);
   const bodyClose = html.indexOf("</body>", rootOpenEnd);
   const rootClose = html.lastIndexOf("</div>", bodyClose);
+  const { preloads, content } = splitLeadingPreloads(markup);
 
   if (rootOpenEnd === -1 || bodyClose === -1 || rootClose === -1) {
     throw new Error("Unable to locate root container boundaries.");
   }
 
   return [
-    html.slice(0, rootStart),
+    html.slice(0, headClose),
+    preloads,
+    html.slice(headClose, rootStart),
     '<div id="root" data-prerendered="true">',
-    markup,
+    content,
     "</div>",
     html.slice(rootClose + "</div>".length),
   ].join("");

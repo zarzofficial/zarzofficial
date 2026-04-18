@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import { products } from "../data/products";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
+import { useDesktopViewport } from "../lib/useDesktopViewport";
 import { SiteIcon } from "./SiteIcon";
 
 const categoryMap: Record<string, { label: string; color: string }> = {
@@ -25,37 +26,11 @@ function FeaturedProductImage({
   loadingStrategy: "eager" | "lazy";
   priority?: boolean;
 }) {
-  const imgRef = useRef<HTMLImageElement>(null);
-  // Start as loaded if priority (preloaded) — will be corrected by useEffect
-  // if the image is not actually in cache yet.
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  // After mount, check if the image is already decoded (preloaded/cached).
-  // If img.complete is true, the onLoad event already fired or the image was
-  // served from cache — show it immediately without any opacity-0 phase.
-  useEffect(() => {
-    if (imgRef.current?.complete) {
-      setIsLoaded(true);
-    }
-  }, []);
-
-  const targetOpacity = outOfStock ? "opacity-50" : "opacity-100";
-  const opacityClass = isLoaded ? targetOpacity : "opacity-0";
+  const opacityClass = outOfStock ? "opacity-50" : "opacity-100";
 
   return (
     <div className="absolute inset-0">
-      {!isLoaded && (
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-br from-white/[0.06] via-white/[0.1] to-white/[0.03]"
-        >
-          <div className="absolute inset-x-5 top-5 h-5 rounded-full bg-white/[0.08]" />
-          <div className="absolute inset-x-10 bottom-10 h-24 rounded-[1.25rem] bg-white/[0.04]" />
-        </div>
-      )}
-
       <img
-        ref={imgRef}
         src={image.src}
         srcSet={image.srcSet}
         alt={alt}
@@ -63,11 +38,7 @@ function FeaturedProductImage({
         loading={loadingStrategy}
         decoding={priority ? "sync" : "async"}
         fetchPriority={priority ? "high" : loadingStrategy === "eager" ? "auto" : "low"}
-        onLoad={() => setIsLoaded(true)}
-        onError={(event) => {
-          handleResponsiveImageError(event, image.src);
-          setIsLoaded(false);
-        }}
+        onError={(event) => handleResponsiveImageError(event, image.src)}
         referrerPolicy="no-referrer"
         sizes="(max-width: 639px) 290px, (max-width: 1023px) 44vw, 30vw"
         draggable={false}
@@ -78,8 +49,8 @@ function FeaturedProductImage({
   );
 }
 
-
 export function FeaturedProducts() {
+  const isDesktopViewport = useDesktopViewport();
   const featuredIds = [
     "شات-جي-بي-تي-بلس",
     "جيميني-برو",
@@ -119,7 +90,7 @@ export function FeaturedProducts() {
         </div>
 
         {/* Mobile: Native horizontal scroll (hidden on desktop) — GPU-smooth on Android */}
-        <div className="lg:hidden -mx-6">
+        {!isDesktopViewport && <div className="-mx-6">
           <div
             dir="rtl"
             className="flex gap-3 overflow-x-auto px-6 pb-6 pt-2"
@@ -196,7 +167,7 @@ export function FeaturedProducts() {
                       >
                         {category.label}
                       </span>
-                      <span className="text-[11px] font-medium text-outline/60">{product.reviewCount || 100} تقييم</span>
+                      <span className="text-[11px] font-medium text-outline/60">{`${product.reviewCount || 100} تقييم`}</span>
                     </div>
 
                     <h3 className={`mb-1.5 line-clamp-2 text-[14px] font-black leading-snug ${product.outOfStock ? "text-outline" : "text-on-surface"}`}>
@@ -219,7 +190,7 @@ export function FeaturedProducts() {
                             </span>
                             <span className="flex items-center gap-1 rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2 py-0.5 text-[9px] font-bold text-[#ff857d]">
                               <span>وفر</span>
-                              <span dir="ltr">{discountPercent}%</span>
+                              <span dir="ltr">{`${discountPercent}%`}</span>
                             </span>
                           </div>
                         </div>
@@ -237,10 +208,10 @@ export function FeaturedProducts() {
               );
             })}
           </div>
-        </div>
+        </div>}
 
         {/* Desktop: 4-column grid (lg and above) */}
-        <div className="hidden lg:grid lg:grid-cols-4 gap-4 pb-4">
+        {isDesktopViewport && <div className="grid grid-cols-4 gap-4 pb-4">
           {featured.map((product, index) => {
             const category = categoryMap[product.category] || {
               label: product.category,
@@ -286,7 +257,7 @@ export function FeaturedProducts() {
                   <div>
                     <div className="mb-2 flex items-center justify-between gap-2">
                       <span className="rounded-full border px-2.5 py-1 text-[10px] font-bold" style={{ color: category.color, borderColor: `${category.color}30`, backgroundColor: `${category.color}10` }}>{category.label}</span>
-                      <span className="text-[11px] font-medium text-outline/60">{product.reviewCount || 100} تقييم</span>
+                      <span className="text-[11px] font-medium text-outline/60">{`${product.reviewCount || 100} تقييم`}</span>
                     </div>
                     <h3 className={`mb-1.5 line-clamp-2 text-[14px] font-black leading-snug ${product.outOfStock ? "text-outline" : "text-on-surface"}`}>{product.title}</h3>
                     <p className="mb-3 line-clamp-2 text-[11px] leading-relaxed text-outline">{product.desc}</p>
@@ -300,7 +271,7 @@ export function FeaturedProducts() {
                         </div>
                         <div className="flex items-center gap-1.5">
                           <span className="flex items-baseline gap-1 text-[10px] text-outline/60 line-through"><span>{formatSudanesePrice(originalPrice)}</span><span>ج.س</span></span>
-                          <span className="flex items-center gap-1 rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2 py-0.5 text-[9px] font-bold text-[#ff857d]"><span>وفر</span><span dir="ltr">{discountPercent}%</span></span>
+                          <span className="flex items-center gap-1 rounded-full border border-[#ff857d]/20 bg-[#ff3b30]/12 px-2 py-0.5 text-[9px] font-bold text-[#ff857d]"><span>وفر</span><span dir="ltr">{`${discountPercent}%`}</span></span>
                         </div>
                       </div>
                     ) : (
@@ -314,7 +285,7 @@ export function FeaturedProducts() {
               </Link>
             );
           })}
-        </div>
+        </div>}
       </div>
     </section>
   );
