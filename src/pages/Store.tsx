@@ -16,6 +16,7 @@ import {
 
 const categories = storeCategories;
 const mobileOverviewBatchSize = 2;
+const catalogVirtualizationThreshold = 60;
 
 
 type VirtualStoreItem =
@@ -59,7 +60,7 @@ const viewportMetricsByColumns: Record<1 | 2 | 3 | 4, StoreViewportMetrics> = {
     imageHeight: 224,
     rowGap: 28,
     rowHeight: 544,
-    overscan: 6,
+    overscan: 10,
     headerHeight: 88,
     spacedHeaderHeight: 184,
     reduceEffects: false,
@@ -69,7 +70,7 @@ const viewportMetricsByColumns: Record<1 | 2 | 3 | 4, StoreViewportMetrics> = {
     imageHeight: 200,
     rowGap: 32,
     rowHeight: 516,
-    overscan: 5,
+    overscan: 8,
     headerHeight: 88,
     spacedHeaderHeight: 184,
     reduceEffects: false,
@@ -79,7 +80,7 @@ const viewportMetricsByColumns: Record<1 | 2 | 3 | 4, StoreViewportMetrics> = {
     imageHeight: 184,
     rowGap: 32,
     rowHeight: 500,
-    overscan: 4,
+    overscan: 8,
     headerHeight: 88,
     spacedHeaderHeight: 184,
     reduceEffects: false,
@@ -151,7 +152,6 @@ function StoreProductCard({
   onAddToCart,
   metrics,
   staticLayout = false,
-  deferContent = false,
   prioritizeImage = false,
 }: {
   product: Product;
@@ -159,13 +159,13 @@ function StoreProductCard({
   onAddToCart: (product: Product) => void;
   metrics: StoreViewportMetrics;
   staticLayout?: boolean;
-  deferContent?: boolean;
   prioritizeImage?: boolean;
 } & Attributes) {
   const discountPercent = getDiscountPercent();
   const originalPrice = getLegacyOriginalPrice(product.basePrice);
   const imageFrameClassName = staticLayout ? "h-[284px] sm:h-[224px] lg:h-[200px] xl:h-[184px]" : "";
   const responsiveImage = getResponsiveProductImage(product.image);
+  const shouldEagerLoadImage = prioritizeImage || !staticLayout;
 
   return (
     <div
@@ -174,11 +174,6 @@ function StoreProductCard({
           ? "shadow-sm"
           : "shadow-md transition-transform duration-300 md:hover:-translate-y-1 md:hover:shadow-[0_18px_38px_rgba(86,0,202,0.14)]"
       } ${product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : ""}`}
-      style={
-        deferContent
-          ? { contentVisibility: "auto", containIntrinsicSize: `1px ${metrics.cardHeight}px` }
-          : undefined
-      }
     >
       <Link
         to={`/products/${product.id}`}
@@ -197,7 +192,7 @@ function StoreProductCard({
           className={`w-full h-full object-cover transition-transform duration-300 md:group-hover:scale-[1.03] ${product.outOfStock ? "opacity-50" : ""}`}
           src={responsiveImage.src}
           srcSet={responsiveImage.srcSet}
-          loading={prioritizeImage ? "eager" : "lazy"}
+          loading={shouldEagerLoadImage ? "eager" : "lazy"}
           decoding="async"
           fetchPriority={prioritizeImage ? "high" : "auto"}
           onError={(event) => handleResponsiveImageError(event, responsiveImage.src)}
@@ -398,7 +393,6 @@ function StoreVirtualizedSections({
                         onOrderNow={onOrderNow}
                         onAddToCart={onAddToCart}
                         metrics={viewportMetrics}
-                        deferContent
                       />
                     ))}
                   </div>
@@ -565,7 +559,6 @@ export function Store() {
   const staticMetrics = getViewportMetrics(columns);
   const effectiveCategory: VisibleCategory = routeCategory ?? "all";
   const isMobileAllOverview = columns === 1 && effectiveCategory === "all";
-  const shouldUseVirtualLayout = enableVirtualLayout && columns > 1;
 
   useEffect(() => {
     const handleResize = () => {
@@ -604,6 +597,10 @@ export function Store() {
     if (effectiveCategory === "all") return products;
     return products.filter((product) => product.category === effectiveCategory);
   }, [effectiveCategory]);
+  const shouldUseVirtualLayout =
+    enableVirtualLayout &&
+    columns > 1 &&
+    filteredProducts.length > catalogVirtualizationThreshold;
 
   const groupedProducts = useMemo(
     () =>

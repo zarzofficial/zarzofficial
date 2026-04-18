@@ -96,12 +96,10 @@ function DesktopHero() {
   );
 }
 
-// Hook: reads window.innerWidth ONCE during the first render via lazy useState initializer.
-// Since this is a pure SPA (no SSR), window is always defined during render.
-// This eliminates the useLayoutEffect flush + re-render that could cause a brief
-// DesktopHero flash on mobile before the layout effect corrected isMobile to true.
+// Read once during the first client render, while keeping prerender safe.
+// The fallback only affects static generation where window does not exist.
 function useIsMobile() {
-  const [isMobile] = useState(() => window.innerWidth < 1024);
+  const [isMobile] = useState(() => (typeof window === "undefined" ? false : window.innerWidth < 1024));
   return isMobile;
 }
 // ─────────────────────────────────────────────────────────────────────────────
