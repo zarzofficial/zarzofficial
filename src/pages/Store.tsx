@@ -310,7 +310,7 @@ function StoreStaticSections({
                 onAddToCart={onAddToCart}
                 metrics={metrics}
                 staticLayout
-                prioritizeImage={index < 4}
+                prioritizeImage={metrics.reduceEffects || index < 4}
               />
             ))}
           </div>

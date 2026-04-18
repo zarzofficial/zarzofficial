@@ -51,6 +51,7 @@ function FeaturedProductImage({
 
 export function FeaturedProducts() {
   const isDesktopViewport = useDesktopViewport();
+  const shouldEagerLoadMobileImages = !isDesktopViewport;
   const featuredIds = [
     "شات-جي-بي-تي-بلس",
     "جيميني-برو",
@@ -134,7 +135,7 @@ export function FeaturedProducts() {
                       alt={product.title}
                       image={responsiveImage}
                       outOfStock={product.outOfStock}
-                      loadingStrategy={index < 3 ? "eager" : "lazy"}
+                      loadingStrategy={shouldEagerLoadMobileImages ? "eager" : index < 3 ? "eager" : "lazy"}
                       priority={index === 0}
                     />
 

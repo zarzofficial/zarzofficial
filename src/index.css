@@ -396,8 +396,12 @@
     .glowing-border-accent,
     .faq-mobile-glow,
     .why-choose-mobile-glow,
+    .cyber-glass-card::before,
     [class*="blur-["] > div,
-    [class*="pointer-events-none"][class*="rounded-full"][class*="blur"] {
+    [class*="pointer-events-none"][class*="rounded-full"][class*="blur"],
+    [class*="pointer-events-none"][class*="blur-"],
+    [class*="-z-10"][class*="blur-"],
+    [class*="absolute"][class*="rounded-full"][class*="blur-"] {
         display: none !important;
     }
 
@@ -407,11 +411,15 @@
     .perf-panel,
     .product-card,
     [data-slot="card"],
-    .main-service-card {
+    .main-service-card,
+    .perf-navbar,
+    .glass-nav {
         backdrop-filter: none !important;
         transform: none !important;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2) !important;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.16) !important;
         transition: none !important;
+        contain: paint !important;
+        isolation: isolate !important;
     }
 
     /* 4. Disable hover effects on touch devices */
@@ -420,12 +428,25 @@
     .product-card:hover,
     .main-service-card:hover {
         transform: none !important;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2) !important;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.16) !important;
         border-color: rgba(208, 188, 255, 0.1) !important;
     }
 
-    /* 5. No contain on mobile — containment strategies can interfere with paint order
-       and cause sections to render late during fast scrolling. Removed entirely. */
+    [class*="drop-shadow"],
+    .drop-shadow-sm,
+    .drop-shadow,
+    svg[style*="filter"] {
+        filter: none !important;
+    }
+
+    [class*="mix-blend"],
+    .mix-blend-screen,
+    .mix-blend-overlay {
+        mix-blend-mode: normal !important;
+    }
+
+    /* 5. Keep containment local to card shells only.
+       This shrinks repaint damage on Android without deferring section visibility. */
 
     /* 6. Disable text-glow (text-shadow triggers repaint) */
     .text-glow {
@@ -439,7 +460,7 @@
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
         background: rgba(29, 12, 38, 0.96) !important;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2) !important;
     }
 
     /* 8. No animations on scroll — prevent layout thrashing */
