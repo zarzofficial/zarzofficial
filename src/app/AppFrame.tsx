@@ -6,15 +6,18 @@ import Lenis from "lenis";
 
 export function AppFrame({ children }: { children: ReactNode }) {
   useEffect(() => {
-    // Add buttery smooth momentum scrolling only for desktop wheel/trackpad
+    // Lenis smooth scroll ONLY for desktop (1024px+)
+    // On mobile, native scroll is always smoother — no JS interception
+    if (window.innerWidth < 1024) return;
+
     const lenis = new Lenis({
-      duration: 1.8, // Make it very slow & smooth as requested
+      duration: 1.8,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
-      wheelMultiplier: 0.8, // Slightly reduce scroll jump speed
-      touchMultiplier: 2, // Keep touch fast
+      wheelMultiplier: 0.8,
+      touchMultiplier: 2,
     });
 
     // Expose for keyboard snap navigation to use lenis.scrollTo directly

@@ -143,6 +143,13 @@
         max-width: 100vw;
     }
 
+    /* Mobile: Enable GPU scroll compositing */
+    @media (max-width: 1023px) {
+        body {
+            -webkit-overflow-scrolling: touch;
+        }
+    }
+
     * {
         @apply border-border outline-ring/50;
     }
@@ -519,54 +526,85 @@
 
 
 /* =========================
-   CLEAN MOBILE FIX
+   MOBILE PERFORMANCE (< 1024px)
+   Disable ALL GPU-expensive effects that cause scroll jank
    ========================= */
-@media (max-width: 768px) {
+@media (max-width: 1023px) {
 
-    .cyber-glass-card,
-    .perf-card,
-    .perf-panel,
-    [data-slot="card"],
-    .product-card {
+    /* 1. Kill backdrop-filter everywhere — #1 jank cause on Android */
+    *,
+    *::before,
+    *::after {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22) !important;
-        transform: none !important;
-        contain: unset !important;
-        content-visibility: visible !important;
     }
 
+    /* 2. Hide ALL decorative blur glow divs — they trigger continuous GPU repaints */
     .home-mobile-glow,
     .mesh-gradient-bg,
     .icon-glow-container::after,
-    .glowing-border-accent {
+    .glowing-border-accent,
+    .faq-mobile-glow,
+    .why-choose-mobile-glow,
+    [class*="blur-["] > div,
+    [class*="pointer-events-none"][class*="rounded-full"][class*="blur"] {
         display: none !important;
     }
 
-    .perf-mobile-horizontal-cards,
-    .perf-horizontal-cards {
+    /* 3. Remove all transforms, box-shadows on cards — compositor-only */
+    .cyber-glass-card,
+    .perf-card,
+    .perf-panel,
+    .product-card,
+    [data-slot="card"],
+    .main-service-card {
+        backdrop-filter: none !important;
         transform: none !important;
-        contain: unset !important;
-    }
-
-    .perf-mobile-horizontal-cards * {
-        animation: none !important;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2) !important;
         transition: none !important;
     }
 
-    .product-card,
-    .product-card * {
-        transition-property: none !important;
+    /* 4. Disable hover effects on touch devices */
+    .cyber-glass-card:hover,
+    .perf-card:hover,
+    .product-card:hover,
+    .main-service-card:hover {
+        transform: none !important;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2) !important;
+        border-color: rgba(208, 188, 255, 0.1) !important;
+    }
+
+    /* 5. Section paint containment — browser only paints visible sections */
+    section,
+    [data-snap-section] {
+        contain: paint;
+        overflow: hidden;
+    }
+
+    /* 6. Disable text-glow (text-shadow triggers repaint) */
+    .text-glow,
+    [class*="drop-shadow"] {
+        text-shadow: none !important;
+        filter: none !important;
+    }
+
+    /* 7. Navbar: solid background, no blur */
+    .perf-navbar,
+    .glass-nav,
+    nav {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background: rgba(29, 12, 38, 0.96) !important;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* 8. No animations on scroll — prevent layout thrashing */
+    .animate-infinite-scroll {
         animation: none !important;
     }
 
-    html,
-    body {
+    html, body {
         overflow-x: hidden !important;
-    }
-
-    .perf-mobile-horizontal-cards {
-        touch-action: auto !important;
     }
 }
 
@@ -580,27 +618,10 @@ body {
     isolation: isolate;
 }
 
+
+/* Swiper CSS kept for potential future use */
 .swiper {
     isolation: isolate;
-}
-
-.swiper-wrapper {
-    transition-timing-function: linear !important;
-}
-
-.swiper-slide {
-    height: auto !important;
-    display: flex;
-}
-
-.featured-product-slide {
-    width: 290px !important;
-}
-
-@media (min-width: 768px) {
-    .featured-product-slide {
-        width: 270px !important;
-    }
 }
 
 /* Animations for Desktop Sections only (lg: 1024px+) */
