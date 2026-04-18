@@ -364,15 +364,31 @@ export function Home() {
         <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch justify-between gap-8 lg:flex-row lg:items-center xl:gap-12">
 
           {/* Main Hero Text */}
-          <div className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right lg:mx-0 lg:max-w-none lg:text-start md:animate-in md:fade-in md:slide-in-from-bottom-12 md:duration-1000 md:ease-out" dir="rtl">
-            <h1 className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.3] tracking-[-0.02em] text-glow sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.3] md:mb-6 md:max-w-none md:text-5xl xl:text-6xl md:leading-[1.3] md:tracking-tight">
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.15, delayChildren: 0.1 }
+              }
+            }}
+            className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right lg:mx-0 lg:max-w-none lg:text-start" dir="rtl">
+            <motion.h1 
+              variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }}
+              className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.3] tracking-[-0.02em] text-glow sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.3] md:mb-6 md:max-w-none md:text-5xl xl:text-6xl md:leading-[1.3] md:tracking-tight">
               تسوق كل ما تحتاجه في <br className="hidden sm:block" />
               <span className="mt-1 block py-2 text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#d0bcff] not-italic md:mt-3 md:italic drop-shadow-sm">مكان واحد</span>
-            </h1>
-            <p className="mb-6 px-1 text-[0.95rem] leading-7 text-outline sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem] md:mb-8 md:max-w-2xl md:text-xl md:leading-relaxed text-[#c4bcda]">
+            </motion.h1>
+            <motion.p 
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
+              className="mb-6 px-1 text-[0.95rem] leading-7 text-outline sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem] md:mb-8 md:max-w-2xl md:text-xl md:leading-relaxed text-[#c4bcda]">
               مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
-            </p>
-            <div className="flex w-full flex-col gap-3 sm:flex-row sm:gap-3 md:justify-start md:gap-5">
+            </motion.p>
+            <motion.div 
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } }}
+              className="flex w-full flex-col gap-3 sm:flex-row sm:gap-3 md:justify-start md:gap-5">
               <Link
                 to="/products"
                 className="primary-gradient w-full rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary transition-all scale-100 active:scale-95 hover:shadow-[0_0_40px_rgba(208,188,255,0.5)] hover:-translate-y-1 sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
@@ -385,8 +401,8 @@ export function Home() {
               >
                 تواصل معنا
               </Link>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Features Vertical Card */}
           <TiltCard className="perf-panel w-full lg:w-[340px] xl:w-[380px] shrink-0 cyber-glass-card rounded-[2rem] p-5 xl:p-6 border border-white/5 bg-surface/60 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] relative hidden lg:block lg:animate-in lg:fade-in lg:slide-in-from-left-12 lg:duration-1000 lg:delay-300 lg:fill-mode-both">
