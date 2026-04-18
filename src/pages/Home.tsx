@@ -336,45 +336,45 @@ export function Home() {
               </span>
             </div>
 
-            <h3 className="text-xl md:text-2xl font-black text-on-background leading-tight mb-3 text-start tracking-tight">
+            <h3 className="text-xl md:text-2xl font-black text-on-background leading-tight mb-4 text-start tracking-tight">
               تجربة أسرع وأوضح للطلبات الرقمية
             </h3>
 
-            <p className="text-[#a1a1aa] text-xs leading-relaxed mb-5 text-start font-medium">
+            <p className="text-[#a1a1aa] text-xs leading-relaxed mb-6 text-start font-medium">
               اختر الخدمة، أرسل بياناتك، وتابع التنفيذ من نفس المكان بدون خطوات معقدة.
             </p>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {/* Feature 1 */}
-              <div className="perf-card p-3 rounded-[1rem] bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/10 transition-colors">
+              <div className="perf-card p-4 rounded-[1.25rem] bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/10 transition-colors">
                 <div className="w-10 h-10 rounded-xl bg-[#e11d48] shrink-0 flex items-center justify-center text-white text-xl font-black shadow-[0_0_15px_rgba(225,29,72,0.4)]">
                   #
                 </div>
                 <div className="text-start">
-                  <h4 className="font-bold text-on-surface mb-0.5 text-[13px]">نمو للحسابات والتفاعل</h4>
-                  <p className="text-[11px] text-outline line-clamp-1">باقات سوشيال ميديا مناسبة للبدء أو التوسع</p>
+                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">نمو للحسابات والتفاعل</h4>
+                  <p className="text-xs text-outline line-clamp-1">باقات سوشيال ميديا مناسبة للبدء أو التوسع</p>
                 </div>
               </div>
 
               {/* Feature 2 */}
-              <div className="perf-card p-3 rounded-[1rem] bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/10 transition-colors">
+              <div className="perf-card p-4 rounded-[1.25rem] bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/10 transition-colors">
                 <div className="w-10 h-10 rounded-xl bg-[#3b82f6] shrink-0 flex items-center justify-center text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]">
                   <SiteIcon name="bolt" className="text-xl" />
                 </div>
                 <div className="text-start">
-                  <h4 className="font-bold text-on-surface mb-0.5 text-[13px]">شحن واشتراكات مباشرة</h4>
-                  <p className="text-[11px] text-outline line-clamp-1">تأكيد سريع ومتابعة عبر واتساب أو الهاتف</p>
+                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">شحن واشتراكات مباشرة</h4>
+                  <p className="text-xs text-outline line-clamp-1">تأكيد سريع ومتابعة عبر واتساب أو الهاتف</p>
                 </div>
               </div>
 
               {/* Feature 3 */}
-              <div className="perf-card p-3 rounded-[1rem] bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/10 transition-colors">
+              <div className="perf-card p-4 rounded-[1.25rem] bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/10 transition-colors">
                 <div className="w-10 h-10 rounded-xl bg-[#10b981] shrink-0 flex items-center justify-center text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]">
                   <SiteIcon name="laptop_mac" className="text-xl" />
                 </div>
                 <div className="text-start">
-                  <h4 className="font-bold text-on-surface mb-0.5 text-[13px]">تنفيذ مواقع ومتاجر حسب الطلب</h4>
-                  <p className="text-[11px] text-outline line-clamp-1">من التعديل السريع إلى المشروع الكامل</p>
+                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">تنفيذ مواقع ومتاجر حسب الطلب</h4>
+                  <p className="text-xs text-outline line-clamp-1">من التعديل السريع إلى المشروع الكامل</p>
                 </div>
               </div>
             </div>
