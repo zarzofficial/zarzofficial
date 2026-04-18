@@ -617,3 +617,14 @@ body {
 .animate-fade-in {
   animation: fadeInDown 0.18s ease-out both;
 }
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@media (min-width: 1024px) {
+  .float-icon-1 { animation: floatIcon 3s ease-in-out infinite; }
+  .float-icon-2 { animation: floatIcon 3.5s ease-in-out infinite 0.5s; }
+  .float-icon-3 { animation: floatIcon 4s ease-in-out infinite 1s; }
+}

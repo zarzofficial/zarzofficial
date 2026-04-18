@@ -409,7 +409,7 @@ export function Home() {
             <div className="space-y-4">
               {/* Feature 1 */}
               <div className="perf-card p-4 rounded-[1.25rem] bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/10 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-[#e11d48] shrink-0 flex items-center justify-center text-white text-xl font-black shadow-[0_0_15px_rgba(225,29,72,0.4)]">
+                <div className="float-icon-1 w-10 h-10 rounded-xl bg-[#e11d48] shrink-0 flex items-center justify-center text-white text-xl font-black shadow-[0_0_15px_rgba(225,29,72,0.4)]">
                   #
                 </div>
                 <div className="text-start">
@@ -420,7 +420,7 @@ export function Home() {
 
               {/* Feature 2 */}
               <div className="perf-card p-4 rounded-[1.25rem] bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/10 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-[#3b82f6] shrink-0 flex items-center justify-center text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]">
+                <div className="float-icon-2 w-10 h-10 rounded-xl bg-[#3b82f6] shrink-0 flex items-center justify-center text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]">
                   <SiteIcon name="bolt" className="text-xl" />
                 </div>
                 <div className="text-start">
@@ -431,7 +431,7 @@ export function Home() {
 
               {/* Feature 3 */}
               <div className="perf-card p-4 rounded-[1.25rem] bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/10 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-[#10b981] shrink-0 flex items-center justify-center text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+                <div className="float-icon-3 w-10 h-10 rounded-xl bg-[#10b981] shrink-0 flex items-center justify-center text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]">
                   <SiteIcon name="laptop_mac" className="text-xl" />
                 </div>
                 <div className="text-start">
