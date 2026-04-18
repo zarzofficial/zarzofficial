@@ -524,8 +524,10 @@ export function Home() {
             style={{ opacity: isDesktopViewport ? 0.3 : 0.18 }}
             src="/assets/hero-ambient.svg"
             loading="eager"
-            decoding="async"
+            decoding="sync"
             fetchPriority="high"
+            width={1600}
+            height={1200}
           />
           <div className="absolute inset-0 bg-gradient-to-l from-background via-transparent to-background/50"></div>
           <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-background/70 to-background sm:h-28"></div>

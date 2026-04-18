@@ -70,8 +70,12 @@ export function FeaturedProducts() {
     <section
       className="perf-mobile-section relative overflow-hidden bg-background px-6 pb-4 pt-4 md:px-12 md:py-14"
     >
-      <div className="pointer-events-none absolute top-0 right-1/4 h-[260px] w-[260px] rounded-full bg-primary/5 blur-[36px] md:h-[500px] md:w-[500px] md:blur-[120px]" />
-      <div className="pointer-events-none absolute bottom-0 left-1/3 h-[220px] w-[220px] rounded-full bg-tertiary/5 blur-[32px] md:h-[400px] md:w-[400px] md:blur-[100px]" />
+      {isDesktopViewport && (
+        <>
+          <div className="pointer-events-none absolute top-0 right-1/4 h-[260px] w-[260px] rounded-full bg-primary/5 blur-[36px] md:h-[500px] md:w-[500px] md:blur-[120px]" />
+          <div className="pointer-events-none absolute bottom-0 left-1/3 h-[220px] w-[220px] rounded-full bg-tertiary/5 blur-[32px] md:h-[400px] md:w-[400px] md:blur-[100px]" />
+        </>
+      )}
 
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="mb-12 flex items-start justify-between gap-4">
@@ -86,7 +90,6 @@ export function FeaturedProducts() {
               اكتشف أكثر الخدمات طلبًا لدينا
             </p>
           </div>
-
         </div>
 
         {/* Mobile: Native horizontal scroll (hidden on desktop) — GPU-smooth on Android */}
