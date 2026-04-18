@@ -556,7 +556,7 @@ export function Home() {
         <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-background to-transparent pointer-events-none z-0 border-b border-background"></div>
         
         <div className="home-mobile-glow absolute top-1/2 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none"></div>
-        <ScrollReveal type="fadeRight" className="max-w-7xl mx-auto relative z-10">
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-row justify-between items-end mb-12 gap-4">
             <div className="text-start">
               <span className="text-primary font-bold tracking-widest text-sm md:text-base uppercase block mb-1">تخصصاتنا</span>
@@ -709,7 +709,7 @@ export function Home() {
             })}
           </div>
 
-        </ScrollReveal>
+        </div>
       </Section>
 
       {/* Why ZARZ Section */}
