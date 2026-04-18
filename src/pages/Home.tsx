@@ -4,6 +4,30 @@ import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
 import { useCoarsePointer } from "../lib/useCoarsePointer";
 import { useScrollReveal } from "../lib/useScrollReveal";
+import { motion } from "framer-motion";
+
+const ScrollReveal = ({ children, type = "fadeUp", delay = 0, className = "" }: { children: React.ReactNode, type?: "fadeUp" | "fadeRight" | "fadeLeft" | "scaleUp" | "blurIn", delay?: number, className?: string }) => {
+  const variants = {
+    fadeUp: { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0 } },
+    fadeRight: { hidden: { opacity: 0, x: -50 }, visible: { opacity: 1, x: 0 } },
+    fadeLeft: { hidden: { opacity: 0, x: 50 }, visible: { opacity: 1, x: 0 } },
+    scaleUp: { hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1 } },
+    blurIn: { hidden: { opacity: 0, filter: "blur(10px)" }, visible: { opacity: 1, filter: "blur(0px)" } },
+  };
+
+  return (
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+      variants={variants[type]}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 const whyChooseItems = [
   {
@@ -393,12 +417,12 @@ export function Home() {
       </IsolatedSection>
 
       {/* Services Grid (Horizontal Carousel) */}
-      <Section className="reveal-on-scroll perf-mobile-section px-6 py-32 bg-surface-container-low md:px-12 relative overflow-hidden" data-perf-size="tall">
+      <Section className="perf-mobile-section px-6 py-32 bg-surface-container-low md:px-12 relative overflow-hidden" data-perf-size="tall">
         <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-background to-transparent pointer-events-none z-0 border-t border-background"></div>
         <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-background to-transparent pointer-events-none z-0 border-b border-background"></div>
         
         <div className="home-mobile-glow absolute top-1/2 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none"></div>
-        <div className="max-w-7xl mx-auto relative z-10">
+        <ScrollReveal type="fadeRight" className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-row justify-between items-end mb-12 gap-4">
             <div className="text-start">
               <span className="text-primary font-bold tracking-widest text-sm md:text-base uppercase block mb-1">تخصصاتنا</span>
@@ -551,14 +575,14 @@ export function Home() {
             })}
           </div>
 
-        </div>
+        </ScrollReveal>
       </Section>
 
       {/* Why ZARZ Section */}
-      <Section className="reveal-on-scroll py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
+      <Section className="py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
         <div className="why-choose-mobile-glow home-mobile-glow absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] pointer-events-none"></div>
         <div className="why-choose-mobile-glow home-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
-        <div className="max-w-6xl mx-auto relative z-10">
+        <ScrollReveal type="fadeUp" className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-primary text-sm font-bold mb-6 backdrop-blur-md">لماذا نحن مختلفون؟</span>
             <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background mb-4">لماذا تختار زارز؟</h2>
@@ -572,12 +596,12 @@ export function Home() {
               </React.Fragment>
             ))}
           </div>
-        </div>
+        </ScrollReveal>
       </Section>
 
       {/* Tech Marquee Section */}
       <IsolatedSection>
-      <div className="reveal-on-scroll z-20 w-full max-w-6xl mx-auto pt-4 pb-12 md:pt-10 md:pb-20 relative">
+      <ScrollReveal type="blurIn" delay={0.2} className="z-20 w-full max-w-6xl mx-auto pt-4 pb-12 md:pt-10 md:pb-20 relative">
         <div className="flex flex-col items-center justify-center text-center mb-10 md:mb-16 relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs md:text-sm font-bold mb-4 backdrop-blur-md shadow-[0_0_15px_rgba(208,188,255,0.1)]">
             <span className="relative flex h-2 w-2 mb-0.5">
@@ -622,17 +646,17 @@ export function Home() {
             {desktopTechLogos}
           </div>
         </div>
-      </div>
+      </ScrollReveal>
 
       </IsolatedSection>
 
       {/* Stats Section */}
-      <Section className="reveal-on-scroll perf-mobile-section relative overflow-hidden px-6 py-24 md:px-12" data-perf-size="compact">
+      <Section className="perf-mobile-section relative overflow-hidden px-6 py-24 md:px-12" data-perf-size="compact">
         <div className="absolute inset-0 z-0">
           <div className="home-mobile-glow absolute top-1/2 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]"></div>
           <div className="home-mobile-glow absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-tertiary/10 rounded-full blur-[120px]"></div>
         </div>
-        <div className="max-w-7xl mx-auto relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 text-center">
+        <ScrollReveal type="scaleUp" className="max-w-7xl mx-auto relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 text-center">
 
           <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-primary/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(86,0,202,0.15)] overflow-hidden flex flex-col justify-center">
             <div className="home-mobile-glow absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl transition-all duration-500 md:group-hover:bg-primary/20"></div>
@@ -677,14 +701,14 @@ export function Home() {
               <div className="text-outline text-sm md:text-base font-bold">دعم فني متواصل</div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </Section>
 
 
       {/* FAQ Section */}
-      <Section id="faq" className="reveal-on-scroll perf-mobile-section relative overflow-hidden bg-background px-6 py-24 md:px-12" data-perf-size="medium">
+      <Section id="faq" className="perf-mobile-section relative overflow-hidden bg-background px-6 py-24 md:px-12" data-perf-size="medium">
         <div className="faq-mobile-glow home-mobile-glow absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px] pointer-events-none"></div>
-        <div className="max-w-4xl mx-auto relative z-10">
+        <ScrollReveal type="fadeLeft" delay={0.1} className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black font-headline text-on-background mb-4">أسئلة شائعة</h2>
             <p className="text-lg text-outline">إجابات سريعة قبل بدء الطلب.</p>
@@ -710,12 +734,12 @@ export function Home() {
               }
             ]}
           />
-        </div>
+        </ScrollReveal>
       </Section>
 
       {/* CTA Section */}
-      <Section className="reveal-on-scroll perf-mobile-section px-6 py-24 md:px-12 md:py-32" data-perf-size="compact">
-        <div className="perf-panel max-w-7xl mx-auto cyber-glass-card rounded-[2.5rem] p-8 md:p-14 relative overflow-hidden group border border-outline-variant/20 shadow-2xl">
+      <Section className="perf-mobile-section px-6 py-24 md:px-12 md:py-32" data-perf-size="compact">
+        <ScrollReveal type="fadeUp" className="perf-panel max-w-7xl mx-auto cyber-glass-card rounded-[2.5rem] p-8 md:p-14 relative overflow-hidden group border border-outline-variant/20 shadow-2xl">
           <div className="mesh-gradient-bg opacity-30"></div>
           <div className="home-mobile-glow absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
           <div className="home-mobile-glow absolute bottom-0 left-0 w-64 h-64 bg-tertiary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
@@ -746,7 +770,7 @@ export function Home() {
               </Link>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
       </Section>
     </div>
   );
