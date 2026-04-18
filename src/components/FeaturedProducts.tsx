@@ -121,8 +121,8 @@ export function FeaturedProducts() {
 
         </div>
 
-        {/* Swiper Slider */}
-        <div className="-mx-6 md:mx-0">
+        {/* Mobile Swiper (hidden on desktop) */}
+        <div className="-mx-6 md:mx-0 lg:hidden">
           <Swiper
             onSwiper={(swiper) => {
               setSwiperInstance(swiper);
