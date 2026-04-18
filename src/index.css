@@ -448,13 +448,9 @@
         overflow-x: hidden !important;
     }
 
-    /* 9. content-visibility: auto for below-fold sections — skip render when off-screen.
-       The browser skips layout+paint for these entirely until they scroll near the viewport.
-       contain-intrinsic-size approximates the section height to keep scrollbar accurate. */
-    [data-cv-section] {
-        content-visibility: auto;
-        contain-intrinsic-size: 0 600px;
-    }
+    /* content-visibility: auto removed — caused pop-in/disappearing sections during fast
+       scrolling because sections entered the viewport before the browser completed their
+       deferred paint. Native scroll + reduced blur/glow is sufficient. */
 }
 
 /* overscroll behavior is set per-breakpoint above */
