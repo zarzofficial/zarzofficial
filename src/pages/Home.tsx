@@ -8,19 +8,19 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 const ScrollReveal = ({ children, type = "fadeUp", delay = 0, className = "" }: { children: React.ReactNode, type?: "fadeUp" | "fadeRight" | "fadeLeft" | "scaleUp" | "blurIn", delay?: number, className?: string }) => {
   const variants = {
-    fadeUp: { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } },
-    fadeRight: { hidden: { opacity: 0, x: -30 }, visible: { opacity: 1, x: 0 } },
-    fadeLeft: { hidden: { opacity: 0, x: 30 }, visible: { opacity: 1, x: 0 } },
-    scaleUp: { hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1 } },
-    blurIn: { hidden: { opacity: 0, scale: 0.97 }, visible: { opacity: 1, scale: 1 } }, // Replaced expensive blur with subtle scale
+    fadeUp: { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } },
+    fadeRight: { hidden: { opacity: 0, x: -24 }, visible: { opacity: 1, x: 0 } },
+    fadeLeft: { hidden: { opacity: 0, x: 24 }, visible: { opacity: 1, x: 0 } },
+    scaleUp: { hidden: { opacity: 0, scale: 0.96 }, visible: { opacity: 1, scale: 1 } },
+    blurIn: { hidden: { opacity: 0, scale: 0.98 }, visible: { opacity: 1, scale: 1 } },
   };
 
   return (
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-20px" }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      viewport={{ once: false, margin: "-60px" }}
+      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
       variants={variants[type]}
       className={className}
     >
@@ -117,8 +117,8 @@ const useKeyboardSectionSnap = () => {
       if (e.key === "ArrowDown") {
         if (currentIndex < sections.length - 1) scrollToIndex(currentIndex + 1);
       } else {
-        if (currentIndex > 0) scrollToIndex(currentIndex - 1);
-        else window.scrollTo({ top: 0, behavior: "smooth" });
+        // Always use scrollToIndex so we land precisely on the section top
+        scrollToIndex(Math.max(0, currentIndex - 1));
       }
     };
 
@@ -403,7 +403,7 @@ export function Home() {
   return (
     <div ref={revealRef} className="home-mobile-page pt-12 md:pt-14">
       {/* Hero Section */}
-      <Section data-snap-section="true" className="relative min-h-0 md:min-h-screen overflow-hidden px-4 pb-2 pt-14 sm:px-6 sm:py-8 md:px-12 md:py-8 lg:py-10">
+      <Section data-snap-section="true" className="relative overflow-hidden px-4 pb-2 pt-14 sm:px-6 sm:py-8 md:px-12 md:py-8 lg:min-h-screen lg:py-10 lg:flex lg:flex-col lg:justify-center">
         <div className="absolute inset-0 z-0">
           {/* Mobile Image */}
           <img
