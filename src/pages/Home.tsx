@@ -72,48 +72,62 @@ const useKeyboardSectionSnap = () => {
     if (window.innerWidth < 1024) return;
 
     let isScrolling = false;
+    let currentIndex = 0;
+
+    const getSections = (): HTMLElement[] =>
+      Array.from(document.querySelectorAll('[data-snap-section="true"]')) as HTMLElement[];
 
     const getAbsoluteTop = (el: HTMLElement): number =>
       el.getBoundingClientRect().top + window.scrollY;
 
+    const scrollToIndex = (idx: number) => {
+      const sections = getSections();
+      if (idx < 0 || idx >= sections.length) return;
+      currentIndex = idx;
+      isScrolling = true;
+      window.scrollTo({ top: getAbsoluteTop(sections[idx]), behavior: "smooth" });
+      setTimeout(() => { isScrolling = false; }, 900);
+    };
+
+    // Sync currentIndex when user scrolls manually
+    const syncIndex = () => {
+      if (isScrolling) return;
+      const sections = getSections();
+      const mid = window.scrollY + window.innerHeight / 2;
+      let best = 0;
+      let bestDiff = Infinity;
+      sections.forEach((s, i) => {
+        const diff = Math.abs(getAbsoluteTop(s) + s.offsetHeight / 2 - mid);
+        if (diff < bestDiff) { bestDiff = diff; best = i; }
+      });
+      currentIndex = best;
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (document.activeElement?.tagName === "INPUT" || document.activeElement?.tagName === "TEXTAREA") return;
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+
+      // Always prevent default arrow scroll on home page (desktop)
+      e.preventDefault();
       if (isScrolling) return;
 
-      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
-      e.preventDefault();
-
-      const sections = Array.from(
-        document.querySelectorAll('[data-snap-section="true"]')
-      ) as HTMLElement[];
+      const sections = getSections();
       if (sections.length === 0) return;
 
-      const currentScroll = window.scrollY;
-      const threshold = 80;
-
       if (e.key === "ArrowDown") {
-        const next = sections.find(s => getAbsoluteTop(s) > currentScroll + threshold);
-        if (next) {
-          isScrolling = true;
-          window.scrollTo({ top: getAbsoluteTop(next), behavior: "smooth" });
-          setTimeout(() => { isScrolling = false; }, 900);
-        }
+        if (currentIndex < sections.length - 1) scrollToIndex(currentIndex + 1);
       } else {
-        const prev = [...sections].reverse().find(s => getAbsoluteTop(s) < currentScroll - threshold);
-        if (prev) {
-          isScrolling = true;
-          window.scrollTo({ top: getAbsoluteTop(prev), behavior: "smooth" });
-          setTimeout(() => { isScrolling = false; }, 900);
-        } else if (currentScroll > threshold) {
-          isScrolling = true;
-          window.scrollTo({ top: 0, behavior: "smooth" });
-          setTimeout(() => { isScrolling = false; }, 900);
-        }
+        if (currentIndex > 0) scrollToIndex(currentIndex - 1);
+        else window.scrollTo({ top: 0, behavior: "smooth" });
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("scroll", syncIndex, { passive: true });
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("scroll", syncIndex);
+    };
   }, []);
 };
 
@@ -520,11 +534,13 @@ export function Home() {
         </div>
       </Section>
 
-      <IsolatedSection>
-        <div data-snap-section="true">
-          <FeaturedProducts />
-        </div>
-      </IsolatedSection>
+      {/* Featured Products Section */}
+      <section
+        data-snap-section="true"
+        className="relative overflow-hidden bg-background lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]"
+      >
+        <FeaturedProducts />
+      </section>
 
       {/* Services Grid (Horizontal Carousel) */}
       <Section data-snap-section="true" className="perf-mobile-section px-6 py-16 md:py-20 bg-surface-container-low md:px-12 relative overflow-hidden lg:flex lg:flex-col lg:justify-center lg:min-h-screen" data-perf-size="tall">
