@@ -44,7 +44,7 @@ export function Navbar() {
   useEffect(() => { setDropdownOpen(false); }, [location.pathname]);
 
   return (
-    <nav className="perf-navbar absolute top-0 w-full z-50 bg-transparent md:backdrop-blur-none backdrop-blur-xl font-headline antialiased">
+    <nav className="perf-navbar fixed md:absolute top-0 w-full z-50 bg-transparent md:backdrop-blur-none backdrop-blur-xl font-headline antialiased transition-all duration-500 ease-in-out">
       <div className="flex justify-between items-center px-6 md:px-12 py-4 w-full max-w-screen-2xl mx-auto relative">
 
         {/* Right: Logo (original "زارز" text) */}
