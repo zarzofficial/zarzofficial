@@ -379,7 +379,10 @@ export function Home() {
               variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }}
               className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.3] tracking-[-0.02em] text-glow sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.3] md:mb-6 md:max-w-none md:text-5xl xl:text-6xl md:leading-[1.3] md:tracking-tight">
               تسوق كل ما تحتاجه في <br className="hidden sm:block" />
-              <span className="mt-1 block py-2 text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#d0bcff] not-italic md:mt-3 md:italic drop-shadow-sm">مكان واحد</span>
+              <span className="relative inline-block mt-1 py-1 md:py-2 md:mt-3">
+                <span className="absolute inset-0 bg-primary/20 blur-[30px] rounded-full hidden md:block animate-[pulse_4s_ease-in-out_infinite]"></span>
+                <span className="relative text-transparent bg-clip-text bg-gradient-to-l from-primary via-[#e9d5ff] to-[#d0bcff] not-italic md:italic drop-shadow-[0_0_15px_rgba(208,188,255,0.5)] md:animate-[pulse_3s_ease-in-out_infinite]">مكان واحد</span>
+              </span>
             </motion.h1>
             <motion.p 
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
