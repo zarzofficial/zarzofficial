@@ -383,6 +383,12 @@
         -webkit-backdrop-filter: none !important;
     }
 
+    /* 1b. Declare vertical-only scroll intent — lets Android skip 300ms touch disambiguation
+       and allows the browser to start compositing the scroll immediately on pointer-down. */
+    .home-mobile-page {
+        touch-action: pan-y;
+    }
+
     /* 2. Hide ALL decorative blur glow divs — they trigger continuous GPU repaints */
     .home-mobile-glow,
     .mesh-gradient-bg,

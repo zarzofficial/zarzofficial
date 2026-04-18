@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { products } from "../data/products";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
@@ -25,22 +25,22 @@ function FeaturedProductImage({
   loadingStrategy: "eager" | "lazy";
   priority?: boolean;
 }) {
+  const imgRef = useRef<HTMLImageElement>(null);
+  // Start as loaded if priority (preloaded) — will be corrected by useEffect
+  // if the image is not actually in cache yet.
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Avoid opacity-0 → transition pop-in for eager/priority images.
-  // Show skeleton for layout stability, but reveal image immediately at load.
-  // No CSS transition on priority images — they must paint with zero delay.
-  const opacityClass = priority
-    ? isLoaded
-      ? outOfStock
-        ? "opacity-50"
-        : "opacity-100"
-      : "opacity-0"
-    : isLoaded
-    ? outOfStock
-      ? "opacity-50"
-      : "opacity-100"
-    : "opacity-0";
+  // After mount, check if the image is already decoded (preloaded/cached).
+  // If img.complete is true, the onLoad event already fired or the image was
+  // served from cache — show it immediately without any opacity-0 phase.
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setIsLoaded(true);
+    }
+  }, []);
+
+  const targetOpacity = outOfStock ? "opacity-50" : "opacity-100";
+  const opacityClass = isLoaded ? targetOpacity : "opacity-0";
 
   return (
     <div className="absolute inset-0">
@@ -55,6 +55,7 @@ function FeaturedProductImage({
       )}
 
       <img
+        ref={imgRef}
         src={image.src}
         srcSet={image.srcSet}
         alt={alt}
@@ -76,6 +77,7 @@ function FeaturedProductImage({
     </div>
   );
 }
+
 
 export function FeaturedProducts() {
   const featuredIds = [

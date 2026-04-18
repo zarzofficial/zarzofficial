@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
 import { useCoarsePointer } from "../lib/useCoarsePointer";
@@ -96,13 +96,12 @@ function DesktopHero() {
   );
 }
 
-// Hook: detects mobile AFTER mount — useLayoutEffect fires synchronously
-// before paint, so no flash and no hydration mismatch.
+// Hook: reads window.innerWidth ONCE during the first render via lazy useState initializer.
+// Since this is a pure SPA (no SSR), window is always defined during render.
+// This eliminates the useLayoutEffect flush + re-render that could cause a brief
+// DesktopHero flash on mobile before the layout effect corrected isMobile to true.
 function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-  useLayoutEffect(() => {
-    setIsMobile(window.innerWidth < 1024);
-  }, []);
+  const [isMobile] = useState(() => window.innerWidth < 1024);
   return isMobile;
 }
 // ─────────────────────────────────────────────────────────────────────────────
