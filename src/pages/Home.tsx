@@ -527,7 +527,7 @@ export function Home() {
       </IsolatedSection>
 
       {/* Services Grid (Horizontal Carousel) */}
-      <Section data-snap-section="true" className="perf-mobile-section px-6 py-16 md:py-20 bg-surface-container-low md:px-12 relative overflow-hidden flex flex-col justify-center min-h-screen" data-perf-size="tall">
+      <Section data-snap-section="true" className="perf-mobile-section px-6 py-16 md:py-20 bg-surface-container-low md:px-12 relative overflow-hidden lg:flex lg:flex-col lg:justify-center lg:min-h-screen" data-perf-size="tall">
         <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-background to-transparent pointer-events-none z-0 border-t border-background"></div>
         <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-background to-transparent pointer-events-none z-0 border-b border-background"></div>
         
@@ -689,7 +689,7 @@ export function Home() {
       </Section>
 
       {/* Why ZARZ Section */}
-      <Section data-snap-section="true" className="py-12 md:py-14 px-6 md:px-12 relative overflow-hidden flex flex-col justify-center min-h-[100vh]">
+      <Section data-snap-section="true" className="py-12 md:py-20 px-6 md:px-12 relative overflow-hidden lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]">
         <div className="why-choose-mobile-glow home-mobile-glow absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] pointer-events-none"></div>
         <div className="why-choose-mobile-glow home-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
         <ScrollReveal type="fadeUp" className="max-w-6xl mx-auto relative z-10 w-full">
@@ -710,7 +710,7 @@ export function Home() {
       </Section>
 
       {/* Unified Marquee & Stats Section */}
-      <Section data-snap-section="true" className="perf-mobile-section relative overflow-hidden px-6 py-16 md:py-20 md:px-12 flex flex-col justify-center min-h-[100vh]" data-perf-size="compact">
+      <Section data-snap-section="true" className="perf-mobile-section relative overflow-hidden px-6 py-16 md:py-20 md:px-12 lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]" data-perf-size="compact">
         <div className="absolute inset-0 z-0 pointer-events-none">
           <div className="home-mobile-glow absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[150px]"></div>
           <div className="home-mobile-glow absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-tertiary/10 rounded-full blur-[120px]"></div>
@@ -813,7 +813,7 @@ export function Home() {
 
 
       {/* FAQ Section */}
-      <Section data-snap-section="true" id="faq" className="perf-mobile-section relative overflow-hidden bg-background px-6 py-16 md:py-20 md:px-12 flex flex-col justify-center min-h-[100vh]" data-perf-size="medium">
+      <Section data-snap-section="true" id="faq" className="perf-mobile-section relative overflow-hidden bg-background px-6 py-16 md:py-20 md:px-12 lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]" data-perf-size="medium">
         <div className="faq-mobile-glow home-mobile-glow absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px] pointer-events-none"></div>
         <ScrollReveal type="fadeLeft" delay={0.1} className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">
@@ -845,7 +845,7 @@ export function Home() {
       </Section>
 
       {/* CTA Section */}
-      <Section data-snap-section="true" className="perf-mobile-section px-6 py-16 md:px-12 md:py-20 flex flex-col justify-center min-h-[70vh]" data-perf-size="compact">
+      <Section data-snap-section="true" className="perf-mobile-section px-6 py-16 md:px-12 md:py-20 lg:flex lg:flex-col lg:justify-center lg:min-h-[70vh]" data-perf-size="compact">
         <ScrollReveal type="fadeUp" className="perf-panel max-w-7xl mx-auto cyber-glass-card rounded-[2.5rem] p-8 md:p-14 relative overflow-hidden group border border-outline-variant/20 shadow-2xl">
           <div className="mesh-gradient-bg opacity-30"></div>
           <div className="home-mobile-glow absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
