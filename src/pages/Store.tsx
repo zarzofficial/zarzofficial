@@ -672,6 +672,8 @@ export function Store() {
                 loading="lazy"
                 decoding="async"
                 fetchPriority="low"
+                width={1024}
+                height={1024}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent"></div>
             </div>

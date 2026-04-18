@@ -104,6 +104,8 @@ export function Terms() {
               alt="Decorative Cyber Security" 
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
               src="/assets/terms-security.svg"
+              width={1200}
+              height={800}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-80"></div>
             <div className="absolute bottom-8 right-8">

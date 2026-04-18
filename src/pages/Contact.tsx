@@ -162,6 +162,8 @@ export function Contact() {
               alt="Map"
               className="w-full h-full object-cover opacity-50 transition-transform duration-1000 group-hover:scale-110" 
               src="/assets/contact-location.svg" 
+              width={1200}
+              height={900}
             />
             <div className="absolute inset-0 primary-gradient opacity-10"></div>
             <div className="perf-card absolute bg-surface-container p-4 rounded-2xl shadow-2xl flex items-center gap-4">

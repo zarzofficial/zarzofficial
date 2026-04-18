@@ -287,6 +287,8 @@ export function Cart() {
                           loading="lazy"
                           decoding="async"
                           onError={(event) => handleResponsiveImageError(event, responsiveImage.src)}
+                          width={634}
+                          height={634}
                         />
                       </div>
                       <div className="flex-grow flex flex-col min-w-0">
