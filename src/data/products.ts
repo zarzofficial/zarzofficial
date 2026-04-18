@@ -92,20 +92,13 @@ const rawProducts: Product[] = [
       type: "حساب خاص",
       duration: "شهر واحد",
       delivery: "واتساب",
-      options: [{ label: "اشتراك شهر واحد", price: 12200 }],
+      options: [
+        { label: "اشتراك شهر واحد", price: 12200 },
+        { label: "اشتراك 4 شهور", price: 29000 },
+      ],
     },
     reviewCount: 154,
     stock: 18,
-    variationGroups: [
-      {
-        id: "delivery",
-        label: "التسليم",
-        options: [
-          { id: "whatsapp", label: "واتساب" },
-          { id: "direct", label: "تأكيد مباشر" },
-        ],
-      },
-    ],
   },
   {
     id: "إنشاء-متاجر-إلكترونية",

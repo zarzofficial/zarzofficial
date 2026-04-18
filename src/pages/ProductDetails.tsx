@@ -30,7 +30,10 @@ export function ProductDetails() {
   const [feedback, setFeedback] = useState("");
   const [selectedVariations, setSelectedVariations] = useState<Record<string, string>>({});
   const visibleVariationGroups = (product?.variationGroups || []).filter(
-    (group) => group.id !== "support" && group.label !== "الدعم",
+    (group) =>
+      group.id !== "support" &&
+      group.label !== "الدعم" &&
+      !(group.id === "delivery" && group.label === "التسليم"),
   );
 
   useEffect(() => {
@@ -158,12 +161,12 @@ export function ProductDetails() {
         رجوع
       </button>
 
-      <div className="perf-panel relative grid grid-cols-1 gap-8 overflow-hidden rounded-[1.75rem] border border-white/10 bg-card/40 p-5 shadow-[0_16px_40px_rgba(0,0,0,0.32)] backdrop-blur-xl lg:grid-cols-2 md:gap-12 md:rounded-[2rem] md:p-10 md:shadow-[0_0_40px_rgba(0,0,0,0.5)]">
+      <div className="perf-panel relative mx-auto grid max-w-6xl grid-cols-1 gap-8 overflow-hidden rounded-[1.75rem] border border-white/10 bg-card/40 p-5 shadow-[0_16px_40px_rgba(0,0,0,0.32)] backdrop-blur-xl lg:grid-cols-2 lg:items-start md:gap-10 md:rounded-[2rem] md:p-8 xl:p-9 md:shadow-[0_0_40px_rgba(0,0,0,0.5)]">
         <div className="pointer-events-none absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl"></div>
         <div className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 -translate-x-1/2 translate-y-1/2 rounded-full bg-secondary/5 blur-3xl"></div>
 
         <div
-          className="relative z-10 mx-auto aspect-square w-full max-w-[28rem] overflow-hidden rounded-[1.5rem] border border-white/5 bg-background/50 shadow-inner lg:max-w-none lg:rounded-2xl"
+          className="relative z-10 mx-auto aspect-square w-full max-w-[24rem] overflow-hidden rounded-[1.5rem] border border-white/5 bg-background/50 shadow-inner sm:max-w-[26rem] lg:mx-0 lg:max-w-[29rem] lg:rounded-2xl"
           style={{ contain: "content" }}
         >
           <img
@@ -183,7 +186,7 @@ export function ProductDetails() {
           />
         </div>
 
-        <div className="z-10 flex flex-col">
+        <div className="z-10 flex flex-col lg:max-w-[31rem]">
           <div className="mb-4 inline-block w-fit rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-sm font-bold text-primary shadow-[0_0_10px_rgba(255,0,122,0.1)]">
             {getCategoryLabel(product.category)}
           </div>

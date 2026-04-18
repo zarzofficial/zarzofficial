@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "swiper/css";
 
 
 @font-face {
@@ -487,11 +486,6 @@
     }
 }
 
-
-/* Swiper CSS kept for potential future use */
-.swiper {
-    isolation: isolate;
-}
 
 /* Animations for Desktop Sections only (lg: 1024px+) */
 @media (min-width: 1024px) {
