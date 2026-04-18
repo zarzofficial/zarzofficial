@@ -642,6 +642,7 @@ export function Home() {
           <div 
             ref={scrollContainerRef}
             className="perf-mobile-horizontal-cards flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-6 lg:gap-8 overflow-x-auto md:overflow-visible snap-x snap-proximity md:snap-none no-scrollbar pb-12 pt-4 px-4 -mx-4 md:px-0 md:-mx-0"
+            style={{ scrollPaddingInline: "1rem" }}
           >
             {[
               {
@@ -684,7 +685,7 @@ export function Home() {
               return (
                 <div
                   key={srv.id}
-                  className="block snap-start snap-always shrink-0 w-[280px] md:w-auto"
+                  className="block snap-start snap-always shrink-0 w-[calc(100vw-3rem)] max-w-[22rem] md:w-auto"
                   onClick={() => {
                     if (!isCoarsePointer) {
                       setActiveIndex(idx);

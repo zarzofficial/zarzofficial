@@ -87,6 +87,7 @@ export function Categories() {
         <div 
           ref={scrollContainerRef}
           className="perf-horizontal-cards flex gap-6 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-8 -mx-4 px-4 md:-mx-6 md:px-6"
+          style={{ scrollPaddingInline: "1rem" }}
         >
           {categories.map((category, idx) => {
             const isActive = activeIndex === idx;
@@ -100,7 +101,7 @@ export function Categories() {
                 onClick={() => setActiveIndex(idx)}
               >
                 <Card
-                  className={`relative group h-[340px] w-[260px] md:w-[280px] flex flex-col justify-end transition-all duration-300 ${
+                  className={`relative group h-[340px] w-[calc(100vw-3rem)] max-w-[20rem] md:w-[280px] flex flex-col justify-end transition-all duration-300 ${
                     isActive 
                       ? "bg-primary border-primary text-white scale-[1.02] shadow-[0_10px_40px_rgba(255,0,122,0.3)] z-10" 
                       : "bg-card/40 backdrop-blur-xl border-white/10 hover:border-primary/30"

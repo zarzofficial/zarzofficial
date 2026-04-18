@@ -458,12 +458,19 @@ function MobileCategorySlider({
       </div>
       <div
         ref={scrollContainerRef}
-        className="perf-horizontal-cards flex w-full gap-4 overflow-x-auto snap-x snap-proximity no-scrollbar px-6 pb-4 md:px-12"
+        className="perf-horizontal-cards flex w-full gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar px-6 pb-4 md:px-12"
         dir="rtl"
-        style={{ scrollBehavior: "smooth", WebkitOverflowScrolling: "touch" }}
+        style={{
+          scrollBehavior: "smooth",
+          WebkitOverflowScrolling: "touch",
+          scrollPaddingInline: "1.5rem",
+        }}
       >
         {products.map((product, index) => (
-          <div key={product.id} className="h-full w-[290px] shrink-0 snap-center">
+          <div
+            key={product.id}
+            className="h-full w-[calc(100vw-3rem)] max-w-[22rem] shrink-0 snap-start"
+          >
             <StoreProductCard
               product={product}
               onOrderNow={onOrderNow}
@@ -682,13 +689,16 @@ export function Store() {
         </div>
       </header>
 
-      <section ref={categoryStripRef} className="perf-scroll-strip mx-auto mb-16 max-w-screen-2xl overflow-x-auto px-6 no-scrollbar md:px-12">
-        <div className="flex gap-4 pb-4">
+      <section
+        ref={categoryStripRef}
+        className="perf-scroll-strip mx-auto mb-16 max-w-screen-2xl px-6 md:overflow-x-auto md:px-12"
+      >
+        <div className="flex flex-wrap gap-3 pb-2 md:w-max md:min-w-full md:flex-nowrap md:gap-4 md:pb-4">
           {categories.map((category) => (
             <button
               key={category.id}
               onClick={() => handleCategoryChange(category.id)}
-              className={`whitespace-nowrap rounded-full px-8 py-3 font-bold transition-colors ${
+              className={`whitespace-nowrap rounded-full px-6 py-2.5 text-sm font-bold transition-colors md:px-8 md:py-3 md:text-base ${
                 effectiveCategory === category.id
                   ? "primary-gradient text-on-primary shadow-lg shadow-primary/20"
                   : "bg-surface-container text-outline hover:text-primary"
