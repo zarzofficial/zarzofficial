@@ -303,23 +303,23 @@ export function Home() {
 
           {/* Main Hero Text */}
           <div className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right lg:mx-0 lg:max-w-none lg:text-start" dir="rtl">
-            <h1 className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.18] tracking-[-0.02em] text-glow sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.2] md:mb-5 md:max-w-none md:text-3xl md:leading-tight xl:text-5xl">
-              تسوق كل ما تحتاجه في <br className="hidden sm:block" />
-              <span className="mt-1 block text-primary not-italic md:mt-2 md:italic">مكان واحد</span>
+            <h1 className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.18] tracking-[-0.02em] text-glow sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.2] md:mb-6 md:max-w-none md:text-5xl xl:text-6xl md:leading-[1.1] md:tracking-tight">
+              احتياجاتك الرقمية بالكامل في <br className="hidden sm:block" />
+              <span className="mt-1 block text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#d0bcff] not-italic md:mt-3 md:italic drop-shadow-sm">مكان واحد وبأسرع وقت</span>
             </h1>
-            <p className="mb-6 px-1 text-[0.95rem] leading-7 text-outline sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem] md:max-w-2xl md:text-base xl:text-base">
-              مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
+            <p className="mb-6 px-1 text-[0.95rem] leading-7 text-outline sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem] md:mb-8 md:max-w-2xl md:text-xl md:leading-relaxed text-[#c4bcda]">
+              مرحباً بك في زارز، وجهتك الأولى والأسرع للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات ذكاء اصطناعي، خدمات السوشيال ميديا، وتطوير المتاجر بمعايير ملكية وأسعار لا تقبل المنافسة.
             </p>
-            <div className="flex w-full flex-col gap-3 sm:flex-row sm:gap-3 md:justify-start md:gap-4">
+            <div className="flex w-full flex-col gap-3 sm:flex-row sm:gap-3 md:justify-start md:gap-5">
               <Link
                 to="/products"
-                className="primary-gradient w-full rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary transition-all scale-100 active:scale-95 hover:shadow-[0_0_30px_rgba(208,188,255,0.4)] sm:min-w-[12rem] sm:w-auto md:px-8 md:py-3.5 md:text-base"
+                className="primary-gradient w-full rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary transition-all scale-100 active:scale-95 hover:shadow-[0_0_40px_rgba(208,188,255,0.5)] hover:-translate-y-1 sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
               >
-                عروضنا الحصرية
+                اكتشف العروض
               </Link>
               <Link
                 to="/contact"
-                className="w-full rounded-full border-[1.5px] border-outline/40 px-8 py-3.5 text-center text-base text-on-background transition-all hover:bg-white/5 sm:min-w-[12rem] sm:w-auto md:px-8 md:py-3.5 md:text-base"
+                className="w-full rounded-full border border-white/20 bg-white/5 backdrop-blur-md px-8 py-3.5 text-center text-base font-bold text-white transition-all hover:bg-white/10 hover:border-white/40 hover:-translate-y-1 sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
               >
                 تواصل معنا
               </Link>
