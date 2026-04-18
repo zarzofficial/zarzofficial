@@ -515,7 +515,7 @@ export function Home() {
       </IsolatedSection>
 
       {/* Services Grid (Horizontal Carousel) */}
-      <Section data-snap-section="true" className="perf-mobile-section px-6 py-32 bg-surface-container-low md:px-12 relative overflow-hidden" data-perf-size="tall">
+      <Section data-snap-section="true" className="perf-mobile-section px-6 py-16 md:py-20 bg-surface-container-low md:px-12 relative overflow-hidden flex flex-col justify-center min-h-screen" data-perf-size="tall">
         <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-background to-transparent pointer-events-none z-0 border-t border-background"></div>
         <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-background to-transparent pointer-events-none z-0 border-b border-background"></div>
         
@@ -677,7 +677,7 @@ export function Home() {
       </Section>
 
       {/* Why ZARZ Section */}
-      <Section data-snap-section="true" className="py-20 md:py-28 px-6 md:px-12 relative overflow-hidden">
+      <Section data-snap-section="true" className="py-20 md:py-20 px-6 md:px-12 relative overflow-hidden flex flex-col justify-center min-h-[100vh]">
         <div className="why-choose-mobile-glow home-mobile-glow absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[60px] md:blur-[120px] pointer-events-none"></div>
         <div className="why-choose-mobile-glow home-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
         <ScrollReveal type="fadeUp" className="max-w-6xl mx-auto relative z-10">
@@ -697,63 +697,60 @@ export function Home() {
         </ScrollReveal>
       </Section>
 
-      {/* Tech Marquee Section */}
-      <IsolatedSection>
-      <ScrollReveal type="blurIn" delay={0.2} className="z-20 w-full max-w-6xl mx-auto pt-4 pb-12 md:pt-10 md:pb-20 relative">
-        <div className="flex flex-col items-center justify-center text-center mb-10 md:mb-16 relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs md:text-sm font-bold mb-4 backdrop-blur-md shadow-[0_0_15px_rgba(208,188,255,0.1)]">
-            <span className="relative flex h-2 w-2 mb-0.5">
-              <span className="home-mobile-ping animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-            </span>
-            شركاء النجاح
-          </div>
-          <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
-            <span className="text-on-background">شركات ملهمة </span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#8b5cf6] drop-shadow-[0_0_20px_rgba(208,188,255,0.4)]">وثقت بنا</span>
-          </h2>
-        </div>
-        <div
-          className="md:hidden pointer-events-none select-none px-1 py-2"
-          dir="ltr"
-        >
-          <div className="flex items-center justify-center opacity-80 grayscale [mask-image:linear-gradient(to_right,transparent_0,black_8%,black_92%,transparent_100%)]">
-            {mobileTechLogos}
-          </div>
-        </div>
-        <div
-          className="group hidden w-full md:inline-flex md:flex-nowrap md:overflow-hidden no-scrollbar md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] opacity-70 grayscale hover:grayscale-0 transition-all duration-700 bg-surface/0"
-          dir="ltr"
-        >
-          <style>{`
-            @keyframes infinite-scroll {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-50%); }
-            }
-            @media (min-width: 768px) {
-              .animate-infinite-scroll {
-                animation: infinite-scroll 30s linear infinite;
-              }
-              .group:hover .animate-infinite-scroll {
-                animation-play-state: paused;
-              }
-            }
-          `}</style>
-          <div className="flex items-center justify-start [&>div]:mx-6 md:[&>div]:mx-10 w-max animate-infinite-scroll">
-            {desktopTechLogos}
-            {desktopTechLogos}
-          </div>
-        </div>
-      </ScrollReveal>
-
-      </IsolatedSection>
-
-      {/* Stats Section */}
-      <Section className="perf-mobile-section relative overflow-hidden px-6 py-24 md:px-12" data-perf-size="compact">
-        <div className="absolute inset-0 z-0">
-          <div className="home-mobile-glow absolute top-1/2 left-1/4 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px]"></div>
+      {/* Unified Marquee & Stats Section */}
+      <Section data-snap-section="true" className="perf-mobile-section relative overflow-hidden px-6 py-16 md:py-20 md:px-12 flex flex-col justify-center min-h-[100vh]" data-perf-size="compact">
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="home-mobile-glow absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[150px]"></div>
           <div className="home-mobile-glow absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-tertiary/10 rounded-full blur-[120px]"></div>
         </div>
+
+        <ScrollReveal type="blurIn" delay={0.1} className="z-20 w-full max-w-6xl mx-auto mb-16 md:mb-24 relative">
+          <div className="flex flex-col items-center justify-center text-center mb-10 md:mb-16 relative z-10">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs md:text-sm font-bold mb-4 backdrop-blur-md shadow-[0_0_15px_rgba(208,188,255,0.1)]">
+              <span className="relative flex h-2 w-2 mb-0.5">
+                <span className="home-mobile-ping animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+              شركاء النجاح
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
+              <span className="text-on-background">شركات ملهمة </span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#8b5cf6] drop-shadow-[0_0_20px_rgba(208,188,255,0.4)]">وثقت بنا</span>
+            </h2>
+          </div>
+          <div
+            className="md:hidden pointer-events-none select-none px-1 py-2"
+            dir="ltr"
+          >
+            <div className="flex items-center justify-center opacity-80 grayscale [mask-image:linear-gradient(to_right,transparent_0,black_8%,black_92%,transparent_100%)]">
+              {mobileTechLogos}
+            </div>
+          </div>
+          <div
+            className="group hidden w-full md:inline-flex md:flex-nowrap md:overflow-hidden no-scrollbar md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] opacity-70 grayscale hover:grayscale-0 transition-all duration-700 bg-surface/0"
+            dir="ltr"
+          >
+            <style>{`
+              @keyframes infinite-scroll {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+              }
+              @media (min-width: 768px) {
+                .animate-infinite-scroll {
+                  animation: infinite-scroll 30s linear infinite;
+                }
+                .group:hover .animate-infinite-scroll {
+                  animation-play-state: paused;
+                }
+              }
+            `}</style>
+            <div className="flex items-center justify-start [&>div]:mx-6 md:[&>div]:mx-10 w-max animate-infinite-scroll">
+              {desktopTechLogos}
+              {desktopTechLogos}
+            </div>
+          </div>
+        </ScrollReveal>
+
         <ScrollReveal type="scaleUp" className="max-w-7xl mx-auto relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 text-center">
 
           <div className="perf-card group relative p-8 md:p-10 rounded-[2.5rem] bg-surface-container-low border border-outline-variant/10 transition-all duration-500 md:hover:border-primary/30 md:hover:-translate-y-3 md:hover:shadow-[0_20px_60px_rgba(86,0,202,0.15)] overflow-hidden flex flex-col justify-center">
@@ -804,7 +801,7 @@ export function Home() {
 
 
       {/* FAQ Section */}
-      <Section data-snap-section="true" id="faq" className="perf-mobile-section relative overflow-hidden bg-background px-6 py-24 md:px-12" data-perf-size="medium">
+      <Section data-snap-section="true" id="faq" className="perf-mobile-section relative overflow-hidden bg-background px-6 py-16 md:py-20 md:px-12 flex flex-col justify-center min-h-[100vh]" data-perf-size="medium">
         <div className="faq-mobile-glow home-mobile-glow absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px] pointer-events-none"></div>
         <ScrollReveal type="fadeLeft" delay={0.1} className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">
@@ -836,7 +833,7 @@ export function Home() {
       </Section>
 
       {/* CTA Section */}
-      <Section data-snap-section="true" className="perf-mobile-section px-6 py-24 md:px-12 md:py-32" data-perf-size="compact">
+      <Section data-snap-section="true" className="perf-mobile-section px-6 py-16 md:px-12 md:py-20 flex flex-col justify-center min-h-[70vh]" data-perf-size="compact">
         <ScrollReveal type="fadeUp" className="perf-panel max-w-7xl mx-auto cyber-glass-card rounded-[2.5rem] p-8 md:p-14 relative overflow-hidden group border border-outline-variant/20 shadow-2xl">
           <div className="mesh-gradient-bg opacity-30"></div>
           <div className="home-mobile-glow absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
