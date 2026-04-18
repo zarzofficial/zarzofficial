@@ -1,4 +1,4 @@
-﻿import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
@@ -7,13 +7,12 @@ import { useScrollReveal } from "../lib/useScrollReveal";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 // ─── Mobile/Desktop Hero split ────────────────────────────────────────────────
-// Two separate components. Selection via useLayoutEffect (fires after mount,
-// before paint) so there is:
-//   · No window check during the render phase → no hydration mismatch
-//   · No resize / matchMedia listener
+// MobileHero: pure static HTML, zero framer-motion, no glow/blur elements.
+// DesktopHero: full motion.* entrance animation.
+// useIsMobile() picks the right one AFTER mount (useLayoutEffect), so:
+//   · No window.innerWidth during render phase → no hydration mismatch
+//   · No resize / matchMedia listeners
 //   · framer-motion is never instantiated on mobile devices
-// isMobile state starts as false (matches SSR output), then useLayoutEffect
-// corrects it synchronously before the browser paints the first frame.
 
 function MobileHero() {
   return (
@@ -74,7 +73,7 @@ function DesktopHero() {
         variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
         className="mb-6 px-1 text-[0.95rem] leading-7 text-outline sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem] md:mb-8 md:max-w-2xl md:text-xl md:leading-relaxed text-[#c4bcda]"
       >
-        مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
+        مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعام فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
       </motion.p>
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } }}
@@ -97,7 +96,8 @@ function DesktopHero() {
   );
 }
 
-// Hook: detects mobile AFTER mount (no window during render, no hydration mismatch)
+// Hook: detects mobile AFTER mount — useLayoutEffect fires synchronously
+// before paint, so no flash and no hydration mismatch.
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
   useLayoutEffect(() => {
@@ -108,7 +108,7 @@ function useIsMobile() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ScrollReveal = ({ children, type = "fadeUp", delay = 0, className = "" }: { children: React.ReactNode, type?: "fadeUp" | "fadeRight" | "fadeLeft" | "scaleUp" | "blurIn", delay?: number, className?: string }) => {
-  // Read once at component definition time â€” avoids re-reading on every render
+  // Read once at component definition time — avoids re-reading on every render
   const isDesktop = typeof window !== "undefined" && window.innerWidth >= 1024;
 
   // On mobile: plain div, zero JS cost, no IntersectionObserver, no framer-motion
@@ -253,8 +253,8 @@ const whyChooseItems = [
     id: "fast",
     number: "01",
     iconName: "bolt" as const,
-    title: "ØªÙ†ÙÙŠØ° ÙÙˆØ±ÙŠ",
-    description: "Ø·Ù„Ø¨Ùƒ ÙŠØ¨Ø¯Ø£ Ø®Ù„Ø§Ù„ Ø¯Ù‚Ø§Ø¦Ù‚ Ù…Ù† Ø§Ù„ØªØ£ÙƒÙŠØ¯ Ø¨Ø¯ÙˆÙ† Ø£ÙŠ ØªØ£Ø®ÙŠØ±",
+    title: "تنفيذ فوري",
+    description: "طلبك يبدأ خلال دقائق من التأكيد بدون أي تأخير",
     borderClass: "md:hover:border-primary/30",
     shadowClass: "md:hover:shadow-[0_16px_40px_rgba(208,188,255,0.08)]",
     overlayClass: "from-primary/[0.04]",
@@ -265,8 +265,8 @@ const whyChooseItems = [
     id: "safe",
     number: "02",
     iconName: "shield" as const,
-    title: "Ø£Ù…Ø§Ù† ÙƒØ§Ù…Ù„",
-    description: "Ø­Ø³Ø§Ø¨Ø§ØªÙƒ Ù…Ø­Ù…ÙŠØ© ÙˆÙ„Ø§ Ù†Ø·Ù„Ø¨ Ø£ÙŠ Ø¨ÙŠØ§Ù†Ø§Øª Ø³Ø±ÙŠØ© Ù…Ø·Ù„Ù‚Ø§Ù‹",
+    title: "أمان كامل",
+    description: "حساباتك محمية ولا نطلب أي بيانات سرية مطلقاً",
     borderClass: "md:hover:border-[#3b82f6]/30",
     shadowClass: "md:hover:shadow-[0_16px_40px_rgba(59,130,246,0.08)]",
     overlayClass: "from-[#3b82f6]/[0.04]",
@@ -277,8 +277,8 @@ const whyChooseItems = [
     id: "support",
     number: "03",
     iconName: "headset_mic" as const,
-    title: "Ø¯Ø¹Ù… Ù¢Ù¤/Ù§",
-    description: "ÙØ±ÙŠÙ‚ Ù…ØªØ®ØµØµ Ø¬Ø§Ù‡Ø² Ù„Ù…Ø³Ø§Ø¹Ø¯ØªÙƒ ÙÙŠ Ø£ÙŠ ÙˆÙ‚Øª ØªØ­ØªØ§Ø¬Ù‡",
+    title: "دعم ٢٤/٧",
+    description: "فريق متخصص جاهز لمساعدتك في أي وقت تحتاجه",
     borderClass: "md:hover:border-[#10b981]/30",
     shadowClass: "md:hover:shadow-[0_16px_40px_rgba(16,185,129,0.08)]",
     overlayClass: "from-[#10b981]/[0.04]",
@@ -289,8 +289,8 @@ const whyChooseItems = [
     id: "payments",
     number: "04",
     iconName: "payments" as const,
-    title: "Ø¯ÙØ¹ Ù…Ø±Ù†",
-    description: "Ù†Ø¯Ø¹Ù… Ø§Ù„ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø¨Ù†ÙƒÙŠ ÙˆØ§Ù„ÙƒØ§Ø´ Ø­Ø³Ø¨ Ù…Ø§ ÙŠÙ†Ø§Ø³Ø¨Ùƒ",
+    title: "دفع مرن",
+    description: "ندعم التحويل البنكي والكاش حسب ما يناسبك",
     borderClass: "md:hover:border-[#f59e0b]/30",
     shadowClass: "md:hover:shadow-[0_16px_40px_rgba(245,158,11,0.08)]",
     overlayClass: "from-[#f59e0b]/[0.04]",
@@ -301,8 +301,8 @@ const whyChooseItems = [
     id: "quality",
     number: "05",
     iconName: "workspace_premium" as const,
-    title: "Ø¬ÙˆØ¯Ø© Ù…Ø¶Ù…ÙˆÙ†Ø©",
-    description: "Ø¶Ù…Ø§Ù† Ø²Ø§Ø±Ø² Ø§Ù„Ù…Ù„ÙƒÙŠ Ø¹Ù„Ù‰ ÙƒÙ„ Ø®Ø¯Ù…Ø© Ù†Ù‚Ø¯Ù‘Ù…Ù‡Ø§ Ù„Ùƒ",
+    title: "جودة مضمونة",
+    description: "ضمان زارز الملكي على كل خدمة نقدّمها لك",
     borderClass: "md:hover:border-[#e11d48]/30",
     shadowClass: "md:hover:shadow-[0_16px_40px_rgba(225,29,72,0.08)]",
     overlayClass: "from-[#e11d48]/[0.04]",
@@ -313,8 +313,8 @@ const whyChooseItems = [
     id: "results",
     number: "06",
     iconName: "trending_up" as const,
-    title: "Ù†ØªØ§Ø¦Ø¬ Ø­Ù‚ÙŠÙ‚ÙŠØ©",
-    description: "Ø®Ø¯Ù…Ø§Øª ÙØ¹Ù„ÙŠØ© Ø¨Ù†ØªØ§Ø¦Ø¬ Ù…Ù„Ù…ÙˆØ³Ø© ÙˆÙ‚Ø§Ø¨Ù„Ø© Ù„Ù„Ù‚ÙŠØ§Ø³",
+    title: "نتائج حقيقية",
+    description: "خدمات فعلية بنتائج ملموسة وقابلة للقياس",
     borderClass: "md:hover:border-[#8b5cf6]/30",
     shadowClass: "md:hover:shadow-[0_16px_40px_rgba(139,92,246,0.08)]",
     overlayClass: "from-[#8b5cf6]/[0.04]",
@@ -405,7 +405,7 @@ function WhyChooseCard({ item }: { item: WhyChooseItem }) {
     <div
       className={`perf-card why-choose-mobile-card group relative overflow-hidden rounded-[1.25rem] border border-outline-variant/10 bg-surface-container-low/60 p-4 md:p-6 md:transition-[transform,border-color] md:duration-400 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] md:duration-500 ${item.borderClass} md:hover:-translate-y-1.5`}
     >
-      {/* gradient overlay â€” opacity only, compositor-safe */}
+      {/* gradient overlay — opacity only, compositor-safe */}
       <div className={`absolute inset-0 bg-gradient-to-br ${item.overlayClass} to-transparent opacity-0 md:transition-opacity md:duration-300 md:group-hover:opacity-100`} />
       <div className="pointer-events-none absolute top-4 left-4 select-none text-[3.5rem] leading-none font-black text-white/[0.03]">
         {item.number}
@@ -537,8 +537,7 @@ export function Home() {
           <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-background/70 to-background sm:h-28"></div>
         </div>
         <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch justify-between gap-8 lg:flex-row lg:items-center xl:gap-12">
-
-          {/* Hero: MobileHero (static, no framer-motion) or DesktopHero (animated) */}
+          {/* Hero: MobileHero (static) or DesktopHero (animated) */}
           {isMobile ? <MobileHero /> : <DesktopHero />}
 
           {/* Features Vertical Card */}
@@ -547,16 +546,16 @@ export function Home() {
 
             <div className="flex justify-start mb-4">
               <span className="bg-[#9f1239]/40 border border-[#e11d48]/30 text-[#fda4af] font-bold text-[10px] px-3 py-1.5 rounded-full backdrop-blur-md">
-                Ø§Ù„Ø£ÙƒØ«Ø± Ø·Ù„Ø¨Ø§Ù‹ Ù‡Ø°Ø§ Ø§Ù„Ø£Ø³Ø¨ÙˆØ¹
+                الأكثر طلباً هذا الأسبوع
               </span>
             </div>
 
             <h3 className="text-xl md:text-2xl font-black text-on-background leading-tight mb-4 text-start tracking-tight">
-              ØªØ¬Ø±Ø¨Ø© Ø£Ø³Ø±Ø¹ ÙˆØ£ÙˆØ¶Ø­ Ù„Ù„Ø·Ù„Ø¨Ø§Øª Ø§Ù„Ø±Ù‚Ù…ÙŠØ©
+              تجربة أسرع وأوضح للطلبات الرقمية
             </h3>
 
             <p className="text-[#a1a1aa] text-xs leading-relaxed mb-6 text-start font-medium">
-              Ø§Ø®ØªØ± Ø§Ù„Ø®Ø¯Ù…Ø©ØŒ Ø£Ø±Ø³Ù„ Ø¨ÙŠØ§Ù†Ø§ØªÙƒØŒ ÙˆØªØ§Ø¨Ø¹ Ø§Ù„ØªÙ†ÙÙŠØ° Ù…Ù† Ù†ÙØ³ Ø§Ù„Ù…ÙƒØ§Ù† Ø¨Ø¯ÙˆÙ† Ø®Ø·ÙˆØ§Øª Ù…Ø¹Ù‚Ø¯Ø©.
+              اختر الخدمة، أرسل بياناتك، وتابع التنفيذ من نفس المكان بدون خطوات معقدة.
             </p>
 
             <div className="space-y-4">
@@ -566,8 +565,8 @@ export function Home() {
                   #
                 </div>
                 <div className="text-start">
-                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">Ù†Ù…Ùˆ Ù„Ù„Ø­Ø³Ø§Ø¨Ø§Øª ÙˆØ§Ù„ØªÙØ§Ø¹Ù„</h4>
-                  <p className="text-xs text-outline line-clamp-1">Ø¨Ø§Ù‚Ø§Øª Ø³ÙˆØ´ÙŠØ§Ù„ Ù…ÙŠØ¯ÙŠØ§ Ù…Ù†Ø§Ø³Ø¨Ø© Ù„Ù„Ø¨Ø¯Ø¡ Ø£Ùˆ Ø§Ù„ØªÙˆØ³Ø¹</p>
+                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">نمو للحسابات والتفاعل</h4>
+                  <p className="text-xs text-outline line-clamp-1">باقات سوشيال ميديا مناسبة للبدء أو التوسع</p>
                 </div>
               </div>
 
@@ -577,8 +576,8 @@ export function Home() {
                   <SiteIcon name="bolt" className="text-xl" />
                 </div>
                 <div className="text-start">
-                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">Ø´Ø­Ù† ÙˆØ§Ø´ØªØ±Ø§ÙƒØ§Øª Ù…Ø¨Ø§Ø´Ø±Ø©</h4>
-                  <p className="text-xs text-outline line-clamp-1">ØªØ£ÙƒÙŠØ¯ Ø³Ø±ÙŠØ¹ ÙˆÙ…ØªØ§Ø¨Ø¹Ø© Ø¹Ø¨Ø± ÙˆØ§ØªØ³Ø§Ø¨ Ø£Ùˆ Ø§Ù„Ù‡Ø§ØªÙ</p>
+                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">شحن واشتراكات مباشرة</h4>
+                  <p className="text-xs text-outline line-clamp-1">تأكيد سريع ومتابعة عبر واتساب أو الهاتف</p>
                 </div>
               </div>
 
@@ -588,8 +587,8 @@ export function Home() {
                   <SiteIcon name="laptop_mac" className="text-xl" />
                 </div>
                 <div className="text-start">
-                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">ØªÙ†ÙÙŠØ° Ù…ÙˆØ§Ù‚Ø¹ ÙˆÙ…ØªØ§Ø¬Ø± Ø­Ø³Ø¨ Ø§Ù„Ø·Ù„Ø¨</h4>
-                  <p className="text-xs text-outline line-clamp-1">Ù…Ù† Ø§Ù„ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø³Ø±ÙŠØ¹ Ø¥Ù„Ù‰ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ Ø§Ù„ÙƒØ§Ù…Ù„</p>
+                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">تنفيذ مواقع ومتاجر حسب الطلب</h4>
+                  <p className="text-xs text-outline line-clamp-1">من التعديل السريع إلى المشروع الكامل</p>
                 </div>
               </div>
             </div>
@@ -611,7 +610,7 @@ export function Home() {
         <FeaturedProducts />
       </section>
 
-      {/* Services Grid â€” data-cv-section enables content-visibility:auto on mobile */}
+      {/* Services Grid — data-cv-section enables content-visibility:auto on mobile */}
       <Section data-snap-section="true" data-cv-section className="perf-mobile-section px-6 py-16 md:py-20 bg-surface-container-low md:px-12 relative overflow-hidden lg:flex lg:flex-col lg:justify-center lg:min-h-screen" data-perf-size="tall">
         <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-background to-transparent pointer-events-none z-0 border-t border-background"></div>
         <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-background to-transparent pointer-events-none z-0 border-b border-background"></div>
@@ -620,8 +619,8 @@ export function Home() {
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-row justify-between items-end mb-12 gap-4">
             <div className="text-start">
-              <span className="text-primary font-bold tracking-widest text-sm md:text-base uppercase block mb-1">ØªØ®ØµØµØ§ØªÙ†Ø§</span>
-              <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background">Ø£Ù‚Ø³Ø§Ù…Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</h2>
+              <span className="text-primary font-bold tracking-widest text-sm md:text-base uppercase block mb-1">تخصصاتنا</span>
+              <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background">أقسامنا الرئيسية</h2>
             </div>
             
             <div className="flex gap-2 md:gap-3 mb-1 md:hidden" dir="ltr">
@@ -647,37 +646,37 @@ export function Home() {
             {[
               {
                 id: "ai",
-                title: "Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ",
-                description: "Ø£ØªÙ…ØªØ© Ø°ÙƒÙŠØ© ÙˆØ­Ù„ÙˆÙ„ ØªØ­Ù„ÙŠÙ„ÙŠØ© Ù…Ø¨Ù†ÙŠØ© Ø¹Ù„Ù‰ Ø£Ø­Ø¯Ø« ØªÙ‚Ù†ÙŠØ§ØªØŒ Ù„ØªØ·ÙˆÙŠØ± Ø£Ø¹Ù…Ø§Ù„Ùƒ Ø¨Ø´ÙƒÙ„ ØºÙŠØ± Ù…Ø³Ø¨ÙˆÙ‚ ÙˆØªØ­Ù‚ÙŠÙ‚ Ù‚ÙØ²Ø§Øª Ù†ÙˆØ¹ÙŠØ© ÙÙŠ Ø§Ù„Ø¥Ù†ØªØ§Ø¬ÙŠØ©.",
+                title: "الذكاء الاصطناعي",
+                description: "أتمتة ذكية وحلول تحليلية مبنية على أحدث تقنيات، لتطوير أعمالك بشكل غير مسبوق وتحقيق قفزات نوعية في الإنتاجية.",
                 iconName: "neurology",
                 link: "/products/catalog/ai",
-                linkText: "ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø®Ø¯Ù…Ø©",
-                badge: "Ø­ØµØ±ÙŠ",
+                linkText: "تفاصيل الخدمة",
+                badge: "حصري",
                 subBadge: "Neural Core v2.0"
               },
               {
                 id: "social",
-                title: "Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ù†ØµØ§Øª",
-                description: "Ù†ØµÙ†Ø¹ Ù…Ø­ØªÙˆÙ‰ ÙŠØªÙØ§Ø¹Ù„ Ù…Ø¹Ù‡ Ø§Ù„Ø¹Ø§Ù„Ù… Ø¨Ø£Ø³Ù„ÙˆØ¨ Ø§Ø­ØªØ±Ø§ÙÙŠ ÙˆØ¬Ø°Ø§Ø¨ ÙŠØ¶Ù…Ù† ÙˆØµÙˆÙ„ Ø±Ø³Ø§Ù„ØªÙƒ Ù„Ù„Ø¬Ù…Ù‡ÙˆØ± Ø§Ù„Ù…Ø³ØªÙ‡Ø¯Ù.",
+                title: "إدارة المنصات",
+                description: "نصنع محتوى يتفاعل معه العالم بأسلوب احترافي وجذاب يضمن وصول رسالتك للجمهور المستهدف.",
                 iconName: "campaign",
                 link: "/products/catalog/social",
-                linkText: "ØªØµÙØ­ Ø§Ù„Ø¨Ø§Ù‚Ø§Øª"
+                linkText: "تصفح الباقات"
               },
               {
                 id: "gaming",
-                title: "Ø®Ø¯Ù…Ø§Øª Ø§Ù„Ø£Ù„Ø¹Ø§Ø¨",
-                description: "Ø´Ø­Ù†ØŒ Ø§Ø´ØªØ±Ø§ÙƒØ§ØªØŒ ÙˆØ£Ø¯ÙˆØ§Øª Ø§Ø­ØªØ±Ø§ÙÙŠØ© Ù„Ø£ÙØ¶Ù„ ØªØ¬Ø±Ø¨Ø© Ù„Ø¹Ø¨. ÙƒÙ„ Ù…Ø§ ÙŠØ­ØªØ§Ø¬Ù‡ Ø§Ù„Ù…Ø­ØªØ±ÙÙˆÙ† ÙÙŠ Ù…ÙƒØ§Ù† ÙˆØ§Ø­Ø¯.",
+                title: "خدمات الألعاب",
+                description: "شحن، اشتراكات، وأدوات احترافية لأفضل تجربة لعب. كل ما يحتاجه المحترفون في مكان واحد.",
                 iconName: "sports_esports",
                 link: "/products/catalog/gaming",
-                linkText: "ØªØµÙØ­ Ø§Ù„Ø¹Ø±ÙˆØ¶"
+                linkText: "تصفح العروض"
               },
               {
                 id: "web",
-                title: "Ø®Ø¯Ù…Ø§Øª Ø§Ù„ÙˆÙŠØ¨",
-                description: "Ø¨Ø±Ù…Ø¬Ø© ÙˆØªØµÙ…ÙŠÙ… ÙˆØ§Ø¬Ù‡Ø§Øª Ø¹ØµØ±ÙŠØ© ØªØ¶Ù…Ù† Ø£ÙØ¶Ù„ ØªØ¬Ø±Ø¨Ø© Ù…Ø³ØªØ®Ø¯Ù… ÙˆØ£Ø¯Ø§Ø¡ ÙØ§Ø¦Ù‚ Ø§Ù„Ø³Ø±Ø¹Ø© Ù…Ø¹ Ø¨Ù†ÙŠØ© ØªØ­ØªÙŠØ© Ø±Ù‚Ù…ÙŠØ© Ù…ØªÙŠÙ†Ø©.",
+                title: "خدمات الويب",
+                description: "برمجة وتصميم واجهات عصرية تضمن أفضل تجربة مستخدم وأداء فائق السرعة مع بنية تحتية رقمية متينة.",
                 iconName: "terminal",
                 link: "/products/catalog/web",
-                linkText: "Ø§ÙƒØªØ´Ù Ø§Ù„Ù…Ø²ÙŠØ¯",
+                linkText: "اكتشف المزيد",
                 bgIcon: "code"
               }
             ].map((srv, idx) => {
@@ -779,9 +778,9 @@ export function Home() {
         <div className="why-choose-mobile-glow home-mobile-glow absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-tertiary/5 blur-[50px] md:blur-[100px] pointer-events-none"></div>
         <ScrollReveal type="fadeUp" className="max-w-6xl mx-auto relative z-10 w-full">
           <div className="text-center mb-8 md:mb-10">
-            <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-primary text-sm font-bold mb-4">Ù„Ù…Ø§Ø°Ø§ Ù†Ø­Ù† Ù…Ø®ØªÙ„ÙÙˆÙ†ØŸ</span>
-            <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background mb-3">Ù„Ù…Ø§Ø°Ø§ ØªØ®ØªØ§Ø± Ø²Ø§Ø±Ø²ØŸ</h2>
-            <p className="text-outline text-base md:text-lg max-w-xl mx-auto leading-relaxed">Ù†Ù‚Ø¯Ù‘Ù… ØªØ¬Ø±Ø¨Ø© Ù…ØªÙƒØ§Ù…Ù„Ø© ØªØ¬Ù…Ø¹ Ø¨ÙŠÙ† Ø§Ù„Ø³Ø±Ø¹Ø© ÙˆØ§Ù„Ø£Ù…Ø§Ù† ÙˆØ§Ù„Ø¯Ø¹Ù… Ø§Ù„Ù…Ø³ØªÙ…Ø±</p>
+            <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-primary text-sm font-bold mb-4">لماذا نحن مختلفون؟</span>
+            <h2 className="text-3xl md:text-5xl font-black font-headline text-on-background mb-3">لماذا تختار زارز؟</h2>
+            <p className="text-outline text-base md:text-lg max-w-xl mx-auto leading-relaxed">نقدّم تجربة متكاملة تجمع بين السرعة والأمان والدعم المستمر</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-3">
@@ -808,11 +807,11 @@ export function Home() {
                 <span className="home-mobile-ping animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              Ø´Ø±ÙƒØ§Ø¡ Ø§Ù„Ù†Ø¬Ø§Ø­
+              شركاء النجاح
             </div>
             <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
-              <span className="text-on-background">Ø´Ø±ÙƒØ§Øª Ù…Ù„Ù‡Ù…Ø© </span>
-              <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#8b5cf6] drop-shadow-[0_0_20px_rgba(208,188,255,0.4)]">ÙˆØ«Ù‚Øª Ø¨Ù†Ø§</span>
+              <span className="text-on-background">شركات ملهمة </span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#8b5cf6] drop-shadow-[0_0_20px_rgba(208,188,255,0.4)]">وثقت بنا</span>
             </h2>
           </div>
           <div
@@ -857,7 +856,7 @@ export function Home() {
                 <SiteIcon name="groups" className="text-2xl md:text-3xl text-primary drop-shadow-[0_0_10px_rgba(208,188,255,0.5)]" />
               </div>
               <div className="text-3xl md:text-5xl font-black text-on-surface mb-1 md:mb-2 tracking-tight transition-colors md:group-hover:text-primary">+10k</div>
-              <div className="text-outline text-xs md:text-base font-bold">Ø¹Ù…ÙŠÙ„ Ø³Ø¹ÙŠØ¯</div>
+              <div className="text-outline text-xs md:text-base font-bold">عميل سعيد</div>
             </div>
           </div>
 
@@ -868,7 +867,7 @@ export function Home() {
                 <SiteIcon name="verified" className="text-2xl md:text-3xl text-[#3b82f6] drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
               </div>
               <div className="text-3xl md:text-5xl font-black text-on-surface mb-1 md:mb-2 tracking-tight transition-colors md:group-hover:text-[#3b82f6]">99%</div>
-              <div className="text-outline text-xs md:text-base font-bold">Ø±Ø¶Ø§ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙŠÙ†</div>
+              <div className="text-outline text-xs md:text-base font-bold">رضا المستخدمين</div>
             </div>
           </div>
 
@@ -879,7 +878,7 @@ export function Home() {
                 <SiteIcon name="rocket_launch" className="text-2xl md:text-3xl text-[#f59e0b] drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]" />
               </div>
               <div className="text-3xl md:text-5xl font-black text-on-surface mb-1 md:mb-2 tracking-tight transition-colors md:group-hover:text-[#f59e0b]">+250</div>
-              <div className="text-outline text-xs md:text-base font-bold">Ù…Ø´Ø±ÙˆØ¹ Ù…Ù†Ø¬Ø²</div>
+              <div className="text-outline text-xs md:text-base font-bold">مشروع منجز</div>
             </div>
           </div>
 
@@ -890,7 +889,7 @@ export function Home() {
                 <SiteIcon name="support_agent" className="text-2xl md:text-3xl text-[#10b981] drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
               </div>
               <div className="text-3xl md:text-5xl font-black text-on-surface mb-1 md:mb-2 tracking-tight transition-colors md:group-hover:text-[#10b981]">24/7</div>
-              <div className="text-outline text-xs md:text-base font-bold">Ø¯Ø¹Ù… ÙÙ†ÙŠ Ù…ØªÙˆØ§ØµÙ„</div>
+              <div className="text-outline text-xs md:text-base font-bold">دعم فني متواصل</div>
             </div>
           </div>
         </ScrollReveal>
@@ -902,27 +901,27 @@ export function Home() {
         <div className="faq-mobile-glow home-mobile-glow absolute top-1/2 right-0 h-96 w-96 -translate-y-1/2 rounded-full bg-primary/5 blur-[100px] pointer-events-none"></div>
         <ScrollReveal type="fadeLeft" delay={0.1} className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black font-headline text-on-background mb-4">Ø£Ø³Ø¦Ù„Ø© Ø´Ø§Ø¦Ø¹Ø©</h2>
-            <p className="text-lg text-outline">Ø¥Ø¬Ø§Ø¨Ø§Øª Ø³Ø±ÙŠØ¹Ø© Ù‚Ø¨Ù„ Ø¨Ø¯Ø¡ Ø§Ù„Ø·Ù„Ø¨.</p>
+            <h2 className="text-4xl md:text-5xl font-black font-headline text-on-background mb-4">أسئلة شائعة</h2>
+            <p className="text-lg text-outline">إجابات سريعة قبل بدء الطلب.</p>
           </div>
 
           <FaqAccordion
             faqs={[
               {
-                question: "ÙƒÙ… ÙŠØ³ØªØºØ±Ù‚ ØªÙ†ÙÙŠØ° Ø§Ù„Ø·Ù„Ø¨ØŸ",
-                answer: "ÙŠØ¹ØªÙ…Ø¯ Ø§Ù„ÙˆÙ‚Øª Ø¹Ù„Ù‰ Ù†ÙˆØ¹ Ø§Ù„Ø®Ø¯Ù…Ø©ØŒ Ù„ÙƒÙ† Ø£ØºÙ„Ø¨ Ø§Ù„Ø·Ù„Ø¨Ø§Øª ÙŠØ¨Ø¯Ø£ ØªÙ†ÙÙŠØ°Ù‡Ø§ Ø®Ù„Ø§Ù„ Ø¯Ù‚Ø§Ø¦Ù‚ Ø¥Ù„Ù‰ Ø³Ø§Ø¹Ø§Øª Ù‚Ù„ÙŠÙ„Ø© Ø¨Ø¹Ø¯ Ø§Ù„ØªØ£ÙƒÙŠØ¯."
+                question: "كم يستغرق تنفيذ الطلب؟",
+                answer: "يعتمد الوقت على نوع الخدمة، لكن أغلب الطلبات يبدأ تنفيذها خلال دقائق إلى ساعات قليلة بعد التأكيد."
               },
               {
-                question: "ÙƒÙŠÙ ÙŠØªÙ… Ø§Ù„ØªÙˆØ§ØµÙ„ Ø¨Ø¹Ø¯ Ø§Ù„Ø·Ù„Ø¨ØŸ",
-                answer: "Ø¹Ø¨Ø± Ø§Ù„ÙˆØ§ØªØ³Ø§Ø¨ Ø¨Ø´ÙƒÙ„ Ù…Ø¨Ø§Ø´Ø± Ø¹Ù„Ù‰ Ø§Ù„Ø±Ù‚Ù… Ø§Ù„Ø®Ø§Øµ Ø¨Ø§Ù„Ù…ØªØ¬Ø±ØŒ ÙˆØ³ÙŠØªÙ… ØªØ²ÙˆÙŠØ¯Ùƒ Ø¨ÙƒÙ„ Ø§Ù„ØªØ­Ø¯ÙŠØ«Ø§Øª Ø§Ù„Ø®Ø§ØµØ© Ø¨Ø·Ù„Ø¨Ùƒ."
+                question: "كيف يتم التواصل بعد الطلب؟",
+                answer: "عبر الواتساب بشكل مباشر على الرقم الخاص بالمتجر، وسيتم تزويدك بكل التحديثات الخاصة بطلبك."
               },
               {
-                question: "Ù‡Ù„ Ø§Ù„Ø®Ø¯Ù…Ø§Øª Ø¢Ù…Ù†Ø© Ø¹Ù„Ù‰ Ø§Ù„Ø­Ø³Ø§Ø¨Ø§ØªØŸ",
-                answer: "Ù†Ø¹Ù…ØŒ Ø¬Ù…ÙŠØ¹ Ø®Ø¯Ù…Ø§ØªÙ†Ø§ Ù†Ø¹ØªÙ…Ø¯ ÙÙŠÙ‡Ø§ Ø¹Ù„Ù‰ Ø£ÙØ¶Ù„ Ù…Ø¹Ø§ÙŠÙŠØ± Ø§Ù„Ø£Ù…Ø§Ù† ÙˆÙ„Ø§ Ù†Ø·Ù„Ø¨ Ø£ÙŠ Ø£Ø±Ù‚Ø§Ù… Ø³Ø±ÙŠØ© Ù‚Ø¯ ØªØ¶Ø± Ø¨Ø­Ø³Ø§Ø¨Ùƒ Ø¥Ø·Ù„Ø§Ù‚Ø§Ù‹."
+                question: "هل الخدمات آمنة على الحسابات؟",
+                answer: "نعم، جميع خدماتنا نعتمد فيها على أفضل معايير الأمان ولا نطلب أي أرقام سرية قد تضر بحسابك إطلاقاً."
               },
               {
-                question: "Ù‡Ù„ ÙŠÙ…ÙƒÙ† Ø·Ù„Ø¨ Ø®Ø¯Ù…Ø© Ù…Ø®ØµØµØ©ØŸ",
-                answer: "Ø¨Ø§Ù„ØªØ£ÙƒÙŠØ¯ØŒ ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹Ù†Ø§ Ø¹Ø¨Ø± Ø§Ù„ÙˆØ§ØªØ³Ø§Ø¨ Ù„Ø´Ø±Ø­ Ù…ØªØ·Ù„Ø¨Ø§ØªÙƒ ÙˆØ³ÙŠÙ‚ÙˆÙ… ÙØ±ÙŠÙ‚Ù†Ø§ Ø¨ØªÙ‚Ø¯ÙŠÙ… Ø­Ù„ ÙŠÙ†Ø§Ø³Ø¨ Ø§Ø­ØªÙŠØ§Ø¬Ø§ØªÙƒ Ø§Ù„Ø®Ø§ØµØ© Ø¨Ø£Ø³Ø¹Ø§Ø± Ù…Ù†Ø§ÙØ³Ø©."
+                question: "هل يمكن طلب خدمة مخصصة؟",
+                answer: "بالتأكيد، يمكنك التواصل معنا عبر الواتساب لشرح متطلباتك وسيقوم فريقنا بتقديم حل يناسب احتياجاتك الخاصة بأسعار منافسة."
               }
             ]}
           />
@@ -940,13 +939,13 @@ export function Home() {
             {/* Text Content */}
             <div className="text-start flex-1 max-w-3xl w-full">
               <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-outline text-sm font-bold mb-8 backdrop-blur-md">
-                Ø¬Ø§Ù‡Ø² ØªØ¨Ø¯Ø£ Ø§Ù„Ø¢Ù†ØŸ
+                جاهز تبدأ الآن؟
               </span>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black font-headline mb-6 text-on-background leading-tight text-glow">
-                Ø®Ù„Ù†Ø§ Ù†Ø­ÙˆÙ„ Ø·Ù„Ø¨Ùƒ Ø¥Ù„Ù‰ ØªÙ†ÙÙŠØ° Ø³Ø±ÙŠØ¹ ÙˆÙ…Ø±ØªØ¨
+                خلنا نحول طلبك إلى تنفيذ سريع ومرتب
               </h2>
               <p className="text-lg md:text-xl text-[#cbc3d9] leading-relaxed max-w-2xl">
-                Ø³ÙˆØ§Ø¡ ÙƒÙ†Øª ØªØ­ØªØ§Ø¬ Ø´Ø­Ù† Ø£Ù„Ø¹Ø§Ø¨ØŒ Ù†Ù…Ùˆ Ù„Ø­Ø³Ø§Ø¨Ø§ØªÙƒØŒ Ø£Ùˆ Ù…ØªØ¬Ø± Ø§Ø­ØªØ±Ø§ÙÙŠØŒ Ø§Ù„Ø¨Ø¯Ø§ÙŠØ© Ù…Ù† Ù‡Ù†Ø§.
+                سواء كنت تحتاج شحن ألعاب، نمو لحساباتك، أو متجر احترافي، البداية من هنا.
               </p>
             </div>
 
@@ -954,10 +953,10 @@ export function Home() {
             <div className="flex flex-col sm:flex-row gap-4 w-full xl:w-auto shrink-0 pb-0 xl:pb-2">
               <a href="https://wa.me/201500007300" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 bg-surface/50 backdrop-blur-md text-on-background border border-outline-variant/30 px-8 py-5 rounded-xl font-bold text-lg md:hover:bg-white/10 transition-all w-full sm:w-auto">
                 <SiteIcon name="forum" className="text-xl" />
-                ØªÙˆØ§ØµÙ„ Ø¹Ø¨Ø± ÙˆØ§ØªØ³Ø§Ø¨
+                تواصل عبر واتساب
               </a>
               <Link to="/products" className="primary-gradient text-on-primary font-bold px-8 py-5 rounded-xl text-lg md:hover:shadow-[0_0_30px_rgba(208,188,255,0.4)] transition-all scale-100 active:scale-95 text-center flex items-center justify-center gap-3 w-full sm:w-auto">
-                Ø§Ø³ØªØ¹Ø±Ø¶ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª
+                استعرض المنتجات
                 <SiteIcon name="arrow_back" className="text-xl" />
               </Link>
             </div>
