@@ -303,9 +303,9 @@ export function Home() {
 
           {/* Main Hero Text */}
           <div className="mx-auto flex w-full max-w-[22rem] flex-1 min-w-0 flex-col text-right lg:mx-0 lg:max-w-none lg:text-start" dir="rtl">
-            <h1 className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.18] tracking-[-0.02em] text-glow sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.2] md:mb-6 md:max-w-none md:text-5xl xl:text-6xl md:leading-[1.1] md:tracking-tight">
+            <h1 className="mb-4 px-1 text-[1.92rem] font-black font-headline text-on-background leading-[1.3] tracking-[-0.02em] text-glow sm:mb-5 sm:max-w-[21rem] sm:px-0 sm:text-[2.2rem] sm:leading-[1.3] md:mb-6 md:max-w-none md:text-5xl xl:text-6xl md:leading-[1.3] md:tracking-tight">
               تسوق كل ما تحتاجه في <br className="hidden sm:block" />
-              <span className="mt-1 block text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#d0bcff] not-italic md:mt-3 md:italic drop-shadow-sm">مكان واحد</span>
+              <span className="mt-1 block py-2 text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#d0bcff] not-italic md:mt-3 md:italic drop-shadow-sm">مكان واحد</span>
             </h1>
             <p className="mb-6 px-1 text-[0.95rem] leading-7 text-outline sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem] md:mb-8 md:max-w-2xl md:text-xl md:leading-relaxed text-[#c4bcda]">
               مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
