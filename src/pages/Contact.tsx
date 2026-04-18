@@ -15,8 +15,8 @@ export function Contact() {
     <div className="pt-32 pb-20 px-6 max-w-7xl mx-auto w-full min-h-screen">
       
       {/* Hero Section */}
-      <section className="mb-20 text-center relative flex flex-col items-center">
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary-container/10 rounded-full blur-[100px] pointer-events-none"></div>
+      <section className="mb-20 text-center relative">
+        <div className="absolute -top-20 inset-x-0 mx-auto w-96 h-96 bg-primary-container/10 rounded-full blur-[100px] pointer-events-none"></div>
         <h1 className="font-headline text-5xl md:text-7xl font-black mb-6 text-on-surface tracking-tight leading-tight">
           نحن هنا <br/>
           <span className="text-primary italic">لأجلك</span>
