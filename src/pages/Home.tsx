@@ -28,18 +28,12 @@ function MobileHero() {
       <p className="mb-6 px-1 text-[0.95rem] leading-7 text-[#c4bcda] sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem]">
         مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
       </p>
-      <div className="flex w-full flex-col gap-3 sm:flex-row sm:gap-3">
+      <div className="flex w-full px-1 sm:px-0">
         <Link
           to="/products"
-          className="primary-gradient w-full rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary active:scale-95 sm:min-w-[12rem] sm:w-auto"
+          className="primary-gradient w-full max-w-[13.25rem] rounded-full px-4 py-2 text-center text-[0.82rem] font-bold text-on-primary active:scale-95 sm:min-w-[12rem] sm:w-auto sm:max-w-none sm:px-8 sm:py-3.5 sm:text-base"
         >
           عروضنا الحصرية
-        </Link>
-        <Link
-          to="/contact"
-          className="w-full rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-center text-base font-bold text-white sm:min-w-[12rem] sm:w-auto"
-        >
-          تواصل معنا
         </Link>
       </div>
     </div>
@@ -78,19 +72,13 @@ function DesktopHero() {
       </motion.p>
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } }}
-        className="flex w-full flex-col gap-3 sm:flex-row sm:gap-3 md:justify-start md:gap-5"
+        className="flex w-full md:justify-start"
       >
         <Link
           to="/products"
-          className="primary-gradient w-full rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary active:scale-95 md:hover:shadow-[0_0_40px_rgba(208,188,255,0.5)] md:hover:-translate-y-1 md:transition-all sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
+          className="primary-gradient w-full max-w-[16rem] rounded-full px-8 py-3.5 text-center text-base font-bold text-on-primary active:scale-95 md:hover:-translate-y-1 md:hover:shadow-[0_0_40px_rgba(208,188,255,0.5)] md:transition-all sm:min-w-[12rem] sm:w-auto sm:max-w-none md:px-10 md:py-4 md:text-lg"
         >
           عروضنا الحصرية
-        </Link>
-        <Link
-          to="/contact"
-          className="w-full rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-center text-base font-bold text-white md:backdrop-blur-md md:hover:bg-white/10 md:hover:border-white/40 md:hover:-translate-y-1 md:transition-all sm:min-w-[12rem] sm:w-auto md:px-10 md:py-4 md:text-lg"
-        >
-          تواصل معنا
         </Link>
       </motion.div>
     </motion.div>
@@ -169,6 +157,109 @@ const TiltCard = ({ children, className = "" }: { children: React.ReactNode, cla
     </motion.div>
   );
 };
+
+type HeroFeatureItem = {
+  title: string;
+  description: string;
+  accentClassName: string;
+  shadowClassName: string;
+  iconName?: SiteIconName;
+  glyph?: string;
+};
+
+const heroFeatureItems: HeroFeatureItem[] = [
+  {
+    title: "نمو للحسابات والتفاعل",
+    description: "باقات سوشيال ميديا مناسبة للبدء أو التوسع",
+    accentClassName: "bg-[#e11d48]",
+    shadowClassName: "shadow-[0_0_15px_rgba(225,29,72,0.4)]",
+    glyph: "#",
+  },
+  {
+    title: "شحن واشتراكات مباشرة",
+    description: "تأكيد سريع ومتابعة عبر واتساب أو الهاتف",
+    accentClassName: "bg-[#3b82f6]",
+    shadowClassName: "shadow-[0_0_15px_rgba(59,130,246,0.4)]",
+    iconName: "bolt",
+  },
+  {
+    title: "تنفيذ مواقع ومتاجر حسب الطلب",
+    description: "من التعديل السريع إلى المشروع الكامل",
+    accentClassName: "bg-[#10b981]",
+    shadowClassName: "shadow-[0_0_15px_rgba(16,185,129,0.4)]",
+    iconName: "laptop_mac",
+  },
+];
+
+function HeroFeatureCard({
+  className = "",
+  compact = false,
+  interactive = false,
+}: {
+  className?: string;
+  compact?: boolean;
+  interactive?: boolean;
+}) {
+  const shellClassName = [
+    "perf-panel relative w-full shrink-0 overflow-hidden rounded-[2rem] border border-white/10 text-on-background shadow-[0_0_50px_rgba(0,0,0,0.38)]",
+    compact
+      ? "max-w-[22rem] self-center bg-[rgba(31,14,45,0.88)] px-4 py-5"
+      : "lg:w-[340px] xl:w-[380px] bg-[rgba(31,14,45,0.7)] p-5 backdrop-blur-2xl xl:p-6",
+    className,
+  ].join(" ");
+
+  const content = (
+    <>
+      <div className="pointer-events-none absolute -right-6 -top-8 h-28 w-28 rounded-full bg-primary/20 blur-[42px]" />
+
+      <div className="relative text-right" dir="rtl">
+        <div className="mb-4 flex justify-start">
+          <span className="rounded-full border border-[#e11d48]/30 bg-[#9f1239]/40 px-3 py-1.5 text-[10px] font-bold text-[#fda4af] backdrop-blur-md">
+            الأكثر طلباً هذا الأسبوع
+          </span>
+        </div>
+
+        <h3 className={`font-headline font-black leading-tight tracking-tight ${compact ? "mb-3 text-[2rem]" : "mb-4 text-xl md:text-2xl"}`}>
+          تجربة أسرع وأوضح للطلبات الرقمية
+        </h3>
+
+        <p className={`font-medium ${compact ? "mb-5 text-[0.92rem] leading-7 text-[#c9c2dd]" : "mb-6 text-xs leading-relaxed text-[#a1a1aa]"}`}>
+          اختر الخدمة، أرسل بياناتك، وتابع التنفيذ من نفس المكان بدون خطوات معقدة.
+        </p>
+
+        <div className={compact ? "space-y-3" : "space-y-4"}>
+          {heroFeatureItems.map((item) => (
+            <div
+              key={item.title}
+              className="perf-card flex items-center gap-3 rounded-[1.25rem] border border-white/8 bg-white/6 p-4 transition-colors hover:bg-white/10"
+            >
+              <div
+                className={`flex ${compact ? "h-12 w-12" : "h-10 w-10"} shrink-0 items-center justify-center rounded-xl text-white ${item.accentClassName} ${item.shadowClassName}`}
+              >
+                {item.iconName ? (
+                  <SiteIcon name={item.iconName} className={compact ? "text-[1.35rem]" : "text-xl"} />
+                ) : (
+                  <span className={`${compact ? "text-2xl" : "text-xl"} font-black leading-none`}>{item.glyph}</span>
+                )}
+              </div>
+
+              <div className="min-w-0 text-start">
+                <h4 className={`mb-0.5 font-bold text-on-surface ${compact ? "text-[1.02rem]" : "text-sm"}`}>{item.title}</h4>
+                <p className={`text-outline ${compact ? "text-[0.84rem] leading-6" : "line-clamp-1 text-xs"}`}>{item.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+
+  if (interactive) {
+    return <TiltCard className={shellClassName}>{content}</TiltCard>;
+  }
+
+  return <div className={shellClassName}>{content}</div>;
+}
 
 const useKeyboardSectionSnap = () => {
   useEffect(() => {
@@ -523,81 +614,32 @@ export function Home() {
   return (
     <div ref={revealRef} className="home-mobile-page pt-12 md:pt-14">
       {/* Hero Section */}
-      <Section data-snap-section="true" className="relative overflow-hidden px-4 pb-2 pt-14 sm:px-6 sm:py-8 md:px-12 md:py-8 lg:min-h-screen lg:py-10 lg:flex lg:flex-col lg:justify-center">
+      <Section data-snap-section="true" className="relative overflow-hidden px-4 pb-6 pt-14 sm:px-6 sm:py-8 md:px-12 md:py-8 lg:flex lg:min-h-screen lg:flex-col lg:justify-center lg:py-10">
         <div className="absolute inset-0 z-0">
           <img
-            alt="Hero Background"
-            className="w-full h-full object-cover"
-            style={{ opacity: isDesktopViewport ? 0.3 : 0.18 }}
-            src="/assets/hero-ambient.svg"
+            alt="ZARZ Hero Background"
+            className="h-full w-full object-cover object-center"
+            src="/assets/hero-zarz-bg.avif"
             loading="eager"
             decoding="sync"
             fetchPriority="high"
-            width={1600}
-            height={1200}
+            width={2752}
+            height={1536}
           />
-          <div className="absolute inset-0 bg-gradient-to-l from-background via-transparent to-background/50"></div>
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-background/70 to-background sm:h-28"></div>
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,7,27,0.46),rgba(18,7,27,0.78))]" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-[rgba(20,8,28,0.58)] to-background sm:h-32" />
         </div>
         <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch justify-between gap-8 lg:flex-row lg:items-center xl:gap-12">
-          {/* Hero: MobileHero (static) or DesktopHero (animated) */}
-          {isDesktopViewport ? <DesktopHero /> : <MobileHero />}
-
-          {/* Features Vertical Card */}
-          {isDesktopViewport && (
-            <TiltCard className="perf-panel w-full lg:w-[340px] xl:w-[380px] shrink-0 cyber-glass-card rounded-[2rem] p-5 xl:p-6 border border-white/5 bg-surface/60 backdrop-blur-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] relative hidden lg:block lg:animate-in lg:fade-in lg:slide-in-from-left-12 lg:duration-1000 lg:delay-300 lg:fill-mode-both">
-            <div className="absolute -top-4 -right-4 w-32 h-32 bg-primary/20 rounded-full blur-[40px] pointer-events-none"></div>
-
-            <div className="flex justify-start mb-4">
-              <span className="bg-[#9f1239]/40 border border-[#e11d48]/30 text-[#fda4af] font-bold text-[10px] px-3 py-1.5 rounded-full backdrop-blur-md">
-                الأكثر طلباً هذا الأسبوع
-              </span>
-            </div>
-
-            <h3 className="text-xl md:text-2xl font-black text-on-background leading-tight mb-4 text-start tracking-tight">
-              تجربة أسرع وأوضح للطلبات الرقمية
-            </h3>
-
-            <p className="text-[#a1a1aa] text-xs leading-relaxed mb-6 text-start font-medium">
-              اختر الخدمة، أرسل بياناتك، وتابع التنفيذ من نفس المكان بدون خطوات معقدة.
-            </p>
-
-            <div className="space-y-4">
-              {/* Feature 1 */}
-              <div className="perf-card p-4 rounded-[1.25rem] bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/10 transition-colors">
-                <div className="float-icon-1 w-10 h-10 rounded-xl bg-[#e11d48] shrink-0 flex items-center justify-center text-white text-xl font-black shadow-[0_0_15px_rgba(225,29,72,0.4)]">
-                  #
-                </div>
-                <div className="text-start">
-                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">نمو للحسابات والتفاعل</h4>
-                  <p className="text-xs text-outline line-clamp-1">باقات سوشيال ميديا مناسبة للبدء أو التوسع</p>
-                </div>
-              </div>
-
-              {/* Feature 2 */}
-              <div className="perf-card p-4 rounded-[1.25rem] bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/10 transition-colors">
-                <div className="float-icon-2 w-10 h-10 rounded-xl bg-[#3b82f6] shrink-0 flex items-center justify-center text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]">
-                  <SiteIcon name="bolt" className="text-xl" />
-                </div>
-                <div className="text-start">
-                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">شحن واشتراكات مباشرة</h4>
-                  <p className="text-xs text-outline line-clamp-1">تأكيد سريع ومتابعة عبر واتساب أو الهاتف</p>
-                </div>
-              </div>
-
-              {/* Feature 3 */}
-              <div className="perf-card p-4 rounded-[1.25rem] bg-white/5 border border-white/5 flex items-center gap-3 hover:bg-white/10 transition-colors">
-                <div className="float-icon-3 w-10 h-10 rounded-xl bg-[#10b981] shrink-0 flex items-center justify-center text-white shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-                  <SiteIcon name="laptop_mac" className="text-xl" />
-                </div>
-                <div className="text-start">
-                  <h4 className="font-bold text-on-surface mb-0.5 text-sm">تنفيذ مواقع ومتاجر حسب الطلب</h4>
-                  <p className="text-xs text-outline line-clamp-1">من التعديل السريع إلى المشروع الكامل</p>
-                </div>
-              </div>
-            </div>
-
-            </TiltCard>
+          {isDesktopViewport ? (
+            <>
+              <DesktopHero />
+              <HeroFeatureCard
+                interactive
+                className="hidden lg:block lg:animate-in lg:slide-in-from-left-12 lg:fade-in lg:duration-1000 lg:delay-300 lg:fill-mode-both"
+              />
+            </>
+          ) : (
+            <MobileHero />
           )}
         </div>
 
@@ -777,7 +819,7 @@ export function Home() {
             })}
           </div>
 
-        </div>
+          </div>
       </Section>
 
       {/* Why ZARZ Section */}
@@ -811,7 +853,7 @@ export function Home() {
         </div>
 
         <ScrollReveal enabled={isDesktopViewport} type="blurIn" delay={0.1} className="z-20 w-full max-w-6xl mx-auto mb-16 md:mb-24 relative">
-          <div className="flex flex-col items-center justify-center text-center mb-10 md:mb-16 relative z-10">
+          <div className="relative z-10 mb-10 flex flex-col items-center justify-center text-center md:mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs md:text-sm font-bold mb-4 backdrop-blur-md shadow-[0_0_15px_rgba(208,188,255,0.1)]">
               <span className="relative flex h-2 w-2 mb-0.5">
                 <span className="home-mobile-ping animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -819,9 +861,11 @@ export function Home() {
               </span>
               شركاء النجاح
             </div>
-            <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
-              <span className="text-on-background">شركات ملهمة </span>
-              <span className="text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#8b5cf6] drop-shadow-[0_0_20px_rgba(208,188,255,0.4)]">وثقت بنا</span>
+            <h2 className="max-w-none whitespace-nowrap text-[1.55rem] font-black font-headline leading-none tracking-[-0.03em] sm:text-3xl md:text-5xl md:tracking-tighter">
+              <span className="inline text-on-background">شركات ملهمة</span>
+              <span className="mr-2 inline text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#8b5cf6] drop-shadow-[0_0_20px_rgba(208,188,255,0.4)] md:mt-0">
+                وثقت بنا
+              </span>
             </h2>
           </div>
           {!isDesktopViewport ? (
@@ -942,35 +986,35 @@ export function Home() {
       </Section>
 
       {/* CTA Section */}
-      <Section data-snap-section="true" className="perf-mobile-section px-6 py-16 md:px-12 md:py-20 lg:flex lg:flex-col lg:justify-center lg:min-h-[70vh]">
-        <ScrollReveal enabled={isDesktopViewport} type="fadeUp" className="perf-panel max-w-7xl mx-auto cyber-glass-card rounded-[2.5rem] p-8 md:p-14 relative overflow-hidden group border border-outline-variant/20 shadow-2xl">
-          <div className="mesh-gradient-bg opacity-30"></div>
-          <div className="home-mobile-glow absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-          <div className="home-mobile-glow absolute bottom-0 left-0 w-64 h-64 bg-tertiary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+      <Section data-snap-section="true" className="perf-mobile-section px-4 py-12 sm:px-6 sm:py-16 md:px-12 md:py-20 lg:flex lg:min-h-[70vh] lg:flex-col lg:justify-center">
+        <ScrollReveal enabled={isDesktopViewport} type="fadeUp" className="perf-panel relative mx-auto w-full max-w-[22rem] overflow-hidden rounded-[2rem] border border-outline-variant/15 p-5 shadow-[0_18px_50px_rgba(0,0,0,0.24)] sm:max-w-7xl sm:rounded-[2.5rem] sm:p-8 md:p-14 lg:shadow-2xl cyber-glass-card group">
+          <div className="mesh-gradient-bg opacity-25 sm:opacity-30"></div>
+          <div className="home-mobile-glow absolute right-0 top-0 h-40 w-40 translate-x-1/3 -translate-y-1/3 rounded-full bg-primary/10 blur-3xl sm:h-64 sm:w-64 sm:translate-x-1/2 sm:-translate-y-1/2"></div>
+          <div className="home-mobile-glow absolute bottom-0 left-0 h-40 w-40 -translate-x-1/3 translate-y-1/3 rounded-full bg-tertiary/10 blur-3xl sm:h-64 sm:w-64 sm:-translate-x-1/2 sm:translate-y-1/2"></div>
 
-          <div className="relative z-10 flex flex-col xl:flex-row items-center xl:items-end justify-between gap-12 xl:gap-20">
+          <div className="relative z-10 flex flex-col items-center justify-between gap-7 text-center sm:gap-10 xl:flex-row xl:items-end xl:gap-20 xl:text-start">
             {/* Text Content */}
-            <div className="text-start flex-1 max-w-3xl w-full">
-              <span className="inline-block px-5 py-2 rounded-full bg-white/5 border border-white/10 text-outline text-sm font-bold mb-8 backdrop-blur-md">
+            <div className="w-full max-w-[18.5rem] flex-1 sm:max-w-3xl">
+              <span className="mb-5 inline-block rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[0.78rem] font-bold text-outline backdrop-blur-md sm:mb-8 sm:px-5 sm:py-2 sm:text-sm">
                 جاهز تبدأ الآن؟
               </span>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black font-headline mb-6 text-on-background leading-tight text-glow">
+              <h2 className="mb-4 font-headline text-[2.05rem] font-black leading-[1.08] text-on-background sm:mb-6 sm:text-4xl md:text-5xl xl:text-start">
                 خلنا نحول طلبك إلى تنفيذ سريع ومرتب
               </h2>
-              <p className="text-lg md:text-xl text-[#cbc3d9] leading-relaxed max-w-2xl">
+              <p className="mx-auto max-w-[16rem] text-[1rem] leading-7 text-[#cbc3d9] sm:mx-0 sm:max-w-2xl sm:text-lg md:text-xl">
                 سواء كنت تحتاج شحن ألعاب، نمو لحساباتك، أو متجر احترافي، البداية من هنا.
               </p>
             </div>
 
             {/* Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 w-full xl:w-auto shrink-0 pb-0 xl:pb-2">
-              <a href="https://wa.me/201500007300" target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 bg-surface/50 backdrop-blur-md text-on-background border border-outline-variant/30 px-8 py-5 rounded-xl font-bold text-lg md:hover:bg-white/10 transition-all w-full sm:w-auto">
-                <SiteIcon name="forum" className="text-xl" />
+            <div className="flex w-full max-w-[15.5rem] shrink-0 flex-col gap-3 pb-0 sm:max-w-none sm:flex-row sm:gap-4 xl:w-auto xl:pb-2">
+              <a href="https://wa.me/201500007300" target="_blank" rel="noreferrer" className="flex w-full items-center justify-center gap-2.5 rounded-[1.15rem] border border-outline-variant/25 bg-surface/45 px-5 py-3.5 text-center text-[0.98rem] font-bold text-on-background backdrop-blur-md transition-all sm:w-auto sm:gap-3 sm:px-8 sm:py-5 sm:text-lg md:hover:bg-white/10">
+                <SiteIcon name="forum" className="text-[1.05rem] sm:text-xl" />
                 تواصل عبر واتساب
               </a>
-              <Link to="/products" className="primary-gradient text-on-primary font-bold px-8 py-5 rounded-xl text-lg md:hover:shadow-[0_0_30px_rgba(208,188,255,0.4)] transition-all scale-100 active:scale-95 text-center flex items-center justify-center gap-3 w-full sm:w-auto">
+              <Link to="/products" className="primary-gradient flex w-full items-center justify-center gap-2.5 rounded-[1.15rem] px-5 py-3.5 text-center text-[0.98rem] font-bold text-on-primary transition-all active:scale-95 sm:w-auto sm:gap-3 sm:px-8 sm:py-5 sm:text-lg md:hover:shadow-[0_0_30px_rgba(208,188,255,0.4)]">
                 استعرض المنتجات
-                <SiteIcon name="arrow_back" className="text-xl" />
+                <SiteIcon name="arrow_back" className="text-[1.05rem] sm:text-xl" />
               </Link>
             </div>
           </div>

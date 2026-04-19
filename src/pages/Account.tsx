@@ -407,7 +407,26 @@ export function Account() {
                 {loading ? "جاري التحميل..." : isLogin ? "تسجيل الدخول" : "إنشاء حساب"}
               </Button>
 
-              <Button disabled={loading} onClick={() => void handleGoogleLogin()} type="button" variant="outline" className="w-full h-12 text-lg rounded-xl border-white/20 hover:border-secondary/50 hover:shadow-[0_0_15px_rgba(0,212,255,0.2)] font-sans">
+              <div className="relative py-1">
+                <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/10" />
+                <span className="relative mx-auto block w-fit rounded-full border border-white/10 bg-background/80 px-3 py-1 text-xs font-bold text-muted-foreground backdrop-blur-sm">
+                  أو المتابعة عبر
+                </span>
+              </div>
+
+              <Button
+                data-testid="account-google"
+                disabled={loading}
+                onClick={() => void handleGoogleLogin()}
+                type="button"
+                className="w-full h-12 rounded-xl border border-white/25 bg-white text-[0.98rem] font-bold text-[#1f1f1f] shadow-[0_10px_30px_rgba(0,0,0,0.16)] hover:bg-white/95 hover:shadow-[0_12px_35px_rgba(0,0,0,0.2)] font-sans"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="mr-2 h-5 w-5">
+                  <path fill="#EA4335" d="M12 10.2v3.9h5.4c-.2 1.3-1.5 3.9-5.4 3.9-3.2 0-5.9-2.7-5.9-6s2.7-6 5.9-6c1.8 0 3 .8 3.7 1.4l2.5-2.4C16.6 3.4 14.5 2.5 12 2.5 6.8 2.5 2.6 6.7 2.6 12S6.8 21.5 12 21.5c6.1 0 9.1-4.3 9.1-6.6 0-.4 0-.7-.1-1H12Z" />
+                  <path fill="#4285F4" d="M21.1 14.9c0-.4 0-.7-.1-1H12v3.9h5.4c-.3 1-1 1.8-2 2.4l3 2.3c1.8-1.7 2.7-4.1 2.7-7.6Z" />
+                  <path fill="#FBBC05" d="M6.1 14.3c-.2-.6-.3-1.2-.3-1.8s.1-1.3.3-1.8l-3-2.3C2.4 9.7 2 10.8 2 12s.4 2.3 1.1 3.4l3-1.1Z" />
+                  <path fill="#34A853" d="M12 21.5c2.5 0 4.6-.8 6.1-2.3l-3-2.3c-.8.6-1.9 1-3.1 1-2.4 0-4.5-1.6-5.2-3.8l-3 2.3c1.5 2.9 4.6 5.1 8.2 5.1Z" />
+                </svg>
                 الدخول عبر Google
               </Button>
 

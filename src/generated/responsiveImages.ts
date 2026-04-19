@@ -4,6 +4,7 @@ export const responsiveImageWidths: Record<string, readonly number[]> = {
   "/assets/facebook-followers-v4.avif": [160, 320, 480, 560, 640, 960, 1024],
   "/assets/freefire-diamonds-v4.avif": [160, 320, 480, 560, 640, 960, 1024],
   "/assets/gemini-pro-v3.avif": [160, 320, 480, 560, 640, 960, 1024],
+  "/assets/hero-zarz-bg.avif": [160, 320, 480, 560, 640, 960, 1280, 2752],
   "/assets/instagram-followers-v4.avif": [160, 320, 480, 560, 640, 960, 1024],
   "/assets/pubg-uc-v4.avif": [160, 320, 480, 560, 640, 960, 1111],
   "/assets/tiktok-followers-v4.avif": [160, 320, 480, 560, 640, 960, 1024],

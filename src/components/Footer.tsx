@@ -14,8 +14,8 @@ export function Footer() {
   };
 
   return (
-    <footer className="w-full pt-8 md:pt-20 pb-10 mt-auto bg-[#1d0c26] bg-gradient-to-t from-[#26142f] to-[#1d0c26]">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 px-12 max-w-7xl mx-auto text-center md:text-start rtl font-body leading-relaxed">
+    <footer className="mt-auto w-full bg-[#1d0c26] bg-gradient-to-t from-[#26142f] to-[#1d0c26] pb-5 pt-6 md:pb-10 md:pt-20">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 text-center font-body leading-relaxed rtl md:grid-cols-3 md:gap-12 md:px-12 md:text-start">
         
         <div className="flex flex-col items-center md:items-start text-center md:text-start">
           <span className="text-2xl font-bold text-[#d0bcff] mb-4 block">زارز</span>
@@ -47,7 +47,7 @@ export function Footer() {
         </div>
 
       </div>
-      <div className="border-t border-white/5 mt-16 pt-8 pb-4 flex items-center justify-center gap-1.5 text-[#958da2] text-sm" dir="rtl">
+      <div className="mt-8 flex items-center justify-center gap-1.5 pb-1 pt-2 text-[0.82rem] text-[#958da2] md:mt-16 md:border-t md:border-white/5 md:pb-4 md:pt-8 md:text-sm" dir="rtl">
         <span>جميع الحقوق محفوظة</span>
         <span>&copy;</span>
         <span>2024</span>
