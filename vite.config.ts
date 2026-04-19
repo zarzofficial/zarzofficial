@@ -9,6 +9,35 @@ export default defineConfig(({mode}) => {
     base: '/',
     build: {
       outDir: 'docs',
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes("node_modules")) return undefined;
+
+            if (id.includes("react-dom") || id.includes("react-router-dom") || id.includes("\\react\\") || id.includes("/react/")) {
+              return "react-vendor";
+            }
+
+            if (id.includes("framer-motion") || id.includes("\\motion\\") || id.includes("/motion/")) {
+              return "motion-vendor";
+            }
+
+            if (id.includes("lucide-react")) {
+              return "icons-vendor";
+            }
+
+            if (id.includes("@tanstack/react-virtual")) {
+              return "virtual-vendor";
+            }
+
+            if (id.includes("@base-ui/react")) {
+              return "base-ui-vendor";
+            }
+
+            return undefined;
+          },
+        },
+      },
     },
     plugins: [react(), tailwindcss()],
     define: {
