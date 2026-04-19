@@ -4,7 +4,7 @@ import sharp from "sharp";
 
 const assetDir = path.resolve("public/assets");
 const generatedManifestPath = path.resolve("src/generated/responsiveImages.ts");
-const widths = [160, 320, 480, 640, 960, 1280];
+const widths = [160, 320, 480, 560, 640, 960, 1280];
 const variantPattern = /-\d+\.webp$/i;
 
 async function generateResponsiveVariants() {

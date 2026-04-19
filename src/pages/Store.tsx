@@ -196,12 +196,12 @@ function StoreProductCard({
           decoding="async"
           fetchPriority={prioritizeImage ? "high" : "auto"}
           onError={(event) => handleResponsiveImageError(event, responsiveImage.src)}
-          referrerPolicy="no-referrer"
-          draggable={false}
-          sizes="(max-width: 639px) 290px, (max-width: 1023px) 45vw, (max-width: 1279px) 30vw, 23vw"
-          width={634}
-          height={634}
-        />
+        referrerPolicy="no-referrer"
+        draggable={false}
+        sizes="(max-width: 639px) calc(100vw - 2.5rem), (max-width: 1023px) 45vw, (max-width: 1279px) 30vw, 23vw"
+        width={634}
+        height={634}
+      />
         <div className="absolute inset-0 z-10 flex flex-col justify-between bg-gradient-to-b from-black/60 via-transparent to-black/20 p-3 pointer-events-none sm:p-4">
           <div className="flex justify-end w-full">
             {discountPercent && !product.outOfStock && (

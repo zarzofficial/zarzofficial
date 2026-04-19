@@ -40,7 +40,7 @@ function FeaturedProductImage({
         fetchPriority={priority ? "high" : loadingStrategy === "eager" ? "auto" : "low"}
         onError={(event) => handleResponsiveImageError(event, image.src)}
         referrerPolicy="no-referrer"
-        sizes="(max-width: 639px) 290px, (max-width: 1023px) 44vw, 30vw"
+        sizes="(max-width: 639px) 240px, (max-width: 1023px) 44vw, 30vw"
         draggable={false}
         width={634}
         height={634}
@@ -51,7 +51,6 @@ function FeaturedProductImage({
 
 export function FeaturedProducts() {
   const isDesktopViewport = useDesktopViewport();
-  const shouldEagerLoadMobileImages = !isDesktopViewport;
   const featuredIds = [
     "شات-جي-بي-تي-بلس",
     "جيميني-برو",
@@ -135,7 +134,7 @@ export function FeaturedProducts() {
                       alt={product.title}
                       image={responsiveImage}
                       outOfStock={product.outOfStock}
-                      loadingStrategy={shouldEagerLoadMobileImages ? "eager" : index < 3 ? "eager" : "lazy"}
+                      loadingStrategy={index === 0 ? "eager" : "lazy"}
                       priority={index === 0}
                     />
 
