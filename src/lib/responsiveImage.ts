@@ -1,14 +1,25 @@
 import type { SyntheticEvent } from "react";
 import { responsiveImageWidths } from "../generated/responsiveImages";
 
-const PRODUCT_IMAGE_PATTERN = /^\/assets\/.+\.webp$/i;
+const PRODUCT_IMAGE_PATTERN = /^\/assets\/.+\.(?:avif|webp)$/i;
 
 function withResponsiveSuffix(src: string, width: number) {
-  return src.replace(/\.webp$/i, `-${width}.webp`);
+  return src.replace(/\.(?:avif|webp)$/i, `-${width}.avif`);
+}
+
+function normalizeResponsiveProductImageSrc(src: string) {
+  if (/\.webp$/i.test(src)) {
+    const avifSrc = src.replace(/\.webp$/i, ".avif");
+    if (responsiveImageWidths[avifSrc]) {
+      return avifSrc;
+    }
+  }
+
+  return src;
 }
 
 export function getResponsiveProductImage(src?: string | null) {
-  const resolvedSrc = src || "/assets/store-fallback.svg";
+  const resolvedSrc = normalizeResponsiveProductImageSrc(src || "/assets/store-fallback.svg");
 
   if (!PRODUCT_IMAGE_PATTERN.test(resolvedSrc)) {
     return { src: resolvedSrc };
@@ -37,6 +48,6 @@ export function handleResponsiveImageError(
   if (image.dataset.fallbackApplied === "true") return;
 
   image.dataset.fallbackApplied = "true";
-  image.src = fallbackSrc || image.src;
+  image.src = normalizeResponsiveProductImageSrc(fallbackSrc || image.src);
   image.srcset = "";
 }
