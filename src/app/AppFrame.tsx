@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { Footer } from "../components/Footer";
 import { Navbar } from "../components/Navbar";
-import Lenis from "lenis";
 
 export function AppFrame({ children }: { children: ReactNode }) {
   useEffect(() => {
@@ -10,28 +9,43 @@ export function AppFrame({ children }: { children: ReactNode }) {
     // On mobile, native scroll is always smoother — no JS interception
     if (window.innerWidth < 1024) return;
 
-    const lenis = new Lenis({
-      duration: 1.8,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: "vertical",
-      gestureOrientation: "vertical",
-      smoothWheel: true,
-      wheelMultiplier: 0.8,
-      touchMultiplier: 2,
-    });
+    let frameId = 0;
+    let disposed = false;
+    let lenis: { raf: (time: number) => void; destroy: () => void } | null = null;
 
-    // Expose for keyboard snap navigation to use lenis.scrollTo directly
-    (window as any).__lenis = lenis;
+    void import("lenis")
+      .then(({ default: Lenis }) => {
+        if (disposed) return;
 
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+        lenis = new Lenis({
+          duration: 1.8,
+          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          orientation: "vertical",
+          gestureOrientation: "vertical",
+          smoothWheel: true,
+          wheelMultiplier: 0.8,
+          touchMultiplier: 2,
+        });
 
-    requestAnimationFrame(raf);
+        // Expose for keyboard snap navigation to use lenis.scrollTo directly.
+        (window as any).__lenis = lenis;
+
+        function raf(time: number) {
+          if (!lenis || disposed) return;
+          lenis.raf(time);
+          frameId = requestAnimationFrame(raf);
+        }
+
+        frameId = requestAnimationFrame(raf);
+      })
+      .catch((error) => {
+        console.error("Lenis failed to load", error);
+      });
 
     return () => {
-      lenis.destroy();
+      disposed = true;
+      if (frameId) cancelAnimationFrame(frameId);
+      lenis?.destroy();
       delete (window as any).__lenis;
     };
   }, []);

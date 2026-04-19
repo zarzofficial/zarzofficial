@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { getProductById, products, type Category } from "../data/products";
+import type { Category } from "../data/products";
 
 const CART_STORAGE_KEY = "zarz_cart";
 
@@ -47,10 +47,13 @@ interface AddItemInput {
 
 interface LegacyCartItemInput {
   id: string;
+  slug?: string;
   title: string;
   price: number;
+  basePrice?: number;
   qty: number;
   image?: string;
+  category?: Category;
 }
 
 interface CartContextType {
@@ -92,6 +95,12 @@ function buildStorageItem(item: CartItem) {
   };
 }
 
+function toCategory(value: unknown): Category {
+  return value === "social" || value === "ai" || value === "web" || value === "gaming"
+    ? value
+    : "social";
+}
+
 function mapStoredItem(value: unknown): CartItem | null {
   if (!value || typeof value !== "object") return null;
 
@@ -99,13 +108,12 @@ function mapStoredItem(value: unknown): CartItem | null {
   const productId = String(candidate.productId || candidate.id || "").trim();
   if (!productId) return null;
 
-  const catalogProduct = getProductById(productId) || products.find((item) => item.id === productId);
   const qty = Math.max(1, Number(candidate.qty || 1));
-  const unitPrice = Number(candidate.unitPrice || candidate.price || catalogProduct?.basePrice || 0);
-  const title = String(candidate.title || catalogProduct?.title || "خدمة");
-  const image = String(candidate.image || catalogProduct?.image || "/favicon.svg");
-  const productSlug = String(candidate.productSlug || catalogProduct?.slug || productId);
-  const category = (candidate.category || catalogProduct?.category || "social") as Category;
+  const unitPrice = Number(candidate.unitPrice || candidate.price || 0);
+  const title = String(candidate.title || "خدمة");
+  const image = String(candidate.image || "/favicon.svg");
+  const productSlug = String(candidate.productSlug || candidate.slug || productId);
+  const category = toCategory(candidate.category);
   const customData = normalizeCustomData(candidate.customData as CartCustomData | undefined);
 
   return {
@@ -120,6 +128,11 @@ function mapStoredItem(value: unknown): CartItem | null {
     totalPrice: unitPrice * qty,
     customData,
   };
+}
+
+function isPrerenderedShell() {
+  if (typeof document === "undefined") return false;
+  return document.getElementById("root")?.dataset.prerendered === "true";
 }
 
 function readStoredCart() {
@@ -143,8 +156,7 @@ function readStoredCart() {
 function readInitialCart() {
   if (typeof window === "undefined") return [];
 
-  const rootElement = document.getElementById("root");
-  if (rootElement?.dataset.prerendered === "true") {
+  if (isPrerenderedShell()) {
     return [];
   }
 
@@ -167,15 +179,20 @@ export function useCart() {
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(readInitialCart);
+  const [hasLoadedStoredCart, setHasLoadedStoredCart] = useState(
+    () => typeof window === "undefined" || !isPrerenderedShell(),
+  );
 
   useEffect(() => {
     setItems(readStoredCart());
+    setHasLoadedStoredCart(true);
   }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (!hasLoadedStoredCart) return;
     window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items.map(buildStorageItem)));
-  }, [items]);
+  }, [hasLoadedStoredCart, items]);
 
   function addItem(input: AddItemInput) {
     setItems((currentItems) => {
@@ -211,16 +228,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }
 
   function addToCart(input: LegacyCartItemInput) {
-    const product = getProductById(input.id) || products.find((item) => item.id === input.id);
-
     addItem({
       productId: input.id,
-      productSlug: product?.slug || input.id,
-      title: input.title || product?.title || "خدمة",
-      category: product?.category || "social",
-      image: input.image || product?.image || "/favicon.svg",
+      productSlug: input.slug || input.id,
+      title: input.title || "خدمة",
+      category: input.category || "social",
+      image: input.image || "/favicon.svg",
       qty: Math.max(1, input.qty),
-      unitPrice: Number(input.price || product?.basePrice || 0),
+      unitPrice: Number(input.price || input.basePrice || 0),
     });
   }
 

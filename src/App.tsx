@@ -1,22 +1,34 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter as Router, Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ScrollToTop } from "./components/ScrollToTop";
-import { getProductBySlugOrId } from "./data/products";
 import { AppFrame } from "./app/AppFrame";
 import { getCatalogPath, getCatalogRouteCategory, getCategoryName } from "./lib/storeCatalog";
-
 import { Home } from "./pages/Home";
-import { Store } from "./pages/Store";
-import CartRoute from "./routes/CartRoute";
-import AccountRoute from "./routes/AccountRoute";
-import { Contact } from "./pages/Contact";
-import { Terms } from "./pages/Terms";
-import { ProductDetails } from "./pages/ProductDetails";
+
+const Store = lazy(() => import("./pages/Store").then((module) => ({ default: module.Store })));
+const ProductDetails = lazy(() =>
+  import("./pages/ProductDetails").then((module) => ({ default: module.ProductDetails })),
+);
+const Contact = lazy(() => import("./pages/Contact").then((module) => ({ default: module.Contact })));
+const Terms = lazy(() => import("./pages/Terms").then((module) => ({ default: module.Terms })));
+const CartRoute = lazy(() => import("./routes/CartRoute"));
+const AccountRoute = lazy(() => import("./routes/AccountRoute"));
+
+function setDocumentTitle(pageName: string) {
+  const prefix = "زارز | ZARZ | ";
+  let title = `${prefix}${pageName}`;
+  if (title.length > 60) {
+    title = `${prefix}${pageName.slice(0, 60 - prefix.length - 3)}...`;
+  }
+
+  document.title = title;
+}
 
 function DynamicTitle() {
   const location = useLocation();
 
   useEffect(() => {
+    let cancelled = false;
     let pageName = "الرئيسية";
     const path = location.pathname === "/" ? "/" : location.pathname.replace(/\/+$/, "");
 
@@ -30,8 +42,19 @@ function DynamicTitle() {
       pageName = category && category !== "all" ? `المنتجات | ${getCategoryName(category)}` : "المنتجات";
     } else if (path.startsWith("/products/")) {
       const id = path.split("/products/")[1];
-      const product = getProductBySlugOrId(id ? decodeURIComponent(id) : "");
-      pageName = product?.title || "تفاصيل المنتج";
+      void import("./data/products")
+        .then(({ getProductBySlugOrId }) => {
+          if (cancelled) return;
+          const product = getProductBySlugOrId(id ? decodeURIComponent(id) : "");
+          setDocumentTitle(product?.title || "تفاصيل المنتج");
+        })
+        .catch(() => {
+          if (!cancelled) setDocumentTitle("تفاصيل المنتج");
+        });
+
+      return () => {
+        cancelled = true;
+      };
     } else {
       switch (path) {
         case "/":
@@ -54,13 +77,11 @@ function DynamicTitle() {
       }
     }
 
-    const prefix = "زارز | ZARZ | ";
-    let title = `${prefix}${pageName}`;
-    if (title.length > 60) {
-      title = `${prefix}${pageName.slice(0, 60 - prefix.length - 3)}...`;
-    }
+    setDocumentTitle(pageName);
 
-    document.title = title;
+    return () => {
+      cancelled = true;
+    };
   }, [location.pathname]);
 
   return null;
@@ -108,25 +129,27 @@ export default function App() {
       <DynamicTitle />
       <ScrollToTop />
       <AppFrame>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<StoreRoute />} />
-          <Route path="/products/catalog" element={<Navigate to="/products" replace />} />
-          <Route path="/products/catalog/:category" element={<Store />} />
-          <Route path="/products/:id" element={<ProductDetails />} />
-          <Route path="/cart" element={<CartRoute />} />
-          <Route path="/products/cart" element={<Navigate to="/cart" replace />} />
-          <Route path="/checkout" element={<Navigate to="/cart" replace />} />
-          <Route path="/products/checkout" element={<Navigate to="/cart" replace />} />
-          <Route path="/account" element={<AccountRoute />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/store.html" element={<Navigate to="/products" replace />} />
-          <Route path="/account.html" element={<Navigate to="/account" replace />} />
-          <Route path="/contact.html" element={<Navigate to="/contact" replace />} />
-          <Route path="/terms.html" element={<Navigate to="/terms" replace />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <Suspense fallback={null}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/products" element={<StoreRoute />} />
+            <Route path="/products/catalog" element={<Navigate to="/products" replace />} />
+            <Route path="/products/catalog/:category" element={<Store />} />
+            <Route path="/products/:id" element={<ProductDetails />} />
+            <Route path="/cart" element={<CartRoute />} />
+            <Route path="/products/cart" element={<Navigate to="/cart" replace />} />
+            <Route path="/checkout" element={<Navigate to="/cart" replace />} />
+            <Route path="/products/checkout" element={<Navigate to="/cart" replace />} />
+            <Route path="/account" element={<AccountRoute />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/store.html" element={<Navigate to="/products" replace />} />
+            <Route path="/account.html" element={<Navigate to="/account" replace />} />
+            <Route path="/contact.html" element={<Navigate to="/contact" replace />} />
+            <Route path="/terms.html" element={<Navigate to="/terms" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </AppFrame>
     </Router>
   );
