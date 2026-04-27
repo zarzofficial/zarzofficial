@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowRight, ShoppingCart, ShieldCheck, HeadphonesIcon, Zap, CheckCircle2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { getCategoryLabel, getProductBySlugOrId, type ProductVariationGroup } from "../data/products";
-import { useCart, type CartVariationSelection } from "../lib/CartContext";
+import { useCartActions, type CartVariationSelection } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
 
@@ -16,7 +16,7 @@ function buildVariationDefaults(groups: ProductVariationGroup[]) {
 export function ProductDetails() {
   const { id } = useParams();
   const product = getProductBySlugOrId(id);
-  const { addItem } = useCart();
+  const { addItem } = useCartActions();
   const navigate = useNavigate();
 
   const [quantity, setQuantity] = useState(1);

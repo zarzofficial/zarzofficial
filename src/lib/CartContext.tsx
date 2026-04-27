@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Category } from "../data/products";
 
 const CART_STORAGE_KEY = "zarz_cart";
@@ -54,19 +54,25 @@ interface LegacyCartItemInput {
   category?: Category;
 }
 
-interface CartContextType {
+interface CartStateContextType {
   items: CartItem[];
+  total: number;
+  itemCount: number;
+}
+
+interface CartActionsContextType {
   addItem: (item: AddItemInput) => void;
   addToCart: (item: LegacyCartItemInput) => void;
   removeItem: (cartId: string) => void;
   removeFromCart: (id: string) => void;
   updateQty: (id: string, qty: number) => void;
   clearCart: () => void;
-  total: number;
-  itemCount: number;
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
+interface CartContextType extends CartStateContextType, CartActionsContextType {}
+
+const CartStateContext = createContext<CartStateContextType | undefined>(undefined);
+const CartActionsContext = createContext<CartActionsContextType | undefined>(undefined);
 
 function buildCartId() {
   return `cart_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -166,8 +172,21 @@ function sameItemSignature(left: CartItem, right: AddItemInput) {
 }
 
 export function useCart() {
-  const context = useContext(CartContext);
-  if (!context) throw new Error("useCart must be used within a CartProvider");
+  return {
+    ...useCartState(),
+    ...useCartActions(),
+  };
+}
+
+export function useCartState() {
+  const context = useContext(CartStateContext);
+  if (!context) throw new Error("useCartState must be used within a CartProvider");
+  return context;
+}
+
+export function useCartActions() {
+  const context = useContext(CartActionsContext);
+  if (!context) throw new Error("useCartActions must be used within a CartProvider");
   return context;
 }
 
@@ -188,7 +207,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items.map(buildStorageItem)));
   }, [hasLoadedStoredCart, items]);
 
-  function addItem(input: AddItemInput) {
+  const addItem = useCallback((input: AddItemInput) => {
     setItems((currentItems) => {
       const existingItem = currentItems.find((item) => sameItemSignature(item, input));
       if (existingItem) {
@@ -219,9 +238,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       return [...currentItems, nextItem];
     });
-  }
+  }, []);
 
-  function addToCart(input: LegacyCartItemInput) {
+  const addToCart = useCallback((input: LegacyCartItemInput) => {
     addItem({
       productId: input.id,
       productSlug: input.slug || input.id,
@@ -231,21 +250,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
       qty: Math.max(1, input.qty),
       unitPrice: Number(input.price || input.basePrice || 0),
     });
-  }
+  }, [addItem]);
 
-  function removeItem(cartId: string) {
+  const removeItem = useCallback((cartId: string) => {
     setItems((currentItems) => currentItems.filter((item) => item.cartId !== cartId));
-  }
+  }, []);
 
-  function removeFromCart(id: string) {
+  const removeFromCart = useCallback((id: string) => {
     setItems((currentItems) => {
       const matchingByCartId = currentItems.filter((item) => item.cartId !== id);
       if (matchingByCartId.length !== currentItems.length) return matchingByCartId;
       return currentItems.filter((item) => item.productId !== id);
     });
-  }
+  }, []);
 
-  function updateQty(id: string, qty: number) {
+  const updateQty = useCallback((id: string, qty: number) => {
     const nextQty = Math.max(1, qty);
     setItems((currentItems) =>
       currentItems.map((item) =>
@@ -254,11 +273,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
           : item,
       ),
     );
-  }
+  }, []);
 
-  function clearCart() {
+  const clearCart = useCallback(() => {
     setItems([]);
-  }
+  }, []);
 
   const total = useMemo(
     () => items.reduce((sum, item) => sum + item.unitPrice * item.qty, 0),
@@ -268,22 +287,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
     () => items.reduce((sum, item) => sum + item.qty, 0),
     [items],
   );
+  const stateValue = useMemo(
+    () => ({ items, total, itemCount }),
+    [itemCount, items, total],
+  );
+  const actionsValue = useMemo(
+    () => ({
+      addItem,
+      addToCart,
+      removeItem,
+      removeFromCart,
+      updateQty,
+      clearCart,
+    }),
+    [addItem, addToCart, clearCart, removeFromCart, removeItem, updateQty],
+  );
 
   return (
-    <CartContext.Provider
-      value={{
-        items,
-        addItem,
-        addToCart,
-        removeItem,
-        removeFromCart,
-        updateQty,
-        clearCart,
-        total,
-        itemCount,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
+    <CartActionsContext.Provider value={actionsValue}>
+      <CartStateContext.Provider value={stateValue}>{children}</CartStateContext.Provider>
+    </CartActionsContext.Provider>
   );
 }

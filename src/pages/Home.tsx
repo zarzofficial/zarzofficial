@@ -566,17 +566,15 @@ const IsolatedSection = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const Section = React.memo(
-  ({ children, className, id, ...props }: React.ComponentProps<"section">) => {
-    return (
-      <IsolatedSection>
-        <section id={id} className={className} {...props}>
-          {children}
-        </section>
-      </IsolatedSection>
-    );
-  }
-);
+const Section = ({ children, className, id, ...props }: React.ComponentProps<"section">) => {
+  return (
+    <IsolatedSection>
+      <section id={id} className={className} {...props}>
+        {children}
+      </section>
+    </IsolatedSection>
+  );
+};
 
 export function Home() {
   useKeyboardSectionSnap();
@@ -874,25 +872,25 @@ export function Home() {
             </div>
           </div>
           <div
-            className="group hidden w-full flex-nowrap overflow-hidden no-scrollbar opacity-70 grayscale transition-all duration-700 bg-surface/0 hover:grayscale-0 lg:flex lg:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]"
+            className="group relative hidden h-16 w-full overflow-hidden no-scrollbar bg-surface/0 opacity-70 grayscale transition-all duration-700 hover:grayscale-0 lg:block lg:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]"
             dir="ltr"
           >
             <style>{`
-              @keyframes infinite-scroll {
-                0% { transform: translateX(0); }
-                100% { transform: translateX(-50%); }
+              @keyframes partner-marquee-sweep {
+                0% { transform: translate3d(100%, -50%, 0); }
+                100% { transform: translate3d(calc(-100vw - 100%), -50%, 0); }
               }
               @media (min-width: 1024px) {
-                .animate-infinite-scroll {
-                  animation: infinite-scroll 30s linear infinite;
+                .partner-marquee-track {
+                  animation: partner-marquee-sweep 24s linear infinite;
+                  will-change: transform;
                 }
-                .group:hover .animate-infinite-scroll {
+                .group:hover .partner-marquee-track {
                   animation-play-state: paused;
                 }
               }
             `}</style>
-            <div className="flex w-max animate-infinite-scroll items-center justify-start [&>div]:mx-6 lg:[&>div]:mx-10">
-              {partnerLogoItems}
+            <div className="partner-marquee-track absolute right-0 top-1/2 flex w-max items-center justify-start [&>div]:mx-6 lg:[&>div]:mx-10">
               {partnerLogoItems}
             </div>
           </div>

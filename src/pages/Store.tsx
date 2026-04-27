@@ -3,7 +3,7 @@ import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { products, type Product } from "../data/products";
 import { SiteIcon } from "../components/SiteIcon";
-import { useCart } from "../lib/CartContext";
+import { useCartActions } from "../lib/CartContext";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
 import {
@@ -560,7 +560,7 @@ function StoreMobileOverviewSections({
 export function Store() {
   const { category: categoryParam } = useParams<{ category?: string }>();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart } = useCartActions();
   const categoryStripRef = useRef<HTMLElement | null>(null);
   const routeCategory = getCatalogRouteCategory(categoryParam);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
