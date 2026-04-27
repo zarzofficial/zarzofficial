@@ -92,8 +92,6 @@ function normalizeDetails(item: CartItem) {
     playerId: item.customData.playerId || null,
     server: item.customData.server || null,
     recipientPhone: item.customData.recipientPhone || null,
-    requirements: item.customData.requirements || null,
-    referenceLink: item.customData.referenceLink || null,
   };
 
   if (Array.isArray(item.customData.variations) && item.customData.variations.length > 0) {

@@ -52,7 +52,7 @@ function splitLeadingPreloads(markup: string) {
   };
 }
 
-function injectIntoRoot(html: string, markup: string) {
+function injectIntoRoot(html: string, markup: string, route: string) {
   const rootStart = html.indexOf('<div id="root"');
   const headClose = html.indexOf("</head>");
   if (rootStart === -1) {
@@ -76,7 +76,7 @@ function injectIntoRoot(html: string, markup: string) {
     html.slice(0, headClose),
     preloads,
     html.slice(headClose, rootStart),
-    '<div id="root" data-prerendered="true">',
+    `<div id="root" data-prerendered="true" data-prerender-route="${route}">`,
     content,
     "</div>",
     html.slice(rootClose + "</div>".length),
@@ -99,6 +99,6 @@ for (const htmlFile of collectHtmlFiles(docsDir)) {
   const route = fileToRoute(htmlFile);
   const sourceHtml = fs.readFileSync(htmlFile, "utf8");
   const routeMarkup = prerenderRoute(route);
-  const nextHtml = injectIntoRoot(sourceHtml, routeMarkup);
+  const nextHtml = injectIntoRoot(sourceHtml, routeMarkup, route);
   fs.writeFileSync(htmlFile, nextHtml);
 }

@@ -670,7 +670,7 @@ export function Store() {
               <span className="royal-gradient-text">التميز الرقمي</span>
             </h1>
             <p className="max-w-lg text-lg leading-relaxed text-outline">
-              اكتشف مجموعة واسعة من الخدمات المتميزة المصممة لتعزيز حضورك الرقمي، من الذكاء الاصطناعي إلى تطوير المواقع وأكثر.
+              اكتشف مجموعة واسعة من الخدمات المتميزة المصممة لتعزيز حضورك الرقمي، من الذكاء الاصطناعي إلى شحن الألعاب وأكثر.
             </p>
             <div className="flex gap-4">
               <div className="h-1 w-20 rounded-full bg-primary/80"></div>

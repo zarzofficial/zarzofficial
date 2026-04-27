@@ -26,7 +26,7 @@ function MobileHero() {
         <span className="mt-1 block text-[#a78bfa] not-italic">مكان واحد</span>
       </h1>
       <p className="mb-6 px-1 text-[0.95rem] leading-7 text-[#c4bcda] sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem]">
-        مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
+        مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات الذكاء الاصطناعي، وخدمات زيادة المتابعين بأفضل الأسعار وأسرع تنفيذ.
       </p>
       <div className="flex w-full px-1 sm:px-0">
         <Link
@@ -68,7 +68,7 @@ function DesktopHero() {
         variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } }}
         className="mb-6 px-1 text-[0.95rem] leading-7 text-outline sm:mb-6 sm:max-w-[22rem] sm:px-0 sm:text-[0.98rem] md:mb-8 md:max-w-2xl md:text-xl md:leading-relaxed text-[#c4bcda]"
       >
-        مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعام فوري، اشتراكات الذكاء الاصطناعي، خدمات زيادة المتابعين، وتطوير المتاجر بأفضل الأسعار وأسرع تنفيذ.
+        مرحباً بك في زارز، وجهتك الأولى للخدمات الرقمية. نوفر لك شحن ألعاب فوري، اشتراكات الذكاء الاصطناعي، وخدمات زيادة المتابعين بأفضل الأسعار وأسرع تنفيذ.
       </motion.p>
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } }}
@@ -183,11 +183,11 @@ const heroFeatureItems: HeroFeatureItem[] = [
     iconName: "bolt",
   },
   {
-    title: "تنفيذ مواقع ومتاجر حسب الطلب",
-    description: "من التعديل السريع إلى المشروع الكامل",
+    title: "متابعة واضحة حسب الطلب",
+    description: "من اختيار الخدمة إلى تأكيد التنفيذ",
     accentClassName: "bg-[#10b981]",
     shadowClassName: "shadow-[0_0_15px_rgba(16,185,129,0.4)]",
-    iconName: "laptop_mac",
+    iconName: "support_agent",
   },
 ];
 
@@ -438,7 +438,7 @@ function FaqItem({
         aria-expanded={isOpen}
         className="flex w-full items-center justify-between gap-4 p-6 text-start"
       >
-        <h3 className="text-lg font-bold text-on-surface">{faq.question}</h3>
+        <span className="text-lg font-bold text-on-surface">{faq.question}</span>
         <SiteIcon
           name={isOpen ? "remove" : "add"}
           className={`origin-center transition-[transform,color] duration-[380ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] ${isOpen ? "rotate-180 text-[#e11d48]" : "rotate-0 text-[#0ea5e9]"}`}
@@ -719,15 +719,6 @@ export function Home() {
                 iconName: "sports_esports",
                 link: "/products/catalog/gaming",
                 linkText: "تصفح العروض"
-              },
-              {
-                id: "web",
-                title: "خدمات الويب",
-                description: "برمجة وتصميم واجهات عصرية تضمن أفضل تجربة مستخدم وأداء فائق السرعة مع بنية تحتية رقمية متينة.",
-                iconName: "terminal",
-                link: "/products/catalog/web",
-                linkText: "اكتشف المزيد",
-                bgIcon: "code"
               }
             ].map((srv, idx) => {
               const isActive = activeIndex === idx;
@@ -802,17 +793,6 @@ export function Home() {
                       </Link>
                     </div>
                     
-                    {srv.bgIcon && (
-                      <div className="hidden lg:block">
-                        <SiteIcon
-                          name={srv.bgIcon as SiteIconName}
-                          className={`absolute -left-8 -bottom-8 select-none pointer-events-none rotate-12 transition-all duration-1000 ${
-                            isActive ? "text-primary/10 text-[180px]" : "text-on-surface/5 text-[140px]"
-                          }`}
-                          strokeWidth={1.4}
-                        />
-                      </div>
-                    )}
                   </div>
                 </div>
               );
@@ -1002,7 +982,7 @@ export function Home() {
                 خلنا نحول طلبك إلى تنفيذ سريع ومرتب
               </h2>
               <p className="mx-auto max-w-[16rem] text-[1rem] leading-7 text-[#cbc3d9] sm:mx-0 sm:max-w-2xl sm:text-lg md:text-xl">
-                سواء كنت تحتاج شحن ألعاب، نمو لحساباتك، أو متجر احترافي، البداية من هنا.
+                سواء كنت تحتاج شحن ألعاب، نمو لحساباتك، أو اشتراك ذكي، البداية من هنا.
               </p>
             </div>
 

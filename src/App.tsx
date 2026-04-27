@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
-import { BrowserRouter as Router, Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { BrowserRouter as Router, Navigate, Route, Routes, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { AppFrame } from "./app/AppFrame";
 import { getCatalogPath, getCatalogRouteCategory, getCategoryName } from "./lib/storeCatalog";
@@ -122,6 +122,16 @@ function StoreRoute() {
   return <Store />;
 }
 
+function CatalogRoute() {
+  const { category } = useParams<{ category?: string }>();
+
+  if (getCatalogRouteCategory(category) === null) {
+    return <Navigate to="/products" replace />;
+  }
+
+  return <Store />;
+}
+
 export default function App() {
   return (
     <Router>
@@ -134,7 +144,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<StoreRoute />} />
             <Route path="/products/catalog" element={<Navigate to="/products" replace />} />
-            <Route path="/products/catalog/:category" element={<Store />} />
+            <Route path="/products/catalog/:category" element={<CatalogRoute />} />
             <Route path="/products/:id" element={<ProductDetails />} />
             <Route path="/cart" element={<CartRoute />} />
             <Route path="/products/cart" element={<Navigate to="/cart" replace />} />

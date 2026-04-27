@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Code, Gamepad2, Share2, Tv, ArrowLeft, ArrowRight, ArrowUpLeft } from "lucide-react";
+import { Gamepad2, Share2, Tv, ArrowLeft, ArrowRight, ArrowUpLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   Card,
@@ -50,12 +50,6 @@ export function Categories() {
       description: "زيادة متابعين، لايكات، ومشاهدات لحساباتك.",
       Icon: Share2,
       color: "bg-pink-500/10",
-    },
-    {
-      title: "تطوير المواقع",
-      description: "برمجة وتصميم مواقع ومتاجر إلكترونية احترافية.",
-      Icon: Code,
-      color: "bg-emerald-500/10",
     },
   ];
 

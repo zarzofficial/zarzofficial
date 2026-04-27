@@ -7,7 +7,6 @@ const CATEGORIES = [
   { name: "الذكاء الاصطناعي", path: "/products/catalog/ai", icon: "neurology" as const },
   { name: "سوشيال ميديا",     path: "/products/catalog/social", icon: "campaign" as const },
   { name: "الألعاب",          path: "/products/catalog/gaming", icon: "sports_esports" as const },
-  { name: "مواقع ومتاجر",     path: "/products/catalog/web", icon: "code" as const },
 ];
 
 export function Navbar() {

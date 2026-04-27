@@ -1,4 +1,4 @@
-export type Category = "social" | "ai" | "web" | "gaming";
+export type Category = "social" | "ai" | "gaming";
 import { getLegacyOriginalPrice } from "../lib/pricing";
 
 export interface ProductOption {
@@ -19,7 +19,6 @@ export interface ProductDetails {
   batch?: number;
   options?: ProductOption[];
   includes?: string[];
-  hasForm?: boolean;
   requiresId?: boolean;
   requiresCountry?: boolean;
 }
@@ -99,96 +98,6 @@ const rawProducts: Product[] = [
     },
     reviewCount: 154,
     stock: 18,
-  },
-  {
-    id: "إنشاء-متاجر-إلكترونية",
-    slug: "إنشاء-متاجر-إلكترونية",
-    title: "إنشاء متاجر إلكترونية",
-    category: "web",
-    desc: "خدمة إنشاء المتاجر الإلكترونية المتكاملة: تصميم عصري، إدارة المنتجات، ربط بوابة الدفع، وتهيئة محركات البحث.",
-    basePrice: 130000,
-    originalPrice: 216660,
-    image: "/assets/ecommerce-store-v4.avif",
-    rating: "5.0",
-    outOfStock: false,
-    features: ["تصاميم احترافية", "دفع آمن", "تسويق فعال", "متوافق مع الهواتف"],
-    details: {
-      type: "خدمة",
-      includes: ["تصميم مخصص", "ربط بوابات الدفع", "لوحة تحكم"],
-      hasForm: true,
-    },
-    reviewCount: 61,
-    stock: 7,
-    featured: true,
-    variationGroups: [
-      {
-        id: "scope",
-        label: "النطاق",
-        options: [
-          { id: "landing", label: "صفحة هبوط" },
-          { id: "full-store", label: "متجر كامل" },
-        ],
-      },
-      {
-        id: "style",
-        label: "الطابع",
-        options: [
-          { id: "clean", label: "نظيف" },
-          { id: "bold", label: "جريء" },
-        ],
-      },
-    ],
-  },
-  {
-    id: "تأجير-موقع",
-    slug: "تأجير-موقع",
-    title: "تأجير موقع إلكتروني",
-    category: "web",
-    desc: "نظام اشتراك شهري، قوالب متنوعة وجاهزة، حلول دفع مدمجة ودعم فني مستمر.",
-    basePrice: 25000,
-    originalPrice: 41660,
-    image: "/assets/webstore-rental-v1.avif",
-    rating: "5.0",
-    outOfStock: false,
-    features: ["قوالب احترافية", "دفع آمن", "تحديثات دورية"],
-    details: {
-      type: "خدمة شهرية",
-      includes: ["قالب جاهز", "استضافة وربط", "متابعة شهرية"],
-      hasForm: true,
-    },
-    reviewCount: 73,
-    stock: 9,
-  },
-  {
-    id: "تطوير-مواقع",
-    slug: "تطوير-مواقع",
-    title: "تعديل وتطوير المواقع",
-    category: "web",
-    desc: "تطوير المواقع الإلكترونية، إصلاح الأخطاء البرمجية وإضافة ميزات جديدة مخصصة.",
-    basePrice: 85000,
-    originalPrice: 141660,
-    image: "/assets/web-modification-v4.avif",
-    rating: "5.0",
-    outOfStock: false,
-    features: ["تطوير مخصص", "إصلاح الأخطاء", "تحسين الأداء"],
-    details: {
-      type: "خدمة",
-      includes: ["تعديلات واجهة المستخدم", "تحسين الأكواد", "إصلاح الأخطاء"],
-      hasForm: true,
-    },
-    reviewCount: 45,
-    stock: 12,
-    featured: true,
-    variationGroups: [
-      {
-        id: "priority",
-        label: "الأولوية",
-        options: [
-          { id: "standard", label: "عادية" },
-          { id: "rush", label: "مستعجلة" },
-        ],
-      },
-    ],
   },
   {
     id: "متابعين-إنستغرام",
@@ -337,9 +246,6 @@ export const featuredProducts = products.filter((product) => product.featured);
 export const legacyProductSlugMap: Record<string, string> = {
   "شات-جي-بي-تي-بلس-شهر": "شات-جي-بي-تي-بلس",
   "جيميني-برو-شهر": "جيميني-برو",
-  "انشاء-متجر-الكتروني": "إنشاء-متاجر-إلكترونية",
-  "تاجير-موقع-او-متجر-الكتروني": "تأجير-موقع",
-  "تعديل-المواقع": "تطوير-مواقع",
   "شدات-ببجي-موبايل": "شدات-ببجي",
   "متابعين-انستجرام": "متابعين-إنستغرام",
 };
@@ -361,8 +267,6 @@ export function getCategoryLabel(category: Category) {
   switch (category) {
     case "ai":
       return "الذكاء الاصطناعي";
-    case "web":
-      return "تطوير المواقع";
     case "social":
       return "وسائل التواصل";
     case "gaming":

@@ -8,7 +8,6 @@ import { SiteIcon } from "./SiteIcon";
 
 const categoryMap: Record<string, { label: string; color: string }> = {
   ai: { label: "الذكاء الاصطناعي", color: "#8b5cf6" },
-  web: { label: "تطوير ويب", color: "#10b981" },
   social: { label: "تواصل اجتماعي", color: "#e11d48" },
   gaming: { label: "ألعاب الفيديو", color: "#3b82f6" },
 };
@@ -54,7 +53,6 @@ export function FeaturedProducts() {
   const featuredIds = [
     "شات-جي-بي-تي-بلس",
     "جيميني-برو",
-    "إنشاء-متاجر-إلكترونية",
     "متابعين-إنستغرام",
     "شدات-ببجي",
     "جواهر-فري-فاير",

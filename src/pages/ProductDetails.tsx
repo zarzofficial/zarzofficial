@@ -25,8 +25,6 @@ export function ProductDetails() {
   const [playerId, setPlayerId] = useState("");
   const [server, setServer] = useState("global");
   const [recipientPhone, setRecipientPhone] = useState("");
-  const [requirements, setRequirements] = useState("");
-  const [referenceLink, setReferenceLink] = useState("");
   const [feedback, setFeedback] = useState("");
   const [selectedVariations, setSelectedVariations] = useState<Record<string, string>>({});
   const visibleVariationGroups = (product?.variationGroups || []).filter(
@@ -45,8 +43,6 @@ export function ProductDetails() {
     setPlayerId("");
     setServer("global");
     setRecipientPhone("");
-    setRequirements("");
-    setReferenceLink("");
     setFeedback("");
     setSelectedVariations(buildVariationDefaults(visibleVariationGroups));
   }, [product]);
@@ -104,10 +100,6 @@ export function ProductDetails() {
       return "أدخل رقم المستلم أو رقم التواصل قبل المتابعة.";
     }
 
-    if (product.category === "web" && !requirements.trim()) {
-      return "اشرح متطلباتك باختصار قبل إضافة الخدمة إلى السلة.";
-    }
-
     return "";
   }
 
@@ -132,8 +124,6 @@ export function ProductDetails() {
         playerId: playerId.trim() || undefined,
         server: product.category === "gaming" ? server : undefined,
         recipientPhone: recipientPhone.trim() || undefined,
-        requirements: requirements.trim() || undefined,
-        referenceLink: referenceLink.trim() || undefined,
         variations: collectVariationSelections(),
       },
     });
@@ -304,32 +294,6 @@ export function ProductDetails() {
               </div>
             )}
 
-            {product.category === "web" && (
-              <>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground font-sans">وصف الخدمة أو المتطلبات</label>
-                  <textarea
-                    rows={4}
-                    value={requirements}
-                    onChange={(event) => setRequirements(event.target.value)}
-                    placeholder="اشرح ما تحتاجه بالتفصيل..."
-                    className="w-full resize-none rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={product.outOfStock}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground font-sans">رابط مرجعي (اختياري)</label>
-                  <input
-                    type="url"
-                    value={referenceLink}
-                    onChange={(event) => setReferenceLink(event.target.value)}
-                    placeholder="https://..."
-                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={product.outOfStock}
-                  />
-                </div>
-              </>
-            )}
           </div>
 
           {product.features && product.features.length > 0 && (

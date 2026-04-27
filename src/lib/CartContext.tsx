@@ -16,8 +16,6 @@ export interface CartCustomData {
   playerId?: string;
   server?: string;
   recipientPhone?: string;
-  requirements?: string;
-  referenceLink?: string;
   variations?: CartVariationSelection[];
 }
 
@@ -81,8 +79,6 @@ function normalizeCustomData(value?: CartCustomData) {
     playerId: value?.playerId || "",
     server: value?.server || "",
     recipientPhone: value?.recipientPhone || "",
-    requirements: value?.requirements || "",
-    referenceLink: value?.referenceLink || "",
     variations: Array.isArray(value?.variations) ? value.variations : [],
   };
 }
@@ -96,9 +92,7 @@ function buildStorageItem(item: CartItem) {
 }
 
 function toCategory(value: unknown): Category {
-  return value === "social" || value === "ai" || value === "web" || value === "gaming"
-    ? value
-    : "social";
+  return value === "social" || value === "ai" || value === "gaming" ? value : "social";
 }
 
 function mapStoredItem(value: unknown): CartItem | null {

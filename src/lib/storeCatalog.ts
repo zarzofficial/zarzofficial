@@ -6,7 +6,6 @@ export const storeCategories = [
   { id: "all", name: "الكل" },
   { id: "social", name: "التواصل الاجتماعي" },
   { id: "ai", name: "الذكاء الاصطناعي" },
-  { id: "web", name: "المواقع والمتاجر" },
   { id: "gaming", name: "الألعاب" },
 ] as const satisfies ReadonlyArray<{ id: VisibleCategory; name: string }>;
 

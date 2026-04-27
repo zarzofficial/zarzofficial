@@ -110,9 +110,16 @@ function warmCommonRoutes() {
   globalThis.setTimeout(warmStoreRoute, 4000);
 }
 
-function shouldHydratePrerenderedApp() {
+function shouldHydratePrerenderedApp(root: HTMLElement) {
   // Keep the prerendered shell visible and attach React to it instead of
-  // clearing the page and remounting from scratch on first load.
+  // clearing the page and remounting from scratch when the route matches.
+  // Static hosts may serve /index.html for unknown legacy URLs; hydrating
+  // mismatched route markup forces React to regenerate the tree and logs #418.
+  const prerenderRoute = root.dataset.prerenderRoute;
+  if (prerenderRoute && normalizeStartupPath(prerenderRoute) !== normalizeStartupPath(window.location.pathname)) {
+    return false;
+  }
+
   return true;
 }
 
@@ -131,7 +138,7 @@ const appTree = (
 );
 
 const isPrerendered = rootElement.dataset.prerendered === "true";
-const shouldHydratePrerendered = isPrerendered && shouldHydratePrerenderedApp();
+const shouldHydratePrerendered = isPrerendered && shouldHydratePrerenderedApp(rootElement);
 
 function mountApp() {
   if (shouldHydratePrerendered) {

@@ -47,8 +47,6 @@ function renderMeta(item: ReturnType<typeof useCart>["items"][number]) {
     item.customData.playerId ? `الآيدي: ${item.customData.playerId}` : "",
     item.customData.server ? `السيرفر: ${item.customData.server}` : "",
     item.customData.recipientPhone ? `الرقم: ${item.customData.recipientPhone}` : "",
-    item.customData.requirements ? `المتطلبات: ${item.customData.requirements}` : "",
-    item.customData.referenceLink ? `مرجع: ${item.customData.referenceLink}` : "",
     ...(item.customData.variations || []).map(
       (variation) => `${variation.groupLabel}: ${variation.optionLabel}`,
     ),
