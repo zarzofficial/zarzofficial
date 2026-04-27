@@ -24,7 +24,6 @@ export function ProductDetails() {
   const [targetLink, setTargetLink] = useState("");
   const [playerId, setPlayerId] = useState("");
   const [server, setServer] = useState("global");
-  const [recipientPhone, setRecipientPhone] = useState("");
   const [feedback, setFeedback] = useState("");
   const [selectedVariations, setSelectedVariations] = useState<Record<string, string>>({});
   const visibleVariationGroups = (product?.variationGroups || []).filter(
@@ -42,7 +41,6 @@ export function ProductDetails() {
     setTargetLink("");
     setPlayerId("");
     setServer("global");
-    setRecipientPhone("");
     setFeedback("");
     setSelectedVariations(buildVariationDefaults(visibleVariationGroups));
   }, [product]);
@@ -96,10 +94,6 @@ export function ProductDetails() {
       return "أدخل رقم اللاعب (الآيدي) قبل المتابعة.";
     }
 
-    if (product.category === "ai" && !recipientPhone.trim()) {
-      return "أدخل رقم المستلم أو رقم التواصل قبل المتابعة.";
-    }
-
     return "";
   }
 
@@ -123,7 +117,6 @@ export function ProductDetails() {
         targetLink: targetLink.trim() || undefined,
         playerId: playerId.trim() || undefined,
         server: product.category === "gaming" ? server : undefined,
-        recipientPhone: recipientPhone.trim() || undefined,
         variations: collectVariationSelections(),
       },
     });
@@ -235,17 +228,30 @@ export function ProductDetails() {
                     disabled={product.outOfStock}
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground font-sans">الكمية</label>
-                  <input
-                    data-testid="product-quantity-input"
-                    type="number"
-                    min={1}
-                    value={quantity}
-                    onChange={(event) => setQuantity(Number(event.target.value))}
-                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={product.outOfStock}
-                  />
+                <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(11rem,0.8fr)] sm:items-end">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-muted-foreground font-sans">الكمية</label>
+                    <input
+                      data-testid="product-quantity-input"
+                      type="number"
+                      min={1}
+                      value={quantity}
+                      onChange={(event) => setQuantity(Math.max(1, Number(event.target.value) || 1))}
+                      className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={product.outOfStock}
+                    />
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans backdrop-blur-sm">
+                    <span className="block text-sm font-medium text-muted-foreground">حاسبة السعر</span>
+                    <div className="mt-1 flex items-end justify-between gap-3">
+                      <span className="text-xs text-muted-foreground">
+                        {safeQuantity} × {formatSudanesePrice(unitPrice)}
+                      </span>
+                      <span className="font-heading text-lg font-black text-white">
+                        {formatSudanesePrice(totalPrice)} <span className="text-xs text-primary/80">ج.س</span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </>
             )}
@@ -277,21 +283,6 @@ export function ProductDetails() {
                   />
                 </div>
               </>
-            )}
-
-            {product.category === "ai" && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground font-sans">رقم المستلم أو التواصل</label>
-                <input
-                  data-testid="product-recipient-phone"
-                  type="tel"
-                  value={recipientPhone}
-                  onChange={(event) => setRecipientPhone(event.target.value.replace(/[^\d+]/g, ""))}
-                  placeholder="مثال: 249..."
-                  className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={product.outOfStock}
-                />
-              </div>
             )}
 
           </div>

@@ -33,8 +33,16 @@ async function cleanupLegacyServiceWorkers() {
 }
 
 function normalizeStartupPath(pathname: string) {
-  if (!pathname || pathname === "/") return "/";
-  return pathname.replace(/\/+$/, "") || "/";
+  let decodedPathname = pathname;
+
+  try {
+    decodedPathname = decodeURI(pathname);
+  } catch {
+    decodedPathname = pathname;
+  }
+
+  if (!decodedPathname || decodedPathname === "/") return "/";
+  return decodedPathname.replace(/\/+$/, "") || "/";
 }
 
 async function preloadStartupRoute() {
@@ -47,7 +55,6 @@ async function preloadStartupRoute() {
   }
 
   if (path === "/products" || path === "/store.html" || path === "/products/catalog" || path.startsWith("/products/catalog/")) {
-    await import("./pages/Store");
     return;
   }
 
@@ -71,43 +78,7 @@ async function preloadStartupRoute() {
     return;
   }
 
-  if (path.startsWith("/products/")) {
-    await import("./pages/ProductDetails");
-  }
-}
-
-function shouldWarmStoreRoute() {
-  if (typeof window === "undefined") return false;
-
-  const isCoarsePointer =
-    typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches;
-  const connection = navigator as Navigator & {
-    connection?: {
-      effectiveType?: string;
-      saveData?: boolean;
-    };
-  };
-  const connectionInfo = connection.connection;
-  const slowConnection =
-    Boolean(connectionInfo?.saveData) ||
-    ["slow-2g", "2g", "3g"].includes(String(connectionInfo?.effectiveType || "").toLowerCase());
-
-  return !isCoarsePointer && !slowConnection;
-}
-
-function warmCommonRoutes() {
-  if (typeof window === "undefined") return;
-
-  const path = normalizeStartupPath(window.location.pathname);
-  if (path !== "/" || !shouldWarmStoreRoute()) return;
-
-  const warmStoreRoute = () => {
-    void import("./pages/Store").catch((error) => {
-      console.error("Store route warmup failed", error);
-    });
-  };
-
-  globalThis.setTimeout(warmStoreRoute, 4000);
+  if (path.startsWith("/products/")) return;
 }
 
 function shouldHydratePrerenderedApp(root: HTMLElement) {
@@ -150,7 +121,6 @@ function mountApp() {
 }
 
 void cleanupLegacyServiceWorkers();
-warmCommonRoutes();
 
 if (isPrerendered) {
   void preloadStartupRoute()

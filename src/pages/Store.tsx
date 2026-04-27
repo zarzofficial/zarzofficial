@@ -639,8 +639,7 @@ export function Store() {
   };
 
   const handleOrderNow = (product: Product) => {
-    addToCart({ ...product, qty: 1, price: product.basePrice });
-    navigate("/cart");
+    navigate(`/products/${product.slug || product.id}`);
   };
 
   const handleAddToCart = (product: Product) => {

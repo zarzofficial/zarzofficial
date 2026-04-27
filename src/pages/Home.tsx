@@ -508,37 +508,55 @@ function WhyChooseCard({ item }: { item: WhyChooseItem }) {
   );
 }
 
-const techLogoNames = [
-  { id: "nova", label: "NOVA", iconName: "rocket_launch" },
-  { id: "luma", label: "LUMA", iconName: "bolt" },
-  { id: "vera", label: "VERA", iconName: "verified" },
-  { id: "nexa", label: "NEXA", iconName: "trending_up" },
-  { id: "orbit", label: "ORBIT", iconName: "groups" },
-  { id: "arc", label: "ARC", iconName: "code" },
-  { id: "vanta", label: "VANTA", iconName: "shield" },
-  { id: "mono", label: "MONO", iconName: "storefront" },
-] as const satisfies ReadonlyArray<{
-  id: string;
-  label: string;
-  iconName: SiteIconName;
-}>;
+const partnerLogos = [
+  {
+    id: "honeytons",
+    label: "Honeytons",
+    href: "https://honeytons.com",
+    logoSrc: "/assets/honeytons-logo.avif",
+  },
+  {
+    id: "wraith",
+    label: "WRAITH",
+  },
+] as const;
 
-const desktopTechLogos = techLogoNames.map((logo) => (
-  <div key={logo.id} className="group flex items-center gap-4 md:gap-8">
-    <span className="font-black text-xl md:text-3xl tracking-[0.25em] text-white opacity-80 font-headline drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
+const partnerLogoItems = partnerLogos.map((logo) => {
+  const content = "logoSrc" in logo ? (
+    <img
+      src={logo.logoSrc}
+      alt={logo.label}
+      className="h-8 w-auto max-w-[9rem] object-contain opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.28)] md:h-10 md:max-w-[12rem]"
+      loading="lazy"
+      decoding="async"
+      width={160}
+      height={48}
+    />
+  ) : (
+    <span className="font-black text-xl tracking-[0.25em] text-white opacity-80 font-headline drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] md:text-3xl">
       {logo.label}
     </span>
-    <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary/40"></span>
-  </div>
-));
+  );
 
-const mobileTechLogos = (
-  <div className="flex items-center justify-center whitespace-nowrap text-white/[0.24]">
-    <span className="font-black text-[0.78rem] tracking-[0.22em] font-headline [text-shadow:0_1px_0_rgba(255,255,255,0.05),0_-1px_0_rgba(0,0,0,0.55)]">
-      WRAITH
-    </span>
-  </div>
-);
+  return (
+    <div key={logo.id} className="group flex items-center gap-4 md:gap-8">
+      {"href" in logo ? (
+        <a
+          href={logo.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${logo.label} website`}
+          className="transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+        >
+          {content}
+        </a>
+      ) : (
+        content
+      )}
+      <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary/40"></span>
+    </div>
+  );
+});
 
 const IsolatedSection = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -630,25 +648,22 @@ export function Home() {
           <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-[rgba(20,8,28,0.58)] to-background sm:h-32" />
         </div>
         <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-stretch justify-between gap-8 lg:flex-row lg:items-center xl:gap-12">
-          {isDesktopViewport ? (
-            <>
-              <DesktopHero />
-              <HeroFeatureCard
-                interactive
-                className="hidden lg:block lg:animate-in lg:slide-in-from-left-12 lg:fade-in lg:duration-1000 lg:delay-300 lg:fill-mode-both"
-              />
-            </>
-          ) : (
+          <div className="lg:hidden">
             <MobileHero />
-          )}
+          </div>
+          <div className="hidden w-full items-center justify-between gap-8 lg:flex xl:gap-12">
+            <DesktopHero />
+            <HeroFeatureCard
+              interactive
+              className="hidden lg:block lg:animate-in lg:slide-in-from-left-12 lg:fade-in lg:duration-1000 lg:delay-300 lg:fill-mode-both"
+            />
+          </div>
         </div>
 
         {/* Decorative Watermark */}
-        {isDesktopViewport && (
-          <div className="absolute -left-20 top-1/2 -translate-y-1/2 opacity-5 select-none pointer-events-none hidden lg:block">
-            <span className="text-[25rem] font-black font-headline tracking-tighter">ZARZ</span>
-          </div>
-        )}
+        <div className="absolute -left-20 top-1/2 hidden -translate-y-1/2 select-none opacity-5 pointer-events-none lg:block">
+          <span className="text-[25rem] font-black font-headline tracking-tighter">ZARZ</span>
+        </div>
       </Section>
 
       {/* Featured Products Section */}
@@ -848,40 +863,39 @@ export function Home() {
               </span>
             </h2>
           </div>
-          {!isDesktopViewport ? (
-            <div
-              className="pointer-events-none select-none px-1 py-2"
-              dir="ltr"
-            >
-              <div className="flex items-center justify-center opacity-80 grayscale [mask-image:linear-gradient(to_right,transparent_0,black_8%,black_92%,transparent_100%)]">
-                {mobileTechLogos}
+          <div
+            className="pointer-events-none select-none px-1 py-2 lg:hidden"
+            dir="ltr"
+          >
+            <div className="flex items-center justify-center opacity-80 grayscale [mask-image:linear-gradient(to_right,transparent_0,black_8%,black_92%,transparent_100%)]">
+              <div className="flex items-center justify-center gap-6 whitespace-nowrap">
+                {partnerLogoItems}
               </div>
             </div>
-          ) : (
-            <div
-              className="group flex w-full flex-nowrap overflow-hidden no-scrollbar md:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)] opacity-70 grayscale hover:grayscale-0 transition-all duration-700 bg-surface/0"
-              dir="ltr"
-            >
-              <style>{`
-                @keyframes infinite-scroll {
-                  0% { transform: translateX(0); }
-                  100% { transform: translateX(-50%); }
+          </div>
+          <div
+            className="group hidden w-full flex-nowrap overflow-hidden no-scrollbar opacity-70 grayscale transition-all duration-700 bg-surface/0 hover:grayscale-0 lg:flex lg:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]"
+            dir="ltr"
+          >
+            <style>{`
+              @keyframes infinite-scroll {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+              }
+              @media (min-width: 1024px) {
+                .animate-infinite-scroll {
+                  animation: infinite-scroll 30s linear infinite;
                 }
-                @media (min-width: 768px) {
-                  .animate-infinite-scroll {
-                    animation: infinite-scroll 30s linear infinite;
-                  }
-                  .group:hover .animate-infinite-scroll {
-                    animation-play-state: paused;
-                  }
+                .group:hover .animate-infinite-scroll {
+                  animation-play-state: paused;
                 }
-              `}</style>
-              <div className="flex items-center justify-start [&>div]:mx-6 md:[&>div]:mx-10 w-max animate-infinite-scroll">
-                {desktopTechLogos}
-                {desktopTechLogos}
-              </div>
+              }
+            `}</style>
+            <div className="flex w-max animate-infinite-scroll items-center justify-start [&>div]:mx-6 lg:[&>div]:mx-10">
+              {partnerLogoItems}
+              {partnerLogoItems}
             </div>
-          )}
+          </div>
         </ScrollReveal>
 
         <ScrollReveal enabled={isDesktopViewport} type="scaleUp" className="max-w-7xl mx-auto relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 text-center">

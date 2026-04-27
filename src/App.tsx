@@ -2,13 +2,12 @@ import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter as Router, Navigate, Route, Routes, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { AppFrame } from "./app/AppFrame";
+import { getProductBySlugOrId } from "./data/products";
 import { getCatalogPath, getCatalogRouteCategory, getCategoryName } from "./lib/storeCatalog";
 import { Home } from "./pages/Home";
+import { ProductDetails } from "./pages/ProductDetails";
+import { Store } from "./pages/Store";
 
-const Store = lazy(() => import("./pages/Store").then((module) => ({ default: module.Store })));
-const ProductDetails = lazy(() =>
-  import("./pages/ProductDetails").then((module) => ({ default: module.ProductDetails })),
-);
 const Contact = lazy(() => import("./pages/Contact").then((module) => ({ default: module.Contact })));
 const Terms = lazy(() => import("./pages/Terms").then((module) => ({ default: module.Terms })));
 const CartRoute = lazy(() => import("./routes/CartRoute"));
@@ -24,11 +23,18 @@ function setDocumentTitle(pageName: string) {
   document.title = title;
 }
 
+function decodeRouteSegment(value: string) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 function DynamicTitle() {
   const location = useLocation();
 
   useEffect(() => {
-    let cancelled = false;
     let pageName = "الرئيسية";
     const path = location.pathname === "/" ? "/" : location.pathname.replace(/\/+$/, "");
 
@@ -42,19 +48,9 @@ function DynamicTitle() {
       pageName = category && category !== "all" ? `المنتجات | ${getCategoryName(category)}` : "المنتجات";
     } else if (path.startsWith("/products/")) {
       const id = path.split("/products/")[1];
-      void import("./data/products")
-        .then(({ getProductBySlugOrId }) => {
-          if (cancelled) return;
-          const product = getProductBySlugOrId(id ? decodeURIComponent(id) : "");
-          setDocumentTitle(product?.title || "تفاصيل المنتج");
-        })
-        .catch(() => {
-          if (!cancelled) setDocumentTitle("تفاصيل المنتج");
-        });
-
-      return () => {
-        cancelled = true;
-      };
+      const product = getProductBySlugOrId(id ? decodeRouteSegment(id) : "");
+      setDocumentTitle(product?.title || "تفاصيل المنتج");
+      return;
     } else {
       switch (path) {
         case "/":
@@ -79,9 +75,6 @@ function DynamicTitle() {
 
     setDocumentTitle(pageName);
 
-    return () => {
-      cancelled = true;
-    };
   }, [location.pathname]);
 
   return null;
