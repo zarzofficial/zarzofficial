@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useCart } from "../lib/CartContext";
+import { useCartState } from "../lib/CartContext";
 import { SiteIcon } from "./SiteIcon";
 
 const CATEGORIES = [
@@ -10,12 +10,10 @@ const CATEGORIES = [
 ];
 
 export function Navbar() {
-  const { items } = useCart();
+  const { itemCount } = useCartState();
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const totalItems = items.reduce((sum, item) => sum + item.qty, 0);
 
   const navLinks = [
     { name: "الرئيسية",  path: "/",        hasDropdown: false },
@@ -142,9 +140,9 @@ export function Navbar() {
             className="relative text-[#a1a1aa] hover:text-white transition-colors group flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/5"
           >
             <SiteIcon name="shopping_cart" className="text-[22px]" />
-            {totalItems > 0 && (
+            {itemCount > 0 && (
               <span className="absolute top-0 right-0 bg-[#e11d48] text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-[0_0_10px_rgba(225,29,72,0.6)] group-hover:scale-110 transition-transform">
-                {totalItems}
+                {itemCount}
               </span>
             )}
           </Link>

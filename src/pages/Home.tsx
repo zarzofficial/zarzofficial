@@ -2,7 +2,6 @@ import { Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import { FeaturedProducts } from "../components/FeaturedProducts";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
-import { useCoarsePointer } from "../lib/useCoarsePointer";
 import { useScrollReveal } from "../lib/useScrollReveal";
 import { useDesktopViewport } from "../lib/useDesktopViewport";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
@@ -43,7 +42,7 @@ function MobileHero() {
 function DesktopHero() {
   return (
     <motion.div
-      initial="hidden"
+      initial={false}
       animate="visible"
       variants={{
         hidden: { opacity: 0 },
@@ -108,7 +107,7 @@ const ScrollReveal = ({ children, type = "fadeUp", delay = 0, className = "", en
 
   return (
     <motion.div
-      initial="hidden"
+      initial={false}
       whileInView="visible"
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
@@ -576,11 +575,14 @@ const Section = ({ children, className, id, ...props }: React.ComponentProps<"se
   );
 };
 
+function isCoarsePointerNow() {
+  return typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+}
+
 export function Home() {
   useKeyboardSectionSnap();
   const location = useLocation();
   const [activeIndex, setActiveIndex] = useState(0);
-  const isCoarsePointer = useCoarsePointer();
   const revealRef = useScrollReveal();
   const isDesktopViewport = useDesktopViewport();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -628,7 +630,7 @@ export function Home() {
   }, [location.pathname, location.search, location.state]);
 
   return (
-    <div ref={revealRef} className="home-mobile-page pt-12 md:pt-14">
+    <div ref={revealRef} className="home-mobile-page">
       {/* Hero Section */}
       <Section data-snap-section="true" className="relative overflow-hidden px-4 pb-6 pt-14 sm:px-6 sm:py-8 md:px-12 md:py-8 lg:flex lg:min-h-screen lg:flex-col lg:justify-center lg:py-10">
         <div className="absolute inset-0 z-0">
@@ -653,7 +655,7 @@ export function Home() {
             <DesktopHero />
             <HeroFeatureCard
               interactive
-              className="hidden lg:block lg:animate-in lg:slide-in-from-left-12 lg:fade-in lg:duration-1000 lg:delay-300 lg:fill-mode-both"
+              className="hidden lg:block"
             />
           </div>
         </div>
@@ -740,7 +742,7 @@ export function Home() {
                   key={srv.id}
                   className="block snap-start snap-always shrink-0 w-[calc(100vw-2.5rem)] md:w-auto"
                   onClick={() => {
-                    if (!isCoarsePointer) {
+                    if (!isCoarsePointerNow()) {
                       setActiveIndex(idx);
                     }
                   }}
@@ -839,10 +841,8 @@ export function Home() {
       {/* Unified Marquee & Stats Section */}
       <Section data-snap-section="true" className="perf-mobile-section relative overflow-hidden px-6 py-16 md:py-20 md:px-12 lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]">
         <div className="absolute inset-0 z-0 pointer-events-none">
-          {isDesktopViewport && <>
-            <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[150px]" />
-            <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-tertiary/10 rounded-full blur-[120px]" />
-          </>}
+          <div className="absolute top-1/3 left-1/4 hidden h-[500px] w-[500px] rounded-full bg-primary/5 blur-[150px] lg:block" />
+          <div className="absolute bottom-0 right-1/4 hidden h-[400px] w-[400px] rounded-full bg-tertiary/10 blur-[120px] lg:block" />
         </div>
 
         <ScrollReveal enabled={isDesktopViewport} type="blurIn" delay={0.1} className="z-20 w-full max-w-6xl mx-auto mb-16 md:mb-24 relative">

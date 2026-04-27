@@ -15,7 +15,15 @@ function normalizeServerLocation(location: string) {
   if (location === "/") return "/";
 
   const [path, suffix = ""] = location.split(/([?#].*)/, 2);
-  const normalizedPath = path.replace(/\/+$/, "") || "/";
+  let decodedPath = path;
+
+  try {
+    decodedPath = decodeURI(path);
+  } catch {
+    decodedPath = path;
+  }
+
+  const normalizedPath = decodedPath.replace(/\/+$/, "") || "/";
   return `${normalizedPath}${suffix}`;
 }
 

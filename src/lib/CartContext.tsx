@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Category } from "../data/products";
 
 const CART_STORAGE_KEY = "zarz_cart";
@@ -97,6 +97,14 @@ function buildStorageItem(item: CartItem) {
   };
 }
 
+function serializeCartItems(items: CartItem[]) {
+  return JSON.stringify(items.map(buildStorageItem));
+}
+
+function areCartItemsEqual(left: CartItem[], right: CartItem[]) {
+  return serializeCartItems(left) === serializeCartItems(right);
+}
+
 function toCategory(value: unknown): Category {
   return value === "social" || value === "ai" || value === "gaming" ? value : "social";
 }
@@ -192,20 +200,30 @@ export function useCartActions() {
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(readInitialCart);
-  const [hasLoadedStoredCart, setHasLoadedStoredCart] = useState(
-    () => typeof window === "undefined" || !isPrerenderedShell(),
+  const hasLoadedStoredCartRef = useRef(
+    typeof window === "undefined" || !isPrerenderedShell(),
+  );
+  const shouldSkipStorageWriteRef = useRef(
+    typeof window !== "undefined" && isPrerenderedShell(),
   );
 
   useEffect(() => {
-    setItems(readStoredCart());
-    setHasLoadedStoredCart(true);
+    const storedItems = readStoredCart();
+    setItems((currentItems) =>
+      areCartItemsEqual(currentItems, storedItems) ? currentItems : storedItems,
+    );
+    hasLoadedStoredCartRef.current = true;
   }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (!hasLoadedStoredCart) return;
+    if (!hasLoadedStoredCartRef.current) return;
+    if (shouldSkipStorageWriteRef.current) {
+      shouldSkipStorageWriteRef.current = false;
+      return;
+    }
     window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items.map(buildStorageItem)));
-  }, [hasLoadedStoredCart, items]);
+  }, [items]);
 
   const addItem = useCallback((input: AddItemInput) => {
     setItems((currentItems) => {

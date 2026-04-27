@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import React from "react";
+import { memo } from "react";
 import { products } from "../data/products";
 import { formatSudanesePrice, getDiscountPercent, getLegacyOriginalPrice } from "../lib/pricing";
 import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
@@ -11,6 +11,22 @@ const categoryMap: Record<string, { label: string; color: string }> = {
   social: { label: "تواصل اجتماعي", color: "#e11d48" },
   gaming: { label: "ألعاب الفيديو", color: "#3b82f6" },
 };
+
+type Product = (typeof products)[number];
+
+const featuredIds = [
+  "شات-جي-بي-تي-بلس",
+  "جيميني-برو",
+  "متابعين-إنستغرام",
+  "شدات-ببجي",
+  "جواهر-فري-فاير",
+];
+
+const featuredProducts = featuredIds
+  .map((id) => products.find((product) => product.id === id))
+  .filter((product): product is Product => Boolean(product));
+
+const discountPercent = getDiscountPercent();
 
 function FeaturedProductImage({
   alt,
@@ -48,21 +64,8 @@ function FeaturedProductImage({
   );
 }
 
-export function FeaturedProducts() {
+function FeaturedProductsComponent() {
   const isDesktopViewport = useDesktopViewport();
-  const featuredIds = [
-    "شات-جي-بي-تي-بلس",
-    "جيميني-برو",
-    "متابعين-إنستغرام",
-    "شدات-ببجي",
-    "جواهر-فري-فاير",
-  ];
-
-  const featured = featuredIds
-    .map((id) => products.find((product) => product.id === id))
-    .filter(Boolean) as typeof products;
-
-  const discountPercent = getDiscountPercent();
 
   return (
     <section
@@ -103,7 +106,7 @@ export function FeaturedProducts() {
               msOverflowStyle: "none",
             }}
           >
-            {featured.map((product, index) => {
+            {featuredProducts.map((product, index) => {
               const category = categoryMap[product.category] || {
                 label: product.category,
                 color: "#d0bcff",
@@ -132,7 +135,7 @@ export function FeaturedProducts() {
                       alt={product.title}
                       image={responsiveImage}
                       outOfStock={product.outOfStock}
-                      loadingStrategy={index === 0 ? "eager" : "lazy"}
+                      loadingStrategy={index < 3 ? "eager" : "lazy"}
                       priority={index === 0}
                     />
 
@@ -213,7 +216,7 @@ export function FeaturedProducts() {
 
         {/* Desktop: 4-column grid (lg and above) */}
         {isDesktopViewport && <div className="grid grid-cols-4 gap-4 pb-4">
-          {featured.map((product, index) => {
+          {featuredProducts.map((product, index) => {
             const category = categoryMap[product.category] || {
               label: product.category,
               color: "#d0bcff",
@@ -291,3 +294,5 @@ export function FeaturedProducts() {
     </section>
   );
 }
+
+export const FeaturedProducts = memo(FeaturedProductsComponent);
