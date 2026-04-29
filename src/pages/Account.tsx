@@ -18,10 +18,6 @@ import {
   CART_LOGIN_RETURN_KEY,
   formatOrderDate,
   getOrderStatusText,
-  readGuestOrders,
-  setHideGuestOrdersAfterLogout,
-  shouldHideGuestOrdersAfterLogout,
-  writeGuestOrders,
   type OrderRecord,
 } from "../lib/order-utils";
 
@@ -44,7 +40,7 @@ export function Account() {
     setLoadingOrders(true);
     try {
       if (!currentUser) {
-        setOrders(shouldHideGuestOrdersAfterLogout() ? [] : readGuestOrders());
+        setOrders([]);
         return;
       }
       setOrders(await loadOrdersForCurrentUser());
@@ -166,14 +162,12 @@ export function Account() {
     if (!window.confirm("هل أنت متأكد من حذف هذا الطلب؟")) return;
 
     try {
-      if (order.remote && currentUser) {
-        await deleteOrderForCurrentUser(order.id);
-        setOrders((currentOrders) => currentOrders.filter((entry) => entry.id !== order.id));
-      } else {
-        const nextOrders = readGuestOrders().filter((entry) => entry.id !== order.id);
-        writeGuestOrders(nextOrders);
-        setOrders(nextOrders);
+      if (!currentUser) {
+        throw new Error("يجب تسجيل الدخول أولاً لحذف الطلب.");
       }
+
+      await deleteOrderForCurrentUser(order.id);
+      setOrders((currentOrders) => currentOrders.filter((entry) => entry.id !== order.id));
 
       setFeedback("تم حذف الطلب بنجاح.");
       setFeedbackType("success");
@@ -189,7 +183,6 @@ export function Account() {
   async function handleSignOut() {
     try {
       await signOutUser();
-      setHideGuestOrdersAfterLogout(true);
       setOrders([]);
       setFeedback("تم تسجيل الخروج بنجاح.");
       setFeedbackType("success");
@@ -215,6 +208,12 @@ export function Account() {
     );
   }
 
+  const accountDisplayName = currentUser?.isAnonymous
+    ? "مستخدم بدون حساب"
+    : currentUser?.displayName || "مستخدم";
+  const accountEmailText = currentUser?.isAnonymous ? "جلسة Anonymous" : currentUser?.email || "";
+  const ordersSourceText = currentUser?.isAnonymous ? "Anonymous" : "الحساب";
+
   if (currentUser) {
     return (
       <div className="container mx-auto px-4 pt-28 pb-12 md:pt-36 md:pb-20 relative min-h-screen overflow-hidden">
@@ -227,9 +226,9 @@ export function Account() {
                 <User className="h-10 w-10 text-primary" />
               </div>
               <h2 className="text-2xl font-black mb-2 font-heading">
-                مرحباً، {currentUser.displayName || "مستخدم"}
+                مرحباً، {accountDisplayName}
               </h2>
-              <p className="text-muted-foreground font-sans">{currentUser.email}</p>
+              <p className="text-muted-foreground font-sans">{accountEmailText}</p>
             </div>
 
             {feedback && (
@@ -263,7 +262,7 @@ export function Account() {
                   الطلبات <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">الأخيرة</span>
                 </h2>
                 <p data-testid="orders-source" className="text-xs text-muted-foreground mt-2">
-                  الحساب
+                  {ordersSourceText}
                 </p>
               </div>
               <div data-testid="orders-count" className="text-lg font-black text-primary">
@@ -335,7 +334,7 @@ export function Account() {
     );
   }
 
-  const guestOrders = orders;
+  const anonymousOrders = orders;
 
   return (
     <div className="container mx-auto px-4 pt-28 pb-12 md:pt-36 md:pb-20 relative min-h-screen overflow-hidden">
@@ -451,27 +450,27 @@ export function Account() {
         <div className="perf-panel bg-card/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-bold mb-2">طلبات الزائر</h2>
+              <h2 className="text-xl font-bold mb-2">طلبات بدون حساب</h2>
               <p data-testid="orders-source" className="text-muted-foreground text-sm">
-                زائر
+                Firebase Anonymous
               </p>
             </div>
             <div data-testid="orders-count" className="text-lg font-black text-primary">
-              {guestOrders.length}
+              {anonymousOrders.length}
             </div>
           </div>
 
-          {guestOrders.length === 0 ? (
+          {anonymousOrders.length === 0 ? (
             <div className="flex flex-col justify-center items-center text-center flex-1">
               <Package className="h-16 w-16 text-muted-foreground mb-4 opacity-50" />
               <h2 className="text-xl font-bold mb-2">تتبع طلباتك</h2>
               <p className="text-muted-foreground">
-                قم بتسجيل الدخول لمعرفة حالة طلباتك، أو أكمل الطلب كزائر وسيظهر هنا على هذا الجهاز.
+                قم بتسجيل الدخول لمعرفة حالة طلباتك، أو أكمل الطلب بدون حساب وسيتم حفظه عبر Firebase.
               </p>
             </div>
           ) : (
             <div data-testid="orders-list" className="space-y-4 overflow-y-auto max-h-[420px]">
-              {guestOrders.map((order) => (
+              {anonymousOrders.map((order) => (
                 <div key={order.id} className="rounded-xl border border-white/5 bg-background/40 p-4">
                   <div className="flex justify-between gap-4">
                     <div>

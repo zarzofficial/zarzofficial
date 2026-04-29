@@ -2,18 +2,14 @@ import { useEffect, useState, type MouseEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../lib/CartContext";
 import { useAuth } from "../lib/AuthContext";
-import { createOrder } from "../lib/firebase";
+import { createOrder, startAnonymousSession } from "../lib/firebase";
 import {
   CART_CHECKOUT_DRAFT_KEY,
   CART_LOGIN_RETURN_KEY,
   buildCartDetailsLines,
   buildOrderPayload,
   buildOrderWhatsAppLink,
-  createOrderRecord,
   generateOrderNumber,
-  readGuestOrders,
-  setHideGuestOrdersAfterLogout,
-  writeGuestOrders,
   type PaymentMethod,
 } from "../lib/order-utils";
 import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
@@ -60,7 +56,7 @@ export function Cart() {
   const { currentUser, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [success, setSuccess] = useState("");
-  const [showGuestPrompt, setShowGuestPrompt] = useState(false);
+  const [showAnonymousPrompt, setShowAnonymousPrompt] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("bankak");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -118,17 +114,17 @@ export function Cart() {
     (paymentMethod === "cash" || /^\d{4}$/.test(receiptNumber));
 
   async function finalizeOrder({
-    forceGuest = false,
+    forceAnonymous = false,
     reservedWindow = null,
   }: {
-    forceGuest?: boolean;
+    forceAnonymous?: boolean;
     reservedWindow?: Window | null;
   } = {}) {
     if (!items.length || !isFormValid) return;
 
     setLoading(true);
     setError("");
-    setShowGuestPrompt(false);
+    setShowAnonymousPrompt(false);
 
     const orderPayload = buildOrderPayload(items, {
       orderNumber: generateOrderNumber(),
@@ -140,17 +136,13 @@ export function Cart() {
     });
 
     try {
-      const shouldSyncAccountOrder = Boolean(currentUser) && !forceGuest;
-      const shouldOpenWhatsApp = paymentMethod === "cash" || !shouldSyncAccountOrder;
+      const shouldUseAnonymous = forceAnonymous || !currentUser || Boolean(currentUser.isAnonymous);
+      const shouldOpenWhatsApp = paymentMethod === "cash" || shouldUseAnonymous;
 
-      if (shouldSyncAccountOrder) {
-        await createOrder(orderPayload);
-      } else {
-        const guestOrders = readGuestOrders();
-        guestOrders.unshift(createOrderRecord(orderPayload, false));
-        writeGuestOrders(guestOrders);
-        setHideGuestOrdersAfterLogout(false);
+      if (shouldUseAnonymous) {
+        await startAnonymousSession();
       }
+      await createOrder(orderPayload);
 
       const detailsText = buildCartDetailsLines(items);
       const whatsappLink = buildOrderWhatsAppLink({
@@ -167,9 +159,9 @@ export function Cart() {
       window.localStorage.removeItem(CART_CHECKOUT_DRAFT_KEY);
 
       setSuccess(
-        shouldSyncAccountOrder
-          ? "تم حفظ طلبك داخل حسابك بنجاح."
-          : "تم حفظ طلبك على هذا الجهاز بنجاح.",
+        shouldUseAnonymous
+          ? "تم حفظ طلبك داخل جلسة آمنة بدون حساب."
+          : "تم حفظ طلبك داخل حسابك بنجاح.",
       );
 
       window.setTimeout(() => {
@@ -206,12 +198,12 @@ export function Cart() {
     }
 
     if (!currentUser) {
-      setShowGuestPrompt(true);
+      setShowAnonymousPrompt(true);
       return;
     }
 
     const reservedWindow = paymentMethod === "cash" ? openReservedWindow() : null;
-    void finalizeOrder({ forceGuest: false, reservedWindow });
+    void finalizeOrder({ forceAnonymous: false, reservedWindow });
   }
 
   function handleLoginRedirect() {
@@ -464,17 +456,17 @@ export function Cart() {
         </div>
       </div>
 
-      {showGuestPrompt && (
+      {showAnonymousPrompt && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm px-4">
           <div className="perf-modal-card bg-surface-container rounded-[40px] p-8 md:p-12 max-w-lg w-full text-center border border-outline-variant/10 shadow-[0_32px_80px_rgba(86,0,202,0.4)] relative">
-            <button onClick={() => setShowGuestPrompt(false)} className="absolute top-6 left-6 text-outline hover:text-white transition-colors" type="button">
+            <button onClick={() => setShowAnonymousPrompt(false)} className="absolute top-6 left-6 text-outline hover:text-white transition-colors" type="button">
               <SiteIcon name="close" />
             </button>
             <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
               <SiteIcon name="person_search" className="text-4xl text-primary" />
             </div>
             <h2 className="text-2xl md:text-3xl font-black font-headline text-on-surface mb-3">هل أنت مسجل؟</h2>
-            <p className="text-outline mb-10 text-sm md:text-base leading-relaxed">يمكنك تسجيل الدخول لحفظ طلبك في حسابك، أو المتابعة فوراً كزائر ليُحفظ على هذا الجهاز فقط.</p>
+            <p className="text-outline mb-10 text-sm md:text-base leading-relaxed">يمكنك تسجيل الدخول لحفظ طلبك في حسابك، أو المتابعة فوراً بدون حساب مع حفظ الطلب في Firebase.</p>
 
             <div className="flex flex-col gap-4">
               <button data-testid="checkout-login-and-continue" onClick={handleLoginRedirect} className="w-full py-4 primary-gradient rounded-full text-on-primary font-bold hover:shadow-[0_10px_30px_rgba(125,60,255,0.4)] transition-all flex items-center justify-center gap-2" type="button">
@@ -482,15 +474,15 @@ export function Cart() {
                 تسجيل الدخول / إنشاء حساب
               </button>
               <button
-                data-testid="checkout-continue-as-guest"
+                data-testid="checkout-continue-anonymous"
                 onClick={() => {
                   const reservedWindow = openReservedWindow();
-                  void finalizeOrder({ forceGuest: true, reservedWindow });
+                  void finalizeOrder({ forceAnonymous: true, reservedWindow });
                 }}
                 className="w-full py-4 bg-surface-container-highest rounded-full text-on-surface font-bold hover:bg-white/5 transition-all text-center border border-outline-variant/10"
                 type="button"
               >
-                المتابعة كزائر
+                المتابعة بدون حساب
               </button>
             </div>
           </div>

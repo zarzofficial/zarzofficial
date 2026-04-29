@@ -4,7 +4,7 @@ import { ArrowRight, Phone, MessageCircle, CheckCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useCart } from "../lib/CartContext";
 import { useAuth } from "../lib/AuthContext";
-import { db, collection, addDoc, Timestamp } from "../lib/firebase";
+import { createOrder, startAnonymousSession } from "../lib/firebase";
 
 export function Checkout() {
   const { items, total, clearCart } = useCart();
@@ -36,24 +36,25 @@ export function Checkout() {
     
     const payload = {
         orderNumber,
-        userId: currentUser?.uid || "guest",
-        userEmail: currentUser?.email || "",
         name,
         phone,
         paymentMethod: method,
         paymentMethodLabel: method === "whatsapp" ? "متابعة عبر واتساب" : "تحويل بنكك",
         paymentReference: "",
-        total: `$${total.toFixed(2)}`,
-        currency: "USD",
-        status: "pending",
-        items: items.map(i => ({ title: i.title, qty: i.qty, price: i.price, productId: i.id })),
+        total: `${total.toFixed(2)} ج.س`,
+        currency: "SDG" as const,
+        status: "pending" as const,
+        productId: items.length === 1 ? items[0].productId : null,
+        items: items.map(i => ({ title: i.title, qty: i.qty, price: i.unitPrice, productId: i.productId, customData: {} })),
         details: items.map(i => `${i.title} (${i.qty})`).join(', '),
-        date: Timestamp.now(),
         quantity: items.reduce((sum, item) => sum + item.qty, 0)
     };
 
     try {
-        await addDoc(collection(db, "orders"), payload);
+        if (!currentUser) {
+          await startAnonymousSession();
+        }
+        await createOrder(payload);
         
         // Prepare whatsapp message
         let waMessage = `*طلب جديد #${orderNumber}*\n\n`;

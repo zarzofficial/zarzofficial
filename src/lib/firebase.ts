@@ -1,13 +1,18 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
 import {
+  EmailAuthProvider,
   GoogleAuthProvider,
   browserLocalPersistence,
   createUserWithEmailAndPassword,
   getAuth,
   getRedirectResult,
+  linkWithCredential,
+  linkWithPopup,
+  linkWithRedirect,
   onAuthStateChanged as firebaseOnAuthStateChanged,
   sendPasswordResetEmail,
   setPersistence,
+  signInAnonymously,
   signInWithEmailAndPassword,
   signInWithPopup,
   signInWithRedirect,
@@ -86,6 +91,7 @@ googleProvider.addScope("profile");
 googleProvider.setCustomParameters({ prompt: "select_account" });
 
 let initialized = false;
+let anonymousSessionPromise: Promise<User> | null = null;
 
 function shouldPreferGoogleRedirect() {
   if (typeof window === "undefined") return false;
@@ -125,6 +131,8 @@ function getFriendlyAuthError(error: unknown, action: "signin" | "register" | "g
 
   if (code.includes("invalid-email")) return "صيغة البريد الإلكتروني غير صحيحة.";
   if (code.includes("email-already-in-use")) return "هذا البريد الإلكتروني مستخدم بالفعل.";
+  if (code.includes("credential-already-in-use")) return "هذا الحساب مرتبط بمستخدم آخر بالفعل.";
+  if (code.includes("provider-already-linked")) return "طريقة الدخول هذه مرتبطة بحسابك بالفعل.";
   if (code.includes("weak-password")) return "كلمة المرور ضعيفة. استخدم 6 أحرف أو أكثر.";
 
   if (
@@ -285,10 +293,36 @@ export function onAuthStateChanged(target: typeof auth, callback: (user: User | 
   return firebaseOnAuthStateChanged(target, callback);
 }
 
+async function createOrReuseAnonymousSession() {
+  await firebaseReadyPromise;
+
+  if (auth.currentUser) {
+    await syncUserRecordSafely(auth.currentUser, "anonymous session reuse");
+    return auth.currentUser;
+  }
+
+  const credential = await signInAnonymously(auth);
+  await syncUserRecordSafely(credential.user, "anonymous sign-in");
+  return credential.user;
+}
+
+export function startAnonymousSession() {
+  if (!anonymousSessionPromise) {
+    anonymousSessionPromise = createOrReuseAnonymousSession().finally(() => {
+      anonymousSessionPromise = null;
+    });
+  }
+
+  return anonymousSessionPromise;
+}
+
 export async function registerWithEmail(input: { name?: string; email: string; password: string }) {
   try {
     await firebaseReadyPromise;
-    const credential = await createUserWithEmailAndPassword(auth, input.email, input.password);
+    const anonymousUser = auth.currentUser?.isAnonymous ? auth.currentUser : null;
+    const credential = anonymousUser
+      ? await linkWithCredential(anonymousUser, EmailAuthProvider.credential(input.email, input.password))
+      : await createUserWithEmailAndPassword(auth, input.email, input.password);
     if (input.name?.trim()) {
       await updateProfile(credential.user, { displayName: input.name.trim() });
     }
@@ -313,15 +347,22 @@ export async function signInWithEmail(input: { email: string; password: string }
 export async function signInWithGoogleFlow() {
   try {
     await firebaseReadyPromise;
+    const anonymousUser = auth.currentUser?.isAnonymous ? auth.currentUser : null;
 
     if (typeof window !== "undefined" && shouldPreferGoogleRedirect()) {
       window.sessionStorage.setItem(GOOGLE_REDIRECT_PENDING_KEY, "1");
       window.sessionStorage.removeItem(GOOGLE_REDIRECT_ERROR_KEY);
-      await signInWithRedirect(auth, googleProvider);
+      if (anonymousUser) {
+        await linkWithRedirect(anonymousUser, googleProvider);
+      } else {
+        await signInWithRedirect(auth, googleProvider);
+      }
       return null;
     }
 
-    const result = await signInWithPopup(auth, googleProvider);
+    const result = anonymousUser
+      ? await linkWithPopup(anonymousUser, googleProvider)
+      : await signInWithPopup(auth, googleProvider);
     await syncUserRecordSafely(result.user, "google popup sign-in");
     return result.user;
   } catch (error) {

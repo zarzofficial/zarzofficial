@@ -1,9 +1,7 @@
 import type { CartItem } from "./CartContext";
 
-export const GUEST_ORDERS_STORAGE_KEY = "zarz_orders";
 export const CART_CHECKOUT_DRAFT_KEY = "zarz_cart_checkout_draft";
 export const CART_LOGIN_RETURN_KEY = "zarz_cart_login_return";
-export const HIDE_GUEST_ORDERS_AFTER_LOGOUT_KEY = "zarz_hide_guest_orders_after_logout";
 
 export type PaymentMethod = "bankak" | "cash";
 
@@ -38,51 +36,6 @@ export interface OrderRecord {
   method: string;
   items: Array<{ title: string; qty: number }>;
   remote: boolean;
-}
-
-function safeLocalStorageGet(key: string) {
-  if (typeof window === "undefined") return "";
-  try {
-    return window.localStorage.getItem(key) || "";
-  } catch {
-    return "";
-  }
-}
-
-function safeLocalStorageSet(key: string, value: string) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(key, value);
-  } catch {
-    // Ignore storage failures.
-  }
-}
-
-function safeSessionStorageGet(key: string) {
-  if (typeof window === "undefined") return "";
-  try {
-    return window.sessionStorage.getItem(key) || "";
-  } catch {
-    return "";
-  }
-}
-
-function safeSessionStorageSet(key: string, value: string) {
-  if (typeof window === "undefined") return;
-  try {
-    window.sessionStorage.setItem(key, value);
-  } catch {
-    // Ignore storage failures.
-  }
-}
-
-function safeSessionStorageRemove(key: string) {
-  if (typeof window === "undefined") return;
-  try {
-    window.sessionStorage.removeItem(key);
-  } catch {
-    // Ignore storage failures.
-  }
 }
 
 function normalizeDetails(item: CartItem) {
@@ -157,48 +110,6 @@ export function buildOrderPayload(
     details: buildCartDetailsLines(items),
     quantity: items.reduce((sum, item) => sum + item.qty, 0),
   };
-}
-
-export function createOrderRecord(payload: OrderPayload, remote: boolean): OrderRecord {
-  return {
-    id: `${payload.orderNumber}-${Date.now()}`,
-    orderNumber: payload.orderNumber,
-    total: payload.total,
-    status: payload.status,
-    date: new Date().toISOString(),
-    method: payload.paymentMethodLabel,
-    items: payload.items.map((item) => ({ title: item.title, qty: item.qty })),
-    remote,
-  };
-}
-
-export function readGuestOrders() {
-  const rawValue = safeLocalStorageGet(GUEST_ORDERS_STORAGE_KEY);
-  if (!rawValue) return [] as OrderRecord[];
-
-  try {
-    const parsedValue = JSON.parse(rawValue);
-    return Array.isArray(parsedValue) ? (parsedValue as OrderRecord[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-export function writeGuestOrders(orders: OrderRecord[]) {
-  safeLocalStorageSet(GUEST_ORDERS_STORAGE_KEY, JSON.stringify(orders));
-}
-
-export function shouldHideGuestOrdersAfterLogout() {
-  return safeSessionStorageGet(HIDE_GUEST_ORDERS_AFTER_LOGOUT_KEY) === "1";
-}
-
-export function setHideGuestOrdersAfterLogout(value: boolean) {
-  if (value) {
-    safeSessionStorageSet(HIDE_GUEST_ORDERS_AFTER_LOGOUT_KEY, "1");
-    return;
-  }
-
-  safeSessionStorageRemove(HIDE_GUEST_ORDERS_AFTER_LOGOUT_KEY);
 }
 
 export function formatOrderDate(value: string) {

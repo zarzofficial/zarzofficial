@@ -67,24 +67,6 @@ service cloud.firestore {
       data.createdAt is timestamp;
     }
 
-    function orderOwnershipFieldsOnlyChanged() {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-        'userId',
-        'userEmail',
-        'ownerType',
-        'guestTransferKey',
-        'transferredAt',
-        'transferredFromGuestId'
-      ]);
-    }
-
-    function ownOrderOwnershipUpdate(userId) {
-      return isOwnUser(userId)
-        && resource.data.userId == userId
-        && request.resource.data.userId == resource.data.userId
-        && orderOwnershipFieldsOnlyChanged();
-    }
-
     match /users/{userId} {
       allow get: if isAdmin() || isOwnUser(userId);
       allow list: if isAdmin();
@@ -102,7 +84,7 @@ service cloud.firestore {
       match /orders/{orderId} {
         allow read: if isAdmin() || isOwnUser(userId);
         allow create: if isOwnUser(userId) && request.resource.data.userId == userId;
-        allow update: if isAdmin() || ownOrderOwnershipUpdate(userId);
+        allow update: if isAdmin();
         allow delete: if isAdmin() || isOwnUser(userId);
       }
     }
