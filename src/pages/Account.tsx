@@ -21,7 +21,6 @@ import {
   getOrderStatusText,
   type OrderRecord,
 } from "../lib/order-utils";
-import { readVisitorViewHidden, writeVisitorViewHidden } from "../lib/visitor-session";
 
 export function Account() {
   const { currentUser, loading: authLoading } = useAuth();
@@ -35,14 +34,13 @@ export function Account() {
   const [feedbackType, setFeedbackType] = useState<"success" | "error">("success");
   const [loading, setLoading] = useState(false);
   const [loadingOrders, setLoadingOrders] = useState(false);
-  const [visitorViewHidden, setVisitorViewHidden] = useState(readVisitorViewHidden);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const ordersScrollRef = useRef<HTMLDivElement | null>(null);
 
   async function fetchOrders() {
     setLoadingOrders(true);
     try {
-      if (!currentUser || (currentUser.isAnonymous && visitorViewHidden)) {
+      if (!currentUser) {
         setOrders([]);
         return;
       }
@@ -61,7 +59,7 @@ export function Account() {
   useEffect(() => {
     if (authLoading) return;
     void fetchOrders();
-  }, [authLoading, currentUser, visitorViewHidden]);
+  }, [authLoading, currentUser]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -74,11 +72,10 @@ export function Account() {
   useEffect(() => {
     if (authLoading) return;
     if (!currentUser || typeof window === "undefined") return;
-    if (currentUser.isAnonymous && visitorViewHidden) return;
     if (window.sessionStorage.getItem(CART_LOGIN_RETURN_KEY) !== "1") return;
     window.sessionStorage.removeItem(CART_LOGIN_RETURN_KEY);
     navigate("/cart");
-  }, [authLoading, currentUser, navigate, visitorViewHidden]);
+  }, [authLoading, currentUser, navigate]);
 
   const orderVirtualizer = useVirtualizer({
     count: orders.length,
@@ -104,8 +101,6 @@ export function Account() {
         await registerWithEmail({ name, email, password });
         setFeedback("تم إنشاء الحساب وتسجيل الدخول.");
       }
-      writeVisitorViewHidden(false);
-      setVisitorViewHidden(false);
       setFeedbackType("success");
     } catch (error) {
       console.error(error);
@@ -125,8 +120,6 @@ export function Account() {
     setFeedback("");
     try {
       await signInWithGoogleFlow();
-      writeVisitorViewHidden(false);
-      setVisitorViewHidden(false);
       setFeedback("تم تسجيل الدخول عبر Google.");
       setFeedbackType("success");
     } catch (error) {
@@ -146,8 +139,6 @@ export function Account() {
     setFeedback("");
     try {
       await startAnonymousSession();
-      writeVisitorViewHidden(false);
-      setVisitorViewHidden(false);
       setFeedback("تم فتح وضع الزائر بنجاح.");
       setFeedbackType("success");
     } catch (error) {
@@ -211,18 +202,10 @@ export function Account() {
 
   async function handleSignOut() {
     try {
-      if (currentUser?.isAnonymous) {
-        writeVisitorViewHidden(true);
-        setVisitorViewHidden(true);
-        setOrders([]);
-        setFeedback("تم الخروج من وضع الزائر.");
-        setFeedbackType("success");
-        return;
-      }
-
+      const wasAnonymous = Boolean(currentUser?.isAnonymous);
       await signOutUser();
       setOrders([]);
-      setFeedback("تم تسجيل الخروج بنجاح.");
+      setFeedback(wasAnonymous ? "تم الخروج من وضع الزائر." : "تم تسجيل الخروج بنجاح.");
       setFeedbackType("success");
     } catch (error) {
       console.error(error);
@@ -252,7 +235,7 @@ export function Account() {
   const accountEmailText = currentUser?.isAnonymous ? "جلسة الزائر" : currentUser?.email || "";
   const ordersSourceText = currentUser?.isAnonymous ? "الزائر" : "الحساب";
 
-  if (currentUser && !(currentUser.isAnonymous && visitorViewHidden)) {
+  if (currentUser) {
     return (
       <div className="container mx-auto px-4 pt-28 pb-12 md:pt-36 md:pb-20 relative min-h-screen overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] -z-10 pointer-events-none"></div>

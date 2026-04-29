@@ -1,4 +1,4 @@
-import { getApp, getApps, initializeApp } from "firebase/app";
+import { getApp, getApps, initializeApp, type FirebaseError } from "firebase/app";
 import {
   EmailAuthProvider,
   GoogleAuthProvider,
@@ -13,6 +13,7 @@ import {
   sendPasswordResetEmail,
   setPersistence,
   signInAnonymously,
+  signInWithCredential,
   signInWithEmailAndPassword,
   signInWithPopup,
   signInWithRedirect,
@@ -130,8 +131,16 @@ function getFriendlyAuthError(error: unknown, action: "signin" | "register" | "g
   const text = getErrorText(error);
 
   if (code.includes("invalid-email")) return "صيغة البريد الإلكتروني غير صحيحة.";
-  if (code.includes("email-already-in-use")) return "هذا البريد الإلكتروني مستخدم بالفعل.";
-  if (code.includes("credential-already-in-use")) return "هذا الحساب مرتبط بمستخدم آخر بالفعل.";
+  if (code.includes("email-already-in-use")) {
+    return action === "register"
+      ? "هذا البريد الإلكتروني مستخدم بالفعل."
+      : "تعذر إكمال الدخول عبر Google الآن. حاول مرة أخرى.";
+  }
+  if (code.includes("credential-already-in-use") || code.includes("account-exists-with-different-credential")) {
+    return action === "google"
+      ? "تعذر إكمال الدخول عبر Google الآن. حاول مرة أخرى."
+      : "هذا الحساب مرتبط بمستخدم آخر بالفعل.";
+  }
   if (code.includes("provider-already-linked")) return "طريقة الدخول هذه مرتبطة بحسابك بالفعل.";
   if (code.includes("weak-password")) return "كلمة المرور ضعيفة. استخدم 6 أحرف أو أكثر.";
 
@@ -221,6 +230,12 @@ async function initializeFirebase() {
         await syncUserRecordSafely(redirectResult.user, "google redirect sign-in");
       }
     } catch (error) {
+      const recoveredUser = await signInWithExistingGoogleAccount(error, "google redirect existing account sign-in");
+      if (recoveredUser) {
+        window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING_KEY);
+        window.sessionStorage.removeItem(GOOGLE_REDIRECT_ERROR_KEY);
+        return;
+      }
       window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING_KEY);
       window.sessionStorage.setItem(GOOGLE_REDIRECT_ERROR_KEY, getFriendlyAuthError(error, "google"));
       console.error("Google redirect result failed", error);
@@ -259,6 +274,27 @@ async function syncUserRecordSafely(user: User | null, context: string) {
   } catch (error) {
     console.warn(`User profile sync failed during ${context}`, error);
   }
+}
+
+function isExistingGoogleAccountError(error: unknown) {
+  const code = getErrorCode(error);
+  return (
+    code.includes("credential-already-in-use") ||
+    code.includes("account-exists-with-different-credential") ||
+    code.includes("email-already-in-use")
+  );
+}
+
+async function signInWithExistingGoogleAccount(error: unknown, context: string) {
+  if (!isExistingGoogleAccountError(error)) return null;
+
+  const credential = GoogleAuthProvider.credentialFromError(error as FirebaseError);
+  if (!credential) return null;
+
+  const result = await signInWithCredential(auth, credential);
+  await ensureUserAuthToken(result.user);
+  await syncUserRecordSafely(result.user, context);
+  return result.user;
 }
 
 async function ensureUserAuthToken(user: User) {
@@ -372,6 +408,8 @@ export async function signInWithGoogleFlow() {
     await syncUserRecordSafely(result.user, "google popup sign-in");
     return result.user;
   } catch (error) {
+    const recoveredUser = await signInWithExistingGoogleAccount(error, "google popup existing account sign-in");
+    if (recoveredUser) return recoveredUser;
     throw withUserMessage(error, getFriendlyAuthError(error, "google"));
   }
 }
