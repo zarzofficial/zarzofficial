@@ -154,11 +154,11 @@ function getFriendlyAuthError(error: unknown, action: "signin" | "register" | "g
   }
 
   if (code.includes("unauthorized-domain") || code.includes("auth-domain-config-required")) {
-    return "دومين الموقع غير مفعل داخل Firebase Authentication.";
+    return "دومين الموقع غير مفعل لتسجيل الدخول.";
   }
 
   if (text.includes("redirect_uri_mismatch")) {
-    return "تم اكتشاف خطأ redirect_uri_mismatch في Google Sign-In. تم تحويل المصادقة إلى auth.zarzofficial.com، أعد المحاولة الآن.";
+    return "تعذر إكمال الدخول عبر Google الآن. أعد المحاولة بعد لحظات.";
   }
 
   if (code.includes("too-many-requests")) {
@@ -180,7 +180,7 @@ function getFriendlyOrderError(error: unknown) {
   const text = getErrorText(error);
 
   if (code.includes("permission-denied") || text.includes("insufficient permissions")) {
-    return "تعذر حفظ الطلب لأن صلاحيات قاعدة البيانات تمنع ذلك حاليًا.";
+    return "تعذر حفظ الطلب الآن. حاول مرة أخرى بعد قليل.";
   }
   if (code.includes("unauthenticated")) {
     return "تعذر حفظ الطلب لأن جلسة تسجيل الدخول غير صالحة حاليًا.";

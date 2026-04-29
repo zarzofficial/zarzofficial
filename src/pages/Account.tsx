@@ -22,6 +22,30 @@ import {
   type OrderRecord,
 } from "../lib/order-utils";
 
+const VISITOR_VIEW_HIDDEN_KEY = "zarz_visitor_view_hidden";
+
+function readVisitorViewHidden() {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(VISITOR_VIEW_HIDDEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeVisitorViewHidden(value: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    if (value) {
+      window.localStorage.setItem(VISITOR_VIEW_HIDDEN_KEY, "1");
+    } else {
+      window.localStorage.removeItem(VISITOR_VIEW_HIDDEN_KEY);
+    }
+  } catch {
+    // Ignore storage failures.
+  }
+}
+
 export function Account() {
   const { currentUser, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -34,13 +58,14 @@ export function Account() {
   const [feedbackType, setFeedbackType] = useState<"success" | "error">("success");
   const [loading, setLoading] = useState(false);
   const [loadingOrders, setLoadingOrders] = useState(false);
+  const [visitorViewHidden, setVisitorViewHidden] = useState(readVisitorViewHidden);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const ordersScrollRef = useRef<HTMLDivElement | null>(null);
 
   async function fetchOrders() {
     setLoadingOrders(true);
     try {
-      if (!currentUser) {
+      if (!currentUser || (currentUser.isAnonymous && visitorViewHidden)) {
         setOrders([]);
         return;
       }
@@ -59,7 +84,7 @@ export function Account() {
   useEffect(() => {
     if (authLoading) return;
     void fetchOrders();
-  }, [authLoading, currentUser]);
+  }, [authLoading, currentUser, visitorViewHidden]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -139,6 +164,8 @@ export function Account() {
     setFeedback("");
     try {
       await startAnonymousSession();
+      writeVisitorViewHidden(false);
+      setVisitorViewHidden(false);
       setFeedback("تم فتح وضع الزائر بنجاح.");
       setFeedbackType("success");
     } catch (error) {
@@ -202,6 +229,15 @@ export function Account() {
 
   async function handleSignOut() {
     try {
+      if (currentUser?.isAnonymous) {
+        writeVisitorViewHidden(true);
+        setVisitorViewHidden(true);
+        setOrders([]);
+        setFeedback("تم الخروج من وضع الزائر.");
+        setFeedbackType("success");
+        return;
+      }
+
       await signOutUser();
       setOrders([]);
       setFeedback("تم تسجيل الخروج بنجاح.");
@@ -234,7 +270,7 @@ export function Account() {
   const accountEmailText = currentUser?.isAnonymous ? "جلسة الزائر" : currentUser?.email || "";
   const ordersSourceText = currentUser?.isAnonymous ? "الزائر" : "الحساب";
 
-  if (currentUser) {
+  if (currentUser && !(currentUser.isAnonymous && visitorViewHidden)) {
     return (
       <div className="container mx-auto px-4 pt-28 pb-12 md:pt-36 md:pb-20 relative min-h-screen overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] -z-10 pointer-events-none"></div>
@@ -270,7 +306,7 @@ export function Account() {
               </Button>
               <Button data-testid="account-signout" onClick={() => void handleSignOut()} variant="outline" className="w-full h-12 text-lg rounded-xl border-destructive/20 text-destructive hover:bg-destructive/10 hover:border-destructive/50 font-sans">
                 <LogOut className="mr-2 h-5 w-5 ml-2" />
-                تسجيل الخروج
+                {currentUser.isAnonymous ? "الخروج من الزائر" : "تسجيل الخروج"}
               </Button>
             </div>
           </div>
@@ -497,7 +533,7 @@ export function Account() {
               <Package className="h-16 w-16 text-muted-foreground mb-4 opacity-50" />
               <h2 className="text-xl font-bold mb-2">تتبع طلباتك</h2>
               <p className="text-muted-foreground">
-                قم بتسجيل الدخول لمعرفة حالة طلباتك، أو أكمل الطلب كزائر وسيتم حفظه عبر Firebase.
+                سجّل الدخول أو تابع كزائر لمراجعة طلباتك هنا.
               </p>
             </div>
           ) : (
