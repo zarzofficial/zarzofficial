@@ -37,6 +37,7 @@ import {
   where,
 } from "firebase/firestore";
 import type { OrderPayload, OrderRecord } from "./order-utils";
+import { isVisitorSessionPausedFor, resumeVisitorSession } from "./visitor-session";
 
 const DEFAULT_AUTH_DOMAIN = "zarzofficial-66638.firebaseapp.com";
 const CUSTOM_AUTH_DOMAIN = "auth.zarzofficial.com";
@@ -227,6 +228,7 @@ async function initializeFirebase() {
       window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING_KEY);
       window.sessionStorage.removeItem(GOOGLE_REDIRECT_ERROR_KEY);
       if (redirectResult?.user) {
+        resumeVisitorSession();
         await syncUserRecordSafely(redirectResult.user, "google redirect sign-in");
       }
     } catch (error) {
@@ -293,6 +295,7 @@ async function signInWithExistingGoogleAccount(error: unknown, context: string) 
 
   const result = await signInWithCredential(auth, credential);
   await ensureUserAuthToken(result.user);
+  resumeVisitorSession();
   await syncUserRecordSafely(result.user, context);
   return result.user;
 }
@@ -389,7 +392,10 @@ export async function signInWithEmail(input: { email: string; password: string }
 export async function signInWithGoogleFlow() {
   try {
     await firebaseReadyPromise;
-    const anonymousUser = auth.currentUser?.isAnonymous ? auth.currentUser : null;
+    const anonymousUser =
+      auth.currentUser?.isAnonymous && !isVisitorSessionPausedFor(auth.currentUser)
+        ? auth.currentUser
+        : null;
 
     if (typeof window !== "undefined" && shouldPreferGoogleRedirect()) {
       window.sessionStorage.setItem(GOOGLE_REDIRECT_PENDING_KEY, "1");
@@ -405,6 +411,7 @@ export async function signInWithGoogleFlow() {
     const result = anonymousUser
       ? await linkWithPopup(anonymousUser, googleProvider)
       : await signInWithPopup(auth, googleProvider);
+    resumeVisitorSession();
     await syncUserRecordSafely(result.user, "google popup sign-in");
     return result.user;
   } catch (error) {

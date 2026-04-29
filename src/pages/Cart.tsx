@@ -13,6 +13,7 @@ import {
   type PaymentMethod,
 } from "../lib/order-utils";
 import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
+import { isVisitorSessionPausedFor, resumeVisitorSession } from "../lib/visitor-session";
 import { SiteIcon } from "../components/SiteIcon";
 
 function closeReservedWindow(target: Window | null | undefined) {
@@ -136,10 +137,14 @@ export function Cart() {
     });
 
     try {
-      const shouldUseAnonymous = forceAnonymous || !currentUser || Boolean(currentUser.isAnonymous);
+      const hasActiveAnonymousSession = Boolean(
+        currentUser?.isAnonymous && !isVisitorSessionPausedFor(currentUser),
+      );
+      const shouldUseAnonymous = forceAnonymous || !currentUser || hasActiveAnonymousSession;
       const shouldOpenWhatsApp = paymentMethod === "cash" || shouldUseAnonymous;
 
       if (shouldUseAnonymous) {
+        resumeVisitorSession();
         await startAnonymousSession();
       }
       await createOrder(orderPayload);
@@ -197,7 +202,7 @@ export function Cart() {
       return;
     }
 
-    if (!currentUser) {
+    if (!currentUser || isVisitorSessionPausedFor(currentUser)) {
       setShowAnonymousPrompt(true);
       return;
     }
