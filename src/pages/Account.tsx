@@ -13,6 +13,7 @@ import {
   signInWithEmail,
   signInWithGoogleFlow,
   signOutUser,
+  startAnonymousSession,
 } from "../lib/firebase";
 import {
   CART_LOGIN_RETURN_KEY,
@@ -133,6 +134,25 @@ export function Account() {
     }
   }
 
+  async function handleAnonymousLogin() {
+    setLoading(true);
+    setFeedback("");
+    try {
+      await startAnonymousSession();
+      setFeedback("تم فتح وضع الزائر بنجاح.");
+      setFeedbackType("success");
+    } catch (error) {
+      console.error(error);
+      setFeedback(
+        (error as Error & { userMessage?: string }).userMessage ||
+          "تعذر فتح وضع الزائر الآن.",
+      );
+      setFeedbackType("error");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleResetPassword() {
     if (!email.trim()) {
       setFeedback("أدخل بريدك الإلكتروني أولًا ثم أعد المحاولة.");
@@ -209,10 +229,10 @@ export function Account() {
   }
 
   const accountDisplayName = currentUser?.isAnonymous
-    ? "مستخدم بدون حساب"
+    ? "الزائر"
     : currentUser?.displayName || "مستخدم";
-  const accountEmailText = currentUser?.isAnonymous ? "جلسة Anonymous" : currentUser?.email || "";
-  const ordersSourceText = currentUser?.isAnonymous ? "Anonymous" : "الحساب";
+  const accountEmailText = currentUser?.isAnonymous ? "جلسة الزائر" : currentUser?.email || "";
+  const ordersSourceText = currentUser?.isAnonymous ? "الزائر" : "الحساب";
 
   if (currentUser) {
     return (
@@ -438,6 +458,18 @@ export function Account() {
                 الدخول عبر Google
               </Button>
 
+              <Button
+                data-testid="account-anonymous"
+                disabled={loading}
+                onClick={() => void handleAnonymousLogin()}
+                type="button"
+                variant="outline"
+                className="w-full h-12 text-lg rounded-xl font-sans"
+              >
+                <User className="mr-2 h-5 w-5 ml-2" />
+                الزائر
+              </Button>
+
               {isLogin && (
                 <Button type="button" variant="ghost" onClick={() => void handleResetPassword()} className="w-full text-muted-foreground hover:text-primary hover:drop-shadow-[0_0_5px_rgba(255,0,122,0.5)] font-sans">
                   نسيت كلمة المرور؟
@@ -450,9 +482,9 @@ export function Account() {
         <div className="perf-panel bg-card/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-bold mb-2">طلبات بدون حساب</h2>
+              <h2 className="text-xl font-bold mb-2">طلبات الزائر</h2>
               <p data-testid="orders-source" className="text-muted-foreground text-sm">
-                Firebase Anonymous
+                الزائر
               </p>
             </div>
             <div data-testid="orders-count" className="text-lg font-black text-primary">
@@ -465,7 +497,7 @@ export function Account() {
               <Package className="h-16 w-16 text-muted-foreground mb-4 opacity-50" />
               <h2 className="text-xl font-bold mb-2">تتبع طلباتك</h2>
               <p className="text-muted-foreground">
-                قم بتسجيل الدخول لمعرفة حالة طلباتك، أو أكمل الطلب بدون حساب وسيتم حفظه عبر Firebase.
+                قم بتسجيل الدخول لمعرفة حالة طلباتك، أو أكمل الطلب كزائر وسيتم حفظه عبر Firebase.
               </p>
             </div>
           ) : (

@@ -261,6 +261,10 @@ async function syncUserRecordSafely(user: User | null, context: string) {
   }
 }
 
+async function ensureUserAuthToken(user: User) {
+  await withTimeout(user.getIdToken(), AUTH_TOKEN_TIMEOUT_MS, "Firebase auth token timed out");
+}
+
 function userOrdersCollection(userId: string) {
   return collection(db, USER_COLLECTION_NAME, userId, "orders");
 }
@@ -297,11 +301,13 @@ async function createOrReuseAnonymousSession() {
   await firebaseReadyPromise;
 
   if (auth.currentUser) {
+    await ensureUserAuthToken(auth.currentUser);
     await syncUserRecordSafely(auth.currentUser, "anonymous session reuse");
     return auth.currentUser;
   }
 
   const credential = await signInAnonymously(auth);
+  await ensureUserAuthToken(credential.user);
   await syncUserRecordSafely(credential.user, "anonymous sign-in");
   return credential.user;
 }
@@ -418,12 +424,10 @@ export async function deleteOrderForCurrentUser(orderId: string) {
 }
 
 export async function createOrder(payload: OrderPayload) {
-  const user = auth.currentUser;
-  if (!user) {
-    throw withUserMessage(new Error("Not authenticated"), "يجب تسجيل الدخول أولًا لحفظ الطلب داخل الحساب.");
-  }
-
   try {
+    await firebaseReadyPromise;
+    const user = auth.currentUser || await startAnonymousSession();
+    await ensureUserAuthToken(user);
     await syncUserRecordSafely(user, "order creation");
     await addDoc(userOrdersCollection(user.uid), {
       ...payload,

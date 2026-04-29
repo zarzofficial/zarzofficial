@@ -160,7 +160,7 @@ export function Cart() {
 
       setSuccess(
         shouldUseAnonymous
-          ? "تم حفظ طلبك داخل جلسة آمنة بدون حساب."
+          ? "تم حفظ طلبك داخل جلسة الزائر بنجاح."
           : "تم حفظ طلبك داخل حسابك بنجاح.",
       );
 
@@ -466,7 +466,7 @@ export function Cart() {
               <SiteIcon name="person_search" className="text-4xl text-primary" />
             </div>
             <h2 className="text-2xl md:text-3xl font-black font-headline text-on-surface mb-3">هل أنت مسجل؟</h2>
-            <p className="text-outline mb-10 text-sm md:text-base leading-relaxed">يمكنك تسجيل الدخول لحفظ طلبك في حسابك، أو المتابعة فوراً بدون حساب مع حفظ الطلب في Firebase.</p>
+            <p className="text-outline mb-10 text-sm md:text-base leading-relaxed">يمكنك تسجيل الدخول لحفظ طلبك في حسابك، أو المتابعة فوراً كزائر مع حفظ الطلب في Firebase.</p>
 
             <div className="flex flex-col gap-4">
               <button data-testid="checkout-login-and-continue" onClick={handleLoginRedirect} className="w-full py-4 primary-gradient rounded-full text-on-primary font-bold hover:shadow-[0_10px_30px_rgba(125,60,255,0.4)] transition-all flex items-center justify-center gap-2" type="button">
@@ -482,7 +482,7 @@ export function Cart() {
                 className="w-full py-4 bg-surface-container-highest rounded-full text-on-surface font-bold hover:bg-white/5 transition-all text-center border border-outline-variant/10"
                 type="button"
               >
-                المتابعة بدون حساب
+                المتابعة كزائر
               </button>
             </div>
           </div>

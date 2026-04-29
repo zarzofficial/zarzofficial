@@ -83,7 +83,7 @@ service cloud.firestore {
 
       match /orders/{orderId} {
         allow read: if isAdmin() || isOwnUser(userId);
-        allow create: if isOwnUser(userId) && request.resource.data.userId == userId;
+        allow create: if isOwnUser(userId);
         allow update: if isAdmin();
         allow delete: if isAdmin() || isOwnUser(userId);
       }
