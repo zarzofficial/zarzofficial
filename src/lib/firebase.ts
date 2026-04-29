@@ -24,6 +24,7 @@ import {
   getDoc,
   getDocs,
   getFirestore,
+  initializeFirestore,
   orderBy,
   query,
   setDoc,
@@ -34,7 +35,9 @@ import type { OrderPayload, OrderRecord } from "./order-utils";
 const DEFAULT_AUTH_DOMAIN = "zarzofficial-66638.firebaseapp.com";
 const CUSTOM_AUTH_DOMAIN = "auth.zarzofficial.com";
 const GOOGLE_REDIRECT_PENDING_KEY = "zarz_google_redirect_pending";
+const GOOGLE_REDIRECT_ERROR_KEY = "zarz_google_redirect_error";
 const USER_COLLECTION_NAME = "users";
+const AUTH_TOKEN_TIMEOUT_MS = 8000;
 
 function resolveAuthDomain() {
   if (typeof window === "undefined") return CUSTOM_AUTH_DOMAIN;
@@ -44,7 +47,11 @@ function resolveAuthDomain() {
     return DEFAULT_AUTH_DOMAIN;
   }
 
-  return CUSTOM_AUTH_DOMAIN;
+  if (runtimeHost === "zarzofficial.com" || runtimeHost === "www.zarzofficial.com") {
+    return CUSTOM_AUTH_DOMAIN;
+  }
+
+  return DEFAULT_AUTH_DOMAIN;
 }
 
 const firebaseConfig = {
@@ -60,9 +67,22 @@ const firebaseConfig = {
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+function resolveFirestoreInstance() {
+  try {
+    return initializeFirestore(app, {
+      experimentalForceLongPolling: true,
+      ignoreUndefinedProperties: true,
+    });
+  } catch {
+    return getFirestore(app);
+  }
+}
+
+export const db = resolveFirestoreInstance();
 export const googleProvider = new GoogleAuthProvider();
 
+googleProvider.addScope("email");
+googleProvider.addScope("profile");
 googleProvider.setCustomParameters({ prompt: "select_account" });
 
 let initialized = false;
@@ -86,6 +106,17 @@ function withUserMessage(error: unknown, message: string) {
   const nextError = error instanceof Error ? error : new Error(message);
   (nextError as Error & { userMessage?: string }).userMessage = message;
   return nextError as Error & { userMessage?: string };
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string) {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(message)), timeoutMs);
+  });
+
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    if (timeoutId) clearTimeout(timeoutId);
+  });
 }
 
 function getFriendlyAuthError(error: unknown, action: "signin" | "register" | "google" | "reset") {
@@ -162,14 +193,28 @@ async function initializeFirebase() {
   await setPersistence(auth, browserLocalPersistence);
 
   if (typeof window !== "undefined") {
+    let hasPendingGoogleRedirect = false;
     try {
-      const redirectResult = await getRedirectResult(auth);
+      hasPendingGoogleRedirect = window.sessionStorage.getItem(GOOGLE_REDIRECT_PENDING_KEY) === "1";
+    } catch {
+      hasPendingGoogleRedirect = false;
+    }
+    if (!hasPendingGoogleRedirect) return;
+
+    try {
+      const redirectResult = await withTimeout(
+        getRedirectResult(auth),
+        AUTH_TOKEN_TIMEOUT_MS,
+        "Google redirect result timed out",
+      );
       window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING_KEY);
+      window.sessionStorage.removeItem(GOOGLE_REDIRECT_ERROR_KEY);
       if (redirectResult?.user) {
-        await syncUserRecord(redirectResult.user);
+        await syncUserRecordSafely(redirectResult.user, "google redirect sign-in");
       }
     } catch (error) {
       window.sessionStorage.removeItem(GOOGLE_REDIRECT_PENDING_KEY);
+      window.sessionStorage.setItem(GOOGLE_REDIRECT_ERROR_KEY, getFriendlyAuthError(error, "google"));
       console.error("Google redirect result failed", error);
     }
   }
@@ -192,11 +237,24 @@ async function syncUserRecord(user: User | null) {
       email: user.email || currentData.email || "",
       phone: currentData.phone || "",
       photoURL: user.photoURL || currentData.photoURL || "",
+      emailVerified: Boolean(user.emailVerified || currentData.emailVerified),
       role: currentData.role || null,
       createdAt: currentData.createdAt || Timestamp.now(),
     },
     { merge: true },
   );
+}
+
+async function syncUserRecordSafely(user: User | null, context: string) {
+  try {
+    await syncUserRecord(user);
+  } catch (error) {
+    console.warn(`User profile sync failed during ${context}`, error);
+  }
+}
+
+function userOrdersCollection(userId: string) {
+  return collection(db, USER_COLLECTION_NAME, userId, "orders");
 }
 
 function mapOrderDoc(entry: { id: string; data: () => Record<string, unknown> }) {
@@ -234,7 +292,7 @@ export async function registerWithEmail(input: { name?: string; email: string; p
     if (input.name?.trim()) {
       await updateProfile(credential.user, { displayName: input.name.trim() });
     }
-    await syncUserRecord(auth.currentUser);
+    await syncUserRecordSafely(auth.currentUser, "email registration");
     return credential.user;
   } catch (error) {
     throw withUserMessage(error, getFriendlyAuthError(error, "register"));
@@ -245,7 +303,7 @@ export async function signInWithEmail(input: { email: string; password: string }
   try {
     await firebaseReadyPromise;
     const credential = await signInWithEmailAndPassword(auth, input.email, input.password);
-    await syncUserRecord(credential.user);
+    await syncUserRecordSafely(credential.user, "email sign-in");
     return credential.user;
   } catch (error) {
     throw withUserMessage(error, getFriendlyAuthError(error, "signin"));
@@ -258,16 +316,25 @@ export async function signInWithGoogleFlow() {
 
     if (typeof window !== "undefined" && shouldPreferGoogleRedirect()) {
       window.sessionStorage.setItem(GOOGLE_REDIRECT_PENDING_KEY, "1");
+      window.sessionStorage.removeItem(GOOGLE_REDIRECT_ERROR_KEY);
       await signInWithRedirect(auth, googleProvider);
       return null;
     }
 
     const result = await signInWithPopup(auth, googleProvider);
-    await syncUserRecord(result.user);
+    await syncUserRecordSafely(result.user, "google popup sign-in");
     return result.user;
   } catch (error) {
     throw withUserMessage(error, getFriendlyAuthError(error, "google"));
   }
+}
+
+export function consumeGoogleRedirectError() {
+  if (typeof window === "undefined") return "";
+
+  const message = window.sessionStorage.getItem(GOOGLE_REDIRECT_ERROR_KEY) || "";
+  window.sessionStorage.removeItem(GOOGLE_REDIRECT_ERROR_KEY);
+  return message;
 }
 
 export async function signOutUser() {
@@ -288,11 +355,11 @@ export async function loadOrdersForCurrentUser() {
   if (!user) return [] as OrderRecord[];
 
   try {
-    const baseQuery = query(collection(db, "orders"), where("userId", "==", user.uid), orderBy("date", "desc"));
+    const baseQuery = query(userOrdersCollection(user.uid), where("userId", "==", user.uid), orderBy("date", "desc"));
     const snapshot = await getDocs(baseQuery);
     return snapshot.docs.map((entry) => mapOrderDoc(entry));
   } catch (error) {
-    const fallbackQuery = query(collection(db, "orders"), where("userId", "==", user.uid));
+    const fallbackQuery = query(userOrdersCollection(user.uid), where("userId", "==", user.uid));
     const snapshot = await getDocs(fallbackQuery);
     return snapshot.docs
       .map((entry) => mapOrderDoc(entry))
@@ -306,7 +373,7 @@ export async function deleteOrderForCurrentUser(orderId: string) {
     throw withUserMessage(new Error("Not authenticated"), "يجب تسجيل الدخول أولًا لحذف الطلب.");
   }
 
-  await deleteDoc(doc(db, "orders", orderId));
+  await deleteDoc(doc(db, USER_COLLECTION_NAME, user.uid, "orders", orderId));
 }
 
 export async function createOrder(payload: OrderPayload) {
@@ -316,12 +383,13 @@ export async function createOrder(payload: OrderPayload) {
   }
 
   try {
-    await syncUserRecord(user);
-    await addDoc(collection(db, "orders"), {
+    await syncUserRecordSafely(user, "order creation");
+    await addDoc(userOrdersCollection(user.uid), {
       ...payload,
       userId: user.uid,
       userEmail: user.email || "",
       date: Timestamp.now(),
+      dateMs: Date.now(),
     });
   } catch (error) {
     throw withUserMessage(error, getFriendlyOrderError(error));

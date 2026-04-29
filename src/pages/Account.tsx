@@ -5,6 +5,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "../components/ui/button";
 import { useAuth } from "../lib/AuthContext";
 import {
+  consumeGoogleRedirectError,
   deleteOrderForCurrentUser,
   loadOrdersForCurrentUser,
   registerWithEmail,
@@ -62,6 +63,14 @@ export function Account() {
     if (authLoading) return;
     void fetchOrders();
   }, [authLoading, currentUser]);
+
+  useEffect(() => {
+    if (authLoading) return;
+    const redirectError = consumeGoogleRedirectError();
+    if (!redirectError) return;
+    setFeedback(redirectError);
+    setFeedbackType("error");
+  }, [authLoading]);
 
   useEffect(() => {
     if (authLoading) return;
