@@ -21,30 +21,7 @@ import {
   getOrderStatusText,
   type OrderRecord,
 } from "../lib/order-utils";
-
-const VISITOR_VIEW_HIDDEN_KEY = "zarz_visitor_view_hidden";
-
-function readVisitorViewHidden() {
-  if (typeof window === "undefined") return false;
-  try {
-    return window.localStorage.getItem(VISITOR_VIEW_HIDDEN_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function writeVisitorViewHidden(value: boolean) {
-  if (typeof window === "undefined") return;
-  try {
-    if (value) {
-      window.localStorage.setItem(VISITOR_VIEW_HIDDEN_KEY, "1");
-    } else {
-      window.localStorage.removeItem(VISITOR_VIEW_HIDDEN_KEY);
-    }
-  } catch {
-    // Ignore storage failures.
-  }
-}
+import { readVisitorViewHidden, writeVisitorViewHidden } from "../lib/visitor-session";
 
 export function Account() {
   const { currentUser, loading: authLoading } = useAuth();
@@ -97,10 +74,11 @@ export function Account() {
   useEffect(() => {
     if (authLoading) return;
     if (!currentUser || typeof window === "undefined") return;
+    if (currentUser.isAnonymous && visitorViewHidden) return;
     if (window.sessionStorage.getItem(CART_LOGIN_RETURN_KEY) !== "1") return;
     window.sessionStorage.removeItem(CART_LOGIN_RETURN_KEY);
     navigate("/cart");
-  }, [authLoading, currentUser, navigate]);
+  }, [authLoading, currentUser, navigate, visitorViewHidden]);
 
   const orderVirtualizer = useVirtualizer({
     count: orders.length,
@@ -126,6 +104,8 @@ export function Account() {
         await registerWithEmail({ name, email, password });
         setFeedback("تم إنشاء الحساب وتسجيل الدخول.");
       }
+      writeVisitorViewHidden(false);
+      setVisitorViewHidden(false);
       setFeedbackType("success");
     } catch (error) {
       console.error(error);
@@ -145,6 +125,8 @@ export function Account() {
     setFeedback("");
     try {
       await signInWithGoogleFlow();
+      writeVisitorViewHidden(false);
+      setVisitorViewHidden(false);
       setFeedback("تم تسجيل الدخول عبر Google.");
       setFeedbackType("success");
     } catch (error) {
