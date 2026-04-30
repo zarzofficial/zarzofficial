@@ -2,6 +2,7 @@ import type { CartItem } from "./CartContext";
 
 export const CART_CHECKOUT_DRAFT_KEY = "zarz_cart_checkout_draft";
 export const CART_LOGIN_RETURN_KEY = "zarz_cart_login_return";
+export const ORDER_CONFIRMATION_STORAGE_KEY = "zarz_order_confirmation";
 
 export type PaymentMethod = "bankak" | "cash";
 
@@ -36,6 +37,28 @@ export interface OrderRecord {
   method: string;
   items: Array<{ title: string; qty: number }>;
   remote: boolean;
+}
+
+export interface OrderConfirmationItem {
+  title: string;
+  qty: number;
+  unitPrice: number;
+  totalPrice: number;
+  details: string[];
+}
+
+export interface OrderConfirmationData {
+  orderNumber: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  paymentMethodLabel: string;
+  paymentReference?: string;
+  totalText: string;
+  items: OrderConfirmationItem[];
+  detailsText: string;
+  whatsappLink: string;
+  createdAt: string;
 }
 
 function normalizeDetails(item: CartItem) {

@@ -11,6 +11,7 @@ import { Store } from "./pages/Store";
 const Contact = lazy(() => import("./pages/Contact").then((module) => ({ default: module.Contact })));
 const Terms = lazy(() => import("./pages/Terms").then((module) => ({ default: module.Terms })));
 const CartRoute = lazy(() => import("./routes/CartRoute"));
+const OrderConfirmationRoute = lazy(() => import("./routes/OrderConfirmationRoute"));
 const AccountRoute = lazy(() => import("./routes/AccountRoute"));
 
 function setDocumentTitle(pageName: string) {
@@ -40,6 +41,8 @@ function DynamicTitle() {
 
     if (path === "/cart" || path === "/products/cart") {
       pageName = "سلة المشتريات";
+    } else if (path === "/order-confirmation") {
+      pageName = "تأكيد الطلب";
     } else if (path === "/checkout" || path === "/products/checkout") {
       pageName = "إتمام الطلب";
     } else if (path === "/products/catalog" || path.startsWith("/products/catalog/")) {
@@ -140,6 +143,7 @@ export default function App() {
             <Route path="/products/catalog/:category" element={<CatalogRoute />} />
             <Route path="/products/:id" element={<ProductDetails />} />
             <Route path="/cart" element={<CartRoute />} />
+            <Route path="/order-confirmation" element={<OrderConfirmationRoute />} />
             <Route path="/products/cart" element={<Navigate to="/cart" replace />} />
             <Route path="/checkout" element={<Navigate to="/cart" replace />} />
             <Route path="/products/checkout" element={<Navigate to="/cart" replace />} />

@@ -72,6 +72,7 @@ const catalogRouteDirectories = [
 const routeDirectories = [
   "account",
   "cart",
+  "order-confirmation",
   "checkout",
   "contact",
   "terms",
@@ -95,6 +96,7 @@ const routeTitles = new Map([
   ["/", defaultTitle],
   ["account", `${titlePrefix}حسابي`],
   ["cart", `${titlePrefix}سلة المشتريات`],
+  ["order-confirmation", `${titlePrefix}تأكيد الطلب`],
   ["checkout", `${titlePrefix}إتمام الطلب`],
   ["contact", `${titlePrefix}تواصل معنا`],
   ["terms", `${titlePrefix}الشروط والأحكام`],
@@ -121,6 +123,10 @@ const routeDescriptions = new Map([
   [
     "cart",
     "راجع سلة مشترياتك في زارز، أكمل بيانات الطلب، واختر طريقة الدفع المناسبة لإتمام طلبك الرقمي بسرعة.",
+  ],
+  [
+    "order-confirmation",
+    "راجع تفاصيل طلبك في زارز بعد الحفظ، وافتح رسالة واتساب الجاهزة عند الحاجة لمتابعة الطلب مع فريق الدعم.",
   ],
   [
     "checkout",

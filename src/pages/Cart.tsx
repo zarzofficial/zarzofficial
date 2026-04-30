@@ -6,36 +6,17 @@ import { createOrder, startAnonymousSession } from "../lib/firebase";
 import {
   CART_CHECKOUT_DRAFT_KEY,
   CART_LOGIN_RETURN_KEY,
+  ORDER_CONFIRMATION_STORAGE_KEY,
   buildCartDetailsLines,
   buildOrderPayload,
   buildOrderWhatsAppLink,
   generateOrderNumber,
+  type OrderConfirmationData,
   type PaymentMethod,
 } from "../lib/order-utils";
 import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
 import { isVisitorSessionPausedFor, resumeVisitorSession } from "../lib/visitor-session";
 import { SiteIcon } from "../components/SiteIcon";
-
-function closeReservedWindow(target: Window | null | undefined) {
-  if (!target || target.closed) return;
-  target.close();
-}
-
-function openReservedWindow() {
-  if (typeof window === "undefined") return null;
-  return window.open("", "_blank");
-}
-
-function redirectReservedWindow(target: Window | null | undefined, nextUrl: string) {
-  if (typeof window === "undefined") return;
-
-  if (target && !target.closed) {
-    target.location.replace(nextUrl);
-    return;
-  }
-
-  window.open(nextUrl, "_blank", "noopener,noreferrer");
-}
 
 function renderMeta(item: ReturnType<typeof useCart>["items"][number]) {
   const parts = [
@@ -56,7 +37,6 @@ export function Cart() {
   const { items, removeItem, updateQty, total, clearCart } = useCart();
   const { currentUser, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [success, setSuccess] = useState("");
   const [showAnonymousPrompt, setShowAnonymousPrompt] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("bankak");
   const [name, setName] = useState("");
@@ -114,13 +94,7 @@ export function Cart() {
     phone.trim() !== "" &&
     (paymentMethod === "cash" || /^\d{4}$/.test(receiptNumber));
 
-  async function finalizeOrder({
-    forceAnonymous = false,
-    reservedWindow = null,
-  }: {
-    forceAnonymous?: boolean;
-    reservedWindow?: Window | null;
-  } = {}) {
+  async function finalizeOrder({ forceAnonymous = false }: { forceAnonymous?: boolean } = {}) {
     if (!items.length || !isFormValid) return;
 
     setLoading(true);
@@ -141,7 +115,6 @@ export function Cart() {
         currentUser?.isAnonymous && !isVisitorSessionPausedFor(currentUser),
       );
       const shouldUseAnonymous = forceAnonymous || !currentUser || hasActiveAnonymousSession;
-      const shouldOpenWhatsApp = paymentMethod === "cash" || shouldUseAnonymous;
 
       if (shouldUseAnonymous) {
         resumeVisitorSession();
@@ -160,23 +133,37 @@ export function Cart() {
         totalText: `${finalTotal.toFixed(2)} ج.س`,
       });
 
+      const confirmationData: OrderConfirmationData = {
+        orderNumber: orderPayload.orderNumber,
+        customerName: name.trim(),
+        customerPhone: phone.trim(),
+        customerEmail: email.trim() || undefined,
+        paymentMethodLabel: orderPayload.paymentMethodLabel,
+        paymentReference: receiptNumber.trim() || undefined,
+        totalText: `${finalTotal.toFixed(2)} ج.س`,
+        items: items.map((item) => ({
+          title: item.title,
+          qty: item.qty,
+          unitPrice: item.unitPrice,
+          totalPrice: item.totalPrice,
+          details: renderMeta(item),
+        })),
+        detailsText,
+        whatsappLink,
+        createdAt: new Date().toISOString(),
+      };
+
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(
+          ORDER_CONFIRMATION_STORAGE_KEY,
+          JSON.stringify(confirmationData),
+        );
+      }
+
       clearCart();
       window.localStorage.removeItem(CART_CHECKOUT_DRAFT_KEY);
-
-      setSuccess(
-        shouldUseAnonymous
-          ? "تم حفظ طلبك داخل جلسة الزائر بنجاح."
-          : "تم حفظ طلبك داخل حسابك بنجاح.",
-      );
-
-      window.setTimeout(() => {
-        if (shouldOpenWhatsApp) {
-          redirectReservedWindow(reservedWindow, whatsappLink);
-        }
-        navigate("/account");
-      }, 1400);
+      navigate("/order-confirmation", { replace: true, state: confirmationData });
     } catch (submissionError) {
-      closeReservedWindow(reservedWindow);
       console.error(submissionError);
       setError(
         (submissionError as Error & { userMessage?: string }).userMessage ||
@@ -207,8 +194,7 @@ export function Cart() {
       return;
     }
 
-    const reservedWindow = paymentMethod === "cash" ? openReservedWindow() : null;
-    void finalizeOrder({ forceAnonymous: false, reservedWindow });
+    void finalizeOrder({ forceAnonymous: false });
   }
 
   function handleLoginRedirect() {
@@ -437,9 +423,9 @@ export function Cart() {
                 </div>
               </div>
 
-              <button data-testid="checkout-submit" onClick={handleCheckoutClick} disabled={items.length === 0 || !isFormValid || loading || authLoading} className={`w-full mt-8 py-5 rounded-full text-on-primary font-bold text-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed ${paymentMethod === "bankak" ? "primary-gradient shadow-[0_10px_30px_rgba(125,60,255,0.4)]" : "bg-[#25D366] shadow-[0_10px_30px_rgba(37,211,102,0.4)]"}`}>
-                <span>{loading ? "جاري إرسال الطلب..." : paymentMethod === "bankak" ? "تأكيد وشراء" : "التأكيد عبر واتساب"}</span>
-                <SiteIcon name={paymentMethod === "bankak" ? "arrow_back" : "forum"} />
+              <button data-testid="checkout-submit" onClick={handleCheckoutClick} disabled={items.length === 0 || !isFormValid || loading || authLoading} className="w-full mt-8 py-5 rounded-full text-on-primary font-bold text-lg active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed primary-gradient shadow-[0_10px_30px_rgba(125,60,255,0.4)]">
+                <span>{loading ? "جاري حفظ الطلب..." : "تأكيد الطلب"}</span>
+                <SiteIcon name="arrow_back" />
               </button>
 
               <div className="mt-6 flex items-center justify-center gap-2 text-xs text-outline opacity-60">
@@ -480,10 +466,7 @@ export function Cart() {
               </button>
               <button
                 data-testid="checkout-continue-anonymous"
-                onClick={() => {
-                  const reservedWindow = openReservedWindow();
-                  void finalizeOrder({ forceAnonymous: true, reservedWindow });
-                }}
+                onClick={() => void finalizeOrder({ forceAnonymous: true })}
                 className="w-full py-4 bg-surface-container-highest rounded-full text-on-surface font-bold hover:bg-white/5 transition-all text-center border border-outline-variant/10"
                 type="button"
               >
@@ -494,20 +477,6 @@ export function Cart() {
         </div>
       )}
 
-      {success && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm">
-          <div className="perf-modal-card bg-surface-container rounded-[40px] p-12 max-w-md w-full text-center border border-primary/20 shadow-[0_32px_80px_rgba(86,0,202,0.4)]">
-            <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-8">
-              <SiteIcon name="check_circle" className="text-5xl text-primary" />
-            </div>
-            <h2 className="text-3xl font-black font-headline text-on-surface mb-4" data-testid="checkout-success">تم الطلب بنجاح!</h2>
-            <p className="text-outline mb-10 leading-relaxed">{success}</p>
-            <Link to="/products" className="block w-full py-4 bg-surface-container-highest rounded-full text-primary font-bold hover:bg-white/5 transition-all text-center">
-              العودة للتسوق
-            </Link>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

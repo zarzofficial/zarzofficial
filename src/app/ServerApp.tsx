@@ -4,6 +4,7 @@ import { AppFrame } from "./AppFrame";
 import { Home } from "../pages/Home";
 import { Store } from "../pages/Store";
 import CartRoute from "../routes/CartRoute";
+import OrderConfirmationRoute from "../routes/OrderConfirmationRoute";
 import AccountRoute from "../routes/AccountRoute";
 import { Contact } from "../pages/Contact";
 import { Terms } from "../pages/Terms";
@@ -61,6 +62,7 @@ export function ServerApp({ location }: { location: string }) {
             <Route path="/products/catalog/:category" element={<CatalogRoute />} />
             <Route path="/products/:id" element={<ProductDetails />} />
             <Route path="/cart" element={<CartRoute />} />
+            <Route path="/order-confirmation" element={<OrderConfirmationRoute />} />
             <Route path="/products/cart" element={<Navigate to="/cart" replace />} />
             <Route path="/checkout" element={<Navigate to="/cart" replace />} />
             <Route path="/products/checkout" element={<Navigate to="/cart" replace />} />
