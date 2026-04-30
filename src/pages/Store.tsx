@@ -17,6 +17,7 @@ import {
 const categories = storeCategories;
 const mobileOverviewBatchSize = 2;
 const catalogVirtualizationThreshold = 60;
+const storeHeaderImage = getResponsiveProductImage("/assets/store-header.avif");
 
 
 type VirtualStoreItem =
@@ -681,10 +682,13 @@ export function Store() {
               <img
                 alt="digital abstract"
                 className="h-full w-full object-cover mix-blend-screen"
-                src="/store-header.png"
+                src={storeHeaderImage.src}
+                srcSet={storeHeaderImage.srcSet}
+                sizes="(min-width: 1024px) min(50vw, 768px), 1px"
                 loading="lazy"
                 decoding="async"
                 fetchPriority="low"
+                onError={(event) => handleResponsiveImageError(event, storeHeaderImage.src)}
                 width={1024}
                 height={1024}
               />

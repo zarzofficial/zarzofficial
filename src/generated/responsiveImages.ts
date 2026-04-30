@@ -7,5 +7,6 @@ export const responsiveImageWidths: Record<string, readonly number[]> = {
   "/assets/honeytons-logo.avif": [160, 180],
   "/assets/instagram-followers-v4.avif": [160, 320, 480, 560, 640, 960, 1024],
   "/assets/pubg-uc-v4.avif": [160, 320, 480, 560, 640, 960, 1111],
+  "/assets/store-header.avif": [160, 320, 480, 560, 640, 960, 1024],
   "/assets/tiktok-followers-v4.avif": [160, 320, 480, 560, 640, 960, 1024],
 };

@@ -2,12 +2,14 @@ import { useMemo, useState } from "react";
 import { TrustedCompanies } from "../components/TrustedCompanies";
 import { SiteIcon, type SiteIconName } from "../components/SiteIcon";
 import { formatSudanesePrice } from "../lib/pricing";
+import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
 
 const WHATSAPP_NUMBER = "201500007300";
 const PAGE_PRICE = 225000;
 const DOMAIN_PRICE = 530000;
 const PAYMENT_GATEWAY_PRICE = 620000;
 const BRAND_PRICE = 125000;
+const storeHeaderImage = getResponsiveProductImage("/assets/store-header.avif");
 
 type InfoCard = {
   icon: SiteIconName;
@@ -202,11 +204,15 @@ export function WebDevelopment() {
       <section className="relative overflow-hidden px-6 pb-20 pt-32 md:px-12 md:pb-28 md:pt-36">
         <div className="absolute inset-0 z-0">
           <img
-            src="/store-header.png"
+            src={storeHeaderImage.src}
+            srcSet={storeHeaderImage.srcSet}
+            sizes="100vw"
             alt=""
             className="h-full w-full object-cover opacity-35"
             loading="eager"
             decoding="async"
+            fetchPriority="high"
+            onError={(event) => handleResponsiveImageError(event, storeHeaderImage.src)}
             width={1024}
             height={1024}
           />
