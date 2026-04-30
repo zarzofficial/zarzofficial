@@ -7,7 +7,7 @@ service cloud.firestore {
 
     function isBootstrapAdmin() {
       return isSignedIn()
-        && request.auth.token.email != null
+        && request.auth.token.email is string
         && (request.auth.token.email == "medozxc7@gmail.com" || request.auth.token.email == "ezh37156@gmail.com");
     }
 
@@ -29,61 +29,40 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    function optionalStringWithin(value, maxLength) {
-      return value == null || (value is string && value.size() <= maxLength);
+    function maySetOwnRoleToEmpty(data) {
+      return !('role' in data) || data.role == null;
     }
 
-    function validUser(data, userId) {
-      return data.keys().hasAll([
-        'uid',
-        'name',
-        'email',
-        'phone',
-        'photoURL',
-        'emailVerified',
-        'createdAt',
-        'role'
-      ]) &&
-      data.keys().hasOnly([
-        'uid',
-        'name',
-        'email',
-        'phone',
-        'photoURL',
-        'emailVerified',
-        'createdAt',
-        'role'
-      ]) &&
-      data.uid is string &&
-      data.uid == userId &&
-      data.uid.size() > 0 &&
-      data.uid.size() <= 128 &&
-      optionalStringWithin(data.name, 100) &&
-      optionalStringWithin(data.email, 200) &&
-      optionalStringWithin(data.phone, 40) &&
-      optionalStringWithin(data.photoURL, 500) &&
-      data.emailVerified is bool &&
-      optionalStringWithin(data.role, 40) &&
-      data.createdAt is timestamp;
+    function keepsOwnRoleUnchanged(data) {
+      return !('role' in data)
+        || (('role' in resource.data) && data.role == resource.data.role)
+        || (!('role' in resource.data) && data.role == null);
+    }
+
+    function writesOwnUserRecord(userId) {
+      return isOwnUser(userId)
+        && request.resource.data.uid == userId;
+    }
+
+    function orderBelongsToUser(userId) {
+      return !('userId' in request.resource.data)
+        || request.resource.data.userId == userId;
     }
 
     match /users/{userId} {
       allow get: if isAdmin() || isOwnUser(userId);
       allow list: if isAdmin();
-      allow create: if validUser(request.resource.data, userId) &&
-        (isBootstrapAdmin() || (isOwnUser(userId) && request.resource.data.role == null));
-      allow update: if validUser(request.resource.data, userId) &&
-        (isAdmin() || (
-          isOwnUser(userId) &&
-          request.resource.data.uid == resource.data.uid &&
-          request.resource.data.createdAt == resource.data.createdAt &&
-          request.resource.data.role == resource.data.role
-        ));
+      allow create: if isBootstrapAdmin() || (writesOwnUserRecord(userId) && maySetOwnRoleToEmpty(request.resource.data));
+      allow update: if isAdmin() || (
+        writesOwnUserRecord(userId)
+        && resource.data.uid == userId
+        && keepsOwnRoleUnchanged(request.resource.data)
+      );
       allow delete: if isAdmin();
 
       match /orders/{orderId} {
         allow read: if isAdmin() || isOwnUser(userId);
-        allow create: if isOwnUser(userId);
+        allow create: if isOwnUser(userId) && orderBelongsToUser(userId);
         allow update: if isAdmin();
         allow delete: if isAdmin() || isOwnUser(userId);
       }
