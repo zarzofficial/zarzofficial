@@ -35,6 +35,7 @@ export function Footer() {
           <h4 className="text-white font-bold mb-2">روابط سريعة</h4>
           <Link to="/" className="text-[#958da2] hover:text-white transition-colors duration-200">الرئيسية</Link>
           <Link to="/products" className="text-[#958da2] hover:text-white transition-colors duration-200">المنتجات</Link>
+          <Link to="/web-development" className="text-[#958da2] hover:text-white transition-colors duration-200">تطوير المواقع</Link>
           <Link to="/contact" className="text-[#958da2] hover:text-white transition-colors duration-200">اتصل بنا</Link>
           <button onClick={handleFaqClick} className="text-[#958da2] hover:text-white transition-colors duration-200">الأسئلة الشائعة</button>
         </div>

@@ -507,56 +507,6 @@ function WhyChooseCard({ item }: { item: WhyChooseItem }) {
   );
 }
 
-const partnerLogos = [
-  {
-    id: "honeytons",
-    label: "Honeytons",
-    href: "https://honeytons.com",
-    logoSrc: "/assets/honeytons-logo.avif",
-  },
-  {
-    id: "wraith",
-    label: "WRAITH",
-  },
-] as const;
-
-const partnerLogoItems = partnerLogos.map((logo) => {
-  const content = "logoSrc" in logo ? (
-    <img
-      src={logo.logoSrc}
-      alt={logo.label}
-      className="h-8 w-auto max-w-[9rem] object-contain opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.28)] md:h-10 md:max-w-[12rem]"
-      loading="lazy"
-      decoding="async"
-      width={160}
-      height={48}
-    />
-  ) : (
-    <span className="font-black text-xl tracking-[0.25em] text-white opacity-80 font-headline drop-shadow-[0_0_15px_rgba(255,255,255,0.4)] md:text-3xl">
-      {logo.label}
-    </span>
-  );
-
-  return (
-    <div key={logo.id} className="group flex items-center gap-4 md:gap-8">
-      {"href" in logo ? (
-        <a
-          href={logo.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${logo.label} website`}
-          className="transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
-        >
-          {content}
-        </a>
-      ) : (
-        content
-      )}
-      <span className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary/40"></span>
-    </div>
-  );
-});
-
 const IsolatedSection = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="isolate-section">
@@ -632,7 +582,7 @@ export function Home() {
   return (
     <div ref={revealRef} className="home-mobile-page">
       {/* Hero Section */}
-      <Section data-snap-section="true" className="relative overflow-hidden px-4 pb-6 pt-14 sm:px-6 sm:py-8 md:px-12 md:py-8 lg:flex lg:min-h-screen lg:flex-col lg:justify-center lg:py-10">
+      <Section data-snap-section="true" className="relative overflow-hidden px-4 pb-6 pt-24 sm:px-6 sm:pb-8 sm:pt-20 md:px-12 md:pb-8 md:pt-20 lg:flex lg:min-h-screen lg:flex-col lg:justify-center lg:py-10">
         <div className="absolute inset-0 z-0">
           <img
             alt="ZARZ Hero Background"
@@ -838,63 +788,12 @@ export function Home() {
         </ScrollReveal>
       </Section>
 
-      {/* Unified Marquee & Stats Section */}
+      {/* Stats Section */}
       <Section data-snap-section="true" className="perf-mobile-section relative overflow-hidden px-6 py-16 md:py-20 md:px-12 lg:flex lg:flex-col lg:justify-center lg:min-h-[100vh]">
         <div className="absolute inset-0 z-0 pointer-events-none">
           <div className="absolute top-1/3 left-1/4 hidden h-[500px] w-[500px] rounded-full bg-primary/5 blur-[150px] lg:block" />
           <div className="absolute bottom-0 right-1/4 hidden h-[400px] w-[400px] rounded-full bg-tertiary/10 blur-[120px] lg:block" />
         </div>
-
-        <ScrollReveal enabled={isDesktopViewport} type="blurIn" delay={0.1} className="z-20 w-full max-w-6xl mx-auto mb-16 md:mb-24 relative">
-          <div className="relative z-10 mb-10 flex flex-col items-center justify-center text-center md:mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs md:text-sm font-bold mb-4 backdrop-blur-md shadow-[0_0_15px_rgba(208,188,255,0.1)]">
-              <span className="relative flex h-2 w-2 mb-0.5">
-                <span className="home-mobile-ping animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-              </span>
-              شركاء النجاح
-            </div>
-            <h2 className="max-w-none whitespace-nowrap text-[1.55rem] font-black font-headline leading-none tracking-[-0.03em] sm:text-3xl md:text-5xl md:tracking-tighter">
-              <span className="inline text-on-background">شركات ملهمة</span>
-              <span className="mr-2 inline text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#8b5cf6] drop-shadow-[0_0_20px_rgba(208,188,255,0.4)] md:mt-0">
-                وثقت بنا
-              </span>
-            </h2>
-          </div>
-          <div
-            className="pointer-events-none select-none px-1 py-2 lg:hidden"
-            dir="ltr"
-          >
-            <div className="flex items-center justify-center opacity-80 grayscale [mask-image:linear-gradient(to_right,transparent_0,black_8%,black_92%,transparent_100%)]">
-              <div className="flex items-center justify-center gap-6 whitespace-nowrap">
-                {partnerLogoItems}
-              </div>
-            </div>
-          </div>
-          <div
-            className="group relative hidden h-16 w-full overflow-hidden no-scrollbar bg-surface/0 opacity-70 grayscale transition-all duration-700 hover:grayscale-0 lg:block lg:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]"
-            dir="ltr"
-          >
-            <style>{`
-              @keyframes partner-marquee-sweep {
-                0% { transform: translate3d(100%, -50%, 0); }
-                100% { transform: translate3d(calc(-100vw - 100%), -50%, 0); }
-              }
-              @media (min-width: 1024px) {
-                .partner-marquee-track {
-                  animation: partner-marquee-sweep 24s linear infinite;
-                  will-change: transform;
-                }
-                .group:hover .partner-marquee-track {
-                  animation-play-state: paused;
-                }
-              }
-            `}</style>
-            <div className="partner-marquee-track absolute right-0 top-1/2 flex w-max items-center justify-start [&>div]:mx-6 lg:[&>div]:mx-10">
-              {partnerLogoItems}
-            </div>
-          </div>
-        </ScrollReveal>
 
         <ScrollReveal enabled={isDesktopViewport} type="scaleUp" className="max-w-7xl mx-auto relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 text-center">
 

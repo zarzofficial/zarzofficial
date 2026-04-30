@@ -660,8 +660,8 @@ export function Store() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24 pt-24 text-on-background">
-      <header className="mx-auto max-w-screen-2xl px-6 pb-16 pt-16 md:px-12">
+    <div className="min-h-screen bg-background pb-24 pt-20 text-on-background md:pt-24">
+      <header className="mx-auto max-w-screen-2xl px-6 pb-12 pt-10 md:px-12 md:pb-16 md:pt-16">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <div className="space-y-6">
             <h1 className="font-headline text-5xl font-black leading-tight tracking-tight text-primary md:text-6xl">

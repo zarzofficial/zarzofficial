@@ -7,6 +7,7 @@ import { getCatalogPath, getCatalogRouteCategory, getCategoryName } from "./lib/
 import { Home } from "./pages/Home";
 import { ProductDetails } from "./pages/ProductDetails";
 import { Store } from "./pages/Store";
+import { WebDevelopment } from "./pages/WebDevelopment";
 
 const Contact = lazy(() => import("./pages/Contact").then((module) => ({ default: module.Contact })));
 const Terms = lazy(() => import("./pages/Terms").then((module) => ({ default: module.Terms })));
@@ -61,6 +62,9 @@ function DynamicTitle() {
           break;
         case "/products":
           pageName = "المنتجات";
+          break;
+        case "/web-development":
+          pageName = "تطوير المواقع والمتاجر الإلكترونية";
           break;
         case "/account":
           pageName = "حسابي";
@@ -142,6 +146,7 @@ export default function App() {
             <Route path="/products/catalog" element={<Navigate to="/products" replace />} />
             <Route path="/products/catalog/:category" element={<CatalogRoute />} />
             <Route path="/products/:id" element={<ProductDetails />} />
+            <Route path="/web-development" element={<WebDevelopment />} />
             <Route path="/cart" element={<CartRoute />} />
             <Route path="/order-confirmation" element={<OrderConfirmationRoute />} />
             <Route path="/products/cart" element={<Navigate to="/cart" replace />} />

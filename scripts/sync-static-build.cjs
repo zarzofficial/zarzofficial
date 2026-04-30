@@ -76,6 +76,7 @@ const routeDirectories = [
   "checkout",
   "contact",
   "terms",
+  "web-development",
   "products",
   "products/catalog",
   ...catalogRouteDirectories,
@@ -100,6 +101,7 @@ const routeTitles = new Map([
   ["checkout", `${titlePrefix}إتمام الطلب`],
   ["contact", `${titlePrefix}تواصل معنا`],
   ["terms", `${titlePrefix}الشروط والأحكام`],
+  ["web-development", `${titlePrefix}تطوير المواقع والمتاجر الإلكترونية`],
   ["products", `${titlePrefix}المنتجات`],
   ["products/catalog", `${titlePrefix}المنتجات`],
   ["products/catalog/social", `${titlePrefix}المنتجات | التواصل الاجتماعي`],
@@ -139,6 +141,10 @@ const routeDescriptions = new Map([
   [
     "terms",
     "اطلع على الشروط والأحكام وسياسات الطلب والدفع والتسليم الخاصة بمتجر زارز للخدمات الرقمية.",
+  ],
+  [
+    "web-development",
+    "اطلب تصميم وتطوير موقع أو متجر إلكتروني عبر زارز مع حاسبة سعر مباشرة ورسالة واتساب جاهزة لتفاصيل المشروع.",
   ],
   [
     "products",

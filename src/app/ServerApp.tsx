@@ -9,6 +9,7 @@ import AccountRoute from "../routes/AccountRoute";
 import { Contact } from "../pages/Contact";
 import { Terms } from "../pages/Terms";
 import { ProductDetails } from "../pages/ProductDetails";
+import { WebDevelopment } from "../pages/WebDevelopment";
 import { getCatalogPath, getCatalogRouteCategory } from "../lib/storeCatalog";
 
 function normalizeServerLocation(location: string) {
@@ -61,6 +62,7 @@ export function ServerApp({ location }: { location: string }) {
             <Route path="/products/catalog" element={<Navigate to="/products" replace />} />
             <Route path="/products/catalog/:category" element={<CatalogRoute />} />
             <Route path="/products/:id" element={<ProductDetails />} />
+            <Route path="/web-development" element={<WebDevelopment />} />
             <Route path="/cart" element={<CartRoute />} />
             <Route path="/order-confirmation" element={<OrderConfirmationRoute />} />
             <Route path="/products/cart" element={<Navigate to="/cart" replace />} />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowRight, ShoppingCart, ShieldCheck, HeadphonesIcon, Zap, CheckCircle2 } from "lucide-react";
+import { ArrowRight, ShoppingCart, Zap, CheckCircle2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { getCategoryLabel, getProductBySlugOrId, type ProductVariationGroup } from "../data/products";
 import { useCartActions, type CartVariationSelection } from "../lib/CartContext";
@@ -301,30 +301,6 @@ export function ProductDetails() {
             </div>
           )}
 
-          <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div className="perf-card flex items-center gap-3 rounded-xl border border-white/5 bg-background/50 p-4 backdrop-blur-sm">
-              <Zap className="h-6 w-6 text-primary drop-shadow-[0_0_8px_rgba(255,0,122,0.5)]" />
-              <div>
-                <strong className="block text-sm font-heading">بدء سريع</strong>
-                <span className="text-xs text-muted-foreground font-sans">تنفيذ فوري للطلب</span>
-              </div>
-            </div>
-            <div className="perf-card flex items-center gap-3 rounded-xl border border-white/5 bg-background/50 p-4 backdrop-blur-sm">
-              <ShieldCheck className="h-6 w-6 text-secondary drop-shadow-[0_0_8px_rgba(0,212,255,0.5)]" />
-              <div>
-                <strong className="block text-sm font-heading">دفع آمن</strong>
-                <span className="text-xs text-muted-foreground font-sans">بوابات موثوقة</span>
-              </div>
-            </div>
-            <div className="perf-card flex items-center gap-3 rounded-xl border border-white/5 bg-background/50 p-4 backdrop-blur-sm">
-              <HeadphonesIcon className="h-6 w-6 text-success drop-shadow-[0_0_8px_rgba(0,230,118,0.5)]" />
-              <div>
-                <strong className="block text-sm font-heading">دعم 24/7</strong>
-                <span className="text-xs text-muted-foreground font-sans">متابعة مستمرة</span>
-              </div>
-            </div>
-          </div>
-
           <div className="perf-card mt-auto rounded-2xl border border-white/5 bg-background/40 p-6 backdrop-blur-md">
             <div className="mb-6 border-b border-white/5 pb-5 text-right" dir="rtl">
               <span className="mb-3 block text-sm font-bold text-muted-foreground font-sans">السعر الإجمالي</span>
@@ -372,8 +348,8 @@ export function ProductDetails() {
                 data-testid="add-to-cart-button"
                 onClick={handleAddToCart}
                 size="lg"
-                variant="outline"
-                className="h-14 flex-1 rounded-xl border-white/10 text-lg transition-all hover:bg-white/5 hover:text-primary backdrop-blur-md"
+                variant="ghost"
+                className="h-14 w-full rounded-xl border border-white/10 bg-background/50 text-lg transition-all hover:bg-white/5 hover:text-primary sm:flex-1"
                 disabled={product.outOfStock}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
@@ -383,10 +359,10 @@ export function ProductDetails() {
                 data-testid="buy-now-button"
                 onClick={handleBuyNow}
                 size="lg"
-                className="h-14 flex-1 rounded-xl text-lg shadow-[0_0_20px_rgba(255,0,122,0.4)] transition-all hover:shadow-[0_0_30px_rgba(255,0,122,0.6)]"
+                className="h-14 w-full rounded-full border border-white/20 bg-[linear-gradient(135deg,#f5d9fe_0%,#d0bcff_42%,#7d3cff_100%)] text-base font-black text-[#1d0c26] shadow-[0_14px_30px_rgba(125,60,255,0.34)] ring-1 ring-primary/20 transition-all active:scale-[0.98] hover:-translate-y-0.5 hover:shadow-[0_18px_38px_rgba(208,188,255,0.34)] disabled:translate-y-0 disabled:shadow-none sm:flex-1 sm:text-lg"
                 disabled={product.outOfStock}
               >
-                <Zap className="mr-2 h-5 w-5" />
+                <Zap className="h-5 w-5" />
                 {product.outOfStock ? "غير متوفر" : "اطلب الآن"}
               </Button>
             </div>

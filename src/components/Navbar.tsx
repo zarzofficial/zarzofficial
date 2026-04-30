@@ -18,6 +18,7 @@ export function Navbar() {
   const navLinks = [
     { name: "الرئيسية",  path: "/",        hasDropdown: false },
     { name: "المنتجات",  path: "/products", hasDropdown: true  },
+    { name: "تطوير المواقع", path: "/web-development", hasDropdown: false },
     { name: "تتبع طلبك", path: "/account",  hasDropdown: false },
     { name: "اتصل بنا", path: "/contact",  hasDropdown: false },
   ];
@@ -133,6 +134,10 @@ export function Navbar() {
           {/* Mobile: store icon */}
           <Link to="/products" className="md:hidden text-[#d0bcff] hover:text-white transition-colors">
             <SiteIcon name="storefront" className="text-[24px]" />
+          </Link>
+
+          <Link to="/web-development" className="md:hidden text-[#d0bcff] hover:text-white transition-colors">
+            <SiteIcon name="code" className="text-[24px]" />
           </Link>
 
           <Link
