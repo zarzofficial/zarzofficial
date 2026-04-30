@@ -334,7 +334,7 @@ export function Cart() {
                 <input data-testid="checkout-name" type="text" value={name} onChange={(event) => setName(event.target.value)} placeholder="الاسم الثلاثي" className="w-full bg-surface-container-highest border-none rounded-2xl p-4 text-on-surface focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-outline/40" />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-outline mr-2">البريد الإلكتروني</label>
+                <label className="text-sm font-medium text-outline mr-2">البريد الإلكتروني (اختياري)</label>
                 <input type="email" dir="ltr" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="example@email.com" className="w-full bg-surface-container-highest border-none rounded-2xl p-4 text-on-surface focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-outline/40 text-left" />
               </div>
               <div className="space-y-2 md:col-span-2">
