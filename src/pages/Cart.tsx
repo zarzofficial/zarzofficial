@@ -212,7 +212,7 @@ export function Cart() {
 
   return (
     <div className="pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto min-h-screen">
-      <div className="flex items-center justify-center mb-16 gap-2 sm:gap-4 rtl">
+      <div className="flex items-center justify-center mb-16 gap-1.5 sm:gap-4 rtl">
         <div className="flex flex-col items-center gap-2 transition-all duration-500">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${currentStep >= 1 ? "primary-gradient shadow-[0_0_20px_rgba(208,188,255,0.3)]" : "bg-surface-container border border-outline-variant/30"}`}>
             <SiteIcon name="shopping_basket" className={currentStep >= 1 ? "text-on-primary" : "text-outline"} />
@@ -220,7 +220,7 @@ export function Cart() {
           <span className={`text-xs font-bold transition-colors ${currentStep >= 1 ? "text-primary" : "text-outline"}`}>السلة</span>
         </div>
 
-        <div className={`w-10 sm:w-16 h-[2px] transition-colors duration-500 ${currentStep >= 2 ? "bg-primary shadow-[0_0_10px_rgba(208,188,255,0.3)]" : "bg-surface-container-highest"}`}></div>
+        <div className={`w-6 sm:w-16 h-[2px] transition-colors duration-500 ${currentStep >= 2 ? "bg-primary shadow-[0_0_10px_rgba(208,188,255,0.3)]" : "bg-surface-container-highest"}`}></div>
 
         <div className="flex flex-col items-center gap-2 transition-all duration-500">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${currentStep >= 2 ? "primary-gradient shadow-[0_0_20px_rgba(208,188,255,0.3)]" : "bg-surface-container border border-outline-variant/30"}`}>
@@ -229,13 +229,22 @@ export function Cart() {
           <span className={`text-xs font-bold transition-colors ${currentStep >= 2 ? "text-primary" : "text-outline"}`}>التفاصيل</span>
         </div>
 
-        <div className={`w-10 sm:w-16 h-[2px] transition-colors duration-500 ${currentStep >= 3 ? "bg-primary shadow-[0_0_10px_rgba(208,188,255,0.3)]" : "bg-surface-container-highest"}`}></div>
+        <div className={`w-6 sm:w-16 h-[2px] transition-colors duration-500 ${currentStep >= 3 ? "bg-primary shadow-[0_0_10px_rgba(208,188,255,0.3)]" : "bg-surface-container-highest"}`}></div>
 
         <div className="flex flex-col items-center gap-2 transition-all duration-500">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${currentStep >= 3 ? "primary-gradient shadow-[0_0_20px_rgba(208,188,255,0.3)]" : "bg-surface-container border border-outline-variant/30"}`}>
             <SiteIcon name="payments" className={currentStep >= 3 ? "text-on-primary" : "text-outline"} />
           </div>
           <span className={`text-xs font-bold transition-colors ${currentStep >= 3 ? "text-primary" : "text-outline"}`}>الدفع</span>
+        </div>
+
+        <div className={`w-6 sm:w-16 h-[2px] transition-colors duration-500 ${currentStep >= 4 ? "bg-primary shadow-[0_0_10px_rgba(208,188,255,0.3)]" : "bg-surface-container-highest"}`}></div>
+
+        <div className="flex flex-col items-center gap-2 transition-all duration-500">
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${currentStep >= 4 ? "primary-gradient shadow-[0_0_20px_rgba(208,188,255,0.3)]" : "bg-surface-container border border-outline-variant/30"}`}>
+            <SiteIcon name="check_circle" className={currentStep >= 4 ? "text-on-primary" : "text-outline"} />
+          </div>
+          <span className={`text-xs font-bold transition-colors ${currentStep >= 4 ? "text-primary" : "text-outline"}`}>التأكيد</span>
         </div>
       </div>
 
