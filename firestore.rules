@@ -7,7 +7,7 @@ service cloud.firestore {
 
     function isBootstrapAdmin() {
       return isSignedIn()
-        && request.auth.token.email is string
+        && request.auth.token.email != null
         && (request.auth.token.email == "medozxc7@gmail.com" || request.auth.token.email == "ezh37156@gmail.com");
     }
 
@@ -29,40 +29,25 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    function maySetOwnRoleToEmpty(data) {
-      return !('role' in data) || data.role == null;
-    }
-
-    function keepsOwnRoleUnchanged(data) {
-      return !('role' in data)
-        || (('role' in resource.data) && data.role == resource.data.role)
-        || (!('role' in resource.data) && data.role == null);
-    }
-
     function writesOwnUserRecord(userId) {
       return isOwnUser(userId)
         && request.resource.data.uid == userId;
     }
 
-    function orderBelongsToUser(userId) {
-      return !('userId' in request.resource.data)
-        || request.resource.data.userId == userId;
-    }
-
     match /users/{userId} {
       allow get: if isAdmin() || isOwnUser(userId);
       allow list: if isAdmin();
-      allow create: if isBootstrapAdmin() || (writesOwnUserRecord(userId) && maySetOwnRoleToEmpty(request.resource.data));
+      allow create: if isBootstrapAdmin() || (writesOwnUserRecord(userId) && request.resource.data.role == null);
       allow update: if isAdmin() || (
         writesOwnUserRecord(userId)
         && resource.data.uid == userId
-        && keepsOwnRoleUnchanged(request.resource.data)
+        && request.resource.data.role == resource.data.role
       );
       allow delete: if isAdmin();
 
       match /orders/{orderId} {
         allow read: if isAdmin() || isOwnUser(userId);
-        allow create: if isOwnUser(userId) && orderBelongsToUser(userId);
+        allow create: if isOwnUser(userId) && request.resource.data.userId == userId;
         allow update: if isAdmin();
         allow delete: if isAdmin() || isOwnUser(userId);
       }
