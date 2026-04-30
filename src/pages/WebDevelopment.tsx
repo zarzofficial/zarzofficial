@@ -255,6 +255,8 @@ export function WebDevelopment() {
         </div>
       </section>
 
+      <TrustedCompanies className="bg-surface/25" />
+
       <section className="bg-surface/35 px-6 py-16 md:px-12 md:py-20">
         <div className="mx-auto max-w-6xl">
           <SectionTitle
@@ -319,8 +321,6 @@ export function WebDevelopment() {
           </div>
         </div>
       </section>
-
-      <TrustedCompanies className="bg-surface/25" />
 
       <section id="website-calculator" className="px-6 py-16 md:px-12 md:py-20">
         <div className="mx-auto max-w-6xl">
