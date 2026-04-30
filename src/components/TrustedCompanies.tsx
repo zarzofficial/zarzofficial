@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 const partnerLogos = [
   {
     id: "honeytons",
@@ -11,15 +13,26 @@ const partnerLogos = [
   },
 ] as const;
 
-function PartnerLogoItems({ cycle }: { cycle: string }) {
+const partnerMarqueeCycles = ["main", "loop-1", "loop-2", "loop-3"] as const;
+
+const PartnerLogoItems = memo(function PartnerLogoItems({
+  cycle,
+  isDuplicate = false,
+}: {
+  cycle: string;
+  isDuplicate?: boolean;
+}) {
   return (
-    <>
+    <div
+      className="partner-marquee-cycle flex shrink-0 items-center gap-10 pe-10 md:gap-12 md:pe-12 lg:gap-20 lg:pe-20"
+      aria-hidden={isDuplicate ? "true" : undefined}
+    >
       {partnerLogos.map((logo) => {
         const content = "logoSrc" in logo ? (
           <img
             src={logo.logoSrc}
             alt={logo.label}
-            className="h-8 w-auto max-w-[9rem] object-contain opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.28)] md:h-10 md:max-w-[12rem]"
+            className="partner-marquee-logo h-8 w-auto max-w-[9rem] object-contain opacity-90 drop-shadow-[0_0_15px_rgba(255,255,255,0.28)] md:h-10 md:max-w-[12rem]"
             loading="lazy"
             decoding="async"
             width={160}
@@ -50,11 +63,11 @@ function PartnerLogoItems({ cycle }: { cycle: string }) {
           </div>
         );
       })}
-    </>
+    </div>
   );
-}
+});
 
-export function TrustedCompanies({ className = "" }: { className?: string }) {
+export const TrustedCompanies = memo(function TrustedCompanies({ className = "" }: { className?: string }) {
   return (
     <section className={`relative overflow-hidden px-6 py-16 md:px-12 md:py-20 ${className}`} dir="rtl">
       <div className="absolute inset-0 z-0 pointer-events-none">
@@ -79,48 +92,32 @@ export function TrustedCompanies({ className = "" }: { className?: string }) {
           </h2>
         </div>
 
-        <style>{`
-            @keyframes partner-marquee-sweep {
-              0% { transform: translate3d(100%, -50%, 0); }
-              100% { transform: translate3d(calc(-100vw - 100%), -50%, 0); }
-            }
-            .partner-marquee-track {
-              animation: partner-marquee-sweep 16s linear infinite;
-              will-change: transform;
-            }
-            .partner-marquee-shell:active .partner-marquee-track {
-              animation-play-state: paused;
-            }
-            @media (min-width: 1024px) {
-              .partner-marquee-track {
-                animation-duration: 24s;
-              }
-              .partner-marquee-shell:hover .partner-marquee-track {
-                animation-play-state: paused;
-              }
-            }
-          `}</style>
-
         <div
-          className="partner-marquee-shell relative h-14 w-full overflow-hidden opacity-80 grayscale transition-all duration-500 active:grayscale-0 lg:hidden [mask-image:linear-gradient(to_right,transparent_0,black_48px,black_calc(100%-48px),transparent_100%)]"
+          className="partner-marquee-shell relative h-14 w-full overflow-hidden opacity-80 grayscale transition-opacity duration-300 active:grayscale-0 lg:hidden [--partner-marquee-duration:20s] [mask-image:linear-gradient(to_right,transparent_0,black_48px,black_calc(100%-48px),transparent_100%)]"
           dir="ltr"
         >
-          <div className="partner-marquee-track absolute right-0 top-1/2 flex w-max items-center justify-start [&>div]:mx-5">
-            <PartnerLogoItems cycle="mobile-a" />
-            <PartnerLogoItems cycle="mobile-b" />
+          <div className="absolute inset-0 flex items-center overflow-hidden">
+            <div className="partner-marquee-track flex w-max items-center justify-start">
+              {partnerMarqueeCycles.map((cycle, index) => (
+                <PartnerLogoItems key={`mobile-${cycle}`} cycle={`mobile-${cycle}`} isDuplicate={index > 0} />
+              ))}
+            </div>
           </div>
         </div>
 
         <div
-          className="partner-marquee-shell relative hidden h-16 w-full overflow-hidden bg-surface/0 opacity-70 grayscale transition-all duration-700 hover:grayscale-0 lg:block lg:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]"
+          className="partner-marquee-shell relative hidden h-16 w-full overflow-hidden bg-surface/0 opacity-70 grayscale transition-opacity duration-500 hover:grayscale-0 lg:block lg:[--partner-marquee-duration:28s] lg:[mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]"
           dir="ltr"
         >
-          <div className="partner-marquee-track absolute right-0 top-1/2 flex w-max items-center justify-start [&>div]:mx-6 lg:[&>div]:mx-10">
-            <PartnerLogoItems cycle="desktop-a" />
-            <PartnerLogoItems cycle="desktop-b" />
+          <div className="absolute inset-0 flex items-center overflow-hidden">
+            <div className="partner-marquee-track flex w-max items-center justify-start">
+              {partnerMarqueeCycles.map((cycle, index) => (
+                <PartnerLogoItems key={`desktop-${cycle}`} cycle={`desktop-${cycle}`} isDuplicate={index > 0} />
+              ))}
+            </div>
           </div>
         </div>
       </div>
     </section>
   );
-}
+});

@@ -1,29 +1,30 @@
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+const coarsePointerQuery = "(pointer: coarse)";
+
+function subscribe(callback: () => void) {
+  if (typeof window === "undefined") return () => {};
+
+  const mediaQuery = window.matchMedia(coarsePointerQuery);
+
+  if ("addEventListener" in mediaQuery) {
+    mediaQuery.addEventListener("change", callback);
+    return () => mediaQuery.removeEventListener("change", callback);
+  }
+
+  const legacyMediaQuery = mediaQuery as MediaQueryList & {
+    addListener: (listener: () => void) => void;
+    removeListener: (listener: () => void) => void;
+  };
+
+  legacyMediaQuery.addListener(callback);
+  return () => legacyMediaQuery.removeListener(callback);
+}
+
+function getSnapshot() {
+  return typeof window !== "undefined" && window.matchMedia(coarsePointerQuery).matches;
+}
 
 export function useCoarsePointer() {
-  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const mediaQuery = window.matchMedia("(pointer: coarse)");
-    const updateMatch = () => setIsCoarsePointer(mediaQuery.matches);
-
-    updateMatch();
-
-    if ("addEventListener" in mediaQuery) {
-      mediaQuery.addEventListener("change", updateMatch);
-      return () => mediaQuery.removeEventListener("change", updateMatch);
-    }
-
-    const legacyMediaQuery = mediaQuery as MediaQueryList & {
-      addListener: (listener: (event: MediaQueryListEvent) => void) => void;
-      removeListener: (listener: (event: MediaQueryListEvent) => void) => void;
-    };
-
-    legacyMediaQuery.addListener(updateMatch);
-    return () => legacyMediaQuery.removeListener(updateMatch);
-  }, []);
-
-  return isCoarsePointer;
+  return useSyncExternalStore(subscribe, getSnapshot, () => false);
 }

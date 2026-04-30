@@ -5,48 +5,79 @@ import { Navbar } from "../components/Navbar";
 
 export function AppFrame({ children }: { children: ReactNode }) {
   useEffect(() => {
-    // Lenis smooth scroll ONLY for desktop (1024px+)
-    // On mobile, native scroll is always smoother — no JS interception
-    if (window.innerWidth < 1024) return;
-
+    const desktopQuery = window.matchMedia("(min-width: 1024px)");
     let frameId = 0;
     let disposed = false;
+    let activationId = 0;
+    let importPending = false;
     let lenis: { raf: (time: number) => void; destroy: () => void } | null = null;
 
-    void import("lenis")
-      .then(({ default: Lenis }) => {
-        if (disposed) return;
+    const stopLenis = () => {
+      activationId += 1;
+      importPending = false;
 
-        lenis = new Lenis({
-          duration: 1.8,
-          easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-          orientation: "vertical",
-          gestureOrientation: "vertical",
-          smoothWheel: true,
-          wheelMultiplier: 0.8,
-          touchMultiplier: 2,
-        });
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+        frameId = 0;
+      }
 
-        // Expose for keyboard snap navigation to use lenis.scrollTo directly.
-        (window as any).__lenis = lenis;
+      lenis?.destroy();
+      lenis = null;
+      delete (window as any).__lenis;
+    };
 
-        function raf(time: number) {
-          if (!lenis || disposed) return;
-          lenis.raf(time);
+    const startLenis = () => {
+      if (lenis || importPending) return;
+
+      const currentActivation = activationId;
+      importPending = true;
+
+      void import("lenis")
+        .then(({ default: Lenis }) => {
+          importPending = false;
+          if (disposed || currentActivation !== activationId || !desktopQuery.matches) return;
+
+          lenis = new Lenis({
+            duration: 1.8,
+            easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: "vertical",
+            gestureOrientation: "vertical",
+            smoothWheel: true,
+            wheelMultiplier: 0.8,
+            touchMultiplier: 2,
+          });
+
+          (window as any).__lenis = lenis;
+
+          function raf(time: number) {
+            if (!lenis || disposed) return;
+            lenis.raf(time);
+            frameId = requestAnimationFrame(raf);
+          }
+
           frameId = requestAnimationFrame(raf);
-        }
+        })
+        .catch((error) => {
+          importPending = false;
+          console.error("Lenis failed to load", error);
+        });
+    };
 
-        frameId = requestAnimationFrame(raf);
-      })
-      .catch((error) => {
-        console.error("Lenis failed to load", error);
-      });
+    const syncLenis = () => {
+      if (desktopQuery.matches) {
+        startLenis();
+      } else {
+        stopLenis();
+      }
+    };
+
+    syncLenis();
+    desktopQuery.addEventListener("change", syncLenis);
 
     return () => {
       disposed = true;
-      if (frameId) cancelAnimationFrame(frameId);
-      lenis?.destroy();
-      delete (window as any).__lenis;
+      desktopQuery.removeEventListener("change", syncLenis);
+      stopLenis();
     };
   }, []);
 

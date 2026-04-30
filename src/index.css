@@ -328,6 +328,52 @@
     touch-action: auto;
 }
 
+@keyframes partner-marquee-loop {
+    from {
+        transform: translate3d(0, 0, 0);
+    }
+
+    to {
+        transform: translate3d(-25%, 0, 0);
+    }
+}
+
+.partner-marquee-shell {
+    contain: layout paint;
+    isolation: isolate;
+    touch-action: pan-y;
+}
+
+.partner-marquee-track {
+    animation: partner-marquee-loop var(--partner-marquee-duration, 24s) linear infinite;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.partner-marquee-cycle {
+    backface-visibility: hidden;
+}
+
+.partner-marquee-shell:active .partner-marquee-track {
+    animation-play-state: paused;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .partner-marquee-shell:hover .partner-marquee-track {
+        animation-play-state: paused;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .partner-marquee-track {
+        animation: none !important;
+        transform: translate3d(0, 0, 0);
+        will-change: auto;
+    }
+}
+
 .perf-horizontal-cards .perf-panel,
 .perf-horizontal-cards .perf-card,
 .perf-horizontal-cards .perf-modal-card,
