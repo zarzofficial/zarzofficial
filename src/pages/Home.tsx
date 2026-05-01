@@ -624,6 +624,63 @@ export function Home() {
         <FeaturedProducts />
       </section>
 
+      {/* Web Development Section */}
+      <Section data-snap-section="true" className="perf-mobile-section bg-background px-4 py-10 sm:px-6 md:px-12 md:py-20 lg:flex lg:min-h-[80vh] lg:flex-col lg:justify-center">
+        <div className="mx-auto grid max-w-7xl gap-5 md:gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div className="text-start">
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-black text-primary">
+              <SiteIcon name="code" className="text-lg" />
+              تطوير المواقع
+            </span>
+            <h2 className="font-headline text-3xl font-black leading-tight text-on-background md:text-5xl">
+              موقعك جاهز ليعرض فكرتك ويستقبل طلباتك
+            </h2>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-outline md:text-lg md:leading-8">
+              نصمم مواقع ومتاجر إلكترونية متجاوبة وسريعة، مع خيار خاص لموقع إهداء للمناسبات مثل التخرج أو عيد الميلاد.
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link
+                to="/web-development"
+                className="primary-gradient inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-black text-on-primary transition-transform active:scale-95"
+              >
+                اطلب موقعك
+                <SiteIcon name="arrow_back" className="text-base" />
+              </Link>
+              <Link
+                to="/web-development#gift-offer"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-outline-variant/20 bg-surface-container-low px-6 text-sm font-bold text-on-background transition-colors hover:border-primary/35"
+              >
+                موقع إهداء 50,000 ج.س
+                <SiteIcon name="gift" className="text-base text-[#fbbf24]" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            {[
+              { icon: "phone_iphone", title: "متجاوب", text: "واجهة مناسبة للهاتف والديسكتوب." },
+              { icon: "bolt", title: "سريع", text: "صفحات خفيفة وتجربة واضحة." },
+              { icon: "shopping_cart", title: "طلبات", text: "ربط واتساب أو متجر حسب الحاجة." },
+              { icon: "gift", title: "موقع إهداء", text: "تجربة مناسبة للمناسبات والمفاجآت." },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="relative min-h-[6rem] overflow-hidden rounded-[1.1rem] border border-white/10 bg-[linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.018))] p-3 text-start shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] sm:min-h-[6.5rem] sm:p-4"
+              >
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <span className="h-1.5 w-8 rounded-full bg-primary/45" />
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
+                    <SiteIcon name={item.icon as SiteIconName} className="text-[0.95rem]" />
+                  </div>
+                </div>
+                <h3 className="font-headline text-sm font-black leading-5 text-on-background sm:text-base">{item.title}</h3>
+                <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-outline sm:text-xs sm:leading-5">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
       {/* Services Grid */}
       <Section data-snap-section="true" className="perf-mobile-section px-6 py-16 md:py-20 bg-surface-container-low md:px-12 relative overflow-hidden lg:flex lg:flex-col lg:justify-center lg:min-h-screen">
         <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-background to-transparent pointer-events-none z-0 border-t border-background"></div>
@@ -684,6 +741,16 @@ export function Home() {
                 iconName: "sports_esports",
                 link: "/products/catalog/gaming",
                 linkText: "تصفح العروض"
+              },
+              {
+                id: "web-development",
+                title: "تطوير المواقع",
+                description: "مواقع ومتاجر إلكترونية بتصميم سريع ومتجاوب، مناسبة لعرض خدماتك أو منتجاتك واستقبال الطلبات باحتراف.",
+                iconName: "code",
+                link: "/web-development",
+                linkText: "اطلب موقعك",
+                badge: "جديد",
+                subBadge: "Web Studio"
               }
             ].map((srv, idx) => {
               const isActive = activeIndex === idx;

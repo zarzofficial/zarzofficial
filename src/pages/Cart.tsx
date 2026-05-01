@@ -2,7 +2,6 @@ import { useEffect, useState, type MouseEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../lib/CartContext";
 import { useAuth } from "../lib/AuthContext";
-import { createOrder, startAnonymousSession } from "../lib/firebase";
 import {
   CART_CHECKOUT_DRAFT_KEY,
   CART_LOGIN_RETURN_KEY,
@@ -17,6 +16,18 @@ import {
 import { getResponsiveProductImage, handleResponsiveImageError } from "../lib/responsiveImage";
 import { isVisitorSessionPausedFor, resumeVisitorSession } from "../lib/visitor-session";
 import { SiteIcon } from "../components/SiteIcon";
+
+type FirebaseActions = typeof import("../lib/firebase");
+
+let firebaseActionsPromise: Promise<FirebaseActions> | null = null;
+
+function loadFirebaseActions() {
+  if (!firebaseActionsPromise) {
+    firebaseActionsPromise = import("../lib/firebase");
+  }
+
+  return firebaseActionsPromise;
+}
 
 function renderMeta(item: ReturnType<typeof useCart>["items"][number]) {
   const parts = [
@@ -62,8 +73,8 @@ export function Cart() {
       };
 
       setName(draft.name || currentUser?.displayName || "");
-      setEmail(draft.email || currentUser?.email || "");
-      setPhone(draft.phone || "");
+      setEmail((draft.email || currentUser?.email || "").slice(0, 254));
+      setPhone((draft.phone || "").replace(/\D/g, "").slice(0, 16));
       setPaymentMethod(draft.paymentMethod || "bankak");
       setReceiptNumber(draft.receiptNumber || "");
     } catch {
@@ -111,6 +122,7 @@ export function Cart() {
     });
 
     try {
+      const { createOrder, startAnonymousSession } = await loadFirebaseActions();
       const hasActiveAnonymousSession = Boolean(
         currentUser?.isAnonymous && !isVisitorSessionPausedFor(currentUser),
       );
@@ -330,11 +342,11 @@ export function Cart() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-outline mr-2">البريد الإلكتروني (اختياري)</label>
-                <input type="email" dir="ltr" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="example@email.com" className="w-full bg-surface-container-highest border-none rounded-2xl p-4 text-on-surface focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-outline/40 text-left" />
+                <input type="email" dir="ltr" value={email} onChange={(event) => setEmail(event.target.value.slice(0, 254))} maxLength={254} placeholder="example@email.com" className="w-full bg-surface-container-highest border-none rounded-2xl p-4 text-on-surface focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-outline/40 text-left" />
               </div>
               <div className="space-y-2 md:col-span-2">
                 <label className="text-sm font-medium text-outline mr-2">رقم الجوال</label>
-                <input data-testid="checkout-phone" type="tel" dir="ltr" value={phone} onChange={(event) => setPhone(event.target.value.replace(/\D/g, ""))} placeholder="01XXXXXXXX او 09XXXXXXXX" className="w-full bg-surface-container-highest border-none rounded-2xl p-4 text-on-surface focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-outline/40 text-left" />
+                <input data-testid="checkout-phone" type="tel" dir="ltr" value={phone} onChange={(event) => setPhone(event.target.value.replace(/\D/g, "").slice(0, 16))} maxLength={16} inputMode="numeric" placeholder="01XXXXXXXX او 09XXXXXXXX" className="w-full bg-surface-container-highest border-none rounded-2xl p-4 text-on-surface focus:ring-2 focus:ring-primary outline-none transition-all placeholder:text-outline/40 text-left" />
               </div>
             </div>
           </div>

@@ -122,8 +122,8 @@ function FeaturedProductsComponent() {
                     product.outOfStock ? "bg-surface-container-low/40 grayscale-[80%]" : "bg-surface-container-low/80"
                   }`}
                   style={{
-                    width: "72vw",
-                    maxWidth: 280,
+                    width: "64vw",
+                    maxWidth: 248,
                     scrollSnapAlign: "start",
                     // No will-change: 6 simultaneous layers on mobile = GPU memory pressure & more jank
                   }}
@@ -163,7 +163,7 @@ function FeaturedProductsComponent() {
                     )}
                   </div>
 
-                  <div className="flex flex-1 flex-col justify-between p-3.5 text-right" dir="rtl">
+                  <div className="flex flex-1 flex-col justify-between p-3 text-right" dir="rtl">
                     <div className="mb-2 flex items-center justify-between gap-2">
                       <span
                         className="rounded-full border px-2.5 py-1 text-[10px] font-bold"
@@ -178,13 +178,13 @@ function FeaturedProductsComponent() {
                       {product.title}
                     </h3>
 
-                    <p className="mb-3 line-clamp-2 text-[11px] leading-relaxed text-outline">{product.desc}</p>
+                    <p className="mb-2 line-clamp-1 text-[11px] leading-relaxed text-outline">{product.desc}</p>
 
-                    <div className="mt-auto flex min-h-[56px] items-end justify-between border-t border-outline-variant/10 pt-2.5">
+                    <div className="mt-auto flex min-h-[48px] items-end justify-between border-t border-outline-variant/10 pt-2.5">
                       {!product.outOfStock ? (
                         <div className="flex flex-col items-start gap-1.5" dir="rtl">
                           <div className="flex items-baseline gap-1.5">
-                            <span className="text-[1.6rem] font-black leading-none text-white">{formatSudanesePrice(product.basePrice)}</span>
+                            <span className="text-[1.25rem] font-black leading-none text-white">{formatSudanesePrice(product.basePrice)}</span>
                             <span className="text-[10px] font-bold text-primary/75">ج.س</span>
                           </div>
                           <div className="flex items-center gap-1.5">

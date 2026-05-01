@@ -5,17 +5,6 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "../components/ui/button";
 import { useAuth } from "../lib/AuthContext";
 import {
-  consumeGoogleRedirectError,
-  deleteOrderForCurrentUser,
-  loadOrdersForCurrentUser,
-  registerWithEmail,
-  sendPasswordReset,
-  signInWithEmail,
-  signInWithGoogleFlow,
-  signOutUser,
-  startAnonymousSession,
-} from "../lib/firebase";
-import {
   CART_LOGIN_RETURN_KEY,
   formatOrderDate,
   getOrderStatusText,
@@ -26,6 +15,18 @@ import {
   readVisitorSessionPaused,
   resumeVisitorSession,
 } from "../lib/visitor-session";
+
+type FirebaseActions = typeof import("../lib/firebase");
+
+let firebaseActionsPromise: Promise<FirebaseActions> | null = null;
+
+function loadFirebaseActions() {
+  if (!firebaseActionsPromise) {
+    firebaseActionsPromise = import("../lib/firebase");
+  }
+
+  return firebaseActionsPromise;
+}
 
 export function Account() {
   const { currentUser, loading: authLoading } = useAuth();
@@ -50,6 +51,7 @@ export function Account() {
         setOrders([]);
         return;
       }
+      const { loadOrdersForCurrentUser } = await loadFirebaseActions();
       setOrders(await loadOrdersForCurrentUser());
     } catch (error) {
       console.error(error);
@@ -69,10 +71,19 @@ export function Account() {
 
   useEffect(() => {
     if (authLoading) return;
-    const redirectError = consumeGoogleRedirectError();
-    if (!redirectError) return;
-    setFeedback(redirectError);
-    setFeedbackType("error");
+    let active = true;
+
+    void loadFirebaseActions().then(({ consumeGoogleRedirectError }) => {
+      if (!active) return;
+      const redirectError = consumeGoogleRedirectError();
+      if (!redirectError) return;
+      setFeedback(redirectError);
+      setFeedbackType("error");
+    });
+
+    return () => {
+      active = false;
+    };
   }, [authLoading]);
 
   useEffect(() => {
@@ -98,6 +109,8 @@ export function Account() {
     setFeedback("");
 
     try {
+      const { registerWithEmail, signInWithEmail } = await loadFirebaseActions();
+
       if (isLogin) {
         await signInWithEmail({ email, password });
         setFeedback("تم تسجيل الدخول بنجاح.");
@@ -128,6 +141,7 @@ export function Account() {
     setLoading(true);
     setFeedback("");
     try {
+      const { signInWithGoogleFlow } = await loadFirebaseActions();
       await signInWithGoogleFlow();
       resumeVisitorSession();
       setVisitorSessionPaused(false);
@@ -149,6 +163,7 @@ export function Account() {
     setLoading(true);
     setFeedback("");
     try {
+      const { startAnonymousSession } = await loadFirebaseActions();
       await startAnonymousSession();
       resumeVisitorSession();
       setVisitorSessionPaused(false);
@@ -176,6 +191,7 @@ export function Account() {
     setLoading(true);
     setFeedback("");
     try {
+      const { sendPasswordReset } = await loadFirebaseActions();
       await sendPasswordReset(email);
       setFeedback("تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك.");
       setFeedbackType("success");
@@ -199,6 +215,7 @@ export function Account() {
         throw new Error("يجب تسجيل الدخول أولاً لحذف الطلب.");
       }
 
+      const { deleteOrderForCurrentUser } = await loadFirebaseActions();
       await deleteOrderForCurrentUser(order.id);
       setOrders((currentOrders) => currentOrders.filter((entry) => entry.id !== order.id));
 
@@ -224,6 +241,7 @@ export function Account() {
         return;
       }
 
+      const { signOutUser } = await loadFirebaseActions();
       await signOutUser();
       setOrders([]);
       setFeedback("تم تسجيل الخروج بنجاح.");
@@ -437,7 +455,7 @@ export function Account() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-muted-foreground font-sans">البريد الإلكتروني</label>
-              <input data-testid="account-email" value={email} onChange={(event) => setEmail(event.target.value)} type="email" required className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all backdrop-blur-sm font-sans" placeholder="name@example.com" />
+              <input data-testid="account-email" value={email} onChange={(event) => setEmail(event.target.value.slice(0, 254))} type="email" maxLength={254} required className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all backdrop-blur-sm font-sans" placeholder="name@example.com" />
             </div>
 
             <div className="space-y-2">

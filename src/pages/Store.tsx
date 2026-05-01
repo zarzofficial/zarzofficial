@@ -47,10 +47,10 @@ type StoreViewportMetrics = {
 
 const viewportMetricsByColumns: Record<1 | 2 | 3 | 4, StoreViewportMetrics> = {
   1: {
-    cardHeight: 500,
-    imageHeight: 284,
-    rowGap: 16,
-    rowHeight: 516,
+    cardHeight: 416,
+    imageHeight: 210,
+    rowGap: 14,
+    rowHeight: 430,
     overscan: 15,
     headerHeight: 88,
     spacedHeaderHeight: 184,
@@ -164,7 +164,7 @@ function StoreProductCard({
 } & Attributes) {
   const discountPercent = getDiscountPercent();
   const originalPrice = getLegacyOriginalPrice(product.basePrice);
-  const imageFrameClassName = staticLayout ? "h-[284px] sm:h-[224px] lg:h-[200px] xl:h-[184px]" : "";
+  const imageFrameClassName = staticLayout ? "h-[210px] sm:h-[224px] lg:h-[200px] xl:h-[184px]" : "";
   const responsiveImage = getResponsiveProductImage(product.image);
   const shouldEagerLoadImage = prioritizeImage || !staticLayout;
 
@@ -226,18 +226,18 @@ function StoreProductCard({
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
-        <h3 className={`mb-2 line-clamp-1 text-[1.05rem] font-bold sm:text-xl ${product.outOfStock ? "text-outline" : ""}`}>
+      <div className="flex flex-1 flex-col p-3 sm:p-5">
+        <h3 className={`mb-1.5 line-clamp-1 text-[0.95rem] font-bold sm:mb-2 sm:text-xl ${product.outOfStock ? "text-outline" : ""}`}>
           {product.title}
         </h3>
-        <p className="mb-3 line-clamp-2 text-[13px] text-outline sm:mb-4 sm:text-sm">{product.desc}</p>
+        <p className="mb-2 line-clamp-1 text-[12px] text-outline sm:mb-4 sm:line-clamp-2 sm:text-sm">{product.desc}</p>
 
-        <div className="mt-auto flex flex-col gap-3 border-t border-outline-variant/10 pt-3 sm:gap-4 sm:pt-4">
-          <div className="flex w-full min-h-[66px] items-end justify-between">
+        <div className="mt-auto flex flex-col gap-2 border-t border-outline-variant/10 pt-2.5 sm:gap-4 sm:pt-4">
+          <div className="flex w-full min-h-[50px] items-end justify-between sm:min-h-[66px]">
             {!product.outOfStock ? (
-              <div className="flex flex-col items-start gap-1.5" dir="rtl">
+              <div className="flex flex-col items-start gap-1 sm:gap-1.5" dir="rtl">
                 <div className="flex items-baseline gap-1.5">
-                  <span className={`text-[1.7rem] font-black leading-none text-white sm:text-[1.9rem] ${metrics.reduceEffects ? "" : "drop-shadow-sm"}`}>
+                  <span className={`text-[1.35rem] font-black leading-none text-white sm:text-[1.9rem] ${metrics.reduceEffects ? "" : "drop-shadow-sm"}`}>
                     {formatSudanesePrice(product.basePrice)}
                   </span>
                   <span className="text-[10px] font-bold text-primary/75 sm:text-[11px]">ج.س</span>
@@ -262,14 +262,14 @@ function StoreProductCard({
             <button
               disabled={product.outOfStock}
               onClick={() => onOrderNow(product)}
-              className="flex-1 rounded-full primary-gradient py-2.5 text-center text-[12px] font-bold text-on-primary shadow-sm transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale sm:py-3 sm:text-[13px] md:text-base md:hover:scale-[1.02]"
+              className="flex-1 rounded-full primary-gradient py-2 text-center text-[12px] font-bold text-on-primary shadow-sm transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale sm:py-3 sm:text-[13px] md:text-base md:hover:scale-[1.02]"
             >
               اطلب الآن
             </button>
             <button
               disabled={product.outOfStock}
               onClick={() => onAddToCart(product)}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-outline-variant/30 bg-surface-container-highest text-primary shadow-sm transition-colors active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-transparent sm:h-12 sm:w-12 md:hover:bg-primary/10"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-outline-variant/30 bg-surface-container-highest text-primary shadow-sm transition-colors active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-transparent sm:h-12 sm:w-12 md:hover:bg-primary/10"
             >
               <SiteIcon name="add_shopping_cart" className="text-base sm:text-xl" />
             </button>
@@ -302,7 +302,7 @@ function StoreStaticSections({
               </h2>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8 xl:grid-cols-4">
+          <div className="grid grid-cols-[minmax(0,18.5rem)] justify-center gap-5 sm:grid-cols-2 sm:justify-stretch lg:grid-cols-3 lg:gap-8 xl:grid-cols-4">
             {categoryProducts.map((product, index) => (
               <StoreProductCard
                 key={product.id}
@@ -477,7 +477,7 @@ function MobileCategorySlider({
         {products.map((product, index) => (
           <div
             key={product.id}
-            className="h-full w-[calc(100vw-2.5rem)] shrink-0 snap-start snap-always"
+            className="h-full w-[min(18rem,76vw)] shrink-0 snap-start snap-always"
           >
             <StoreProductCard
               product={product}

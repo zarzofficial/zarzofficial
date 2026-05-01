@@ -13,6 +13,8 @@ function buildVariationDefaults(groups: ProductVariationGroup[]) {
   );
 }
 
+const MAX_PRODUCT_QUANTITY = 999999;
+
 export function ProductDetails() {
   const { id } = useParams();
   const product = getProductBySlugOrId(id);
@@ -57,7 +59,7 @@ export function ProductDetails() {
 
   const packageOptions = product.details.options || [];
   const selectedPackage = packageOptions[selectedPackageIndex] || null;
-  const safeQuantity = Math.max(1, Number(quantity) || 1);
+  const safeQuantity = Math.min(MAX_PRODUCT_QUANTITY, Math.max(1, Number(quantity) || 1));
   const unitPrice = selectedPackage?.price ?? product.basePrice;
   const totalPrice = unitPrice * safeQuantity;
   const totalOriginalPrice = getLegacyOriginalPrice(totalPrice);
@@ -235,8 +237,11 @@ export function ProductDetails() {
                       data-testid="product-quantity-input"
                       type="number"
                       min={1}
+                      max={MAX_PRODUCT_QUANTITY}
                       value={quantity}
-                      onChange={(event) => setQuantity(Math.max(1, Number(event.target.value) || 1))}
+                      onChange={(event) =>
+                        setQuantity(Math.min(MAX_PRODUCT_QUANTITY, Math.max(1, Number(event.target.value) || 1)))
+                      }
                       className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3 font-sans transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={product.outOfStock}
                     />
@@ -247,7 +252,7 @@ export function ProductDetails() {
                       <span className="text-xs text-muted-foreground">
                         {safeQuantity} × {formatSudanesePrice(unitPrice)}
                       </span>
-                      <span className="font-heading text-lg font-black text-white">
+                      <span className="min-w-0 break-all text-left font-heading text-lg font-black text-white">
                         {formatSudanesePrice(totalPrice)} <span className="text-xs text-primary/80">ج.س</span>
                       </span>
                     </div>
@@ -308,7 +313,7 @@ export function ProductDetails() {
                 {!product.outOfStock ? (
                   <div className="flex flex-col items-start gap-2 text-left" dir="ltr">
                     <div className="flex items-end gap-2">
-                      <span className="font-heading text-4xl font-black leading-none text-white md:text-5xl">
+                      <span className="min-w-0 break-all font-heading text-4xl font-black leading-none text-white md:text-5xl">
                         {formatSudanesePrice(totalPrice)}
                       </span>
                       <span className="pb-1 text-sm font-bold text-primary/80">ج.س</span>

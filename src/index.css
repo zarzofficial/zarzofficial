@@ -167,6 +167,19 @@
         touch-action: manipulation;
     }
 
+    input,
+    textarea,
+    select {
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    input,
+    textarea {
+        overflow-wrap: anywhere;
+        text-overflow: ellipsis;
+    }
+
     body {
         @apply bg-background text-foreground font-sans overflow-x-hidden;
     }

@@ -9,6 +9,9 @@ const PAGE_PRICE = 225000;
 const DOMAIN_PRICE = 530000;
 const PAYMENT_GATEWAY_PRICE = 620000;
 const BRAND_PRICE = 125000;
+const GIFT_WEBSITE_PRICE = 50000;
+const GIFT_WEBSITE_ORIGINAL_PRICE = 85000;
+const MAX_WEBSITE_PAGE_COUNT = 30;
 const storeHeaderImage = getResponsiveProductImage("/assets/store-header.avif");
 
 type InfoCard = {
@@ -166,35 +169,51 @@ export function WebDevelopment() {
   const [includeDomain, setIncludeDomain] = useState(false);
   const [includePaymentGateway, setIncludePaymentGateway] = useState(false);
   const [includeBrand, setIncludeBrand] = useState(false);
+  const [includeGiftWebsite, setIncludeGiftWebsite] = useState(false);
   const [details, setDetails] = useState("");
+  const [giftDetails, setGiftDetails] = useState("");
 
   const totalPrice = useMemo(() => {
+    if (includeGiftWebsite) {
+      return GIFT_WEBSITE_PRICE;
+    }
+
     return (
       pageCount * PAGE_PRICE +
       (includeDomain ? DOMAIN_PRICE : 0) +
       (includePaymentGateway ? PAYMENT_GATEWAY_PRICE : 0) +
       (includeBrand ? BRAND_PRICE : 0)
     );
-  }, [includeBrand, includeDomain, includePaymentGateway, pageCount]);
+  }, [includeBrand, includeDomain, includeGiftWebsite, includePaymentGateway, pageCount]);
 
   const handlePageCountChange = (value: string) => {
-    const nextValue = Math.max(1, Math.floor(Number(value) || 1));
+    const nextValue = Math.min(MAX_WEBSITE_PAGE_COUNT, Math.max(1, Math.floor(Number(value) || 1)));
     setPageCount(nextValue);
   };
 
   const handleWhatsappSubmit = () => {
-    const message = [
-      "طلب تطوير موقع أو متجر إلكتروني",
-      "",
-      `عدد الصفحات: ${pageCount}`,
-      `إضافة دومين: ${yesNo(includeDomain)}`,
-      `إضافة بوابة دفع: ${yesNo(includePaymentGateway)}`,
-      `تصميم شعار أو براند: ${yesNo(includeBrand)}`,
-      `السعر الإجمالي التقريبي: ${formatSudanesePrice(totalPrice)} ج.س`,
-      "",
-      "تفاصيل المشروع:",
-      details.trim() || "لم يتم كتابة تفاصيل إضافية.",
-    ].join("\n");
+    const message = includeGiftWebsite
+      ? [
+          "طلب موقع إهداء",
+          "",
+          "نوع المنتج: موقع إهداء مخصص",
+          `السعر: ${formatSudanesePrice(GIFT_WEBSITE_PRICE)} ج.س`,
+          "",
+          "تفاصيل موقع الإهداء:",
+          giftDetails.trim() || "لم يتم كتابة تفاصيل الإهداء.",
+        ].join("\n")
+      : [
+          "طلب تطوير موقع أو متجر إلكتروني",
+          "",
+          `عدد الصفحات: ${pageCount}`,
+          `إضافة دومين: ${yesNo(includeDomain)}`,
+          `إضافة بوابة دفع: ${yesNo(includePaymentGateway)}`,
+          `تصميم شعار أو براند: ${yesNo(includeBrand)}`,
+          `السعر الإجمالي التقريبي: ${formatSudanesePrice(totalPrice)} ج.س`,
+          "",
+          "تفاصيل المشروع:",
+          details.trim() || "لم يتم كتابة تفاصيل إضافية.",
+        ].join("\n");
 
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
   };
@@ -328,103 +347,238 @@ export function WebDevelopment() {
         </div>
       </section>
 
+      <section id="gift-offer" className="scroll-mt-24 bg-surface/35 px-4 py-10 md:px-12 md:py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-4 overflow-hidden rounded-[1.25rem] border border-[#fbbf24]/30 bg-[#fbbf24]/10 p-4 shadow-[0_14px_34px_rgba(0,0,0,0.22)] md:gap-6 md:rounded-[1.5rem] md:p-7 lg:grid-cols-[1.1fr_0.75fr] lg:items-center">
+            <div>
+              <span className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#fbbf24]/25 bg-[#fbbf24]/10 px-3 py-1 text-[11px] font-black text-[#fbbf24] md:mb-4 md:px-4 md:py-1.5 md:text-xs">
+                <SiteIcon name="gift" className="text-sm md:text-base" />
+                عرض موقع إهداء
+              </span>
+              <h2 className="font-headline text-2xl font-black leading-tight text-[#fbbf24] sm:text-3xl md:text-5xl">
+                أرسل موقعاً صغيراً للإهداء لا يُنسى
+              </h2>
+              <p className="mt-3 max-w-3xl text-xs leading-6 text-outline sm:text-sm md:mt-4 md:text-lg md:leading-8">
+                نجهز موقع إهداء أنيقاً باسم الشخص وصوره ورسالتك الخاصة، مناسباً لعيد ميلاد، تخرج، ذكرى، تهنئة، أو مفاجأة بسيطة يمكن إرسال رابطها مباشرة عبر واتساب.
+              </p>
+              <a
+                href="#website-order"
+                onClick={() => setIncludeGiftWebsite(true)}
+                className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#fbbf24] px-4 text-xs font-black text-[#1d0c26] transition-transform active:scale-[0.98] sm:w-auto md:mt-6 md:h-12 md:px-6 md:text-sm"
+              >
+                أضف موقع إهداء للطلب
+                <SiteIcon name="arrow_back" className="text-base" />
+              </a>
+            </div>
+            <div className="rounded-2xl border border-[#fbbf24]/20 bg-background/45 p-3 text-center md:rounded-[1.25rem] md:p-5">
+              <div className="flex items-center justify-between gap-3 text-right md:block md:text-center">
+                <div className="min-w-0">
+                  <span className="inline-flex rounded-full bg-[#ff3b30] px-2.5 py-1 text-[10px] font-black text-white md:mb-3 md:px-3 md:text-xs">
+                    عرض خاص
+                  </span>
+                  <div className="mt-1 text-[11px] font-bold text-outline md:text-sm">بدلاً من</div>
+                  <div className="text-sm font-black text-outline/60 line-through md:mt-1 md:text-2xl">
+                    {formatSudanesePrice(GIFT_WEBSITE_ORIGINAL_PRICE)} ج.س
+                  </div>
+                </div>
+                <strong className="shrink-0 font-headline text-3xl font-black leading-none text-white md:mt-3 md:block md:text-5xl">
+                  {formatSudanesePrice(GIFT_WEBSITE_PRICE)}
+                  <span className="mr-1 text-[11px] text-primary/85 md:mr-2 md:text-sm">ج.س</span>
+                </strong>
+              </div>
+              <p className="mt-3 hidden text-sm leading-7 text-outline sm:block">
+                يشمل تصميماً مناسباً للمناسبة ورسالة شخصية وطريقة مشاركة جاهزة.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="website-calculator" className="px-6 py-16 md:px-12 md:py-20">
         <div className="mx-auto max-w-6xl">
           <SectionTitle
             eyebrow="حاسبة تطوير الموقع"
             title="احسب تكلفة مشروعك مباشرة"
-            description="اختر عدد الصفحات والإضافات المطلوبة، وسيظهر السعر الإجمالي فوراً."
+            description="اختر نوع الطلب أولاً؛ الموقع العادي يُحسب بعدد الصفحات والإضافات، أما موقع الإهداء فسعره ثابت كتجربة مستقلة."
           />
 
           <div id="website-order" className="grid gap-6 lg:grid-cols-[1fr_0.95fr] lg:items-start">
             <div className="perf-card rounded-[1.5rem] border border-primary/15 bg-surface-container-low p-5 shadow-[0_18px_48px_rgba(0,0,0,0.25)] md:p-7">
-              <div className="mb-6">
-                <label htmlFor="page-count" className="mb-3 block text-sm font-bold text-[#d8d0e8]">
-                  عدد الصفحات
-                </label>
-                <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
-                  <input
-                    id="page-count"
-                    type="number"
-                    min={1}
-                    step={1}
-                    value={pageCount}
-                    onChange={(event) => handlePageCountChange(event.target.value)}
-                    className="h-14 w-full rounded-2xl border border-outline-variant/25 bg-background/55 px-4 text-lg font-black text-white outline-none ring-primary/40 transition focus:border-primary/50 focus:ring-2"
-                  />
-                  <span className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-outline">
-                    الصفحة = {formatSudanesePrice(PAGE_PRICE)} ج.س
+              <div className="mb-6 grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  aria-pressed={!includeGiftWebsite}
+                  onClick={() => setIncludeGiftWebsite(false)}
+                  className={`rounded-2xl border px-4 py-4 text-right transition-colors ${
+                    !includeGiftWebsite
+                      ? "border-primary/45 bg-primary/15 text-white"
+                      : "border-outline-variant/15 bg-background/35 text-outline hover:border-primary/30"
+                  }`}
+                >
+                  <span className="mb-1 flex items-center gap-2 text-sm font-black">
+                    <SiteIcon name="code" className="text-base text-primary" />
+                    موقع أو متجر
                   </span>
+                  <span className="block text-xs leading-6 text-outline">تسعير حسب عدد الصفحات والإضافات.</span>
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={includeGiftWebsite}
+                  onClick={() => setIncludeGiftWebsite(true)}
+                  className={`rounded-2xl border px-4 py-4 text-right transition-colors ${
+                    includeGiftWebsite
+                      ? "border-[#fbbf24]/55 bg-[#fbbf24]/12 text-white"
+                      : "border-outline-variant/15 bg-background/35 text-outline hover:border-[#fbbf24]/35"
+                  }`}
+                >
+                  <span className="mb-1 flex items-center gap-2 text-sm font-black">
+                    <SiteIcon name="gift" className="text-base text-[#fbbf24]" />
+                    موقع إهداء
+                  </span>
+                  <span className="block text-xs leading-6 text-outline">سعر ثابت لتصميم مستقل جاهز للإرسال.</span>
+                </button>
+              </div>
+
+              {includeGiftWebsite ? (
+                <div className="rounded-[1.25rem] border border-[#fbbf24]/25 bg-[#fbbf24]/10 p-5">
+                  <span className="inline-flex rounded-full bg-[#ff3b30] px-3 py-1 text-xs font-black text-white">
+                    عرض خاص
+                  </span>
+                  <h3 className="mt-4 font-headline text-2xl font-black text-white">موقع إهداء مخصص</h3>
+                  <p className="mt-2 text-sm leading-7 text-outline">
+                    هذا المنتج منفصل عن تسعيرة المواقع العادية، ويشمل تصميماً مناسباً للمناسبة ورسالة شخصية وطريقة مشاركة جاهزة.
+                  </p>
+                  <div className="mt-5 rounded-2xl border border-white/10 bg-background/45 p-4 text-center">
+                    <span className="block text-sm font-bold text-outline">سعر موقع الإهداء</span>
+                    <span className="mt-1 block text-lg font-black text-outline/60 line-through">
+                      {formatSudanesePrice(GIFT_WEBSITE_ORIGINAL_PRICE)} ج.س
+                    </span>
+                    <strong className="mt-2 block font-headline text-4xl font-black text-white">
+                      {formatSudanesePrice(GIFT_WEBSITE_PRICE)}
+                      <span className="mr-2 text-sm text-primary/85">ج.س</span>
+                    </strong>
+                  </div>
                 </div>
-              </div>
-
-              <div className="space-y-3">
-                {[
-                  {
-                    id: "domain",
-                    label: "إضافة دومين",
-                    price: DOMAIN_PRICE,
-                    checked: includeDomain,
-                    onChange: setIncludeDomain,
-                  },
-                  {
-                    id: "payment",
-                    label: "إضافة بوابة دفع",
-                    price: PAYMENT_GATEWAY_PRICE,
-                    checked: includePaymentGateway,
-                    onChange: setIncludePaymentGateway,
-                  },
-                  {
-                    id: "brand",
-                    label: "تصميم شعار أو براند",
-                    price: BRAND_PRICE,
-                    checked: includeBrand,
-                    onChange: setIncludeBrand,
-                  },
-                ].map((option) => (
-                  <label
-                    key={option.id}
-                    htmlFor={option.id}
-                    className="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-outline-variant/15 bg-background/35 px-4 py-4 transition-colors hover:border-primary/30"
-                  >
-                    <span className="flex items-center gap-3">
+              ) : (
+                <>
+                  <div className="mb-6">
+                    <label htmlFor="page-count" className="mb-3 block text-sm font-bold text-[#d8d0e8]">
+                      عدد الصفحات
+                    </label>
+                    <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
                       <input
-                        id={option.id}
-                        type="checkbox"
-                        checked={option.checked}
-                        onChange={(event) => option.onChange(event.target.checked)}
-                        className="h-5 w-5 accent-primary"
+                        id="page-count"
+                        type="number"
+                        min={1}
+                        max={MAX_WEBSITE_PAGE_COUNT}
+                        step={1}
+                        value={pageCount}
+                        onChange={(event) => handlePageCountChange(event.target.value)}
+                        className="h-14 w-full rounded-2xl border border-outline-variant/25 bg-background/55 px-4 text-lg font-black text-white outline-none ring-primary/40 transition focus:border-primary/50 focus:ring-2"
                       />
-                      <span className="font-bold text-on-background">{option.label}</span>
-                    </span>
-                    <span className="shrink-0 text-sm font-black text-primary">
-                      +{formatSudanesePrice(option.price)}
-                    </span>
-                  </label>
-                ))}
-              </div>
+                      <span className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold text-outline">
+                        الصفحة = {formatSudanesePrice(PAGE_PRICE)} ج.س
+                      </span>
+                    </div>
+                  </div>
 
-              <div className="mt-6 rounded-[1.25rem] border border-primary/20 bg-primary/10 p-5 text-center">
-                <span className="block text-sm font-bold text-outline">السعر الإجمالي التقريبي</span>
-                <strong className="mt-2 block font-headline text-4xl font-black text-white md:text-5xl">
-                  {formatSudanesePrice(totalPrice)}
-                  <span className="mr-2 text-sm text-primary/85">ج.س</span>
-                </strong>
-              </div>
+                  <div className="space-y-3">
+                    {[
+                      {
+                        id: "domain",
+                        label: "إضافة دومين",
+                        price: DOMAIN_PRICE,
+                        checked: includeDomain,
+                        onChange: setIncludeDomain,
+                      },
+                      {
+                        id: "payment",
+                        label: "إضافة بوابة دفع",
+                        price: PAYMENT_GATEWAY_PRICE,
+                        checked: includePaymentGateway,
+                        onChange: setIncludePaymentGateway,
+                      },
+                      {
+                        id: "brand",
+                        label: "تصميم شعار أو براند",
+                        price: BRAND_PRICE,
+                        checked: includeBrand,
+                        onChange: setIncludeBrand,
+                      },
+                    ].map((option) => (
+                      <label
+                        key={option.id}
+                        htmlFor={option.id}
+                        className="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-outline-variant/15 bg-background/35 px-4 py-4 transition-colors hover:border-primary/30"
+                      >
+                        <span className="flex items-center gap-3">
+                          <input
+                            id={option.id}
+                            type="checkbox"
+                            checked={option.checked}
+                            onChange={(event) => option.onChange(event.target.checked)}
+                            className="h-5 w-5 accent-primary"
+                          />
+                          <span className="font-bold text-on-background">{option.label}</span>
+                        </span>
+                        <span className="shrink-0 text-sm font-black text-primary">
+                          +{formatSudanesePrice(option.price)}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {!includeGiftWebsite && (
+                <div className="mt-6 rounded-[1.25rem] border border-primary/20 bg-primary/10 p-5 text-center">
+                  <span className="block text-sm font-bold text-outline">السعر الإجمالي التقريبي</span>
+                  <strong className="mt-2 block font-headline text-4xl font-black text-white md:text-5xl">
+                    {formatSudanesePrice(totalPrice)}
+                    <span className="mr-2 text-sm text-primary/85">ج.س</span>
+                  </strong>
+                </div>
+              )}
             </div>
 
             <div className="perf-card rounded-[1.5rem] border border-outline-variant/12 bg-surface-container-low p-5 shadow-[0_18px_48px_rgba(0,0,0,0.25)] md:p-7">
-              <label htmlFor="project-details" className="mb-3 block text-sm font-bold text-[#d8d0e8]">
-                نموذج طلب تطوير موقع
-              </label>
-              <textarea
-                id="project-details"
-                value={details}
-                onChange={(event) => setDetails(event.target.value)}
-                rows={10}
-                placeholder="اكتب فكرة المشروع، نوع الموقع المطلوب، تفاصيل المتجر، رابط موقع مشابه، أو أي ملاحظات إضافية..."
-                className="min-h-[260px] w-full resize-y rounded-2xl border border-outline-variant/25 bg-background/55 px-4 py-4 text-sm leading-7 text-white outline-none ring-primary/40 transition placeholder:text-outline/70 focus:border-primary/50 focus:ring-2"
-              />
+              {includeGiftWebsite ? (
+                <div className="rounded-[1.25rem] border border-[#fbbf24]/20 bg-[#fbbf24]/10 p-4">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <label htmlFor="gift-details" className="text-sm font-black text-[#fbbf24]">
+                      وصف موقع الإهداء
+                    </label>
+                    <span className="shrink-0 rounded-full bg-background/50 px-3 py-1 text-xs font-black text-white">
+                      {formatSudanesePrice(GIFT_WEBSITE_PRICE)} ج.س
+                    </span>
+                  </div>
+                  <p className="mb-3 text-xs leading-6 text-outline">
+                    اكتب المناسبة وما تريد ظهوره في الموقع: إهداء عيد ميلاد، تخرج، تهنئة، أسماء، رسالة قصيرة، ألوان مفضلة، أو أي فكرة خاصة.
+                  </p>
+                  <textarea
+                    id="gift-details"
+                    value={giftDetails}
+                    onChange={(event) => setGiftDetails(event.target.value)}
+                    rows={10}
+                    placeholder="مثال: موقع إهداء تخرج باسم محمد، أريد ألوان ذهبية ورسالة تهنئة وصورة شخصية وطريقة مشاركة سهلة..."
+                    className="min-h-[260px] w-full resize-y rounded-2xl border border-[#fbbf24]/25 bg-background/55 px-4 py-4 text-sm leading-7 text-white outline-none ring-[#fbbf24]/30 transition placeholder:text-outline/70 focus:border-[#fbbf24]/50 focus:ring-2"
+                  />
+                </div>
+              ) : (
+                <>
+                  <label htmlFor="project-details" className="mb-3 block text-sm font-bold text-[#d8d0e8]">
+                    نموذج طلب تطوير موقع
+                  </label>
+                  <textarea
+                    id="project-details"
+                    value={details}
+                    onChange={(event) => setDetails(event.target.value)}
+                    rows={10}
+                    placeholder="اكتب فكرة المشروع، نوع الموقع المطلوب، تفاصيل المتجر، رابط موقع مشابه، أو أي ملاحظات إضافية..."
+                    className="min-h-[260px] w-full resize-y rounded-2xl border border-outline-variant/25 bg-background/55 px-4 py-4 text-sm leading-7 text-white outline-none ring-primary/40 transition placeholder:text-outline/70 focus:border-primary/50 focus:ring-2"
+                  />
+                </>
+              )}
               <button
                 type="button"
                 onClick={handleWhatsappSubmit}

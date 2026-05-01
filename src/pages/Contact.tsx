@@ -113,6 +113,7 @@ export function Contact() {
                       type="email" 
                       id="email" 
                       required
+                      maxLength={254}
                       placeholder="example@zarz.com" 
                       className="w-full bg-surface-container-highest border-none rounded-2xl p-4 focus:ring-2 focus:ring-primary transition-all text-on-surface placeholder:text-outline" 
                     />

@@ -4,7 +4,18 @@ import { ArrowRight, Phone, MessageCircle, CheckCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { useCart } from "../lib/CartContext";
 import { useAuth } from "../lib/AuthContext";
-import { createOrder, startAnonymousSession } from "../lib/firebase";
+
+type FirebaseActions = typeof import("../lib/firebase");
+
+let firebaseActionsPromise: Promise<FirebaseActions> | null = null;
+
+function loadFirebaseActions() {
+  if (!firebaseActionsPromise) {
+    firebaseActionsPromise = import("../lib/firebase");
+  }
+
+  return firebaseActionsPromise;
+}
 
 export function Checkout() {
   const { items, total, clearCart } = useCart();
@@ -51,6 +62,7 @@ export function Checkout() {
     };
 
     try {
+        const { createOrder, startAnonymousSession } = await loadFirebaseActions();
         if (!currentUser) {
           await startAnonymousSession();
         }
@@ -128,7 +140,7 @@ export function Checkout() {
               
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground font-sans">رقم الهاتف</label>
-                <input value={phone} onChange={e=>setPhone(e.target.value)} type="tel" required className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all backdrop-blur-sm font-sans" />
+                <input value={phone} onChange={e=>setPhone(e.target.value.replace(/\D/g, "").slice(0, 16))} type="tel" inputMode="numeric" maxLength={16} required className="w-full bg-background/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all backdrop-blur-sm font-sans" />
               </div>
 
               <div className="space-y-2">
