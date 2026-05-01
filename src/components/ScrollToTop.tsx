@@ -43,12 +43,15 @@ export function ScrollToTop() {
               behavior: "auto",
             });
           }
-          return;
         }
 
         attempts += 1;
-        if (attempts < 80 && window.performance.now() - startedAt < 5000) {
-          timeoutId = window.setTimeout(scrollToTarget, 50);
+        const elapsed = window.performance.now() - startedAt;
+        const shouldRetryMissingTarget = !target && attempts < 80 && elapsed < 5000;
+        const shouldRetryAfterLayoutShift = Boolean(target) && attempts < 14 && elapsed < 2400;
+
+        if (shouldRetryMissingTarget || shouldRetryAfterLayoutShift) {
+          timeoutId = window.setTimeout(scrollToTarget, target ? 160 : 50);
         }
       };
 

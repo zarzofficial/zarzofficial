@@ -447,6 +447,24 @@
         touch-action: pan-y;
     }
 
+    /* Android Chrome changes the visual viewport while its toolbar hides/shows.
+       Keep screen-height utilities tied to the stable small viewport on mobile. */
+    @supports (min-height: 100svh) {
+        html,
+        body,
+        #root {
+            min-height: 100svh;
+        }
+
+        .min-h-screen {
+            min-height: 100svh !important;
+        }
+
+        .h-screen {
+            height: 100svh !important;
+        }
+    }
+
     /* 2. Hide ALL decorative blur glow divs — they trigger continuous GPU repaints */
     .home-mobile-glow,
     .mesh-gradient-bg,
@@ -517,6 +535,8 @@
     nav {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
         background: rgba(29, 12, 38, 0.96) !important;
         box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2) !important;
     }
