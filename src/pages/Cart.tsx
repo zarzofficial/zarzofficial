@@ -216,6 +216,10 @@ export function Cart() {
     navigate("/account");
   }
 
+  function getCartItemProductPath(item: ReturnType<typeof useCart>["items"][number]) {
+    return `/products/${item.productSlug || item.productId}`;
+  }
+
   let currentStep = 1;
   const hasItems = items.length > 0;
   const hasValidDetails = name.trim() !== "" && phone.trim() !== "";
@@ -275,11 +279,16 @@ export function Cart() {
               <div className="space-y-6">
                 {items.map((item, index) => {
                   const responsiveImage = getResponsiveProductImage(item.image);
+                  const productPath = getCartItemProductPath(item);
 
                   return (
                   <div key={item.cartId}>
-                    <div className="flex items-start sm:items-center gap-4 sm:gap-6 group">
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-[#13071A] p-1 flex items-center justify-center">
+                    <div className="flex items-start gap-4 sm:items-center sm:gap-6">
+                      <Link
+                        to={productPath}
+                        aria-label={`عرض ${item.title}`}
+                        className="group block w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-[#13071A] p-1"
+                      >
                         <img
                           alt={item.title}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -292,11 +301,19 @@ export function Cart() {
                           width={634}
                           height={634}
                         />
-                      </div>
+                      </Link>
                       <div className="flex-grow flex flex-col min-w-0">
                         <div className="flex justify-between items-start mb-2 gap-3 sm:gap-4">
-                          <h3 className="text-base sm:text-lg font-bold text-on-surface line-clamp-2">{item.title}</h3>
-                          <button onClick={() => removeItem(item.cartId)} className="text-outline hover:text-error transition-colors shrink-0 pt-1" type="button">
+                          <h3 className="text-base sm:text-lg font-bold text-on-surface line-clamp-2">
+                            <Link to={productPath} className="transition-colors hover:text-primary">
+                              {item.title}
+                            </Link>
+                          </h3>
+                          <button
+                            onClick={() => removeItem(item.cartId)}
+                            className="text-outline hover:text-error transition-colors shrink-0 pt-1"
+                            type="button"
+                          >
                             <SiteIcon name="delete" />
                           </button>
                         </div>
@@ -314,11 +331,19 @@ export function Cart() {
                         <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3 mt-1 sm:mt-2">
                           <span className="text-base sm:text-lg font-bold text-tertiary">{item.totalPrice.toFixed(2)} ج.س</span>
                           <div className="flex items-center bg-surface-container rounded-full px-4 py-1 gap-4 shrink-0 shadow-sm border border-white/5">
-                            <button onClick={() => updateQty(item.cartId, item.qty - 1)} className="text-primary hover:text-white" type="button">
+                            <button
+                              onClick={() => updateQty(item.cartId, item.qty - 1)}
+                              className="text-primary hover:text-white"
+                              type="button"
+                            >
                               <SiteIcon name="remove" className="text-sm" />
                             </button>
                             <span className="text-sm font-bold w-4 text-center text-on-surface">{item.qty}</span>
-                            <button onClick={() => updateQty(item.cartId, item.qty + 1)} className="text-primary hover:text-white" type="button">
+                            <button
+                              onClick={() => updateQty(item.cartId, item.qty + 1)}
+                              className="text-primary hover:text-white"
+                              type="button"
+                            >
                               <SiteIcon name="add" className="text-sm" />
                             </button>
                           </div>
