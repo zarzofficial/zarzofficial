@@ -53,7 +53,7 @@ const rawProducts: Product[] = [
     originalPrice: 20000,
     image: "/assets/chatgpt-plus-v4.avif",
     rating: "5.0",
-    outOfStock: false,
+    outOfStock: true,
     features: ["دخول بجهازين", "تجديد اشتراك أوفر", "ضمان كامل المدة", "دعم فني مستمر"],
     details: {
       type: "حساب خاص",
