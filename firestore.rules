@@ -176,7 +176,7 @@ service cloud.firestore {
     }
 
     function validPaymentReference(data) {
-      return (data.paymentMethod == "bankak" && data.paymentReference.matches("^[0-9]{4}$"))
+      return (data.paymentMethod == "bankak" && data.paymentReference is string && (data.paymentReference == "" || data.paymentReference.matches("^[0-9]{4}$")))
         || (data.paymentMethod == "whatsapp" && data.paymentReference is string && data.paymentReference.size() <= 80);
     }
 
