@@ -29,27 +29,204 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    function optionalString(data, key, maxSize) {
+      return !(key in data) || (data[key] is string && data[key].size() <= maxSize);
+    }
+
+    function userProfileFields() {
+      return ["uid", "name", "email", "phone", "photoURL", "emailVerified", "role", "createdAt"];
+    }
+
+    function userMutableFields() {
+      return ["uid", "name", "email", "phone", "photoURL", "emailVerified", "createdAt"];
+    }
+
+    function validUserRole(data) {
+      return !("role" in data) || data.role == null || data.role == "admin";
+    }
+
+    function validUserProfileFields(data, userId) {
+      return data.uid == userId
+        && data.uid is string
+        && optionalString(data, "name", 120)
+        && optionalString(data, "email", 254)
+        && optionalString(data, "phone", 32)
+        && optionalString(data, "photoURL", 500)
+        && (!("emailVerified" in data) || data.emailVerified is bool)
+        && (!("createdAt" in data) || data.createdAt is timestamp)
+        && validUserRole(data);
+    }
+
+    function validUserProfileCreate(userId) {
+      return request.resource.data.keys().hasOnly(userProfileFields())
+        && request.resource.data.keys().hasAll(["uid", "role", "createdAt"])
+        && validUserProfileFields(request.resource.data, userId);
+    }
+
+    function validUserProfileUpdate(userId) {
+      return resource.data.uid == userId
+        && request.resource.data.uid == userId
+        && request.resource.data.keys().hasOnly(userProfileFields())
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(userProfileFields())
+        && validUserProfileFields(request.resource.data, userId);
+    }
+
     function writesOwnUserRecord(userId) {
       return isOwnUser(userId)
         && request.resource.data.uid == userId;
     }
 
+    function validOwnUserCreate(userId) {
+      return writesOwnUserRecord(userId)
+        && validUserProfileCreate(userId)
+        && request.resource.data.role == null;
+    }
+
+    function validOwnUserUpdate(userId) {
+      return writesOwnUserRecord(userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(userMutableFields())
+        && request.resource.data.role == resource.data.role
+        && validUserProfileUpdate(userId);
+    }
+
+    function orderFields() {
+      return [
+        "orderNumber",
+        "name",
+        "phone",
+        "paymentMethod",
+        "paymentMethodLabel",
+        "paymentReference",
+        "total",
+        "currency",
+        "status",
+        "productId",
+        "items",
+        "details",
+        "quantity",
+        "userId",
+        "userEmail",
+        "date",
+        "dateMs"
+      ];
+    }
+
+    function orderItemCustomDataFields() {
+      return ["packageLabel", "targetLink", "playerId", "server", "recipientPhone", "variations"];
+    }
+
+    function validOrderItemCustomData(data) {
+      return data is map
+        && data.keys().hasOnly(orderItemCustomDataFields())
+        && (!("packageLabel" in data) || data.packageLabel == null || (data.packageLabel is string && data.packageLabel.size() <= 160))
+        && (!("targetLink" in data) || data.targetLink == null || (data.targetLink is string && data.targetLink.size() <= 500))
+        && (!("playerId" in data) || data.playerId == null || (data.playerId is string && data.playerId.size() <= 160))
+        && (!("server" in data) || data.server == null || (data.server is string && data.server.size() <= 120))
+        && (!("recipientPhone" in data) || data.recipientPhone == null || (data.recipientPhone is string && data.recipientPhone.size() <= 32))
+        && (!("variations" in data) || data.variations == null || (data.variations is string && data.variations.size() <= 1000));
+    }
+
+    function validOrderItem(item) {
+      return item is map
+        && item.keys().hasOnly(["title", "qty", "price", "productId", "customData"])
+        && item.keys().hasAll(["title", "qty", "price", "productId", "customData"])
+        && item.title is string
+        && item.title.size() >= 1
+        && item.title.size() <= 180
+        && item.qty is number
+        && item.qty >= 1
+        && item.qty <= 100
+        && item.price is number
+        && item.price >= 0
+        && item.price <= 1000000000
+        && item.productId is string
+        && item.productId.size() >= 1
+        && item.productId.size() <= 160
+        && validOrderItemCustomData(item.customData);
+    }
+
+    function validOrderItemAt(items, index) {
+      return items.size() <= index || validOrderItem(items[index]);
+    }
+
+    function validOrderItems(items) {
+      return items is list
+        && items.size() >= 1
+        && items.size() <= 20
+        && validOrderItemAt(items, 0)
+        && validOrderItemAt(items, 1)
+        && validOrderItemAt(items, 2)
+        && validOrderItemAt(items, 3)
+        && validOrderItemAt(items, 4)
+        && validOrderItemAt(items, 5)
+        && validOrderItemAt(items, 6)
+        && validOrderItemAt(items, 7)
+        && validOrderItemAt(items, 8)
+        && validOrderItemAt(items, 9)
+        && validOrderItemAt(items, 10)
+        && validOrderItemAt(items, 11)
+        && validOrderItemAt(items, 12)
+        && validOrderItemAt(items, 13)
+        && validOrderItemAt(items, 14)
+        && validOrderItemAt(items, 15)
+        && validOrderItemAt(items, 16)
+        && validOrderItemAt(items, 17)
+        && validOrderItemAt(items, 18)
+        && validOrderItemAt(items, 19);
+    }
+
+    function validPaymentReference(data) {
+      return (data.paymentMethod == "bankak" && data.paymentReference.matches("^[0-9]{4}$"))
+        || (data.paymentMethod == "whatsapp" && data.paymentReference is string && data.paymentReference.size() <= 80);
+    }
+
+    function validOrderCreate(userId) {
+      return request.resource.data.keys().hasOnly(orderFields())
+        && request.resource.data.keys().hasAll(orderFields())
+        && request.resource.data.userId == userId
+        && request.resource.data.userId is string
+        && request.resource.data.userEmail is string
+        && request.resource.data.userEmail.size() <= 254
+        && request.resource.data.orderNumber is string
+        && request.resource.data.orderNumber.matches("^[A-Z0-9]{8}$")
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 1
+        && request.resource.data.name.size() <= 120
+        && request.resource.data.phone is string
+        && request.resource.data.phone.matches("^[0-9]{6,16}$")
+        && (request.resource.data.paymentMethod == "bankak" || request.resource.data.paymentMethod == "whatsapp")
+        && request.resource.data.paymentMethodLabel is string
+        && request.resource.data.paymentMethodLabel.size() <= 80
+        && validPaymentReference(request.resource.data)
+        && request.resource.data.total is string
+        && request.resource.data.total.size() <= 40
+        && request.resource.data.currency == "SDG"
+        && request.resource.data.status == "pending"
+        && (request.resource.data.productId == null || (request.resource.data.productId is string && request.resource.data.productId.size() <= 160))
+        && validOrderItems(request.resource.data.items)
+        && request.resource.data.details is string
+        && request.resource.data.details.size() <= 4000
+        && request.resource.data.quantity is number
+        && request.resource.data.quantity >= 1
+        && request.resource.data.quantity <= 100
+        && request.resource.data.date is timestamp
+        && request.resource.data.dateMs is number;
+    }
+
     match /users/{userId} {
       allow get: if isAdmin() || isOwnUser(userId);
       allow list: if isAdmin();
-      allow create: if isBootstrapAdmin() || (writesOwnUserRecord(userId) && request.resource.data.role == null);
+      allow create: if (isBootstrapAdmin() && validUserProfileCreate(userId)) || validOwnUserCreate(userId);
       allow update: if isAdmin() || (
-        writesOwnUserRecord(userId)
-        && resource.data.uid == userId
-        && request.resource.data.role == resource.data.role
+        validOwnUserUpdate(userId)
       );
       allow delete: if isAdmin();
 
       match /orders/{orderId} {
         allow read: if isAdmin() || isOwnUser(userId);
-        allow create: if isOwnUser(userId) && request.resource.data.userId == userId;
+        allow create: if isOwnUser(userId) && validOrderCreate(userId);
         allow update: if isAdmin();
-        allow delete: if isAdmin() || isOwnUser(userId);
+        allow delete: if isAdmin() || (isOwnUser(userId) && resource.data.status == "pending");
       }
     }
 
